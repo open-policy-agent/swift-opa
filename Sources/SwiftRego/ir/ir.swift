@@ -31,17 +31,15 @@ struct BuiltinFunc: Codable, Equatable {
     //    var decl : FunctionDecl
 }
 
-/*
- struct FunctionDecl : Codable {
- var args [Type]
- var result Type
- var variadic Type
- }
-
- struct Type : Codable {
-
- }
- */
+// struct FunctionDecl : Codable {
+// var args [Type]
+// var result Type
+// var variadic Type
+// }
+//
+// struct Type : Codable {
+//
+// }
 
 struct Plans: Codable, Equatable {
     var plans: [Plan] = []
@@ -77,7 +75,7 @@ struct Block: Codable, Equatable {
             var outStmt: any Statement
 
             switch anyStmt.type {
-            case .CallStmt:
+            case .callStmt:
                 outStmt = try inner.decode(CallStatement.self, forKey: .innerStatement)
             //            case .AssignVarStmt:
             //            case .MakeObjectStmt:
@@ -85,7 +83,7 @@ struct Block: Codable, Equatable {
             //            case .ResultSetAddStmt:
             default:
                 //                 TODO This wouldn't get here if the type was unknown :/
-                throw StatementError.Unknown(anyStmt.type.rawValue)
+                throw StatementError.unknown(anyStmt.type.rawValue)
             //                outStmt = CallStatement()
             //                print("skipping \(anyStmt.type.rawValue)")
             }
@@ -100,7 +98,7 @@ struct Block: Codable, Equatable {
     }
 
     func encode(to encoder: any Encoder) throws {
-        throw EncodingError.Unsupported
+        throw EncodingError.unsupported
     }
 
     static func == (lhs: Self, rhs: Self) -> Bool {
@@ -120,11 +118,11 @@ struct Block: Codable, Equatable {
 // statement decoding.
 struct AnyStatement: Codable, Equatable {
     enum KnownStatements: String, Codable {
-        case CallStmt
-        case AssignVarStmt
-        case MakeObjectStmt
-        case ObjectInsertStmt
-        case ResultSetAddStmt
+        case callStmt = "CallStmt"
+        case assignVarStmt = "AssignVarStmt"
+        case makeObjectStmt = "MakeObjectStmt"
+        case objectInsertStmt = "ObjectInsertStmt"
+        case resultSetAddStmt = "ResultSetAddStmt"
     }
     enum CodingKeys: String, CodingKey {
         case type
@@ -141,10 +139,10 @@ struct Location: Codable, Equatable {
 }
 
 enum StatementError: Error {
-    case Unknown(String)
+    case unknown(String)
 }
 enum EncodingError: Error {
-    case Unsupported
+    case unsupported
 }
 
 // Statement is implemented by each conctete statement type
@@ -172,7 +170,7 @@ struct Argument: Codable, Equatable {
 }
 
 struct Funcs: Codable, Equatable {
-    var Funcs: [Func] = []
+    var funcs: [Func] = []
 }
 
 struct Func: Codable, Equatable {
@@ -200,15 +198,15 @@ struct AssignVarStatement: Statement, Codable, Equatable {
 
 struct Operand: Equatable {
     enum OpType: String, Codable, Equatable {
-        case local
-        case bool
-        case string_index
+        case local = "local"
+        case bool = "bool"
+        case stringIndex = "string_index"
     }
 
     enum Value: Equatable {
         case number(Int)
         case bool(Bool)
-        case string_index(Int)
+        case stringIndex(Int)
     }
 
     var type: OpType
@@ -236,14 +234,14 @@ extension Operand: Codable {
         case .bool:
             let v = try container.decode(Bool.self, forKey: .value)
             self.value = Value.bool(v)
-        case .string_index:
+        case .stringIndex:
             let v = try container.decode(Int.self, forKey: .value)
-            self.value = Value.string_index(v)
+            self.value = Value.stringIndex(v)
         }
     }
 
     func encode(to encoder: any Encoder) throws {
-        throw EncodingError.Unsupported
+        throw EncodingError.unsupported
     }
 
 }

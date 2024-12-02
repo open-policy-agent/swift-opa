@@ -9,6 +9,9 @@ struct decodeIRTestCase {
     var json: String
     var policy: Policy
 }
+extension decodeIRTestCase : CustomTestStringConvertible {
+    var testDescription: String { name }
+}
 
 @Test(arguments: [
     decodeIRTestCase(
@@ -76,10 +79,10 @@ enum ResultExpectation<Success, Failure> {
 
 @Test("decodeIR Operands")
 func decodeIROperands() throws {
-    struct testCase {
+    struct testCase: Sendable {
         var name: String?
         var json: String
-        var expected: ResultExpectation<Operand, Error.Type>
+        var expected: ResultExpectation<Operand, any (Error.Type)>
     }
 
     for tc in [
@@ -133,13 +136,12 @@ func decodeIROperands() throws {
             expected: .failure(DecodingError.self)
         ),
         testCase(
-            name: "missing value",
+            name: "missing value field",
             json: #"""
                 {
                     "type": "local",
                 }
                 """#,
-            //expected: .success(Operand(type: .local, value: .number(7)))  //.failure(DecodingError.self)
             expected: .failure(DecodingError.self)
         )
     ] {
@@ -147,6 +149,7 @@ func decodeIROperands() throws {
              try JSONDecoder()
                 .decode(Operand.self, from: tc.json.data(using: .utf8)!)
         }
+        
         switch tc.expected {
         case .success(let expectedValue):
             #expect(throws: Never.self, commentFor(tc.name)) {
@@ -159,19 +162,12 @@ func decodeIROperands() throws {
                 return
             }
             #expect(actual == expectedValue, commentFor(tc.name))
-        case .failure(_):
-            // TODO check the exact error!!
-            #expect(throws: (any Error).self, commentFor(tc.name)) { try result.get() }
-//            #expect{try actual.get()} throws: { error in
-//                error is errType
-//            }
-//            do {
-//                try actual.get()
-//            }
-//            catch let err {
-//                #expect(err is errType.self)
-//            }
-//            #expect(error: errType) { try actual.get() }
+        case .failure(let expectedErr):
+            #expect(commentFor(tc.name)){ try result.get() } throws: { error in
+                let mirror = Mirror(reflecting: error)
+                let b: Bool = mirror.subjectType == expectedErr
+                return b
+            }
         }
     }
 }

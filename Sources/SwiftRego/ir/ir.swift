@@ -50,8 +50,29 @@ struct Plan: Codable, Equatable {
     var blocks: [Block]
 }
 
-struct Block: Codable, Equatable {
-    // TODO
+struct Block: Equatable {
+    var statements: [any Statement]
+
+    // TODO TODO
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        guard lhs.statements.count == rhs.statements.count else {
+            return false
+        }
+
+        //        for i in 0..<lhs.statements.count {
+        //            guard lhs.statements[i] == rhs.statements[i] else {
+        //                return false
+        //            }
+        //        }
+
+        // TODO
+
+        return true
+    }
+
+}
+
+extension Block: Codable {
     enum CodingKeys: String, CodingKey {
         case statements = "stmts"
     }
@@ -59,9 +80,6 @@ struct Block: Codable, Equatable {
     enum InnerCodingKeys: String, CodingKey {
         case innerStatement = "stmt"
     }
-    //var statements: Statements
-    var statements: [any Statement]
-
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         var iter = try container.nestedUnkeyedContainer(forKey: .statements)
@@ -77,19 +95,21 @@ struct Block: Codable, Equatable {
             switch anyStmt.type {
             case .callStmt:
                 outStmt = try inner.decode(CallStatement.self, forKey: .innerStatement)
-            //            case .AssignVarStmt:
-            //            case .MakeObjectStmt:
-            //            case .ObjectInsertStmt:
-            //            case .ResultSetAddStmt:
-            default:
-                //                 TODO This wouldn't get here if the type was unknown :/
-                throw StatementError.unknown(anyStmt.type.rawValue)
-            //                outStmt = CallStatement()
-            //                print("skipping \(anyStmt.type.rawValue)")
+            case .assignVarStmt:
+                outStmt = try inner.decode(AssignVarStatement.self, forKey: .innerStatement)
+            case .makeObjectStmt:
+                outStmt = try inner.decode(MakeObjectStatement.self, forKey: .innerStatement)
+            case .objectInsertStmt:
+                outStmt = try inner.decode(ObjectInsertStatement.self, forKey: .innerStatement)
+            case .resultSetAddStmt:
+                outStmt = try inner.decode(ResultSetAddStatement.self, forKey: .innerStatement)
+            //            default:
+            //                // TODO This wouldn't get here if the type was unknown :/
+            //                throw StatementError.unknown(anyStmt.type.rawValue)
             }
 
             // Set location properties shared by any statement type
-            outStmt.location = anyStmt.location
+            outStmt.location = anyStmt.inner.location
 
             out.append(outStmt)
         }
@@ -100,17 +120,6 @@ struct Block: Codable, Equatable {
     func encode(to encoder: any Encoder) throws {
         throw EncodingError.unsupported
     }
-
-    static func == (lhs: Self, rhs: Self) -> Bool {
-        guard lhs.statements.count == rhs.statements.count else {
-            return false
-        }
-
-        // TODO
-
-        return true
-    }
-
 }
 
 // AnyStatement represents the generic parts of a statement - its type and location.
@@ -126,10 +135,21 @@ struct AnyStatement: Codable, Equatable {
     }
     enum CodingKeys: String, CodingKey {
         case type
-        case location = "stmt"
+        case inner = "stmt"
     }
     var type: KnownStatements
-    var location: Location
+    var inner: AnyInnerStatement
+}
+
+// AnyInnerStatement represents the generic stmt field, which should always contain location fields.
+struct AnyInnerStatement: Codable, Equatable {
+    var location: Location {
+        Location(row: row, col: col, file: file)
+    }
+
+    var row: Int = 0
+    var col: Int = 0
+    var file: Int = 0
 }
 
 struct Location: Codable, Equatable {
@@ -190,10 +210,17 @@ struct Func: Codable, Equatable {
 }
 // -=-=-=-= End CallStatement -=-=-=-=
 
+typealias Local = UInt32
 struct AssignVarStatement: Statement, Codable, Equatable {
     var location: Location = Location()
 
+    enum CodingKeys: String, CodingKey {
+        case source
+        case target
+    }
+
     var source: Operand
+    var target: Local
 }
 
 struct Operand: Equatable {
@@ -211,6 +238,40 @@ struct Operand: Equatable {
 
     var type: OpType
     var value: Value
+}
+// -=-=-=-= End Assign*Statement -=-=-=-=
+
+struct MakeObjectStatement: Statement, Codable, Equatable {
+    var location: Location = Location()
+
+    enum CodingKeys: String, CodingKey {
+        case target
+    }
+
+    var target: Local
+}
+
+struct ObjectInsertStatement: Statement, Codable, Equatable {
+    var location: Location = Location()
+
+    enum CodingKeys: String, CodingKey {
+        case key
+        case value
+        case object
+    }
+
+    var key: Operand
+    var value: Operand
+    var object: Local
+}
+
+struct ResultSetAddStatement: Statement, Codable, Equatable {
+    var location: Location = Location()
+
+    enum CodingKeys: String, CodingKey {
+        case value
+    }
+    var value: Local
 }
 
 // Apparently, when defining a custom initializer in the struct, it suppresses generation

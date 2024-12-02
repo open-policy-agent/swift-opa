@@ -62,9 +62,65 @@ func decodeIRStatements() throws {
         DecodeIRTestCase(
             name: "simple",
             json: #"""
-                {"plans":{"plans":[{"name":"policy/hello","blocks":[{"stmts":[{"type":"CallStmt","stmt":{"func":"g0.data.policy.hello","args":[{"type":"local","value":0},{"type":"local","value":1}],"result":2,"file":9,"col":8,"row":0}},{"type":"AssignVarStmt","stmt":{"source":{"type":"local","value":2},"target":3,"file":0,"col":0,"row":0}},{"type":"MakeObjectStmt","stmt":{"target":4,"file":0,"col":0,"row":0}},{"type":"ObjectInsertStmt","stmt":{"key":{"type":"string_index","value":0},"value":{"type":"local","value":3},"object":4,"file":0,"col":0,"row":0}},{"type":"ResultSetAddStmt","stmt":{"value":4,"file":0,"col":0,"row":0}}]}]}]}}
+                {"plans":{"plans":[{"name":"policy/hello","blocks":[{"stmts":[{"type":"CallStmt","stmt":{"func":"g0.data.policy.hello","args":[{"type":"local","value":0},{"type":"local","value":1}],"result":2,"file":9,"col":8,"row":0}},{"type":"AssignVarStmt","stmt":{"source":{"type":"local","value":2},"target":3,"file":3,"col":2,"row":1}},{"type":"MakeObjectStmt","stmt":{"target":4,"file":0,"col":0,"row":0}},{"type":"ObjectInsertStmt","stmt":{"key":{"type":"string_index","value":0},"value":{"type":"local","value":3},"object":4,"file":0,"col":0,"row":0}},{"type":"ResultSetAddStmt","stmt":{"value":4,"file":0,"col":0,"row":0}}]}]}]}}
                 """#,
-            policy: Policy()
+            policy: Policy(
+                plans: Plans(
+                    plans: [
+                        Plan(
+                            name: "policy/hello",
+                            blocks: [
+                                Block(
+                                    statements: [
+                                        CallStatement(
+                                            location: Location(row: 0, col: 8, file: 9),
+                                            callFunc: "g0.data.policy.hello",
+                                            args: [
+                                                Argument(
+                                                    type: "local",
+                                                    value: 0
+                                                ),
+                                                Argument(
+                                                    type: "local",
+                                                    value: 1
+                                                ),
+                                            ]
+                                        ),
+                                        AssignVarStatement(
+                                            location: Location(row: 1, col: 2, file: 3),
+                                            source: Operand(
+                                                type: .local,
+                                                value: .number(2)
+                                            ),
+                                            target: 3
+                                        ),
+                                        MakeObjectStatement(
+                                            location: Location(row: 0, col: 0, file: 0),
+                                            target: 4
+                                        ),
+                                        ObjectInsertStatement(
+                                            location: Location(row: 0, col: 0, file: 0),
+                                            key: Operand(
+                                                type: .stringIndex,
+                                                value: .stringIndex(0)
+                                            ),
+                                            value: Operand(
+                                                type: .local,
+                                                value: .number(3)
+                                            ),
+                                            object: 4
+                                        ),
+                                        ResultSetAddStatement(
+                                            location: Location(row: 0, col: 0, file: 0),
+                                            value: 4
+                                        ),
+                                    ]
+                                )
+                            ]
+                        )
+                    ]
+                )
+            )
         )
     ] {
         let actual = try JSONDecoder().decode(Policy.self, from: tc.json.data(using: .utf8)!)

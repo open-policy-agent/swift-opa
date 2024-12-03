@@ -50,7 +50,7 @@ struct Plan: Codable, Equatable {
     var blocks: [Block]
 }
 
-struct Block: Equatable {
+struct Block: Sendable, Equatable {
     var statements: [any Statement]
 
     // Equatable, we need a custom implementation for dynamic dispatch
@@ -102,6 +102,20 @@ extension Block: Codable {
                 outStmt = try inner.decode(ObjectInsertStatement.self, forKey: .innerStatement)
             case .resultSetAddStmt:
                 outStmt = try inner.decode(ResultSetAddStatement.self, forKey: .innerStatement)
+            case .resetLocalStmt:
+                outStmt = try inner.decode(ResetLocalStatement.self, forKey: .innerStatement)
+            case .dotStmt:
+                outStmt = try inner.decode(DotStatement.self, forKey: .innerStatement)
+            case .equalStmt:
+                outStmt = try inner.decode(EqualStatement.self, forKey: .innerStatement)
+            case .isDefinedStmt:
+                outStmt = try inner.decode(IsDefinedStatement.self, forKey: .innerStatement)
+            case .isUndefinedStmt:
+                outStmt = try inner.decode(IsUndefinedStatement.self, forKey: .innerStatement)
+            case .assignVarOnceStmt:
+                outStmt = try inner.decode(AssignVarOnceStatement.self, forKey: .innerStatement)
+            case .returnLocalStmt:
+                outStmt = try inner.decode(ReturnLocalStatement.self, forKey: .innerStatement)
             //            default:
             //                // TODO This wouldn't get here if the type was unknown :/
             //                throw StatementError.unknown(anyStmt.type.rawValue)
@@ -131,6 +145,13 @@ struct AnyStatement: Codable, Equatable {
         case makeObjectStmt = "MakeObjectStmt"
         case objectInsertStmt = "ObjectInsertStmt"
         case resultSetAddStmt = "ResultSetAddStmt"
+        case dotStmt = "DotStmt"
+        case equalStmt = "EqualStmt"
+        case isDefinedStmt = "IsDefinedStmt"
+        case isUndefinedStmt = "IsUndefinedStmt"
+        case assignVarOnceStmt = "AssignVarOnceStmt"
+        case resetLocalStmt = "ResetLocalStmt"
+        case returnLocalStmt = "ReturnLocalStmt"
     }
     enum CodingKeys: String, CodingKey {
         case type
@@ -165,7 +186,7 @@ enum EncodingError: Error {
 }
 
 // Statement is implemented by each conctete statement type
-protocol Statement {
+protocol Statement: Sendable {
     // Location coordinates, shared by all concrete statement
     var location: Location { get set }
 
@@ -206,7 +227,7 @@ struct Func: Codable, Equatable {
     var name: String
     var path: [String]
     var params: [Int]
-    var returnVar: Int
+    var returnVar: Local
     var blocks: [Block]
 
     enum CodingKeys: String, CodingKey {
@@ -302,6 +323,144 @@ struct ResultSetAddStatement: Statement, Codable, Equatable {
         case value
     }
     var value: Local
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
+    }
+}
+
+struct DotStatement: Statement, Codable, Equatable {
+    var location: Location = Location()
+
+    enum CodingKeys: String, CodingKey {
+        case source
+        case key
+        case target
+    }
+    var source: Operand
+    var key: Operand
+    var target: Local
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
+    }
+}
+
+struct EqualStatement: Statement, Codable, Equatable {
+    var location: Location = Location()
+
+    enum CodingKeys: String, CodingKey {
+        case a
+        case b
+    }
+    var a: Operand
+    var b: Operand
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
+    }
+}
+
+struct AssignVarOnceStatement: Statement, Codable, Equatable {
+    var location: Location = Location()
+
+    enum CodingKeys: String, CodingKey {
+        case source
+        case target
+    }
+    var source: Operand
+    var target: Local
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
+    }
+}
+
+struct IsDefinedStatement: Statement, Codable, Equatable {
+    var location: Location = Location()
+
+    enum CodingKeys: String, CodingKey {
+        case source
+    }
+    // NOTE: There is a mistake upstream in the spec, which specifies this as an operand (https://www.openpolicyagent.org/docs/latest/ir/#isdefinedstmt)
+    var source: Local
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
+    }
+}
+
+struct IsUndefinedStatement: Statement, Codable, Equatable {
+    var location: Location = Location()
+
+    enum CodingKeys: String, CodingKey {
+        case source
+    }
+    // NOTE: There is a mistake upstream in the spec, which specifies this as an operand (https://www.openpolicyagent.org/docs/latest/ir/#isundefinedstmt)
+    var source: Local
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
+    }
+}
+
+struct ReturnLocalStmt: Statement, Codable, Equatable {
+    var location: Location = Location()
+
+    enum CodingKeys: String, CodingKey {
+        case source
+    }
+    var source: Local
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
+    }
+}
+
+struct ResetLocalStatement: Statement, Codable, Equatable {
+    var location: Location = Location()
+
+    enum CodingKeys: String, CodingKey {
+        case target
+    }
+    var target: Local
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
+    }
+}
+
+struct ReturnLocalStatement: Statement, Codable, Equatable {
+    var location: Location = Location()
+
+    enum CodingKeys: String, CodingKey {
+        case source
+    }
+    var source: Local
 
     func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {

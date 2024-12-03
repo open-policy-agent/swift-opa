@@ -3,8 +3,7 @@ import Testing
 
 @testable import SwiftRego
 
-@preconcurrency
-struct DecodeIRTestCase {
+struct DecodeIRTestCase: Sendable {
     var name: String
     var json: String
     var policy: Policy
@@ -228,7 +227,7 @@ func decodeIROperands() throws {
     }
 }
 
-struct TestCaseCompareBlocks {
+struct TestCaseCompareBlocks: Sendable {
     let name: String
     let lhs: Block
     let rhs: Block
@@ -384,6 +383,15 @@ func compareBlocks(_ tc: TestCaseCompareBlocks) {
     } else {
         #expect(tc.lhs != tc.rhs)
     }
+}
+
+@Test
+func decodeFuncs() async throws {
+    let input = #"""
+        {"funcs":{"funcs":[{"name":"g0.data.policy.hello","params":[0,1],"return":2,"blocks":[{"stmts":[{"type":"ResetLocalStmt","stmt":{"target":3,"file":0,"col":1,"row":7}},{"type":"DotStmt","stmt":{"source":{"type":"local","value":0},"key":{"type":"string_index","value":1},"target":4,"file":0,"col":10,"row":7}},{"type":"EqualStmt","stmt":{"a":{"type":"local","value":4},"b":{"type":"string_index","value":2},"file":0,"col":10,"row":7}},{"type":"AssignVarOnceStmt","stmt":{"source":{"type":"bool","value":true},"target":3,"file":0,"col":1,"row":7}}]},{"stmts":[{"type":"IsDefinedStmt","stmt":{"source":3,"file":0,"col":1,"row":7}},{"type":"AssignVarOnceStmt","stmt":{"source":{"type":"local","value":3},"target":2,"file":0,"col":1,"row":7}}]},{"stmts":[{"type":"IsUndefinedStmt","stmt":{"source":2,"file":0,"col":9,"row":5}},{"type":"AssignVarOnceStmt","stmt":{"source":{"type":"bool","value":false},"target":2,"file":0,"col":9,"row":5}}]},{"stmts":[{"type":"ReturnLocalStmt","stmt":{"source":2,"file":0,"col":9,"row":5}}]}],"path":["g0","policy","hello"]}]}}
+        """#
+
+    _ = try JSONDecoder().decode(Policy.self, from: input.data(using: .utf8)!)
 }
 
 func commentFor(_ name: String?) -> Comment {

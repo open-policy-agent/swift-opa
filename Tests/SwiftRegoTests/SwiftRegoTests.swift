@@ -228,6 +228,164 @@ func decodeIROperands() throws {
     }
 }
 
+struct TestCaseCompareBlocks {
+    let name: String
+    let lhs: Block
+    let rhs: Block
+    let expected: Bool
+}
+extension TestCaseCompareBlocks: CustomTestStringConvertible {
+    var testDescription: String { name }
+}
+
+@Test(arguments: [
+    TestCaseCompareBlocks(
+        name: "equal",
+        lhs: Block(
+            statements: [
+                CallStatement(
+                    location: Location(row: 0, col: 1, file: 2),
+                    callFunc: "myfunc",
+                    args: [
+                        Argument(
+                            type: "something",
+                            value: 0
+                        )
+                    ]
+                ),
+                AssignVarStatement(
+                    source: Operand(
+                        type: .local,
+                        value: .number(123)
+                    ),
+                    target: 456
+                ),
+            ]
+        ),
+        rhs: Block(
+            statements: [
+                CallStatement(
+                    location: Location(row: 0, col: 1, file: 2),
+                    callFunc: "myfunc",
+                    args: [
+                        Argument(
+                            type: "something",
+                            value: 0
+                        )
+                    ]
+                ),
+                AssignVarStatement(
+                    source: Operand(
+                        type: .local,
+                        value: .number(123)
+                    ),
+                    target: 456
+                ),
+            ]
+        ),
+        expected: true
+    ),
+    TestCaseCompareBlocks(
+        name: "swapped not equal",
+        lhs: Block(
+            statements: [
+                AssignVarStatement(
+                    source: Operand(
+                        type: .local,
+                        value: .number(123)
+                    ),
+                    target: 456
+                ),
+                CallStatement(
+                    location: Location(row: 0, col: 1, file: 2),
+                    callFunc: "myfunc",
+                    args: [
+                        Argument(
+                            type: "something",
+                            value: 0
+                        )
+                    ]
+                ),
+            ]
+        ),
+        rhs: Block(
+            statements: [
+                CallStatement(
+                    location: Location(row: 0, col: 1, file: 2),
+                    callFunc: "myfunc",
+                    args: [
+                        Argument(
+                            type: "something",
+                            value: 0
+                        )
+                    ]
+                ),
+                AssignVarStatement(
+                    source: Operand(
+                        type: .local,
+                        value: .number(123)
+                    ),
+                    target: 456
+                ),
+            ]
+        ),
+        expected: false
+    ),
+    TestCaseCompareBlocks(
+        name: "slightly different",
+        lhs: Block(
+            statements: [
+                CallStatement(
+                    location: Location(row: 0, col: 1, file: 2),
+                    callFunc: "myfunc",
+                    args: [
+                        Argument(
+                            type: "something",
+                            value: 0
+                        )
+                    ]
+                ),
+                AssignVarStatement(
+                    source: Operand(
+                        type: .local,
+                        value: .number(123)
+                    ),
+                    target: 456
+                ),
+            ]
+        ),
+        rhs: Block(
+            statements: [
+                CallStatement(
+                    location: Location(row: 0, col: 1, file: 2),
+                    callFunc: "myfunc",
+                    args: [
+                        Argument(
+                            type: "something else",
+                            value: 0
+                        )
+                    ]
+                ),
+                AssignVarStatement(
+                    source: Operand(
+                        type: .local,
+                        value: .number(123)
+                    ),
+                    target: 456
+                ),
+            ]
+        ),
+        expected: false
+    ),
+])
+func compareBlocks(_ tc: TestCaseCompareBlocks) {
+    if tc.expected {
+        #expect(tc.lhs == tc.rhs)
+    } else {
+        #expect(tc.lhs != tc.rhs)
+    }
+}
+
 func commentFor(_ name: String?) -> Comment {
     guard let name else {
         return Comment("[failed testcase: unnamed]")

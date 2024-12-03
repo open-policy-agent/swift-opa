@@ -53,19 +53,18 @@ struct Plan: Codable, Equatable {
 struct Block: Equatable {
     var statements: [any Statement]
 
-    // TODO TODO
+    // Equatable, we need a custom implementation for dynamic dispatch
+    // to our heterogenous extistential type instances (statements)
     static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs.statements.count == rhs.statements.count else {
             return false
         }
 
-        //        for i in 0..<lhs.statements.count {
-        //            guard lhs.statements[i] == rhs.statements[i] else {
-        //                return false
-        //            }
-        //        }
-
-        // TODO
+        for i in 0..<lhs.statements.count {
+            guard lhs.statements[i].isEqual(to: rhs.statements[i]) else {
+                return false
+            }
+        }
 
         return true
     }
@@ -166,9 +165,12 @@ enum EncodingError: Error {
 }
 
 // Statement is implemented by each conctete statement type
-protocol Statement: Codable, Equatable {
+protocol Statement {
     // Location coordinates, shared by all concrete statement
     var location: Location { get set }
+
+    // This will be used to implement Equatable dynamically between heterogenous statement types
+    func isEqual(to other: any Statement) -> Bool
 }
 
 // -=-=-=-= CallStatement -=-=-=-=
@@ -181,6 +183,13 @@ struct CallStatement: Statement, Codable, Equatable {
     enum CodingKeys: String, CodingKey {
         case callFunc = "func"
         case args
+    }
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
     }
 }
 
@@ -221,6 +230,13 @@ struct AssignVarStatement: Statement, Codable, Equatable {
 
     var source: Operand
     var target: Local
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
+    }
 }
 
 struct Operand: Equatable {
@@ -249,6 +265,13 @@ struct MakeObjectStatement: Statement, Codable, Equatable {
     }
 
     var target: Local
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
+    }
 }
 
 struct ObjectInsertStatement: Statement, Codable, Equatable {
@@ -263,6 +286,13 @@ struct ObjectInsertStatement: Statement, Codable, Equatable {
     var key: Operand
     var value: Operand
     var object: Local
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
+    }
 }
 
 struct ResultSetAddStatement: Statement, Codable, Equatable {
@@ -272,6 +302,13 @@ struct ResultSetAddStatement: Statement, Codable, Equatable {
         case value
     }
     var value: Local
+
+    func isEqual(to other: any Statement) -> Bool {
+        guard let rhs = other as? Self else {
+            return false
+        }
+        return self == rhs
+    }
 }
 
 // Apparently, when defining a custom initializer in the struct, it suppresses generation

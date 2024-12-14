@@ -348,7 +348,8 @@ struct MakeNumberRefStatement: Statement, Codable, Equatable {
     var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
-        case index
+        // According to the Java SDK - "yup, it's capitalized"
+        case index = "Index"
         case target
     }
 
@@ -400,6 +401,14 @@ struct MakeSetStatement: Statement, Codable, Equatable {
 struct NopStatement: Statement, Codable, Equatable {
     var location: Location = Location()
 
+    // Workaround - NopStatement has no fields aside from the Location fields, which
+    // are decoded generically in Block's decode initializer.
+    // Since we can' provide an empty CodingKeys, and we don't want the default magic
+    // behavior of looking for a "location" key, we override the decoding initializer
+    // and do nothing.
+    init(from decoder: Decoder) throws {
+    }
+    
     func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false

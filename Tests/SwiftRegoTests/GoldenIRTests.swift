@@ -3,10 +3,14 @@ import Testing
 
 @testable import SwiftRego
 
-struct TestURL: CustomTestStringConvertible {
+// TestURL wraps our test arguments to make their descriptions pretty
+struct TestURL {
     var url: URL
+}
+extension TestURL: CustomTestStringConvertible {
     var testDescription: String { url.lastPathComponent }
 }
+
 func goldenFiles() -> [TestURL] {
     let files = Bundle.module.urls(
         forResourcesWithExtension: "json",
@@ -15,12 +19,11 @@ func goldenFiles() -> [TestURL] {
     return files.map {TestURL(url: $0)}
 }
 
-//extension URL: CustomTestStringConvertible {
-//    var testDescription: String { name }
-//}
-
 @Test("testParsingGolden", arguments: goldenFiles())
 func testParsingGolden(input: TestURL) async throws {
+//    if input.url.pathComponents.last != "policy-verify-BreakStmt.json" {
+//        return
+//    }
     let data = try Data(contentsOf: input.url)
-    let policy = try JSONDecoder().decode(Policy.self, from: data)
+    let _ = try JSONDecoder().decode(Policy.self, from: data)
 }

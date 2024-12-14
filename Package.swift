@@ -18,7 +18,8 @@ let package = Package(
             name: "SwiftRego"),
         .testTarget(
             name: "SwiftRegoTests",
-            dependencies: ["SwiftRego"]
+            dependencies: ["SwiftRego"],
+            resources: [.copy("Fixtures")]
         ),
     ]
 )

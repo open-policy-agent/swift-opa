@@ -1,0 +1,35 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 6
+                    },
+                    {
+                      "type": "local",
+                      "value": 7
+                    }
+                  ],
+                  "col": 10,
+                  "file": 50,
+                  "func": "plus",
+                  "result": 8,
+                  "row": 49
+                },
+                "type": "CallStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

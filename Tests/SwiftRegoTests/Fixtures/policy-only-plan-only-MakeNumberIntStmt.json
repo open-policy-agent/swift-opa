@@ -1,0 +1,25 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 33,
+                  "target": 3,
+                  "value": 300
+                },
+                "type": "MakeNumberIntStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

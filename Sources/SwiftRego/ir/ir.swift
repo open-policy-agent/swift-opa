@@ -92,30 +92,74 @@ extension Block: Codable {
             var outStmt: any Statement
 
             switch anyStmt.type {
-            case .callStmt:
-                outStmt = try inner.decode(CallStatement.self, forKey: .innerStatement)
+            case .arrayAppendStmt:
+                outStmt = try inner.decode(AssignAppendStatement.self, forKey: .innerStatement)
+            case .assignIntStmt:
+                outStmt = try inner.decode(AssignIntStatement.self, forKey: .innerStatement)
+            case .assignVarOnceStmt:
+                outStmt = try inner.decode(AssignVarOnceStatement.self, forKey: .innerStatement)
             case .assignVarStmt:
                 outStmt = try inner.decode(AssignVarStatement.self, forKey: .innerStatement)
-            case .makeObjectStmt:
-                outStmt = try inner.decode(MakeObjectStatement.self, forKey: .innerStatement)
-            case .objectInsertStmt:
-                outStmt = try inner.decode(ObjectInsertStatement.self, forKey: .innerStatement)
-            case .resultSetAddStmt:
-                outStmt = try inner.decode(ResultSetAddStatement.self, forKey: .innerStatement)
-            case .resetLocalStmt:
-                outStmt = try inner.decode(ResetLocalStatement.self, forKey: .innerStatement)
+            case .blockStmt:
+                outStmt = try inner.decode(BlockStatement.self, forKey: .innerStatement)
+            case .breakStmt:
+                outStmt = try inner.decode(BreakStatement.self, forKey: .innerStatement)
+            case .callStmt:
+                outStmt = try inner.decode(CallStatement.self, forKey: .innerStatement)
+            case .callDynamicStmt:
+                outStmt = try inner.decode(CallDynamicStatement.self, forKey: .innerStatement)
             case .dotStmt:
                 outStmt = try inner.decode(DotStatement.self, forKey: .innerStatement)
             case .equalStmt:
                 outStmt = try inner.decode(EqualStatement.self, forKey: .innerStatement)
+            case .isArrayStmt:
+                outStmt = try inner.decode(IsArrayStatement.self, forKey: .innerStatement)
             case .isDefinedStmt:
                 outStmt = try inner.decode(IsDefinedStatement.self, forKey: .innerStatement)
+            case .isObjectStmt:
+                outStmt = try inner.decode(IsObjectStatement.self, forKey: .innerStatement)
+            case .isSetStmt:
+                outStmt = try inner.decode(IsSetStatement.self, forKey: .innerStatement)
             case .isUndefinedStmt:
                 outStmt = try inner.decode(IsUndefinedStatement.self, forKey: .innerStatement)
-            case .assignVarOnceStmt:
-                outStmt = try inner.decode(AssignVarOnceStatement.self, forKey: .innerStatement)
+            case .lenStmt:
+                outStmt = try inner.decode(LenStatement.self, forKey: .innerStatement)
+            case .makeArrayStmt:
+                outStmt = try inner.decode(MakeArrayStatement.self, forKey: .innerStatement)
+            case .makeNullStmt:
+                outStmt = try inner.decode(MakeNullStatement.self, forKey: .innerStatement)
+            case .makeNumberIntStmt:
+                outStmt = try inner.decode(MakeNumberStatement.self, forKey: .innerStatement)
+            case .makeNumberRefStmt:
+                outStmt = try inner.decode(MakeNumberRefStatement.self, forKey: .innerStatement)
+            case .makeObjectStmt:
+                outStmt = try inner.decode(MakeObjectStatement.self, forKey: .innerStatement)
+            case .makeSetStmt:
+                outStmt = try inner.decode(MakeSetStatement.self, forKey: .innerStatement)
+            case .nopStmt:
+                outStmt = try inner.decode(NopStatement.self, forKey: .innerStatement)
+            case .notEqualStmt:
+                outStmt = try inner.decode(NotEqualStatement.self, forKey: .innerStatement)
+            case .notStmt:
+                outStmt = try inner.decode(NotStatement.self, forKey: .innerStatement)
+            case .objectInsertOnceStmt:
+                outStmt = try inner.decode(ObjectInsertOnceStatement.self, forKey: .innerStatement)
+            case .objectInsertStmt:
+                outStmt = try inner.decode(ObjectInsertStatement.self, forKey: .innerStatement)
+            case .objectMergeStmt:
+                outStmt = try inner.decode(ObjectMergeStatement.self, forKey: .innerStatement)
+            case .resetLocalStmt:
+                outStmt = try inner.decode(ResetLocalStatement.self, forKey: .innerStatement)
+            case .resultSetAddStmt:
+                outStmt = try inner.decode(ResultSetAddStatement.self, forKey: .innerStatement)
             case .returnLocalStmt:
                 outStmt = try inner.decode(ReturnLocalStatement.self, forKey: .innerStatement)
+            case .scanStmt:
+                outStmt = try inner.decode(ScanStatement.self, forKey: .innerStatement)
+            case .setAddStmt:
+                outStmt = try inner.decode(SetAddStatement.self, forKey: .innerStatement)
+            case .withStmt:
+                outStmt = try inner.decode(WithStatement.self, forKey: .innerStatement)
             //            default:
             //                // TODO This wouldn't get here if the type was unknown :/
             //                throw StatementError.unknown(anyStmt.type.rawValue)
@@ -140,18 +184,40 @@ extension Block: Codable {
 // statement decoding.
 struct AnyStatement: Codable, Equatable {
     enum KnownStatements: String, Codable {
-        case callStmt = "CallStmt"
+        case arrayAppendStmt = "ArrayAppendStmt"
+        case assignIntStmt = "AssignIntStmt"
+        case assignVarOnceStmt = "AssignVarOnceStmt"
         case assignVarStmt = "AssignVarStmt"
-        case makeObjectStmt = "MakeObjectStmt"
-        case objectInsertStmt = "ObjectInsertStmt"
-        case resultSetAddStmt = "ResultSetAddStmt"
+        case blockStmt = "BlockStmt"
+        case breakStmt = "BreakStmt"
+        case callDynamicStmt = "CallDynamicStmt"
+        case callStmt = "CallStmt"
         case dotStmt = "DotStmt"
         case equalStmt = "EqualStmt"
+        case isArrayStmt = "IsArrayStmt"
         case isDefinedStmt = "IsDefinedStmt"
+        case isObjectStmt = "IsObjectStmt"
+        case isSetStmt = "IsSetStmt"
         case isUndefinedStmt = "IsUndefinedStmt"
-        case assignVarOnceStmt = "AssignVarOnceStmt"
+        case lenStmt = "LenStmt"
+        case makeArrayStmt = "MakeArrayStmt"
+        case makeNullStmt = "MakeNullStmt"
+        case makeNumberIntStmt = "MakeNumberIntStmt"
+        case makeNumberRefStmt = "MakeNumberRefStmt"
+        case makeObjectStmt = "MakeObjectStmt"
+        case makeSetStmt = "MakeSetStmt"
+        case nopStmt = "NopStmt"
+        case notEqualStmt = "NotEqualStmt"
+        case notStmt = "NotStmt"
+        case objectInsertOnceStmt = "ObjectInsertOnceStmt"
+        case objectInsertStmt = "ObjectInsertStmt"
+        case objectMergeStmt = "ObjectMergeStmt"
         case resetLocalStmt = "ResetLocalStmt"
+        case resultSetAddStmt = "ResultSetAddStmt"
         case returnLocalStmt = "ReturnLocalStmt"
+        case scanStmt = "ScanStmt"
+        case setAddStmt = "SetAddStmt"
+        case withStmt = "WithStmt"
     }
     enum CodingKeys: String, CodingKey {
         case type
@@ -194,26 +260,6 @@ protocol Statement: Sendable {
     func isEqual(to other: any Statement) -> Bool
 }
 
-// -=-=-=-= CallStatement -=-=-=-=
-struct CallStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    var callFunc: String = ""
-    var args: [Argument] = []
-
-    enum CodingKeys: String, CodingKey {
-        case callFunc = "func"
-        case args
-    }
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
-}
-
 struct Argument: Codable, Equatable {
     var type: String
     var value: Int
@@ -238,27 +284,8 @@ struct Func: Codable, Equatable {
         case blocks
     }
 }
-// -=-=-=-= End CallStatement -=-=-=-=
 
 typealias Local = UInt32
-struct AssignVarStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    enum CodingKeys: String, CodingKey {
-        case source
-        case target
-    }
-
-    var source: Operand
-    var target: Local
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
-}
 
 struct Operand: Equatable {
     enum OpType: String, Codable, Equatable {
@@ -275,199 +302,6 @@ struct Operand: Equatable {
 
     var type: OpType
     var value: Value
-}
-// -=-=-=-= End Assign*Statement -=-=-=-=
-
-struct MakeObjectStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    enum CodingKeys: String, CodingKey {
-        case target
-    }
-
-    var target: Local
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
-}
-
-struct ObjectInsertStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    enum CodingKeys: String, CodingKey {
-        case key
-        case value
-        case object
-    }
-
-    var key: Operand
-    var value: Operand
-    var object: Local
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
-}
-
-struct ResultSetAddStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    enum CodingKeys: String, CodingKey {
-        case value
-    }
-    var value: Local
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
-}
-
-struct DotStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    enum CodingKeys: String, CodingKey {
-        case source
-        case key
-        case target
-    }
-    var source: Operand
-    var key: Operand
-    var target: Local
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
-}
-
-struct EqualStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    enum CodingKeys: String, CodingKey {
-        case a
-        case b
-    }
-    var a: Operand
-    var b: Operand
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
-}
-
-struct AssignVarOnceStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    enum CodingKeys: String, CodingKey {
-        case source
-        case target
-    }
-    var source: Operand
-    var target: Local
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
-}
-
-struct IsDefinedStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    enum CodingKeys: String, CodingKey {
-        case source
-    }
-    // NOTE: There is a mistake upstream in the spec, which specifies this as an operand (https://www.openpolicyagent.org/docs/latest/ir/#isdefinedstmt)
-    var source: Local
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
-}
-
-struct IsUndefinedStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    enum CodingKeys: String, CodingKey {
-        case source
-    }
-    // NOTE: There is a mistake upstream in the spec, which specifies this as an operand (https://www.openpolicyagent.org/docs/latest/ir/#isundefinedstmt)
-    var source: Local
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
-}
-
-struct ReturnLocalStmt: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    enum CodingKeys: String, CodingKey {
-        case source
-    }
-    var source: Local
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
-}
-
-struct ResetLocalStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    enum CodingKeys: String, CodingKey {
-        case target
-    }
-    var target: Local
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
-}
-
-struct ReturnLocalStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
-
-    enum CodingKeys: String, CodingKey {
-        case source
-    }
-    var source: Local
-
-    func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 // Apparently, when defining a custom initializer in the struct, it suppresses generation
@@ -500,5 +334,4 @@ extension Operand: Codable {
     func encode(to encoder: any Encoder) throws {
         throw EncodingError.unsupported
     }
-
 }

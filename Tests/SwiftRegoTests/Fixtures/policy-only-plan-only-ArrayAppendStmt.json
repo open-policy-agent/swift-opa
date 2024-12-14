@@ -1,0 +1,28 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "array": 4,
+                  "col": 16,
+                  "file": 0,
+                  "row": 34,
+                  "value": {
+                    "type": "string_index",
+                    "value": 9
+                  }
+                },
+                "type": "ArrayAppendStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

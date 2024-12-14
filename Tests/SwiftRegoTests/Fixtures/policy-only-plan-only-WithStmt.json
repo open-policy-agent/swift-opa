@@ -1,0 +1,49 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "block": {
+                    "stmts": [
+                      {
+                        "stmt": {
+                          "col": 1,
+                          "file": 0,
+                          "row": 30,
+                          "source": {
+                            "type": "local",
+                            "value": 19
+                          },
+                          "target": 3
+                        },
+                        "type": "AssignVarOnceStmt"
+                      }
+                    ]
+                  },
+                  "col": 9,
+                  "file": 0,
+                  "local": 0,
+                  "path": [
+                    1,
+                    2
+                  ],
+                  "row": 31,
+                  "value": {
+                    "type": "local",
+                    "value": 8
+                  }
+                },
+                "type": "WithStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

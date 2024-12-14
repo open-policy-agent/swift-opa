@@ -1,0 +1,43 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "block": {
+                    "stmts": [
+                      {
+                        "stmt": {
+                          "col": 14,
+                          "file": 0,
+                          "row": 31,
+                          "source": {
+                            "type": "local",
+                            "value": 11
+                          },
+                          "target": 13
+                        },
+                        "type": "AssignVarStmt"
+                      }
+                    ]
+                  },
+                  "col": 14,
+                  "file": 0,
+                  "key": 11,
+                  "row": 31,
+                  "source": 10,
+                  "value": 12
+                },
+                "type": "ScanStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

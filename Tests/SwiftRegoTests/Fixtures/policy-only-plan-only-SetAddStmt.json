@@ -1,0 +1,28 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 2,
+                  "file": 1,
+                  "row": 3,
+                  "set": 14,
+                  "value": {
+                    "type": "local",
+                    "value": 13
+                  }
+                },
+                "type": "SetAddStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

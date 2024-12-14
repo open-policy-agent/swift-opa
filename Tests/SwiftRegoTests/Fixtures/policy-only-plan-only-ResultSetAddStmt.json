@@ -1,0 +1,24 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 6,
+                  "file": 5,
+                  "row": 7,
+                  "value": 14
+                },
+                "type": "ResultSetAddStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

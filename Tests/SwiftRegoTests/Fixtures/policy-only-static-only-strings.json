@@ -1,0 +1,60 @@
+{
+  "static": {
+    "strings": [
+      {
+        "value": "result"
+      },
+      {
+        "value": "amir"
+      },
+      {
+        "value": "foo"
+      },
+      {
+        "value": "bar"
+      },
+      {
+        "value": "100"
+      },
+      {
+        "value": "101"
+      },
+      {
+        "value": "43"
+      },
+      {
+        "value": "42"
+      },
+      {
+        "value": "john"
+      },
+      {
+        "value": "hello"
+      },
+      {
+        "value": "admin"
+      },
+      {
+        "value": "user"
+      },
+      {
+        "value": "roles"
+      },
+      {
+        "value": "m"
+      },
+      {
+        "value": "y"
+      },
+      {
+        "value": "1"
+      },
+      {
+        "value": "yolo"
+      },
+      {
+        "value": "policy"
+      }
+    ]
+  }
+}

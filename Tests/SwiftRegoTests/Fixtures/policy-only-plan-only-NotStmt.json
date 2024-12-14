@@ -1,0 +1,43 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "block": {
+                    "stmts": [
+                      {
+                        "stmt": {
+                          "a": {
+                            "type": "local",
+                            "value": 4
+                          },
+                          "b": {
+                            "type": "string_index",
+                            "value": 15
+                          },
+                          "col": 5,
+                          "file": 0,
+                          "row": 16
+                        },
+                        "type": "EqualStmt"
+                      }
+                    ]
+                  },
+                  "col": 5,
+                  "file": 0,
+                  "row": 16
+                },
+                "type": "NotStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

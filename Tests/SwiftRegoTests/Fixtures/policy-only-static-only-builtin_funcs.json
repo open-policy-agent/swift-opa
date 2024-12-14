@@ -1,0 +1,90 @@
+{
+  "static": {
+    "builtin_funcs": [
+      {
+        "decl": {
+          "args": [
+            {
+              "description": "the set/array/object/string to be counted",
+              "name": "collection",
+              "of": [
+                {
+                  "type": "string"
+                },
+                {
+                  "dynamic": {
+                    "type": "any"
+                  },
+                  "type": "array"
+                },
+                {
+                  "dynamic": {
+                    "key": {
+                      "type": "any"
+                    },
+                    "value": {
+                      "type": "any"
+                    }
+                  },
+                  "type": "object"
+                },
+                {
+                  "of": {
+                    "type": "any"
+                  },
+                  "type": "set"
+                }
+              ],
+              "type": "any"
+            }
+          ],
+          "result": {
+            "description": "the count of elements, key/val pairs, or characters, respectively.",
+            "name": "n",
+            "type": "number"
+          },
+          "type": "function"
+        },
+        "name": "count"
+      },
+      {
+        "decl": {
+          "args": [
+            {
+              "type": "any"
+            },
+            {
+              "type": "any"
+            }
+          ],
+          "result": {
+            "type": "boolean"
+          },
+          "type": "function"
+        },
+        "name": "internal.member_2"
+      },
+      {
+        "decl": {
+          "args": [
+            {
+              "name": "x",
+              "type": "number"
+            },
+            {
+              "name": "y",
+              "type": "number"
+            }
+          ],
+          "result": {
+            "description": "the remainder",
+            "name": "z",
+            "type": "number"
+          },
+          "type": "function"
+        },
+        "name": "rem"
+      }
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "args": [
+                    0,
+                    1,
+                    2,
+                    3
+                  ],
+                  "col": 1,
+                  "file": 0,
+                  "path": [
+                    {
+                      "type": "local",
+                      "value": 10
+                    },
+                    {
+                      "type": "string_index",
+                      "value": 5
+                    }
+                  ],
+                  "result": 5,
+                  "row": 48
+                },
+                "type": "CallDynamicStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

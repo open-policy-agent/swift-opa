@@ -1,0 +1,32 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 0,
+                  "file": 0,
+                  "key": {
+                    "type": "string_index",
+                    "value": 19
+                  },
+                  "row": 0,
+                  "source": {
+                    "type": "local",
+                    "value": 1
+                  },
+                  "target": 10
+                },
+                "type": "DotStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "funcs": {
+    "funcs": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "array": 4,
+                  "col": 16,
+                  "file": 0,
+                  "row": 34,
+                  "value": {
+                    "type": "string_index",
+                    "value": 9
+                  }
+                },
+                "type": "ArrayAppendStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.policy.hello",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "policy",
+          "hello"
+        ],
+        "return": 2
+      }
+    ]
+  },
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 0,
+                  "file": 0,
+                  "row": 0,
+                  "target": 2
+                },
+                "type": "MakeObjectStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  },
+  "static": {
+    "builtin_funcs": [
+      {
+        "decl": {
+          "args": [
+            {
+              "description": "the set/array/object/string to be counted",
+              "name": "collection",
+              "of": [
+                {
+                  "type": "string"
+                },
+                {
+                  "dynamic": {
+                    "type": "any"
+                  },
+                  "type": "array"
+                },
+                {
+                  "dynamic": {
+                    "key": {
+                      "type": "any"
+                    },
+                    "value": {
+                      "type": "any"
+                    }
+                  },
+                  "type": "object"
+                },
+                {
+                  "of": {
+                    "type": "any"
+                  },
+                  "type": "set"
+                }
+              ],
+              "type": "any"
+            }
+          ],
+          "result": {
+            "description": "the count of elements, key/val pairs, or characters, respectively.",
+            "name": "n",
+            "type": "number"
+          },
+          "type": "function"
+        },
+        "name": "count"
+      },
+      {
+        "decl": {
+          "args": [
+            {
+              "type": "any"
+            },
+            {
+              "type": "any"
+            }
+          ],
+          "result": {
+            "type": "boolean"
+          },
+          "type": "function"
+        },
+        "name": "internal.member_2"
+      },
+      {
+        "decl": {
+          "args": [
+            {
+              "name": "x",
+              "type": "number"
+            },
+            {
+              "name": "y",
+              "type": "number"
+            }
+          ],
+          "result": {
+            "description": "the remainder",
+            "name": "z",
+            "type": "number"
+          },
+          "type": "function"
+        },
+        "name": "rem"
+      }
+    ],
+    "files": [
+      {
+        "value": "policy.rego"
+      }
+    ],
+    "strings": [
+      {
+        "value": "result"
+      },
+      {
+        "value": "testing"
+      }
+    ]
+  }
+}

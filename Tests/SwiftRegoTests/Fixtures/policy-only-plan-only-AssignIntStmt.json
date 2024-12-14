@@ -1,0 +1,25 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 16,
+                  "file": 0,
+                  "row": 34,
+                  "target": 4,
+                  "value": 10
+                },
+                "type": "AssignIntStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

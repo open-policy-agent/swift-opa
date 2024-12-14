@@ -1,0 +1,14 @@
+op=ENTER,statement=BlockStmt,file=0,row=0,col=0,blockIndex=0,stmtIndex=0
+op=ENTER,statement=NopStmt,file=11,row=11,col=11,blockIndex=0,stmtIndex=0
+op=EXIT,statement=NopStmt,file=11,row=11,col=11,blockIndex=0,stmtIndex=0
+op=ENTER,statement=BlockStmt,file=45,row=45,col=45,blockIndex=0,stmtIndex=1
+op=ENTER,statement=NopStmt,file=22,row=22,col=22,blockIndex=0,stmtIndex=0
+op=EXIT,statement=NopStmt,file=22,row=22,col=22,blockIndex=0,stmtIndex=0
+op=ENTER,statement=BreakStmt,file=33,row=33,col=33,blockIndex=0,stmtIndex=1
+op=EXIT,statement=BreakStmt,file=33,row=33,col=33,blockIndex=0,stmtIndex=1
+op=EXIT,statement=BlockStmt,file=45,row=45,col=45,blockIndex=0,stmtIndex=1
+op=EXIT,statement=BlockStmt,file=0,row=0,col=0,blockIndex=0,stmtIndex=0
+op=ENTER,statement=NopStmt,file=77,row=77,col=77,blockIndex=1,stmtIndex=0
+op=EXIT,statement=NopStmt,file=77,row=77,col=77,blockIndex=1,stmtIndex=0
+op=ENTER,statement=NopStmt,file=88,row=88,col=88,blockIndex=1,stmtIndex=1
+op=EXIT,statement=NopStmt,file=88,row=88,col=88,blockIndex=1,stmtIndex=1

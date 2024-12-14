@@ -1,0 +1,32 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 5,
+                  "file": 0,
+                  "key": {
+                    "type": "local",
+                    "value": 11
+                  },
+                  "object": 55,
+                  "row": 34,
+                  "value": {
+                    "type": "bool",
+                    "value": false
+                  }
+                },
+                "type": "ObjectInsertStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

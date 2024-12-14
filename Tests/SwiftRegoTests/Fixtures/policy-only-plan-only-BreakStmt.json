@@ -1,0 +1,38 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "blocks": [
+                    {
+                      "stmts": [
+                        {
+                          "stmt": {
+                            "col": 0,
+                            "file": 0,
+                            "index": 1,
+                            "row": 0
+                          },
+                          "type": "BreakStmt"
+                        }
+                      ]
+                    }
+                  ],
+                  "col": 2,
+                  "file": 1,
+                  "row": 3
+                },
+                "type": "BlockStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

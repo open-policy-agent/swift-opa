@@ -1,0 +1,26 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "a": 12,
+                  "b": 2,
+                  "col": 20,
+                  "file": 10,
+                  "row": 22,
+                  "target": 11
+                },
+                "type": "ObjectMergeStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

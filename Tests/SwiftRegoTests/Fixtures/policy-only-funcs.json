@@ -1,0 +1,38 @@
+{
+  "funcs": {
+    "funcs": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "array": 4,
+                  "col": 16,
+                  "file": 0,
+                  "row": 34,
+                  "value": {
+                    "type": "string_index",
+                    "value": 9
+                  }
+                },
+                "type": "ArrayAppendStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.policy.hello",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "policy",
+          "hello"
+        ],
+        "return": 2
+      }
+    ]
+  }
+}

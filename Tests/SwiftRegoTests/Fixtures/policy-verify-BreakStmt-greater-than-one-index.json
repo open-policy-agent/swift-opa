@@ -1,0 +1,116 @@
+{
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "blocks": [
+                    {
+                      "stmts": [
+                        {
+                          "stmt": {
+                            "col": 11,
+                            "file": 11,
+                            "row": 11
+                          },
+                          "type": "NopStmt"
+                        },
+                        {
+                          "stmt": {
+                            "blocks": [
+                              {
+                                "stmts": [
+                                  {
+                                    "stmt": {
+                                      "col": 22,
+                                      "file": 22,
+                                      "row": 22
+                                    },
+                                    "type": "NopStmt"
+                                  },
+                                  {
+                                    "stmt": {
+                                      "col": 33,
+                                      "file": 33,
+                                      "index": 2,
+                                      "row": 33
+                                    },
+                                    "type": "BreakStmt"
+                                  }
+                                ]
+                              }
+                            ],
+                            "col": 45,
+                            "file": 45,
+                            "row": 45
+                          },
+                          "type": "BlockStmt"
+                        }
+                      ]
+                    },
+                    {
+                      "stmts": [
+                        {
+                          "stmt": {
+                            "col": 44,
+                            "file": 44,
+                            "row": 44
+                          },
+                          "type": "NopStmt"
+                        },
+                        {
+                          "stmt": {
+                            "col": 55,
+                            "file": 55,
+                            "row": 55
+                          },
+                          "type": "NopStmt"
+                        }
+                      ]
+                    }
+                  ],
+                  "col": 0,
+                  "file": 0,
+                  "row": 0
+                },
+                "type": "BlockStmt"
+              },
+              {
+                "stmt": {
+                  "col": 66,
+                  "file": 66,
+                  "row": 66
+                },
+                "type": "NopStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 77,
+                  "file": 77,
+                  "row": 77
+                },
+                "type": "NopStmt"
+              },
+              {
+                "stmt": {
+                  "col": 88,
+                  "file": 88,
+                  "row": 88
+                },
+                "type": "NopStmt"
+              }
+            ]
+          }
+        ],
+        "name": "policy"
+      }
+    ]
+  }
+}

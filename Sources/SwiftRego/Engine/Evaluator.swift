@@ -17,6 +17,6 @@ struct ResultSet {
 struct Frame {
     // TODO this needs to point back to the next block->statement after the callsite.
     let returnAddress: Int
-    var locals: [Local]
+    var locals: [Any]
 
 }

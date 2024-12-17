@@ -11,9 +11,9 @@ struct Policy: Codable, Equatable {
 }
 
 struct Static: Codable, Equatable {
-    var strings: [ConstString]
+    var strings: [ConstString]?
     var builtinFuncs: [BuiltinFunc]?
-    var files: [ConstString]
+    var files: [ConstString]?
 
     enum CodingKeys: String, CodingKey {
         case strings
@@ -25,21 +25,6 @@ struct Static: Codable, Equatable {
 struct ConstString: Codable, Equatable {
     var value: String
 }
-
-struct BuiltinFunc: Codable, Equatable {
-    var name: String
-    //    var decl : FunctionDecl
-}
-
-// struct FunctionDecl : Codable {
-// var args [Type]
-// var result Type
-// var variadic Type
-// }
-//
-// struct Type : Codable {
-//
-// }
 
 struct Plans: Codable, Equatable {
     var plans: [Plan] = []

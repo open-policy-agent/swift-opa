@@ -16,14 +16,11 @@ func goldenFiles() -> [TestURL] {
         forResourcesWithExtension: "json",
         subdirectory: "Fixtures"
     )!
-    return files.map {TestURL(url: $0)}
+    return files.map { TestURL(url: $0) }
 }
 
 @Test("testParsingGolden", arguments: goldenFiles())
 func testParsingGolden(input: TestURL) async throws {
-//    if input.url.pathComponents.last != "policy-verify-BreakStmt.json" {
-//        return
-//    }
     let data = try Data(contentsOf: input.url)
     let _ = try JSONDecoder().decode(Policy.self, from: data)
 }

@@ -408,7 +408,7 @@ struct NopStatement: Statement, Codable, Equatable {
     // and do nothing.
     init(from decoder: Decoder) throws {
     }
-    
+
     func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
@@ -616,7 +616,7 @@ struct WithStatement: Statement, Codable, Equatable {
     }
 
     var local: Local
-    var path: [Int32]
+    var path: [Int32]?
     var value: Operand
     var block: Block
 
@@ -627,6 +627,3 @@ struct WithStatement: Statement, Codable, Equatable {
         return self == rhs
     }
 }
-
-
-

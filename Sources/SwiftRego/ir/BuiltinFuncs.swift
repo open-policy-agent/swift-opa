@@ -52,64 +52,6 @@ struct FunctionDecl: Codable, Equatable {
     }
 }
 
-enum KnownTypes: String, Codable {
-    case any = "any"
-    case array = "array"
-    case boolean = "boolean"
-    case function = "function"
-    //case namedType = "named_type"
-    case null = "null"
-    case number = "number"
-    case object = "object"
-    case set = "set"
-    case string = "string"
-}
-
-// TypeDecoder is used for partial decoding of polymorphic types
-// to determine the concrete type, which is then decoded in the type member.
-struct TypeDecoder: Decodable {
-    var typeMarker: KnownTypes
-    var type: any Type
-
-    private enum CodingKeys: String, CodingKey {
-        case typeMarker = "type"
-    }
-
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        typeMarker = try container.decode(KnownTypes.self, forKey: .typeMarker)
-
-        switch typeMarker {
-        case .any:
-            type = try AnyType(from: decoder)
-        case .array:
-            type = try ArrayType(from: decoder)
-        case .boolean:
-            type = try BooleanType(from: decoder)
-        case .function:
-            type = try FunctionType(from: decoder)
-        case .null:
-            type = try NullType(from: decoder)
-        case .number:
-            type = try NumberType(from: decoder)
-        case .object:
-            type = try ObjectType(from: decoder)
-        case .set:
-            type = try SetType(from: decoder)
-        case .string:
-            type = try StringType(from: decoder)
-        }
-    }
-}
-
-// Statement is implemented by each conctete statement type
-protocol Type: Sendable, Equatable {
-    var type: KnownTypes { get }
-
-    // This will be used to implement Equatable dynamically between heterogenous types
-    func isEqual(to other: any Type) -> Bool
-}
-
 //struct NamedType: Type, Equatable {
 //    var type: String
 //

@@ -2,7 +2,7 @@
 
 struct EvaluationContext {
     let query: String = ""
-    let input: ObjectType = ObjectType(staticProps: [])
+    let input: ast.RegoValue = ast.RegoValue.null
     var results: ResultSet = ResultSet()
     var funcs: [String: Func] = [:]  // indexed from the policy top-level funcs
     let staticStrings: [String] = []  // populate from the policy top-level static.strings
@@ -12,7 +12,7 @@ struct ResultSet {
     var results: [EvalResult] = []  // array of [String: RegoValue] dictionaries
 }
 
-typealias EvalResult = [String: RegoValue]
+typealias EvalResult = [String: ast.RegoValue]
 
 struct Locals {
     var locals: [Int: Any]

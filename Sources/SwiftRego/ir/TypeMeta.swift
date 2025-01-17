@@ -1,3 +1,10 @@
+//
+//  File.swift
+//  SwiftRego
+//
+//  Created by Oren Shomron on 1/17/25.
+//
+
 import Foundation
 
 struct AnyType: Type, Codable {
@@ -254,7 +261,7 @@ struct StringType: Type, Codable {
     }
 }
 
-enum RegoType {
+enum ASTValue {
     case any(AnyType)
     case array(ArrayType)
     case boolean(BooleanType)
@@ -264,59 +271,4 @@ enum RegoType {
     case object(ObjectType)
     case set(SetType)
     case string(StringType)
-}
-
-// RegoValue represents any concrete JSON-representable value consumable by Rego
-enum RegoValue: Equatable {
-    case array([RegoValue])
-    case boolean(Bool)
-    case null
-    case number(NSNumber)
-    case object([String: RegoValue])
-//    case set(SetType) // TODO Implement sets
-    case string(String)
-    
-    enum ValueError: Error {
-        case unsupportedArrayElement
-        case unsupportedObjectElement
-        case unsupportedType(Any.Type)
-    }
-
-    init(from: Any) throws(ValueError) {
-        switch from {
-        case let v as String:
-            self = .string(v)
-        case let v as [Any]:
-            do {
-                let values: [RegoValue] = try v.map{try RegoValue(from: $0)}
-                self = .array(values)
-            } catch {
-                throw .unsupportedArrayElement  // TODO wrap the inital error. Need to assert it backto RegoError
-            }
-        case let v as [String: Any]:
-            do {
-                let values: [String: RegoValue] = try v.reduce(into: [:]) { m, elem in m[elem.key] = try RegoValue(from: elem.value)}
-                self = .object(values)
-            } catch {
-                throw .unsupportedObjectElement  // TODO wrap the inital error. Need to assert it back to RegoError
-            }
-        case let v as NSNumber:
-            if  v.isBool {
-                self = .boolean(v.boolValue)
-            } else {
-                self = .number(v)
-            }
-        case _ as NSNull:
-            self = .null
-        default:
-            throw .unsupportedType(type(of: from))
-        }
-    }
-}
-
-let boolLiteral = NSNumber(booleanLiteral: true)
-extension NSNumber {
-    var isBool: Bool {
-        return type(of: self) == type(of: boolLiteral)
-    }
 }

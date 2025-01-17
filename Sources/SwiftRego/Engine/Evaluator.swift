@@ -9,7 +9,13 @@ struct EvaluationContext {
 }
 
 struct ResultSet {
-    var results: [[String: RegoValue]] = []  // array of [String: RegoValue] dictionaries
+    var results: [EvalResult] = []  // array of [String: RegoValue] dictionaries
+}
+
+typealias EvalResult = [String: RegoValue]
+
+struct Locals {
+    var locals: [Int: Any]
 }
 
 // Frame represents a stack frame used during Rego IR evaluation. Each function call
@@ -17,6 +23,6 @@ struct ResultSet {
 struct Frame {
     // TODO this needs to point back to the next block->statement after the callsite.
     let returnAddress: Int
-    var locals: [Any]
-
+    var locals: Locals  // Superset of frame locals
+    var scopeLocals: [Locals]  // Stack of locals per-scope
 }

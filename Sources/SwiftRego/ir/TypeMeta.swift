@@ -5,7 +5,7 @@
 
 import Foundation
 
-enum types {
+enum Types {
     struct AnyType: Type, Codable {
         let type = KnownTypes.any
         var of: [any Type]?
@@ -54,7 +54,8 @@ enum types {
                 [TypeDecoder].self,
                 forKey: .staticItems)
             staticItems = argsDecoder?.map { $0.type }
-            dynamicItems = try container.decodeIfPresent(TypeDecoder.self, forKey: .dynamicItems)?.type
+            dynamicItems = try container.decodeIfPresent(TypeDecoder.self, forKey: .dynamicItems)?
+                .type
         }
 
         func encode(to encoder: any Encoder) throws {
@@ -296,23 +297,23 @@ struct TypeDecoder: Decodable {
 
         switch typeMarker {
         case .any:
-            type = try types.AnyType(from: decoder)
+            type = try Types.AnyType(from: decoder)
         case .array:
-            type = try types.ArrayType(from: decoder)
+            type = try Types.ArrayType(from: decoder)
         case .boolean:
-            type = try types.BooleanType(from: decoder)
+            type = try Types.BooleanType(from: decoder)
         case .function:
-            type = try types.FunctionType(from: decoder)
+            type = try Types.FunctionType(from: decoder)
         case .null:
-            type = try types.NullType(from: decoder)
+            type = try Types.NullType(from: decoder)
         case .number:
-            type = try types.NumberType(from: decoder)
+            type = try Types.NumberType(from: decoder)
         case .object:
-            type = try types.ObjectType(from: decoder)
+            type = try Types.ObjectType(from: decoder)
         case .set:
-            type = try types.SetType(from: decoder)
+            type = try Types.SetType(from: decoder)
         case .string:
-            type = try types.StringType(from: decoder)
+            type = try Types.StringType(from: decoder)
         }
     }
 }
@@ -324,4 +325,3 @@ protocol Type: Sendable, Equatable {
     // This will be used to implement Equatable dynamically between heterogenous types
     func isEqual(to other: any Type) -> Bool
 }
-

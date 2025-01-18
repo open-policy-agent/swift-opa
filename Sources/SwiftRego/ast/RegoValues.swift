@@ -1,6 +1,6 @@
 import Foundation
 
-enum ast {
+enum Ast {
     // RegoValue represents any concrete JSON-representable value consumable by Rego
     enum RegoValue: Equatable {
         case array([RegoValue])
@@ -51,11 +51,18 @@ enum ast {
                 throw .unsupportedType(type(of: from))
             }
         }
+
+        // Initialize a RegoValue from raw JSON-encoded data
+        init(fromJson rawJson: Data) throws {
+            // TODO throws deserializationerror, valuerror
+            let d = try JSONSerialization.jsonObject(with: rawJson, options: [])
+            try self.init(from: d)
+        }
     }
 
 }
 
-fileprivate let boolLiteral = NSNumber(booleanLiteral: true)
+private let boolLiteral = NSNumber(booleanLiteral: true)
 extension NSNumber {
     var isBool: Bool {
         return type(of: self) == type(of: boolLiteral)

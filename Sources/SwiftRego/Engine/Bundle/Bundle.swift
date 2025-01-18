@@ -8,8 +8,13 @@ struct Bundle {
 struct Manifest: Equatable {
     let revision: String
     let roots: [String]?
-    let regoVersion: Int?
+    let regoVersion: Version
     let metadata: [String: Ast.RegoValue]
+
+    enum Version: Int {
+        case regoV0 = 0
+        case regoV1 = 1
+    }
 }
 
 extension Manifest {
@@ -40,8 +45,18 @@ extension Manifest {
         }
         self.roots = roots
 
-        let regoVersion = jsonDict["rego_version"] as? Int ?? 0
-        self.regoVersion = regoVersion
+        let regoVersion = jsonDict["rego_version"] as? Int ?? 1
+        self.regoVersion =
+            switch regoVersion {
+            case 0:
+                .regoV0
+            case 1:
+                .regoV1
+            default:
+                throw DecodingError.dataCorrupted(
+                    DecodingError.Context(
+                        codingPath: [], debugDescription: "Unsupported Rego version"))
+            }
 
         guard let metadataAny = jsonDict["metadata"] else {
             self.metadata = [:]

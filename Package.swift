@@ -27,7 +27,9 @@ let package = Package(
         .target(
             name: "Runtime",
             dependencies: ["AST"]),
-        .target(name: "Engine"),
+        .target(
+            name: "Engine",
+            dependencies: ["AST", "IR"]),
         .testTarget(
             name: "IRTests",
             dependencies: ["IR"],

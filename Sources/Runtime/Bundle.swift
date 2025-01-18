@@ -1,9 +1,9 @@
 import AST
 import Foundation
-import IR
 
 struct Bundle {
-    let policy: IR.Policy
+    let manifest: Manifest
+    let planFiles: [BundleFile]
     let data: AST.RegoValue
 }
 
@@ -81,4 +81,9 @@ extension Manifest {
         case regoVersion = "rego_version"
         case metadata = "metadata"
     }
+}
+
+struct BundleFile: Sendable {
+    let path: String
+    let data: Data
 }

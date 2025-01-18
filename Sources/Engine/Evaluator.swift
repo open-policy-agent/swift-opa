@@ -5,6 +5,7 @@ import IR
 struct EvaluationContext {
     let query: String = ""
     let input: AST.RegoValue = AST.RegoValue.null
+    let store: Store = NullStore()
     var results: ResultSet = ResultSet()
     var funcs: [String: IR.Func] = [:]  // indexed from the policy top-level funcs
     let staticStrings: [String] = []  // populate from the policy top-level static.strings

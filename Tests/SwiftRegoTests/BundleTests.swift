@@ -1,11 +1,11 @@
 import Foundation
 import Testing
 
-@testable import SwiftRego
+@testable import Runtime
 
 @Suite("BundleDecodingTests")
 struct BundleDecodingTests {
-    struct TestCase {
+    struct TestCase: Sendable {
         let description: String
         let data: Data
         let expected: Manifest

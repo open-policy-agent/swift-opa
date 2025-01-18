@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import SwiftRego
+@testable import IR
 
 // TestURL wraps our test arguments to make their descriptions pretty
 struct TestURL {

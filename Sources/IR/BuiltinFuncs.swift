@@ -1,11 +1,11 @@
 import Foundation
 
-struct BuiltinFunc: Codable, Equatable {
+public struct BuiltinFunc: Codable, Equatable, Sendable {
     var name: String
     var decl: FunctionDecl
 }
 
-struct FunctionDecl: Codable, Equatable {
+public struct FunctionDecl: Codable, Equatable, Sendable {
     // TODO are these really optional?
     var args: [any Type]?
     var result: (any Type)?
@@ -17,7 +17,7 @@ struct FunctionDecl: Codable, Equatable {
         case variadic
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let argsDecoder = try container.decodeIfPresent(
             [TypeDecoder].self,
@@ -27,11 +27,11 @@ struct FunctionDecl: Codable, Equatable {
         variadic = try container.decodeIfPresent(TypeDecoder.self, forKey: .variadic)?.type
     }
 
-    func encode(to encoder: any Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
         throw EncodingError.unsupported
     }
 
-    static func == (lhs: FunctionDecl, rhs: FunctionDecl) -> Bool {
+    public static func == (lhs: FunctionDecl, rhs: FunctionDecl) -> Bool {
         // TODO compare result and variadic too!!!
 
         if lhs.args == nil && rhs.args == nil {

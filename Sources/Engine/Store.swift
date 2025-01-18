@@ -4,9 +4,11 @@
 //
 //  Created by Oren Shomron on 1/17/25.
 //
+import AST
+
 protocol Store {
-    func read(path: StoreKeyPath) async throws -> Ast.RegoValue
-    func write(path: StoreKeyPath, value: Ast.RegoValue) async throws
+    func read(path: StoreKeyPath) async throws -> AST.RegoValue
+    func write(path: StoreKeyPath, value: AST.RegoValue) async throws
 }
 
 struct StoreKeyPath {

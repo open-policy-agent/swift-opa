@@ -1,15 +1,17 @@
+import AST
 import Foundation
+import IR
 
 struct Bundle {
-    let policy: Policy
-    let data: Ast.RegoValue
+    let policy: IR.Policy
+    let data: AST.RegoValue
 }
 
-struct Manifest: Equatable {
+struct Manifest: Equatable, Sendable {
     let revision: String
     let roots: [String]?
     let regoVersion: Version
-    let metadata: [String: Ast.RegoValue]
+    let metadata: [String: AST.RegoValue]
 
     enum Version: Int {
         case regoV0 = 0
@@ -63,10 +65,10 @@ extension Manifest {
             return
         }
 
-        let metadataValue = try Ast.RegoValue(from: metadataAny)
+        let metadataValue = try AST.RegoValue(from: metadataAny)
         guard case .object(let metadataDict) = metadataValue else {
             throw DecodingError.typeMismatch(
-                [String: Ast.RegoValue].self,
+                [String: AST.RegoValue].self,
                 DecodingError.Context(
                     codingPath: [CodingKeys.metadata], debugDescription: "Invalid metadata value"))
         }
@@ -78,22 +80,5 @@ extension Manifest {
         case roots = "roots"
         case regoVersion = "rego_version"
         case metadata = "metadata"
-    }
-}
-
-protocol BundleLoader {
-    func load() async throws -> Bundle
-}
-
-// InMemBundleLoader implements BundleLoader over an in-memory bundle representation
-struct InMemBundleLoader: BundleLoader {
-    let rawPolicy: Data
-    let rawData: Data
-
-    func load() async throws -> Bundle {
-        let policy = try Policy(fromJson: rawPolicy)
-        let data = try Ast.RegoValue(fromJson: rawData)
-
-        return Bundle(policy: policy, data: data)
     }
 }

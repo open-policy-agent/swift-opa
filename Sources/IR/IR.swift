@@ -1,4 +1,4 @@
-struct Policy: Codable, Equatable {
+public struct Policy: Codable, Equatable, Sendable {
     var staticData: Static?
     var plans: Plans? = nil
     var funcs: Funcs? = nil
@@ -10,7 +10,7 @@ struct Policy: Codable, Equatable {
     }
 }
 
-struct Static: Codable, Equatable {
+public struct Static: Codable, Equatable, Sendable {
     var strings: [ConstString]?
     var builtinFuncs: [BuiltinFunc]?
     var files: [ConstString]?
@@ -22,25 +22,25 @@ struct Static: Codable, Equatable {
     }
 }
 
-struct ConstString: Codable, Equatable {
+public struct ConstString: Codable, Equatable, Sendable {
     var value: String
 }
 
-struct Plans: Codable, Equatable {
+public struct Plans: Codable, Equatable, Sendable {
     var plans: [Plan] = []
 }
 
-struct Plan: Codable, Equatable {
+public struct Plan: Codable, Equatable, Sendable {
     var name: String
     var blocks: [Block]
 }
 
-struct Block: Sendable, Equatable {
+public struct Block: Equatable, Sendable {
     var statements: [any Statement]
 
     // Equatable, we need a custom implementation for dynamic dispatch
     // to our heterogenous extistential type instances (statements)
-    static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs.statements.count == rhs.statements.count else {
             return false
         }
@@ -64,7 +64,7 @@ extension Block: Codable {
     enum InnerCodingKeys: String, CodingKey {
         case innerStatement = "stmt"
     }
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         var iter = try container.nestedUnkeyedContainer(forKey: .statements)
         var peek = iter
@@ -159,7 +159,7 @@ extension Block: Codable {
         self.statements = out
     }
 
-    func encode(to encoder: any Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
         throw EncodingError.unsupported
     }
 }
@@ -223,21 +223,22 @@ struct AnyInnerStatement: Codable, Equatable {
     var file: Int = 0
 }
 
-struct Location: Codable, Equatable {
+public struct Location: Codable, Equatable, Sendable {
     var row: Int = 0
     var col: Int = 0
     var file: Int = 0
 }
 
-enum StatementError: Error {
+public enum StatementError: Error {
     case unknown(String)
 }
-enum EncodingError: Error {
+
+public enum EncodingError: Error {
     case unsupported
 }
 
 // Statement is implemented by each conctete statement type
-protocol Statement: Sendable {
+public protocol Statement: Sendable {
     // Location coordinates, shared by all concrete statement
     var location: Location { get set }
 
@@ -245,16 +246,16 @@ protocol Statement: Sendable {
     func isEqual(to other: any Statement) -> Bool
 }
 
-struct Argument: Codable, Equatable {
+public struct Argument: Codable, Equatable, Sendable {
     var type: String
     var value: Int
 }
 
-struct Funcs: Codable, Equatable {
+public struct Funcs: Codable, Equatable, Sendable {
     var funcs: [Func] = []
 }
 
-struct Func: Codable, Equatable {
+public struct Func: Codable, Equatable, Sendable {
     var name: String
     var path: [String]
     var params: [Int]

@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import SwiftRego
+@testable import AST
 
 @Test
 func testJsonToRegoValues() throws {
@@ -36,9 +36,9 @@ func testJsonToRegoValues() throws {
         """#
 
     let d = try JSONSerialization.jsonObject(with: input.data(using: .utf8)!)
-    let val = try Ast.RegoValue(from: d)
+    let val = try AST.RegoValue(from: d)
 
-    let expected = Ast.RegoValue.object([
+    let expected = AST.RegoValue.object([
         "pets": .array([
             .object([
                 "name": .string("Mr. Meowgi"),

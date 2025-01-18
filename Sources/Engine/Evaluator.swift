@@ -1,10 +1,12 @@
 // Evaluator.swift - this file contains code related to evaluating an Rego IR Plan.
+import AST
+import IR
 
 struct EvaluationContext {
     let query: String = ""
-    let input: Ast.RegoValue = Ast.RegoValue.null
+    let input: AST.RegoValue = AST.RegoValue.null
     var results: ResultSet = ResultSet()
-    var funcs: [String: Func] = [:]  // indexed from the policy top-level funcs
+    var funcs: [String: IR.Func] = [:]  // indexed from the policy top-level funcs
     let staticStrings: [String] = []  // populate from the policy top-level static.strings
 }
 
@@ -12,7 +14,7 @@ struct ResultSet {
     var results: [EvalResult] = []  // array of [String: RegoValue] dictionaries
 }
 
-typealias EvalResult = [String: Ast.RegoValue]
+typealias EvalResult = [String: AST.RegoValue]
 
 struct Locals {
     var locals: [Int: Any]

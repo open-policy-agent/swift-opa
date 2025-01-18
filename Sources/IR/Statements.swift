@@ -1,5 +1,5 @@
-struct AssignAppendStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct AssignAppendStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case array
@@ -9,7 +9,7 @@ struct AssignAppendStatement: Statement, Codable, Equatable {
     var array: Local
     var value: Operand
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -17,8 +17,8 @@ struct AssignAppendStatement: Statement, Codable, Equatable {
     }
 }
 
-struct AssignIntStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct AssignIntStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case value
@@ -28,7 +28,7 @@ struct AssignIntStatement: Statement, Codable, Equatable {
     var value: Int64
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -36,8 +36,8 @@ struct AssignIntStatement: Statement, Codable, Equatable {
     }
 }
 
-struct AssignVarOnceStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct AssignVarOnceStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case source
@@ -46,7 +46,7 @@ struct AssignVarOnceStatement: Statement, Codable, Equatable {
     var source: Operand
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -54,8 +54,8 @@ struct AssignVarOnceStatement: Statement, Codable, Equatable {
     }
 }
 
-struct AssignVarStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct AssignVarStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case source
@@ -65,7 +65,7 @@ struct AssignVarStatement: Statement, Codable, Equatable {
     var source: Operand
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -73,8 +73,8 @@ struct AssignVarStatement: Statement, Codable, Equatable {
     }
 }
 
-struct BlockStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct BlockStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case blocks
@@ -82,7 +82,7 @@ struct BlockStatement: Statement, Codable, Equatable {
 
     var blocks: [Block]
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -90,8 +90,8 @@ struct BlockStatement: Statement, Codable, Equatable {
     }
 }
 
-struct BreakStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct BreakStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case index
@@ -99,7 +99,7 @@ struct BreakStatement: Statement, Codable, Equatable {
 
     var index: UInt32
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -107,8 +107,8 @@ struct BreakStatement: Statement, Codable, Equatable {
     }
 }
 
-struct CallDynamicStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct CallDynamicStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case path
@@ -120,7 +120,7 @@ struct CallDynamicStatement: Statement, Codable, Equatable {
     var args: [Local]
     var result: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -128,8 +128,8 @@ struct CallDynamicStatement: Statement, Codable, Equatable {
     }
 }
 
-struct CallStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct CallStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     var callFunc: String = ""
     var args: [Argument] = []
@@ -139,7 +139,7 @@ struct CallStatement: Statement, Codable, Equatable {
         case args
     }
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -147,8 +147,8 @@ struct CallStatement: Statement, Codable, Equatable {
     }
 }
 
-struct DotStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct DotStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case source
@@ -159,7 +159,7 @@ struct DotStatement: Statement, Codable, Equatable {
     var key: Operand
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -167,8 +167,8 @@ struct DotStatement: Statement, Codable, Equatable {
     }
 }
 
-struct EqualStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct EqualStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case a
@@ -177,7 +177,7 @@ struct EqualStatement: Statement, Codable, Equatable {
     var a: Operand
     var b: Operand
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -185,8 +185,8 @@ struct EqualStatement: Statement, Codable, Equatable {
     }
 }
 
-struct IsArrayStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct IsArrayStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case source
@@ -194,7 +194,7 @@ struct IsArrayStatement: Statement, Codable, Equatable {
 
     var source: Operand
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -202,8 +202,8 @@ struct IsArrayStatement: Statement, Codable, Equatable {
     }
 }
 
-struct IsDefinedStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct IsDefinedStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case source
@@ -211,7 +211,7 @@ struct IsDefinedStatement: Statement, Codable, Equatable {
     // NOTE: There is a mistake upstream in the spec, which specifies this as an operand (https://www.openpolicyagent.org/docs/latest/ir/#isdefinedstmt)
     var source: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -219,8 +219,8 @@ struct IsDefinedStatement: Statement, Codable, Equatable {
     }
 }
 
-struct IsObjectStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct IsObjectStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case source
@@ -228,7 +228,7 @@ struct IsObjectStatement: Statement, Codable, Equatable {
 
     var source: Operand
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -236,8 +236,8 @@ struct IsObjectStatement: Statement, Codable, Equatable {
     }
 }
 
-struct IsSetStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct IsSetStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case source
@@ -245,7 +245,7 @@ struct IsSetStatement: Statement, Codable, Equatable {
 
     var source: Operand
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -253,8 +253,8 @@ struct IsSetStatement: Statement, Codable, Equatable {
     }
 }
 
-struct IsUndefinedStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct IsUndefinedStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case source
@@ -262,7 +262,7 @@ struct IsUndefinedStatement: Statement, Codable, Equatable {
     // NOTE: There is a mistake upstream in the spec, which specifies this as an operand (https://www.openpolicyagent.org/docs/latest/ir/#isundefinedstmt)
     var source: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -270,8 +270,8 @@ struct IsUndefinedStatement: Statement, Codable, Equatable {
     }
 }
 
-struct LenStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct LenStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case source
@@ -281,7 +281,7 @@ struct LenStatement: Statement, Codable, Equatable {
     var source: Operand
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -289,8 +289,8 @@ struct LenStatement: Statement, Codable, Equatable {
     }
 }
 
-struct MakeArrayStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct MakeArrayStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case capacity
@@ -300,7 +300,7 @@ struct MakeArrayStatement: Statement, Codable, Equatable {
     var capacity: Int32
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -308,8 +308,8 @@ struct MakeArrayStatement: Statement, Codable, Equatable {
     }
 }
 
-struct MakeNullStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct MakeNullStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case target
@@ -317,7 +317,7 @@ struct MakeNullStatement: Statement, Codable, Equatable {
 
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -325,8 +325,8 @@ struct MakeNullStatement: Statement, Codable, Equatable {
     }
 }
 
-struct MakeNumberStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct MakeNumberStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case value
@@ -336,7 +336,7 @@ struct MakeNumberStatement: Statement, Codable, Equatable {
     var value: Int64
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -344,8 +344,8 @@ struct MakeNumberStatement: Statement, Codable, Equatable {
     }
 }
 
-struct MakeNumberRefStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct MakeNumberRefStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         // According to the Java SDK - "yup, it's capitalized"
@@ -356,7 +356,7 @@ struct MakeNumberRefStatement: Statement, Codable, Equatable {
     var index: Int32
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -364,8 +364,8 @@ struct MakeNumberRefStatement: Statement, Codable, Equatable {
     }
 }
 
-struct MakeObjectStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct MakeObjectStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case target
@@ -373,7 +373,7 @@ struct MakeObjectStatement: Statement, Codable, Equatable {
 
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -381,8 +381,8 @@ struct MakeObjectStatement: Statement, Codable, Equatable {
     }
 }
 
-struct MakeSetStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct MakeSetStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case target
@@ -390,7 +390,7 @@ struct MakeSetStatement: Statement, Codable, Equatable {
 
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -398,18 +398,18 @@ struct MakeSetStatement: Statement, Codable, Equatable {
     }
 }
 
-struct NopStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct NopStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     // Workaround - NopStatement has no fields aside from the Location fields, which
     // are decoded generically in Block's decode initializer.
     // Since we can' provide an empty CodingKeys, and we don't want the default magic
     // behavior of looking for a "location" key, we override the decoding initializer
     // and do nothing.
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
     }
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -417,8 +417,8 @@ struct NopStatement: Statement, Codable, Equatable {
     }
 }
 
-struct NotStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct NotStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case block
@@ -426,7 +426,7 @@ struct NotStatement: Statement, Codable, Equatable {
 
     var block: Block
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -434,8 +434,8 @@ struct NotStatement: Statement, Codable, Equatable {
     }
 }
 
-struct NotEqualStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct NotEqualStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case a
@@ -445,7 +445,7 @@ struct NotEqualStatement: Statement, Codable, Equatable {
     var a: Operand
     var b: Operand
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -453,8 +453,8 @@ struct NotEqualStatement: Statement, Codable, Equatable {
     }
 }
 
-struct ObjectInsertOnceStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct ObjectInsertOnceStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case key
@@ -466,7 +466,7 @@ struct ObjectInsertOnceStatement: Statement, Codable, Equatable {
     var value: Operand
     var object: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -474,8 +474,8 @@ struct ObjectInsertOnceStatement: Statement, Codable, Equatable {
     }
 }
 
-struct ObjectInsertStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct ObjectInsertStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case key
@@ -487,7 +487,7 @@ struct ObjectInsertStatement: Statement, Codable, Equatable {
     var value: Operand
     var object: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -495,8 +495,8 @@ struct ObjectInsertStatement: Statement, Codable, Equatable {
     }
 }
 
-struct ObjectMergeStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct ObjectMergeStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case a
@@ -508,7 +508,7 @@ struct ObjectMergeStatement: Statement, Codable, Equatable {
     var b: Local
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -516,8 +516,8 @@ struct ObjectMergeStatement: Statement, Codable, Equatable {
     }
 }
 
-struct ResetLocalStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct ResetLocalStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case target
@@ -525,22 +525,23 @@ struct ResetLocalStatement: Statement, Codable, Equatable {
 
     var target: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
         return self == rhs
     }
 }
-struct ResultSetAddStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+
+public struct ResultSetAddStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case value
     }
     var value: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -548,23 +549,24 @@ struct ResultSetAddStatement: Statement, Codable, Equatable {
     }
 }
 
-struct ReturnLocalStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct ReturnLocalStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case source
     }
     var source: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
         return self == rhs
     }
 }
-struct ScanStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+
+public struct ScanStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case source
@@ -578,7 +580,7 @@ struct ScanStatement: Statement, Codable, Equatable {
     var value: Local
     var block: Block
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -586,8 +588,8 @@ struct ScanStatement: Statement, Codable, Equatable {
     }
 }
 
-struct SetAddStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct SetAddStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case value
@@ -597,7 +599,7 @@ struct SetAddStatement: Statement, Codable, Equatable {
     var value: Operand
     var set: Local
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }
@@ -605,8 +607,8 @@ struct SetAddStatement: Statement, Codable, Equatable {
     }
 }
 
-struct WithStatement: Statement, Codable, Equatable {
-    var location: Location = Location()
+public struct WithStatement: Statement, Codable, Equatable {
+    public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
         case local
@@ -620,7 +622,7 @@ struct WithStatement: Statement, Codable, Equatable {
     var value: Operand
     var block: Block
 
-    func isEqual(to other: any Statement) -> Bool {
+    public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
         }

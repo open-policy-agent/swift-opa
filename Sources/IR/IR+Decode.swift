@@ -6,7 +6,7 @@
 import Foundation
 
 extension Policy {
-    init(fromJson rawJson: Data) throws {
+    public init(fromJson rawJson: Data) throws {
         self = try JSONDecoder().decode(Self.self, from: rawJson)
     }
 }

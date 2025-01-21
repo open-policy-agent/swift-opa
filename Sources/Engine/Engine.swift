@@ -1,23 +1,10 @@
 import Foundation
 
-public protocol Engine {
+public struct Engine {
+    // TODO bundles here on the engine or on the EvaluationContext?
+    var bundles: [String: Bundle]
 
-}
-
-struct IREvaluationContext {
-
-}
-
-public struct IREngine: Engine {
-
-    //    // TODO when is the right time for this loading to happen?
-    //    func load(withBundleLoader bundleLoader: BundleLoader) async throws {
-    //
-    //    }
-    //
-    func evaluate(withContext ctx: EvaluationContext = EvaluationContext()) async throws
-        -> ResultSet
-    {
+    func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet {
         return ResultSet()
     }
 }

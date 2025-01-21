@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import Runtime
+@testable import Engine
 
 @Suite("BundleDecodingTests")
 struct BundleDecodingTests {
@@ -169,6 +169,19 @@ struct BundleDecodingTests {
             let b: Bool = mirror.subjectType == tc.expectedErr
             return b
         }
+    }
+}
+
+@Suite("BundleDirectoryLoaderTests")
+struct BundleDirectoryLoaderTests {
+    @Test
+    func testDirectoryLoader() throws {
+        // TODO
+        //        let url = URL(fileURLWithPath: "/tmp")  // .deletingLastPathComponent()
+        //        let bdl = DirectoryLoader(baseURL: url)
+        //        for entry in bdl.enumerated() {
+        //            print(entry)
+        //        }
     }
 }
 

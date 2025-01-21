@@ -18,23 +18,32 @@ let package = Package(
             name: "SwiftRego",
             dependencies: ["AST", "IR", "Runtime", "Engine"]
         ),
-        .testTarget(
-            name: "SwiftRegoTests",
-            dependencies: ["SwiftRego"]
-        ),
         .target(name: "AST"),
         .target(name: "IR"),
         .target(
-            name: "Runtime",
-            dependencies: ["AST"]),
-        .target(
             name: "Engine",
             dependencies: ["AST", "IR"]),
+        .target(
+            name: "Runtime",
+            dependencies: ["AST"]),
+        // Internal module tests
+        .testTarget(
+            name: "ASTTests",
+            dependencies: ["AST"]
+        ),
         .testTarget(
             name: "IRTests",
             dependencies: ["IR"],
             resources: [.copy("Fixtures")]
         ),
-        .testTarget(name: "ASTTests"),
+        .testTarget(
+            name: "EngineTests",
+            dependencies: ["Engine"]
+        ),
+        // Public API surface tests
+        .testTarget(
+            name: "SwiftRegoTests",
+            dependencies: ["SwiftRego"]
+        ),
     ]
 )

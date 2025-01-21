@@ -1,9 +1,3 @@
-//
-//  Store.swift
-//  SwiftRego
-//
-//  Created by Oren Shomron on 1/17/25.
-//
 import AST
 
 public protocol Store {

@@ -13,7 +13,7 @@ internal struct IREvaluator {
                 } catch {
                     throw EvaluatorError.bundleInitializationFailed(
                         bundle: bundleName,
-                        reason: "IR plan file '\($0.path)' parsing failed: \(error)"
+                        reason: "IR plan file '\($0.url)' parsing failed: \(error)"
                     )
                 }
             }

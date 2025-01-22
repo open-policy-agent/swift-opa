@@ -9,7 +9,7 @@ struct Bundle {
 
 struct Manifest: Equatable, Sendable {
     let revision: String
-    let roots: [String]?
+    let roots: [String]
     let regoVersion: Version
     let metadata: [String: AST.RegoValue]
 
@@ -28,28 +28,13 @@ extension Manifest {
                 DecodingError.Context(codingPath: [], debugDescription: "Invalid JSON format"))
         }
 
-        guard let revision = jsonDict["revision"] as? String else {
-            throw DecodingError.keyNotFound(
-                CodingKeys.revision,
-                DecodingError.Context(
-                    codingPath: [CodingKeys.revision],
-                    debugDescription: "Missing required field 'revision'"))
-        }
-        self.revision = revision
+        let revision = jsonDict["revision"] as? String ?? ""
 
-        // TODO is roots optional??
-        guard let roots = jsonDict["roots"] as? [String] else {
-            throw DecodingError.keyNotFound(
-                CodingKeys.roots,
-                DecodingError.Context(
-                    codingPath: [CodingKeys.roots],
-                    debugDescription: "Missing required field 'roots'"))
-        }
-        self.roots = roots
+        let roots = jsonDict["roots"] as? [String] ?? [""]
 
-        let regoVersion = jsonDict["rego_version"] as? Int ?? 1
-        self.regoVersion =
-            switch regoVersion {
+        let regoVersionProp = jsonDict["rego_version"] as? Int ?? 1
+        let regoVersion: Version =
+            switch regoVersionProp {
             case 0:
                 .regoV0
             case 1:
@@ -61,10 +46,12 @@ extension Manifest {
             }
 
         guard let metadataAny = jsonDict["metadata"] else {
-            self.metadata = [:]
+            // No metadata, use default
+            self.init(revision: revision, roots: roots, regoVersion: regoVersion, metadata: [:])
             return
         }
 
+        // Parse metadata
         let metadataValue = try AST.RegoValue(from: metadataAny)
         guard case .object(let metadataDict) = metadataValue else {
             throw DecodingError.typeMismatch(
@@ -72,7 +59,8 @@ extension Manifest {
                 DecodingError.Context(
                     codingPath: [CodingKeys.metadata], debugDescription: "Invalid metadata value"))
         }
-        self.metadata = metadataDict
+        
+        self.init(revision: revision, roots: roots, regoVersion: regoVersion, metadata: metadataDict)
     }
 
     enum CodingKeys: String, CodingKey {

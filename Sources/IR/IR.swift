@@ -1,7 +1,7 @@
 public struct Policy: Codable, Equatable, Sendable {
-    var staticData: Static?
-    var plans: Plans? = nil
-    var funcs: Funcs? = nil
+    public var staticData: Static?
+    public var plans: Plans? = nil
+    public var funcs: Funcs? = nil
 
     enum CodingKeys: String, CodingKey {
         case staticData = "static"
@@ -11,9 +11,9 @@ public struct Policy: Codable, Equatable, Sendable {
 }
 
 public struct Static: Codable, Equatable, Sendable {
-    var strings: [ConstString]?
-    var builtinFuncs: [BuiltinFunc]?
-    var files: [ConstString]?
+    public var strings: [ConstString]?
+    public var builtinFuncs: [BuiltinFunc]?
+    public var files: [ConstString]?
 
     enum CodingKeys: String, CodingKey {
         case strings
@@ -23,20 +23,20 @@ public struct Static: Codable, Equatable, Sendable {
 }
 
 public struct ConstString: Codable, Equatable, Sendable {
-    var value: String
+    public var value: String
 }
 
 public struct Plans: Codable, Equatable, Sendable {
-    var plans: [Plan] = []
+    public var plans: [Plan] = []
 }
 
 public struct Plan: Codable, Equatable, Sendable {
-    var name: String
-    var blocks: [Block]
+    public var name: String
+    public var blocks: [Block]
 }
 
 public struct Block: Equatable, Sendable {
-    var statements: [any Statement]
+    public var statements: [any Statement]
 
     // Equatable, we need a custom implementation for dynamic dispatch
     // to our heterogenous extistential type instances (statements)
@@ -213,20 +213,20 @@ struct AnyStatement: Codable, Equatable {
 }
 
 // AnyInnerStatement represents the generic stmt field, which should always contain location fields.
-struct AnyInnerStatement: Codable, Equatable {
-    var location: Location {
+public struct AnyInnerStatement: Codable, Equatable {
+    public var location: Location {
         Location(row: row, col: col, file: file)
     }
 
-    var row: Int = 0
-    var col: Int = 0
-    var file: Int = 0
+    public var row: Int = 0
+    public var col: Int = 0
+    public var file: Int = 0
 }
 
 public struct Location: Codable, Equatable, Sendable {
-    var row: Int = 0
-    var col: Int = 0
-    var file: Int = 0
+    public var row: Int = 0
+    public var col: Int = 0
+    public var file: Int = 0
 }
 
 public enum StatementError: Error {
@@ -247,20 +247,20 @@ public protocol Statement: Sendable {
 }
 
 public struct Argument: Codable, Equatable, Sendable {
-    var type: String
-    var value: Int
+    public var type: String
+    public var value: Int
 }
 
 public struct Funcs: Codable, Equatable, Sendable {
-    var funcs: [Func] = []
+    public var funcs: [Func] = []
 }
 
 public struct Func: Codable, Equatable, Sendable {
-    var name: String
-    var path: [String]
-    var params: [Int]
-    var returnVar: Local
-    var blocks: [Block]
+    public var name: String
+    public var path: [String]
+    public var params: [Int]
+    public var returnVar: Local
+    public var blocks: [Block]
 
     enum CodingKeys: String, CodingKey {
         case name
@@ -271,9 +271,9 @@ public struct Func: Codable, Equatable, Sendable {
     }
 }
 
-typealias Local = UInt32
+public typealias Local = UInt32
 
-struct Operand: Equatable {
+public struct Operand: Equatable, Sendable {
     enum OpType: String, Codable, Equatable {
         case local = "local"
         case bool = "bool"
@@ -300,7 +300,7 @@ extension Operand: Codable {
         case value
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.type = try container.decode(OpType.self, forKey: .type)
 
@@ -317,7 +317,7 @@ extension Operand: Codable {
         }
     }
 
-    func encode(to encoder: any Encoder) throws {
+    public func encode(to encoder: any Encoder) throws {
         throw EncodingError.unsupported
     }
 }

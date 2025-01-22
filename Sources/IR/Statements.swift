@@ -6,8 +6,8 @@ public struct AssignAppendStatement: Statement, Codable, Equatable {
         case value
     }
 
-    var array: Local
-    var value: Operand
+    public var array: Local
+    public var value: Operand
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -25,8 +25,8 @@ public struct AssignIntStatement: Statement, Codable, Equatable {
         case target
     }
 
-    var value: Int64
-    var target: Local
+    public var value: Int64
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -43,8 +43,9 @@ public struct AssignVarOnceStatement: Statement, Codable, Equatable {
         case source
         case target
     }
-    var source: Operand
-    var target: Local
+
+    public var source: Operand
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -62,8 +63,8 @@ public struct AssignVarStatement: Statement, Codable, Equatable {
         case target
     }
 
-    var source: Operand
-    var target: Local
+    public var source: Operand
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -80,7 +81,7 @@ public struct BlockStatement: Statement, Codable, Equatable {
         case blocks
     }
 
-    var blocks: [Block]
+    public var blocks: [Block]
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -97,7 +98,7 @@ public struct BreakStatement: Statement, Codable, Equatable {
         case index
     }
 
-    var index: UInt32
+    public var index: UInt32
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -116,9 +117,9 @@ public struct CallDynamicStatement: Statement, Codable, Equatable {
         case result
     }
 
-    var path: [Operand]
-    var args: [Local]
-    var result: Local
+    public var path: [Operand]
+    public var args: [Local]
+    public var result: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -131,8 +132,8 @@ public struct CallDynamicStatement: Statement, Codable, Equatable {
 public struct CallStatement: Statement, Codable, Equatable {
     public var location: Location = Location()
 
-    var callFunc: String = ""
-    var args: [Argument] = []
+    public var callFunc: String = ""
+    public var args: [Argument] = []
 
     enum CodingKeys: String, CodingKey {
         case callFunc = "func"
@@ -155,9 +156,10 @@ public struct DotStatement: Statement, Codable, Equatable {
         case key
         case target
     }
-    var source: Operand
-    var key: Operand
-    var target: Local
+
+    public var source: Operand
+    public var key: Operand
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -174,8 +176,9 @@ public struct EqualStatement: Statement, Codable, Equatable {
         case a
         case b
     }
-    var a: Operand
-    var b: Operand
+
+    public var a: Operand
+    public var b: Operand
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -192,7 +195,7 @@ public struct IsArrayStatement: Statement, Codable, Equatable {
         case source
     }
 
-    var source: Operand
+    public var source: Operand
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -208,8 +211,9 @@ public struct IsDefinedStatement: Statement, Codable, Equatable {
     enum CodingKeys: String, CodingKey {
         case source
     }
+
     // NOTE: There is a mistake upstream in the spec, which specifies this as an operand (https://www.openpolicyagent.org/docs/latest/ir/#isdefinedstmt)
-    var source: Local
+    public var source: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -226,7 +230,7 @@ public struct IsObjectStatement: Statement, Codable, Equatable {
         case source
     }
 
-    var source: Operand
+    public var source: Operand
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -243,7 +247,7 @@ public struct IsSetStatement: Statement, Codable, Equatable {
         case source
     }
 
-    var source: Operand
+    public var source: Operand
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -259,8 +263,9 @@ public struct IsUndefinedStatement: Statement, Codable, Equatable {
     enum CodingKeys: String, CodingKey {
         case source
     }
+
     // NOTE: There is a mistake upstream in the spec, which specifies this as an operand (https://www.openpolicyagent.org/docs/latest/ir/#isundefinedstmt)
-    var source: Local
+    public var source: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -278,8 +283,8 @@ public struct LenStatement: Statement, Codable, Equatable {
         case target
     }
 
-    var source: Operand
-    var target: Local
+    public var source: Operand
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -297,8 +302,8 @@ public struct MakeArrayStatement: Statement, Codable, Equatable {
         case target
     }
 
-    var capacity: Int32
-    var target: Local
+    public var capacity: Int32
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -315,7 +320,7 @@ public struct MakeNullStatement: Statement, Codable, Equatable {
         case target
     }
 
-    var target: Local
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -333,8 +338,8 @@ public struct MakeNumberStatement: Statement, Codable, Equatable {
         case target
     }
 
-    var value: Int64
-    var target: Local
+    public var value: Int64
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -353,8 +358,8 @@ public struct MakeNumberRefStatement: Statement, Codable, Equatable {
         case target
     }
 
-    var index: Int32
-    var target: Local
+    public var index: Int32
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -371,7 +376,7 @@ public struct MakeObjectStatement: Statement, Codable, Equatable {
         case target
     }
 
-    var target: Local
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -388,7 +393,7 @@ public struct MakeSetStatement: Statement, Codable, Equatable {
         case target
     }
 
-    var target: Local
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -424,7 +429,7 @@ public struct NotStatement: Statement, Codable, Equatable {
         case block
     }
 
-    var block: Block
+    public var block: Block
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -442,8 +447,8 @@ public struct NotEqualStatement: Statement, Codable, Equatable {
         case b
     }
 
-    var a: Operand
-    var b: Operand
+    public var a: Operand
+    public var b: Operand
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -462,9 +467,9 @@ public struct ObjectInsertOnceStatement: Statement, Codable, Equatable {
         case object
     }
 
-    var key: Operand
-    var value: Operand
-    var object: Local
+    public var key: Operand
+    public var value: Operand
+    public var object: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -483,9 +488,9 @@ public struct ObjectInsertStatement: Statement, Codable, Equatable {
         case object
     }
 
-    var key: Operand
-    var value: Operand
-    var object: Local
+    public var key: Operand
+    public var value: Operand
+    public var object: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -504,9 +509,9 @@ public struct ObjectMergeStatement: Statement, Codable, Equatable {
         case target
     }
 
-    var a: Local
-    var b: Local
-    var target: Local
+    public var a: Local
+    public var b: Local
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -523,7 +528,7 @@ public struct ResetLocalStatement: Statement, Codable, Equatable {
         case target
     }
 
-    var target: Local
+    public var target: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -539,7 +544,8 @@ public struct ResultSetAddStatement: Statement, Codable, Equatable {
     enum CodingKeys: String, CodingKey {
         case value
     }
-    var value: Local
+
+    public var value: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -555,7 +561,8 @@ public struct ReturnLocalStatement: Statement, Codable, Equatable {
     enum CodingKeys: String, CodingKey {
         case source
     }
-    var source: Local
+
+    public var source: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -575,10 +582,10 @@ public struct ScanStatement: Statement, Codable, Equatable {
         case block
     }
 
-    var source: Local
-    var key: Local
-    var value: Local
-    var block: Block
+    public var source: Local
+    public var key: Local
+    public var value: Local
+    public var block: Block
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -596,8 +603,8 @@ public struct SetAddStatement: Statement, Codable, Equatable {
         case set
     }
 
-    var value: Operand
-    var set: Local
+    public var value: Operand
+    public var set: Local
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -617,10 +624,10 @@ public struct WithStatement: Statement, Codable, Equatable {
         case block
     }
 
-    var local: Local
-    var path: [Int32]?
-    var value: Operand
-    var block: Block
+    public var local: Local
+    public var path: [Int32]?
+    public var value: Operand
+    public var block: Block
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {

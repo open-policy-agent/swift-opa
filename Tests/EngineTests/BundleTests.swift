@@ -193,23 +193,24 @@ struct BundleDirectoryLoaderTests {
         let bundleURL: URL
         let expected: [BundleFile]
     }
-    
+
     static var testCases: [TestCase] {
         let resourcesURL = Bundle.module.resourceURL!
-        
+
         return [
             TestCase(
                 bundleURL: resourcesURL.appending(path: "TestData/Bundles/simple-directory-bundle"),
                 expected: [
                     BundleFile(
-                        url: resourcesURL.appending(path: "TestData/Bundles/simple-directory-bundle/data.json"),
+                        url: resourcesURL.appending(
+                            path: "TestData/Bundles/simple-directory-bundle/data.json"),
                         data: Data()
                     )
                 ]
             )
         ]
     }
-    
+
     @Test(arguments: testCases)
     func testDirectoryLoader(tc: TestCase) throws {
         let valid = Set(["data.json", "plan.json", ".manifest"])

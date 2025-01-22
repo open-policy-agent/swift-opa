@@ -8,6 +8,7 @@ protocol Evaluator {
 
 public enum EvaluationError: Error {
     case unknownQuery(query: String)
+    case evaluationCancelled(reason: String)
 }
 
 // EvaluationContext is the common evaluation context that is passed to the common Engine.

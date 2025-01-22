@@ -69,5 +69,10 @@ private func evalPlan(withContext ctx: IREvaluationContext, plan: IR.Plan) throw
 
     // TODO: Initialize the starting Frame and begin processing the first block of the plan
 
+    if Task.isCancelled {
+        // TODO: What should we do on cancel? Is raising an error the right thing?
+        throw EvaluationError.evaluationCancelled(reason: "parent task cancelled")
+    }
+
     return ResultSet()
 }

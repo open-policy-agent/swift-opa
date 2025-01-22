@@ -6,6 +6,10 @@ protocol Evaluator {
     func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet
 }
 
+public enum EvaluationError: Error {
+    case unknownQuery(query: String)
+}
+
 // EvaluationContext is the common evaluation context that is passed to the common Engine.
 struct EvaluationContext {
     let query: String = ""

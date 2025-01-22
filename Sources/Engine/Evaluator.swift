@@ -6,6 +6,10 @@ protocol Evaluator {
     func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet
 }
 
+public enum EvaluatorError: Error {
+    case bundleInitializationFailed(bundle: String, reason: String)
+}
+
 public enum EvaluationError: Error {
     case unknownQuery(query: String)
     case evaluationCancelled(reason: String)

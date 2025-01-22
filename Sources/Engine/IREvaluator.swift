@@ -1,17 +1,33 @@
+import Foundation
 import IR
 
-internal struct IREvaluator: Evaluator {
-    private var policies: [Policy] = []
+internal struct IREvaluator {
+    private var policies: [IndexedIRPolicy] = []
 
-    init(policies: [IR.Policy]) {
-        policies.forEach { self.policies.append(Policy(policy: $0)) }
+    init(bundles: [String: Bundle]) async throws {
+        for (bundleName, bundle) in bundles {
+            try bundle.planFiles.forEach {
+                do {
+                    let parsed = try JSONDecoder().decode(IR.Policy.self, from: $0.data)
+                    self.policies.append(IndexedIRPolicy(policy: parsed))
+                } catch {
+                    throw EvaluatorError.bundleInitializationFailed(
+                        bundle: bundleName,
+                        reason: "IR plan file '\($0.path)' parsing failed: \(error)"
+                    )
+                }
+            }
+        }
     }
+}
 
+extension IREvaluator: Evaluator {
     func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet {
         // TODO: We're assuming that queries are only ever defined in a single policy... that _should_ hold true.. but who's checkin?
         for policy in policies {
             if let plan = policy.plans[ctx.query] {
-                return try evalPlan(withContext: .init(ctx: ctx, policy: policy), plan: plan)
+                return try evalPlan(
+                    withContext: IREvaluationContext(ctx: ctx, policy: policy), plan: plan)
             }
         }
         throw EvaluationError.unknownQuery(query: ctx.query)
@@ -19,7 +35,7 @@ internal struct IREvaluator: Evaluator {
 }
 
 // Policy wraps an IR.Policy with some more optimized accessors for use in evaluations.
-private struct Policy {
+private struct IndexedIRPolicy {
     var ir: IR.Policy
     var plans: [String: IR.Plan] = [:]  // indexed from the policy top level plans by plan name (aka query name)
     var funcs: [String: IR.Func] = [:]  // indexed from the policy top-level funcs by function name
@@ -41,11 +57,11 @@ private struct Policy {
 
 private struct IREvaluationContext {
     var ctx: EvaluationContext
-    var policy: Policy
+    var policy: IndexedIRPolicy
 
     var results: ResultSet = ResultSet()  // TODO: do we need/want to track results on this context?
 
-    init(ctx: EvaluationContext, policy: Policy) {
+    init(ctx: EvaluationContext, policy: IndexedIRPolicy) {
         self.ctx = ctx
         self.policy = policy
     }

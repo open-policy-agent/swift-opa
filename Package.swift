@@ -41,7 +41,8 @@ let package = Package(
         ),
         .testTarget(
             name: "EngineTests",
-            dependencies: ["Engine"]
+            dependencies: ["Engine"],
+            resources: [.copy("TestData")]
         ),
         // Public API surface tests
         .testTarget(

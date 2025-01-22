@@ -171,7 +171,7 @@ struct BundleDecodingTests {
                     }
                     """#.data(using: .utf8)!,
                 expectedErr: DecodingError.self
-            ),
+            )
         ]
     }
 
@@ -189,12 +189,31 @@ struct BundleDecodingTests {
 
 @Suite("BundleDirectoryLoaderTests")
 struct BundleDirectoryLoaderTests {
-    @Test
-    func testDirectoryLoader() throws {
+    struct TestCase {
+        let bundleURL: URL
+        let expected: [BundleFile]
+    }
+    
+    static var testCases: [TestCase] {
+        let resourcesURL = Bundle.module.resourceURL!
+        
+        return [
+            TestCase(
+                bundleURL: resourcesURL.appending(path: "TestData/Bundles/simple-directory-bundle"),
+                expected: [
+                    BundleFile(
+                        url: resourcesURL.appending(path: "TestData/Bundles/simple-directory-bundle/data.json"),
+                        data: Data()
+                    )
+                ]
+            )
+        ]
+    }
+    
+    @Test(arguments: testCases)
+    func testDirectoryLoader(tc: TestCase) throws {
         let valid = Set(["data.json", "plan.json", ".manifest"])
-        let url = URL(fileURLWithPath: "/Users/shomron/sandbox/plan-aquaria/untar")
-        let bdl = DirectorySequence(baseURL: url)
-        //        let bdl = DirectoryLoader.load(at: url)
+        let bdl = DirectorySequence(baseURL: tc.bundleURL)
         for entry in bdl.lazy.filter({ elem in
             switch elem {
             case .failure:

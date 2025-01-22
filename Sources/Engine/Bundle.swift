@@ -84,6 +84,6 @@ extension Manifest {
 }
 
 struct BundleFile: Sendable {
-    let path: String
+    let url: URL
     let data: Data
 }

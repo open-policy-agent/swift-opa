@@ -176,12 +176,26 @@ struct BundleDecodingTests {
 struct BundleDirectoryLoaderTests {
     @Test
     func testDirectoryLoader() throws {
-        // TODO
-        //        let url = URL(fileURLWithPath: "/tmp")  // .deletingLastPathComponent()
-        //        let bdl = DirectoryLoader(baseURL: url)
-        //        for entry in bdl.enumerated() {
-        //            print(entry)
-        //        }
+        let valid = Set(["data.json", "plan.json", ".manifest"])
+        let url = URL(fileURLWithPath: "/Users/shomron/sandbox/plan-aquaria/untar")
+        let bdl = DirectorySequence(baseURL: url)
+        //        let bdl = DirectoryLoader.load(at: url)
+        for entry in bdl.lazy.filter({ elem in
+            switch elem {
+            case .failure:
+                return true
+            case .success(let bundleFile):
+                return valid.contains(bundleFile.url.lastPathComponent)
+                    || bundleFile.url.pathExtension == "rego"
+            }
+        }) {
+            switch entry {
+            case .failure(let error):
+                throw error
+            case .success(let bundleFile):
+                print(bundleFile.url)
+            }
+        }
     }
 }
 

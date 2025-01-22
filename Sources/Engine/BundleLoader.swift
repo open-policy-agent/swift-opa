@@ -5,20 +5,21 @@ import Foundation
 //    func load() async throws -> Bundle
 //}
 //
-// DirectoryLoader is a sequence of BundleFiles over a filesystem directory.
-struct DirectoryLoader: Sequence {
+// DirectorySequence is a sequence of BundleFiles over a filesystem directory.
+struct DirectorySequence: Sequence {
     let baseURL: URL
 
     struct DirectoryIterator: IteratorProtocol {
         var innerIter: (any IteratorProtocol)?
         var fileError: Box<(any Error)?> = .init(nil)
+        var done: Bool = false
 
         init(baseURL: URL) {
             // Trick to allow the errorHandler below to retain a reference to the
             // captureError. It can't directly hold a reference to self, so instead self and
             // the current scope share the same underlying error storage.
             // For this to be ok, we need to hope the handler is always called on our same thread.
-            var captureError = Box<(any Error)?>(nil)
+            let captureError = Box<(any Error)?>(nil)
             self.fileError = captureError
 
             let enumerator = FileManager.default.enumerator(
@@ -26,7 +27,8 @@ struct DirectoryLoader: Sequence {
                 includingPropertiesForKeys: [.nameKey, .isDirectoryKey, .isRegularFileKey],
                 options: [],
                 errorHandler: { (url, error) -> Bool in
-                    // Capture the first error if any occur
+                    // Capture errors as they occur, they will be emitted back
+                    // to the end-user in next() below.
                     captureError.value = error
                     return false
                 }
@@ -38,28 +40,38 @@ struct DirectoryLoader: Sequence {
             self.innerIter = enumerator.makeIterator()
         }
         mutating func next() -> Result<BundleFile, Error>? {
-            // If we captured an error earlier, return it and end iteration.
+            if done {
+                return nil
+            }
+
+            // If we captured an error earlier from the inital setup of the enumerator,
+            // return it and end iteration.
             if let error = self.fileError.value {
+                done = true
                 return .failure(error)
             }
             let nextResult = innerIter?.next()
             guard let nextResult else {
-                if self.fileError.value != nil {
-                    // TODO: Does the errorHandler ever get called after the initial
-                    // enumerator is set up?
-                    return .failure(self.fileError.value!)
+                if let error = self.fileError.value {
+                    done = true
+                    return .failure(error)
                 }
 
                 // Iteration from underlying iterator complete
                 return nil
             }
+            guard let url = nextResult as? URL else {
+                done = true
+                return .failure(Err.unexpectedType)
+            }
 
             // TODO
-            return .success(BundleFile(path: "", data: Data()))
+            return .success(BundleFile(url: url, data: Data()))
         }
 
         enum Err: Error {
             case unknownError
+            case unexpectedType
         }
     }
 
@@ -67,6 +79,33 @@ struct DirectoryLoader: Sequence {
         return DirectoryIterator(baseURL: baseURL)
     }
 }
+
+// DirectoryLoader loads a sequence of OPA bundle files from a directory
+//struct DirectoryLoader {
+//    let baseURL: URL
+//    let validFiles = Set(["data.json", "plan.json", ".manifest"])
+//
+//    func load() async throws -> AnySequence<Result<BundleFile, Error>> {
+//        return AnySequence { () -> AnyIterator<Result<BundleFile, Error>> in
+//            var iter = DirectorySequence(baseURL: baseURL).makeIterator()
+//
+//            return AnyIterator {
+//                while(true) {
+//                    guard let next = iter.next() else { return nil }
+//
+//                    switch next {
+//                    case .failure(let error):
+//                        return .failure(error)
+//                    case .success(let url):
+//                        if validFiles.contains(url.lastPathComponent) ||  url.pathExtension == "rego" {
+//                            return .success(BundleFile(url: url))
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 // InMemBundleLoader implements BundleLoader over an in-memory bundle representation
 //struct InMemBundleLoader: BundleLoader {

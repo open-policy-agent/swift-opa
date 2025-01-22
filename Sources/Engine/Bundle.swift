@@ -8,10 +8,10 @@ struct Bundle {
 }
 
 struct Manifest: Equatable, Sendable {
-    let revision: String
-    let roots: [String]
-    let regoVersion: Version
-    let metadata: [String: AST.RegoValue]
+    var revision: String = ""
+    var roots: [String] = [""]
+    var regoVersion: Version = .regoV1
+    var metadata: [String: AST.RegoValue] = [:]
 
     enum Version: Int {
         case regoV0 = 0
@@ -29,12 +29,17 @@ extension Manifest {
         }
 
         let revision = jsonDict["revision"] as? String ?? ""
+        self.revision = revision
 
-        let roots = jsonDict["roots"] as? [String] ?? [""]
+        var roots = jsonDict["roots"] as? [String] ?? [""]
+        if roots.isEmpty {
+            roots = [""]
+        }
+        self.roots = roots
 
-        let regoVersionProp = jsonDict["rego_version"] as? Int ?? 1
-        let regoVersion: Version =
-            switch regoVersionProp {
+        let regoVersionInt = jsonDict["rego_version"] as? Int ?? 1
+        self.regoVersion =
+            switch regoVersionInt {
             case 0:
                 .regoV0
             case 1:
@@ -47,7 +52,7 @@ extension Manifest {
 
         guard let metadataAny = jsonDict["metadata"] else {
             // No metadata, use default
-            self.init(revision: revision, roots: roots, regoVersion: regoVersion, metadata: [:])
+            self.metadata = [:]
             return
         }
 
@@ -59,8 +64,7 @@ extension Manifest {
                 DecodingError.Context(
                     codingPath: [CodingKeys.metadata], debugDescription: "Invalid metadata value"))
         }
-        
-        self.init(revision: revision, roots: roots, regoVersion: regoVersion, metadata: metadataDict)
+        self.metadata = metadataDict
     }
 
     enum CodingKeys: String, CodingKey {

@@ -102,9 +102,52 @@ struct BundleDecodingTests {
                 expected:
                     Manifest(
                         revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
-                        roots: [],
+                        // Empty roots is coerced into one root empty string
+                        roots: [""],
                         regoVersion: .regoV1,
                         metadata: [:]
+                    )
+            ),
+            TestCase(
+                description: "missing revision",
+                data: #"""
+                    {
+                      "roots": ["roles", "http/example/authz"]
+                    }
+                    """#.data(using: .utf8)!,
+                expected:
+                    Manifest(
+                        revision: "",
+                        roots: ["roles", "http/example/authz"],
+                        regoVersion: .regoV1,
+                        metadata: [:]
+                    )
+            ),
+            TestCase(
+                description: "missing roots",
+                data: #"""
+                    {
+                      "revision" : "7864d60dd78d748dbce54b569e939f5b0dc07486"
+                    }
+                    """#.data(using: .utf8)!,
+                expected:
+                    Manifest(
+                        revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
+                        roots: [""]
+                    )
+            ),
+            TestCase(
+                description: "nil roots",
+                data: #"""
+                    {
+                      "revision" : "7864d60dd78d748dbce54b569e939f5b0dc07486",
+                      "roots": null
+                    }
+                    """#.data(using: .utf8)!,
+                expected:
+                    Manifest(
+                        revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
+                        roots: [""]
                     )
             ),
         ]
@@ -125,34 +168,6 @@ struct BundleDecodingTests {
                       "revision" : "7864d60dd78d748dbce54b569e939f5b0dc07486",
                       "roots": ["roles", "http/example/authz"],
                       "rego_version": 42
-                    }
-                    """#.data(using: .utf8)!,
-                expectedErr: DecodingError.self
-            ),
-            ErrorCase(
-                description: "missing revision",
-                data: #"""
-                    {
-                      "roots": ["roles", "http/example/authz"]
-                    }
-                    """#.data(using: .utf8)!,
-                expectedErr: DecodingError.self
-            ),
-            ErrorCase(
-                description: "missing roots",
-                data: #"""
-                    {
-                      "revision" : "7864d60dd78d748dbce54b569e939f5b0dc07486"
-                    }
-                    """#.data(using: .utf8)!,
-                expectedErr: DecodingError.self
-            ),
-            ErrorCase(
-                description: "nil roots",
-                data: #"""
-                    {
-                      "revision" : "7864d60dd78d748dbce54b569e939f5b0dc07486",
-                      "roots": null
                     }
                     """#.data(using: .utf8)!,
                 expectedErr: DecodingError.self

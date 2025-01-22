@@ -1,5 +1,3 @@
-import Foundation
-
 public struct Engine {
     // TODO bundles here on the engine or on the EvaluationContext?
     var bundles: [String: Bundle]

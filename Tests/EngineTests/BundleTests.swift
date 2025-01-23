@@ -190,22 +190,36 @@ struct BundleDecodingTests {
 @Suite("BundleDirectoryLoaderTests")
 struct BundleDirectoryLoaderTests {
     struct TestCase {
-        let bundleURL: URL
+        let sourceBundle: URL
         let expected: [BundleFile]
     }
 
-    static var testCases: [TestCase] {
+    static func relPath(_ path: String) -> URL {
         let resourcesURL = Bundle.module.resourceURL!
+        return resourcesURL.appending(path: path)
+    }
 
+    static var testCases: [TestCase] {
         return [
             TestCase(
-                bundleURL: resourcesURL.appending(path: "TestData/Bundles/simple-directory-bundle"),
+                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
                 expected: [
                     BundleFile(
-                        url: resourcesURL.appending(
-                            path: "TestData/Bundles/simple-directory-bundle/data.json"),
+                        url: relPath("TestData/Bundles/simple-directory-bundle/.manifest"),
                         data: Data()
-                    )
+                    ),
+                    BundleFile(
+                        url: relPath("TestData/Bundles/simple-directory-bundle/data.json"),
+                        data: Data()
+                    ),
+                    BundleFile(
+                        url: relPath("TestData/Bundles/simple-directory-bundle/plan.json"),
+                        data: Data()
+                    ),
+                    BundleFile(
+                        url: relPath("TestData/Bundles/simple-directory-bundle/app/rbac.rego"),
+                        data: Data()
+                    ),
                 ]
             )
         ]
@@ -214,23 +228,21 @@ struct BundleDirectoryLoaderTests {
     @Test(arguments: testCases)
     func testDirectoryLoader(tc: TestCase) throws {
         let valid = Set(["data.json", "plan.json", ".manifest"])
-        let bdl = DirectorySequence(baseURL: tc.bundleURL)
-        for entry in bdl.lazy.filter({ elem in
+        let bdl = DirectorySequence(baseURL: tc.sourceBundle)
+
+        let results: [BundleFile] = bdl.lazy.filter({ elem in
             switch elem {
             case .failure:
-                return true
+                return false
             case .success(let bundleFile):
                 return valid.contains(bundleFile.url.lastPathComponent)
                     || bundleFile.url.pathExtension == "rego"
             }
-        }) {
-            switch entry {
-            case .failure(let error):
-                throw error
-            case .success(let bundleFile):
-                print(bundleFile.url)
-            }
-        }
+        }).compactMap { try? $0.get() }  // Unwrap the success values, nils will get dumped by compactMap
+
+        let actualPaths = results.map { $0.url.path }.sorted()
+        let expectedPaths = tc.expected.map { $0.url.path }.sorted()
+        #expect(actualPaths == expectedPaths)
     }
 }
 

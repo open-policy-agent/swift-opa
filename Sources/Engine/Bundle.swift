@@ -75,7 +75,7 @@ extension Manifest {
     }
 }
 
-struct BundleFile: Sendable {
+struct BundleFile: Sendable, Hashable {
     let url: URL
     let data: Data
 }

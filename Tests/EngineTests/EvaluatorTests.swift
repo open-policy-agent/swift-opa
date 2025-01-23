@@ -64,6 +64,7 @@ struct ResultSetTests {
         ]
     }
 
+    // Verify ResultSet dedup with EvalResult hashing / equality generated conformance
     @Test(arguments: testCases)
     func testResultSet(tc: TestCase) throws {
         let s = ResultSet(tc.evalResults)

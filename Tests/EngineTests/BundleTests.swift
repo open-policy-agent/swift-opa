@@ -253,3 +253,7 @@ extension BundleDecodingTests.TestCase: CustomTestStringConvertible {
 extension BundleDecodingTests.ErrorCase: CustomTestStringConvertible {
     var testDescription: String { description }
 }
+
+extension BundleDirectoryLoaderTests.TestCase: CustomTestStringConvertible {
+    var testDescription: String { sourceBundle.lastPathComponent }
+}

@@ -9,7 +9,7 @@ internal struct IREvaluator {
         for (bundleName, bundle) in bundles {
             for planFile in bundle.planFiles {
                 do {
-                    let parsed = try JSONDecoder().decode(IR.Policy.self, from: planFile.data)
+                    let parsed = try IR.Policy(fromJson: planFile.data)
                     self.policies.append(IndexedIRPolicy(policy: parsed))
                 } catch {
                     throw EvaluatorError.bundleInitializationFailed(
@@ -55,9 +55,11 @@ private struct IndexedIRPolicy {
         self.ir = policy
         for plan in policy.plans?.plans ?? [] {
             // TODO: is plan.name actually the right string format to match a query string? If no, convert it here.
+            // TODO: validator should ensure these names were unique
             self.plans[plan.name] = plan
         }
         for funcDecl in policy.funcs?.funcs ?? [] {
+            // TODO: validator should ensure these names were unique
             self.funcs[funcDecl.name] = funcDecl
         }
         for string in policy.staticData?.strings ?? [] {
@@ -71,7 +73,7 @@ private struct IREvaluationContext {
     var policy: IndexedIRPolicy
 }
 
-private typealias Locals = [IR.Local: AST.RegoValue]  // TODO: is this the right type?
+private typealias Locals = [IR.Local: AST.RegoValue]
 
 private struct WithPatch {
     var local: IR.Local

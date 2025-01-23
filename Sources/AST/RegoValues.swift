@@ -1,7 +1,7 @@
 import Foundation
 
 // RegoValue represents any concrete JSON-representable value consumable by Rego
-public enum RegoValue: Equatable, Sendable {
+public enum RegoValue: Equatable, Sendable, Hashable {
     case array([RegoValue])
     case boolean(Bool)
     case null

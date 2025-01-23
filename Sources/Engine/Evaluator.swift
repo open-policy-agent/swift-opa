@@ -13,6 +13,7 @@ public enum EvaluatorError: Error {
 public enum EvaluationError: Error {
     case unknownQuery(query: String)
     case evaluationCancelled(reason: String)
+    case internalError(reason: String)
 }
 
 // EvaluationContext is the common evaluation context that is passed to the common Engine.
@@ -23,8 +24,6 @@ struct EvaluationContext {
     var results: ResultSet = ResultSet()
 }
 
-struct ResultSet {
-    var results: [EvalResult] = []  // array of [String: RegoValue] dictionaries
-}
+typealias ResultSet = Set<EvalResult>
 
 typealias EvalResult = [String: AST.RegoValue]

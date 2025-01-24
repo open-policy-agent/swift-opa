@@ -1,3 +1,4 @@
+import AST
 import Foundation
 import Testing
 
@@ -241,7 +242,7 @@ struct BundleDirectoryLoaderTests {
 struct BundleLoaderTests {
     struct TestCase {
         let sourceBundle: URL
-        //        let expected: Bundle
+        let expected: Rego.Bundle
     }
 
     static func relPath(_ path: String) -> URL {
@@ -252,7 +253,89 @@ struct BundleLoaderTests {
     static var testCases: [TestCase] {
         return [
             TestCase(
-                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle")
+                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                expected: Rego.Bundle(
+                    manifest: Rego.Manifest(
+                        revision: "e6f1a8ad-5b47-498f-a6eb-d1ecc86b63ae",
+                        roots: [""], regoVersion: Rego.Manifest.Version.regoV1,
+                        metadata: ["name": AST.RegoValue.string("example-rbac")]),
+
+                    planFiles: [
+                        Rego.BundleFile(
+                            url: relPath("TestData/Bundles/simple-directory-bundle/plan.json"),
+                            data: Data()
+                        )
+                    ],
+                    regoFiles: [
+                        Rego.BundleFile(
+                            url: relPath("TestData/Bundles/simple-directory-bundle/rbac.rego"),
+                            data: Data()
+                        )
+                    ],
+                    data:
+                        AST.RegoValue.object([
+                            "user_roles": AST.RegoValue.object([
+                                "eve": AST.RegoValue.array([
+                                    AST.RegoValue.string("customer")
+                                ]),
+                                "bob": AST.RegoValue.array([
+                                    AST.RegoValue.string("employee"),
+                                    AST.RegoValue.string("billing"),
+                                ]),
+                                "alice": AST.RegoValue.array([
+                                    AST.RegoValue.string("admin")
+                                ]),
+                            ]),
+                            "role_grants": AST.RegoValue.object([
+                                "billing": AST.RegoValue.array([
+                                    AST.RegoValue.object([
+                                        "action": AST.RegoValue.string("read"),
+                                        "type": AST.RegoValue.string("finance"),
+                                    ]),
+                                    AST.RegoValue.object([
+                                        "type": AST.RegoValue.string("finance"),
+                                        "action": AST.RegoValue.string("update"),
+                                    ]),
+                                ]),
+                                "customer": AST.RegoValue.array([
+                                    AST.RegoValue.object([
+                                        "type": AST.RegoValue.string("dog"),
+                                        "action": AST.RegoValue.string("read"),
+                                    ]),
+                                    AST.RegoValue.object([
+                                        "action": AST.RegoValue.string("read"),
+                                        "type": AST.RegoValue.string("cat"),
+                                    ]),
+                                    AST.RegoValue.object([
+                                        "action": AST.RegoValue.string("adopt"),
+                                        "type": AST.RegoValue.string("dog"),
+                                    ]),
+                                    AST.RegoValue.object([
+                                        "type": AST.RegoValue.string("cat"),
+                                        "action": AST.RegoValue.string("adopt"),
+                                    ]),
+                                ]),
+                                "employee": AST.RegoValue.array([
+                                    AST.RegoValue.object([
+                                        "action": AST.RegoValue.string("read"),
+                                        "type": AST.RegoValue.string("dog"),
+                                    ]),
+                                    AST.RegoValue.object([
+                                        "type": AST.RegoValue.string("cat"),
+                                        "action": AST.RegoValue.string("read"),
+                                    ]),
+                                    AST.RegoValue.object([
+                                        "action": AST.RegoValue.string("update"),
+                                        "type": AST.RegoValue.string("dog"),
+                                    ]),
+                                    AST.RegoValue.object([
+                                        "action": AST.RegoValue.string("update"),
+                                        "type": AST.RegoValue.string("cat"),
+                                    ]),
+                                ]),
+                            ]),
+                        ])
+                )
             )
         ]
     }
@@ -260,6 +343,51 @@ struct BundleLoaderTests {
     @Test(arguments: testCases)
     func testLoadingBundleFromDirectory(tc: TestCase) async throws {
         let b = try BundleLoader.load(fromDirectory: tc.sourceBundle)
+        // #expect(b == tc.expected)
+        #expect(fuzzyBundleEquals(b, tc.expected))
+    }
+
+    func fuzzyBundleEquals(_ lhs: Rego.Bundle, _ rhs: Rego.Bundle) -> Bool {
+        guard lhs.manifest == rhs.manifest else {
+            return false
+        }
+
+        guard lhs.planFiles.count == rhs.planFiles.count else {
+            return false
+        }
+
+        for (lhsFile, rhsFile) in zip(lhs.planFiles, rhs.planFiles) {
+            guard fuzzyBundleFileEquals(lhsFile, rhsFile) else {
+                return false
+            }
+        }
+
+        guard lhs.regoFiles.count == rhs.regoFiles.count else {
+            return false
+        }
+
+        for (lhsFile, rhsFile) in zip(lhs.regoFiles, rhs.regoFiles) {
+            guard fuzzyBundleFileEquals(lhsFile, rhsFile) else {
+                return false
+            }
+        }
+
+        guard lhs.data == rhs.data else {
+            return false
+        }
+
+        return true
+    }
+
+    func fuzzyBundleFileEquals(_ lhs: BundleFile, _ rhs: BundleFile) -> Bool {
+        // TODO check paths relative to the bundle base
+        guard lhs.url.lastPathComponent == rhs.url.lastPathComponent else {
+            print("\(lhs.url.lastPathComponent) != \(rhs.url.lastPathComponent)")
+            return false
+        }
+
+        // TODO ignore data for now
+        return true
     }
 
 }
@@ -273,5 +401,9 @@ extension BundleDecodingTests.ErrorCase: CustomTestStringConvertible {
 }
 
 extension BundleDirectoryLoaderTests.TestCase: CustomTestStringConvertible {
+    var testDescription: String { sourceBundle.lastPathComponent }
+}
+
+extension BundleLoaderTests.TestCase: CustomTestStringConvertible {
     var testDescription: String { sourceBundle.lastPathComponent }
 }

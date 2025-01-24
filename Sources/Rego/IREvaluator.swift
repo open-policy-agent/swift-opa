@@ -165,13 +165,11 @@ private func evalFrame(
     // To evaluate a Frame we iterate through each block of the current scope, evaluating
     // statements in the block one at a time. We will jump between blocks being executed but
     // never go backwards, only early exit maneuvers jumping "forward" in the plan.
-    blockLoop:
-    while currentScopePtr.v.blockIdx < currentScopePtr.v.blocks.count {
-        
+    blockLoop: while currentScopePtr.v.blockIdx < currentScopePtr.v.blocks.count {
+
         let currentBlock = currentScopePtr.v.blocks[currentScopePtr.v.blockIdx]
-        
-        stmtLoop:
-        while currentScopePtr.v.statementIdx < currentBlock.statements.count {
+
+        stmtLoop: while currentScopePtr.v.statementIdx < currentBlock.statements.count {
 
             if Task.isCancelled {
                 throw EvaluationError.evaluationCancelled(reason: "parent task cancelled")

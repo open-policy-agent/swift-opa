@@ -1,11 +1,11 @@
 import AST
 import Foundation
 
-struct Bundle {
-    let manifest: Manifest
-    let planFiles: [BundleFile]
-    let regoFiles: [BundleFile]
-    let data: AST.RegoValue
+struct Bundle: Equatable, Sendable {
+    var manifest: Manifest = Manifest()
+    var planFiles: [BundleFile] = []
+    var regoFiles: [BundleFile] = []
+    var data: AST.RegoValue = .object([:])
 }
 
 struct Manifest: Equatable, Sendable {

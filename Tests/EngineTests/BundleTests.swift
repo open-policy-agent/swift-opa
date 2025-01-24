@@ -227,23 +227,41 @@ struct BundleDirectoryLoaderTests {
 
     @Test(arguments: testCases)
     func testDirectoryLoader(tc: TestCase) throws {
-        let valid = Set(["data.json", "plan.json", ".manifest"])
-        let bdl = DirectorySequence(baseURL: tc.sourceBundle)
+        let bdl = DirectoryLoader(baseURL: tc.sourceBundle)
 
-        let results: [BundleFile] = bdl.lazy.filter({ elem in
-            switch elem {
-            case .failure:
-                return false
-            case .success(let bundleFile):
-                return valid.contains(bundleFile.url.lastPathComponent)
-                    || bundleFile.url.pathExtension == "rego"
-            }
-        }).compactMap { try? $0.get() }  // Unwrap the success values, nils will get dumped by compactMap
+        let results: [BundleFile] = bdl.compactMap { try? $0.get() }  // Unwrap the success values, nils will get dumped by compactMap
 
         let actualPaths = results.map { $0.url.path }.sorted()
         let expectedPaths = tc.expected.map { $0.url.path }.sorted()
         #expect(actualPaths == expectedPaths)
     }
+}
+
+@Suite
+struct BundleLoaderTests {
+    struct TestCase {
+        let sourceBundle: URL
+//        let expected: Bundle
+    }
+
+    static func relPath(_ path: String) -> URL {
+        let resourcesURL = Bundle.module.resourceURL!
+        return resourcesURL.appending(path: path)
+    }
+
+    static var testCases: [TestCase] {
+        return [
+            TestCase(
+                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle")
+            )
+        ]
+    }
+    
+    @Test(arguments: testCases)
+    func testLoadingBundleFromDirectory(tc: TestCase) async throws {
+        let b = try BundleLoader.load(fromDirectory: tc.sourceBundle)
+    }
+    
 }
 
 extension BundleDecodingTests.TestCase: CustomTestStringConvertible {

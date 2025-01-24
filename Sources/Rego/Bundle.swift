@@ -4,6 +4,7 @@ import Foundation
 struct Bundle {
     let manifest: Manifest
     let planFiles: [BundleFile]
+    let regoFiles: [BundleFile]
     let data: AST.RegoValue
 }
 

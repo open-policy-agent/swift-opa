@@ -19,12 +19,12 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "SwiftRego",
-            dependencies: ["AST", "IR", "Runtime", "Engine"]
+            dependencies: ["AST", "IR", "Runtime", "Rego"]
         ),
         .target(name: "AST"),
         .target(name: "IR"),
         .target(
-            name: "Engine",
+            name: "Rego",
             dependencies: ["AST", "IR"]),
         .target(
             name: "Runtime",
@@ -41,7 +41,7 @@ let package = Package(
         ),
         .testTarget(
             name: "EngineTests",
-            dependencies: ["Engine"],
+            dependencies: ["Rego"],
             resources: [.copy("TestData")]
         ),
         // Public API surface tests

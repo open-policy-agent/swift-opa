@@ -2,7 +2,7 @@ import AST
 import Foundation
 import Testing
 
-@testable import Engine
+@testable import Rego
 
 @Suite("ResultSetTests")
 struct ResultSetTests {

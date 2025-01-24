@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import Engine
+@testable import Rego
 
 @Suite("BundleDecodingTests")
 struct BundleDecodingTests {

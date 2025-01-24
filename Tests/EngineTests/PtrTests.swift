@@ -1,6 +1,6 @@
 import Testing
 
-@testable import Engine
+@testable import Rego
 
 @Suite
 struct PtrTests {

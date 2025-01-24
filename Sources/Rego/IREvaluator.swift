@@ -90,8 +90,7 @@ private struct Frame {
     var results: ResultSet = ResultSet()
 
     init(blocks: [IR.Block], locals: Locals = [:]) {
-        var initialScope = Scope(blocks: blocks, locals: locals)
-        let initialScopePtr = Ptr(ref: &initialScope)
+        let initialScopePtr = Ptr(toCopyOf: Scope(blocks: blocks, locals: locals))
         for (idx, value) in initialScopePtr.v.locals {
             self.locals[idx] = value
         }

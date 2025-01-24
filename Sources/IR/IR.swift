@@ -281,7 +281,7 @@ public struct Operand: Equatable, Sendable {
     }
 
     public enum Value: Equatable, Sendable {
-        case number(Int)
+        case localIndex(Int)
         case bool(Bool)
         case stringIndex(Int)
     }
@@ -307,7 +307,7 @@ extension Operand: Codable {
         switch self.type {
         case .local:
             let v = try container.decode(Int.self, forKey: .value)
-            self.value = Value.number(v)
+            self.value = Value.localIndex(v)
         case .bool:
             let v = try container.decode(Bool.self, forKey: .value)
             self.value = Value.bool(v)

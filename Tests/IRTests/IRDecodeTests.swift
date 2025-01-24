@@ -89,7 +89,7 @@ func decodeIRStatements() throws {
                                             location: Location(row: 1, col: 2, file: 3),
                                             source: Operand(
                                                 type: .local,
-                                                value: .number(2)
+                                                value: .localIndex(2)
                                             ),
                                             target: 3
                                         ),
@@ -105,7 +105,7 @@ func decodeIRStatements() throws {
                                             ),
                                             value: Operand(
                                                 type: .local,
-                                                value: .number(3)
+                                                value: .localIndex(3)
                                             ),
                                             object: 4
                                         ),
@@ -149,7 +149,7 @@ func decodeIROperands() throws {
                     "value": 7
                 }
                 """#,
-            expected: .success(Operand(type: .local, value: .number(7)))
+            expected: .success(Operand(type: .local, value: .localIndex(7)))
         ),
         TestCase(
             name: "simple bool",
@@ -255,7 +255,7 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                 AssignVarStatement(
                     source: Operand(
                         type: .local,
-                        value: .number(123)
+                        value: .localIndex(123)
                     ),
                     target: 456
                 ),
@@ -276,7 +276,7 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                 AssignVarStatement(
                     source: Operand(
                         type: .local,
-                        value: .number(123)
+                        value: .localIndex(123)
                     ),
                     target: 456
                 ),
@@ -291,7 +291,7 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                 AssignVarStatement(
                     source: Operand(
                         type: .local,
-                        value: .number(123)
+                        value: .localIndex(123)
                     ),
                     target: 456
                 ),
@@ -322,7 +322,7 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                 AssignVarStatement(
                     source: Operand(
                         type: .local,
-                        value: .number(123)
+                        value: .localIndex(123)
                     ),
                     target: 456
                 ),
@@ -347,7 +347,7 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                 AssignVarStatement(
                     source: Operand(
                         type: .local,
-                        value: .number(123)
+                        value: .localIndex(123)
                     ),
                     target: 456
                 ),
@@ -368,7 +368,7 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                 AssignVarStatement(
                     source: Operand(
                         type: .local,
-                        value: .number(123)
+                        value: .localIndex(123)
                     ),
                     target: 456
                 ),

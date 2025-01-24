@@ -90,7 +90,7 @@ private struct Frame {
     }
 
     func currentScope() throws -> Ptr<Scope> {
-        if self.scopeStack.count <= 0 {
+        guard !self.scopeStack.isEmpty else {
             throw EvaluationError.internalError(reason: "no scopes remain on the frame")
         }
         return self.scopeStack.last!
@@ -113,18 +113,19 @@ private struct Frame {
 
     func resolveLocal(ctx: IREvaluationContext, idx: IR.Local) throws -> AST.RegoValue? {
         // walk the scope stack backwards looking for the first hit
-        var i = self.scopeStack.count - 1
-        while i >= 0 {
+        // stride sequence is empty if we gave an impossible range (-1..0 with -1 stride)
+        // so we correctly don't enter the loop with an empty scopeStack.
+        for i in stride(from: self.scopeStack.count - 1, through: 0, by: -1) {
             if let localValue = self.scopeStack[i].v.locals[idx] {
                 return localValue
             }
-            i -= 1
         }
+
         return nil
     }
 
     mutating func assignLocal(idx: IR.Local, value: AST.RegoValue) throws {
-        if self.scopeStack.count <= 0 {
+        guard !self.scopeStack.isEmpty else {
             throw EvaluationError.internalError(
                 reason: "attempted to assign local with no scope on the frame")
         }
@@ -259,8 +260,7 @@ private func evalFrame(
             case let stmt as IR.ResetLocalStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.ResultSetAddStatement:
-                let value: AST.RegoValue? = try framePtr.v.resolveLocal(ctx: ctx, idx: stmt.value)
-                guard value != nil else {
+                guard let value = try framePtr.v.resolveLocal(ctx: ctx, idx: stmt.value) else {
                     // undefined
                     currentScopePtr.v.blockIdx += 1
                     currentScopePtr.v.statementIdx = 0
@@ -282,46 +282,36 @@ private func evalFrame(
             case let stmt as IR.WithStatement:
                 // First we need to resolve the value that will be upserted
                 var value: AST.RegoValue?
-                switch stmt.value.type {
-                case .local:
-                    guard case .number(let numberValue) = stmt.value.value else {
-                        throw EvaluationError.invalidDataType(
-                            reason: "expected number value type with local operand,"
-                                + " got \(type(of: stmt.value.value))")
-                    }
+                switch stmt.value.value {
+                case .localIndex(let numberValue):
                     value = try framePtr.v.resolveLocal(ctx: ctx, idx: Local(numberValue))
-                case .bool:
-                    guard case .bool(let boolValue) = stmt.value.value else {
-                        throw EvaluationError.invalidDataType(
-                            reason: "expected boolean value type with boolean operand,"
-                                + " got \(type(of: stmt.value.value))")
-                    }
+                case .bool(let boolValue):
                     value = AST.RegoValue.boolean(boolValue)
-                case .stringIndex:
-                    guard case .stringIndex(let idxValue) = stmt.value.value else {
-                        throw EvaluationError.invalidDataType(
-                            reason: "expected integer value type with string_index operand,"
-                                + " got \(type(of: stmt.value.value))")
+                case .stringIndex(let stringIdx):
+                    guard stringIdx >= 0 && stringIdx < ctx.policy.staticStrings.endIndex else {
+                        throw EvaluationError.invalidOperand(
+                            reason:
+                                "string index out of bounds 0..\(stringIdx)..\(ctx.policy.staticStrings.endIndex)"
+                        )
                     }
-                    value = AST.RegoValue.string(ctx.policy.staticStrings[idxValue])
+                    value = AST.RegoValue.string(ctx.policy.staticStrings[stringIdx])
                 }
 
-                guard value != nil else {
+                guard let value else {
                     throw EvaluationError.internalError(
                         reason: "unable to resolve target value for WithStmt patching")
                 }
+                // TODO what do we do with the value now?
 
                 // Next look up the object we'll be upserting in to
-                var patched: AST.RegoValue? = try framePtr.v.resolveLocal(ctx: ctx, idx: stmt.local)
-
-                guard patched != nil else {
+                guard let patched = try framePtr.v.resolveLocal(ctx: ctx, idx: stmt.local) else {
                     // undefined // TODO: is this the right behavior? Or we should just "patch" a fresh empty object?
                     currentScopePtr.v.blockIdx += 1
                     currentScopePtr.v.statementIdx = 0
                     break blockLoop
                 }
 
-                guard case .object(var patchedObj) = patched! else {
+                guard case .object(var patchedObj) = patched else {
                     throw EvaluationError.internalError(
                         reason: "unexpected value type \(type(of: statement)) for WithStmt patch")
                 }
@@ -333,7 +323,7 @@ private func evalFrame(
                 // scopes values) and start evaluating the new block
                 currentScopePtr = framePtr.v.pushScope(
                     blocks: [stmt.block],
-                    locals: [stmt.local: try AST.RegoValue(from: patchedObj)]
+                    locals: [stmt.local: patched]  // TODO figure out how to coerce RegoValue.object regoValue
                 )
                 break blockLoop
             default:

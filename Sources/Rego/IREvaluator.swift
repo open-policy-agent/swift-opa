@@ -112,7 +112,7 @@ private struct Frame {
             throw EvaluationError.internalError(reason: "attempted to pop with no scopes left")
         }
 
-        for (idx, value) in currentScope.v.locals {
+        for (idx, _) in currentScope.v.locals {
             self.locals.removeValue(forKey: idx)
         }
 
@@ -156,25 +156,28 @@ private func evalPlan(withContext ctx: IREvaluationContext, plan: IR.Plan) throw
 }
 
 // Evaluate a Frame from start to finish (respecting Task.isCancelled)
-private func evalFrame(withContext ctx: IREvaluationContext, framePtr: Ptr<Frame>) throws
-    -> ResultSet
-{
+private func evalFrame(
+    withContext ctx: IREvaluationContext,
+    framePtr: Ptr<Frame>
+) throws -> ResultSet {
     var currentScopePtr = framePtr.v.currentScope
 
     // To evaluate a Frame we iterate through each block of the current scope, evaluating
     // statements in the block one at a time. We will jump between blocks being executed but
     // never go backwards, only early exit maneuvers jumping "forward" in the plan.
-    blockLoop: while currentScopePtr.v.blockIdx < currentScopePtr.v.blocks.count {
-        stmtLoop: while currentScopePtr.v.statementIdx
-            < currentScopePtr.v.blocks[currentScopePtr.v.blockIdx].statements.count
-        {
+    blockLoop:
+    while currentScopePtr.v.blockIdx < currentScopePtr.v.blocks.count {
+        
+        let currentBlock = currentScopePtr.v.blocks[currentScopePtr.v.blockIdx]
+        
+        stmtLoop:
+        while currentScopePtr.v.statementIdx < currentBlock.statements.count {
 
             if Task.isCancelled {
                 throw EvaluationError.evaluationCancelled(reason: "parent task cancelled")
             }
 
-            let statement = currentScopePtr.v.blocks[currentScopePtr.v.blockIdx].statements[
-                currentScopePtr.v.statementIdx]
+            let statement = currentBlock.statements[currentScopePtr.v.statementIdx]
 
             switch statement {
             case let stmt as IR.AssignAppendStatement:

@@ -14,7 +14,7 @@ struct PtrTests {
         var a = SomeStruct(foo: "bar", i: 42)
         let b = a
 
-        let p = Ptr(ref: &a)
+        let p = Ptr(toCopyOf: a)
         let p2 = p
 
         a.foo = "baz"

@@ -100,8 +100,7 @@ private struct Frame {
 
     // Create a new Scope, seed with some locals, push it to the stack, and return it.
     mutating func pushScope(blocks: [IR.Block], locals: Locals = [:]) -> Ptr<Scope> {
-        var scope = Scope(blocks: blocks, locals: locals)
-        let scopePtr = Ptr(ref: &scope)
+        let scopePtr = Ptr(toCopyOf: Scope(blocks: blocks, locals: locals))
         self.savedScopes.append(scopePtr)
         for (idx, value) in scopePtr.v.locals {
             self.locals[idx] = value
@@ -154,8 +153,7 @@ private struct Scope {
 // Evaluate an IR Plan from start to finish for the given IREvaluationContext
 private func evalPlan(withContext ctx: IREvaluationContext, plan: IR.Plan) throws -> ResultSet {
     // Initialize the starting Frame+Scope from the top level Plan blocks and kick off evaluation.
-    var rootFrame = Frame(blocks: plan.blocks)
-    return try evalFrame(withContext: ctx, framePtr: Ptr<Frame>(ref: &rootFrame))
+    return try evalFrame(withContext: ctx, framePtr: Ptr(toCopyOf: Frame(blocks: plan.blocks)))
 }
 
 // Evaluate a Frame from start to finish (respecting Task.isCancelled)

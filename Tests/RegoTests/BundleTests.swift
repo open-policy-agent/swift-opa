@@ -241,7 +241,7 @@ struct BundleDirectoryLoaderTests {
 struct BundleLoaderTests {
     struct TestCase {
         let sourceBundle: URL
-//        let expected: Bundle
+        //        let expected: Bundle
     }
 
     static func relPath(_ path: String) -> URL {
@@ -256,12 +256,12 @@ struct BundleLoaderTests {
             )
         ]
     }
-    
+
     @Test(arguments: testCases)
     func testLoadingBundleFromDirectory(tc: TestCase) async throws {
         let b = try BundleLoader.load(fromDirectory: tc.sourceBundle)
     }
-    
+
 }
 
 extension BundleDecodingTests.TestCase: CustomTestStringConvertible {

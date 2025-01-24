@@ -40,7 +40,7 @@ let package = Package(
             resources: [.copy("Fixtures")]
         ),
         .testTarget(
-            name: "EngineTests",
+            name: "RegoTests",
             dependencies: ["Rego"],
             resources: [.copy("TestData")]
         ),

@@ -3,35 +3,35 @@ import Foundation
 
 struct BundleLoader {
     var bundleFiles: any Sequence<Result<BundleFile, any Error>>
-    
+
     init(fromFileSequence files: any Sequence<Result<BundleFile, any Error>>) {
         self.bundleFiles = files
     }
-    
+
     public enum LoadError: Error {
         case unexpectedManifest(URL)
         case unexpectedData(URL)
         case manifestParseError(URL, Error)
         case dataParseError(URL, Error)
     }
-    
+
     func load() throws -> Bundle {
         // Unwrap files, throw first error if we encounter one
-        let files: [BundleFile] = try bundleFiles.map{ try $0.get() }
-        
+        let files: [BundleFile] = try bundleFiles.map { try $0.get() }
+
         // TODO Boo, no fun functional shenanigans :(
         //        var regoFiles: [BundleFile] = files.filter({$0.url.pathExtension == "rego"})
         //        var planFiles: [BundleFile] = files.filter({$0.url.lastPathComponent == "plan.json"})
         //        var manifest: Manifest? = try files.first(where: {$0.url.lastPathComponent == ".manifest"})
         //            .flatMap{ try Manifest(from: $0.data) }
-        
+
         // TODO how do we know what the root is to ensure that .manifest is at the root?
-        
+
         var regoFiles: [BundleFile] = []
         var planFiles: [BundleFile] = []
         var manifest: Manifest?
         var data: AST.RegoValue?
-        
+
         for f in files {
             switch f.url.lastPathComponent {
             case ".manifest":
@@ -39,7 +39,7 @@ struct BundleLoader {
                     throw LoadError.unexpectedManifest(f.url)
                 }
                 manifest = try Manifest(from: f.data)
-                
+
             case "data.json":
                 guard data == nil else {
                     // TODO - just for now, support only a single data file per-bundle
@@ -50,10 +50,10 @@ struct BundleLoader {
                 } catch {
                     throw LoadError.dataParseError(f.url, error)
                 }
-                
+
             case "plan.json":
                 planFiles.append(f)
-                
+
             default:
                 if f.url.pathExtension != "rego" {
                     break
@@ -61,15 +61,15 @@ struct BundleLoader {
                 regoFiles.append(f)
             }
         }
-        
+
         regoFiles.sort(by: { $0.url.path < $1.url.path })
         planFiles.sort(by: { $0.url.path < $1.url.path })
 
-        manifest = manifest ?? Manifest() // Default manifest if none was provided
-        data = data ?? AST.RegoValue.object([:]) // Default data if none was provided
+        manifest = manifest ?? Manifest()  // Default manifest if none was provided
+        data = data ?? AST.RegoValue.object([:])  // Default data if none was provided
         return Bundle(manifest: manifest!, planFiles: planFiles, regoFiles: regoFiles, data: data!)
     }
-    
+
     public static func load(fromDirectory url: URL) throws -> Bundle {
         let files = DirectoryLoader(baseURL: url)
         return try BundleLoader(fromFileSequence: files).load()
@@ -98,16 +98,21 @@ struct DirectoryLoader: Sequence {
                     || keepExtensions.contains(bundleFile.url.pathExtension)
             }
             // TODO we need to ensure that .manifest is at the root
-        }).map{
+        }).map {
             switch $0 {
             case .failure:
                 return $0
             case .success(let bundleFile):
                 // TODO is there a cool way to limit file sizes we're willing to read?
-                let data = Result{ try Data(contentsOf: bundleFile.url) }
+                let data = Result { try Data(contentsOf: bundleFile.url) }
                 guard let data = try? data.get() else {
                     // TODO wrap the underlying error
-                    return .failure(NSError(domain: "DirectoryLoader", code: 1, userInfo: [NSLocalizedDescriptionKey : "Failed to read file \(bundleFile.url)"]))
+                    return .failure(
+                        NSError(
+                            domain: "DirectoryLoader", code: 1,
+                            userInfo: [
+                                NSLocalizedDescriptionKey: "Failed to read file \(bundleFile.url)"
+                            ]))
                 }
                 return .success(BundleFile(url: bundleFile.url, data: data))
             }

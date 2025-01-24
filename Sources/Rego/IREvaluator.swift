@@ -2,6 +2,9 @@ import AST
 import Foundation
 import IR
 
+let LOCAL_IDX_DATA = Local(0)
+let LOCAL_IDX_INPUT = Local(1)
+
 internal struct IREvaluator {
     private var policies: [IndexedIRPolicy] = []
 
@@ -27,7 +30,7 @@ extension IREvaluator: Evaluator {
         // TODO: We're assuming that queries are only ever defined in a single policy... that _should_ hold true.. but who's checkin?
         for policy in policies {
             if let plan = policy.plans[ctx.query] {
-                return try evalPlan(
+                return try await evalPlan(
                     withContext: IREvaluationContext(ctx: ctx, policy: policy), plan: plan)
             }
         }
@@ -54,7 +57,8 @@ private struct IndexedIRPolicy {
     init(policy: IR.Policy) {
         self.ir = policy
         for plan in policy.plans?.plans ?? [] {
-            // TODO: is plan.name actually the right string format to match a query string? If no, convert it here.
+            // TODO: is plan.name actually the right string format to
+            // match a query string? If no, convert it here.
             // TODO: validator should ensure these names were unique
             self.plans[plan.name] = plan
         }
@@ -75,60 +79,56 @@ private struct IREvaluationContext {
 
 private typealias Locals = [IR.Local: AST.RegoValue]
 
-private struct WithPatch {
-    var local: IR.Local
-    var path: [Int32]
-    var value: AST.RegoValue  // TODO: is this the right type?
-}
-
 // Frame represents a stack frame used during Rego IR evaluation. Each function call
 // will prompt creation of a new stack frame.
 private struct Frame {
-    var locals: Locals = [:]  // Superset of frame locals
-    var savedScopes: [Ptr<Scope>] = []
-    var currentScope: Ptr<Scope>
+    var scopeStack: [Ptr<Scope>] = []
     var results: ResultSet = ResultSet()
 
     init(blocks: [IR.Block], locals: Locals = [:]) {
-        let initialScopePtr = Ptr(toCopyOf: Scope(blocks: blocks, locals: locals))
-        for (idx, value) in initialScopePtr.v.locals {
-            self.locals[idx] = value
+        _ = self.pushScope(blocks: blocks, locals: locals)
+    }
+
+    func currentScope() throws -> Ptr<Scope> {
+        if self.scopeStack.count <= 0 {
+            throw EvaluationError.internalError(reason: "no scopes remain on the frame")
         }
-        self.currentScope = initialScopePtr
+        return self.scopeStack.last!
     }
 
     // Create a new Scope, seed with some locals, push it to the stack, and return it.
     mutating func pushScope(blocks: [IR.Block], locals: Locals = [:]) -> Ptr<Scope> {
         let scopePtr = Ptr(toCopyOf: Scope(blocks: blocks, locals: locals))
-        self.savedScopes.append(scopePtr)
-        for (idx, value) in scopePtr.v.locals {
-            self.locals[idx] = value
-        }
+        self.scopeStack.append(scopePtr)
         return scopePtr
     }
 
     mutating func popScope() throws -> Ptr<Scope> {
-        if self.savedScopes.count < 1 {
+        if self.scopeStack.count <= 1 {
             throw EvaluationError.internalError(reason: "attempted to pop with no scopes left")
         }
-
-        for (idx, _) in currentScope.v.locals {
-            self.locals.removeValue(forKey: idx)
-        }
-
-        self.currentScope = self.savedScopes.removeLast()
-
-        // TODO: Any "with" shadowing stuff to cleanup?
-        return self.currentScope
+        self.scopeStack.removeLast()
+        return self.scopeStack.last!
     }
 
-    func resolveLocal(idx: IR.Local) -> AST.RegoValue? {
-        return locals[idx]
+    func resolveLocal(ctx: IREvaluationContext, idx: IR.Local) throws -> AST.RegoValue? {
+        // walk the scope stack backwards looking for the first hit
+        var i = self.scopeStack.count - 1
+        while i >= 0 {
+            if let localValue = self.scopeStack[i].v.locals[idx] {
+                return localValue
+            }
+            i -= 1
+        }
+        return nil
     }
 
     mutating func assignLocal(idx: IR.Local, value: AST.RegoValue) throws {
-        self.currentScope.v.locals[idx] = value
-        locals[idx] = value
+        if self.scopeStack.count <= 0 {
+            throw EvaluationError.internalError(
+                reason: "attempted to assign local with no scope on the frame")
+        }
+        self.scopeStack.last!.v.locals[idx] = value
     }
 }
 
@@ -150,17 +150,33 @@ private struct Scope {
 }
 
 // Evaluate an IR Plan from start to finish for the given IREvaluationContext
-private func evalPlan(withContext ctx: IREvaluationContext, plan: IR.Plan) throws -> ResultSet {
+private func evalPlan(
+    withContext ctx: IREvaluationContext,
+    plan: IR.Plan
+) async throws -> ResultSet {
     // Initialize the starting Frame+Scope from the top level Plan blocks and kick off evaluation.
-    return try evalFrame(withContext: ctx, framePtr: Ptr(toCopyOf: Frame(blocks: plan.blocks)))
+    var frame = Frame(
+        blocks: plan.blocks,
+        locals: [
+            // TODO: ?? are we going to hide stuff under special roots like OPA does?
+            // TODO: We don't resolve refs with more complex paths very much... maybe we should
+            // instead special case the DotStmt for local 0 and do a smaller read on the store?
+            // ¯\_(ツ)_/¯ for now we'll just drop the whole thang in here as it simplifies the
+            // other statments. We can refactor that part later to optimize.
+            LOCAL_IDX_DATA: try await ctx.ctx.store.read(path: StoreKeyPath(segments: ["data"])),
+            LOCAL_IDX_INPUT: ctx.ctx.input,
+        ]
+    )
+    var pFrame = Ptr(toCopyOf: frame)
+    return try await evalFrame(withContext: ctx, framePtr: pFrame)
 }
 
 // Evaluate a Frame from start to finish (respecting Task.isCancelled)
 private func evalFrame(
     withContext ctx: IREvaluationContext,
     framePtr: Ptr<Frame>
-) throws -> ResultSet {
-    var currentScopePtr = framePtr.v.currentScope
+) async throws -> ResultSet {
+    var currentScopePtr = try framePtr.v.currentScope()
 
     // To evaluate a Frame we iterate through each block of the current scope, evaluating
     // statements in the block one at a time. We will jump between blocks being executed but
@@ -243,15 +259,20 @@ private func evalFrame(
             case let stmt as IR.ResetLocalStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.ResultSetAddStatement:
-                guard let value: AST.RegoValue = framePtr.v.resolveLocal(idx: stmt.value) else {
+                let value: AST.RegoValue? = try framePtr.v.resolveLocal(ctx: ctx, idx: stmt.value)
+                guard value != nil else {
                     // undefined
                     currentScopePtr.v.blockIdx += 1
                     currentScopePtr.v.statementIdx = 0
                     break blockLoop
                 }
-                // TODO: what should the key be for these to match up with the go SDK? i _think_ query is right? it probably shouldn't be a String type though..
-                framePtr.v.results.insert([ctx.ctx.query: value])
-                break
+                guard case .object(let objValue) = value else {
+                    // undefined
+                    currentScopePtr.v.blockIdx += 1
+                    currentScopePtr.v.statementIdx = 0
+                    break blockLoop
+                }
+                framePtr.v.results.insert(objValue)
             case let stmt as IR.ReturnLocalStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.ScanStatement:
@@ -259,7 +280,61 @@ private func evalFrame(
             case let stmt as IR.SetAddStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.WithStatement:
-                currentScopePtr = framePtr.v.pushScope(blocks: [stmt.block])
+                // First we need to resolve the value that will be upserted
+                var value: AST.RegoValue?
+                switch stmt.value.type {
+                case .local:
+                    guard case .number(let numberValue) = stmt.value.value else {
+                        throw EvaluationError.invalidDataType(
+                            reason: "expected number value type with local operand,"
+                                + " got \(type(of: stmt.value.value))")
+                    }
+                    value = try framePtr.v.resolveLocal(ctx: ctx, idx: Local(numberValue))
+                case .bool:
+                    guard case .bool(let boolValue) = stmt.value.value else {
+                        throw EvaluationError.invalidDataType(
+                            reason: "expected boolean value type with boolean operand,"
+                                + " got \(type(of: stmt.value.value))")
+                    }
+                    value = AST.RegoValue.boolean(boolValue)
+                case .stringIndex:
+                    guard case .stringIndex(let idxValue) = stmt.value.value else {
+                        throw EvaluationError.invalidDataType(
+                            reason: "expected integer value type with string_index operand,"
+                                + " got \(type(of: stmt.value.value))")
+                    }
+                    value = AST.RegoValue.string(ctx.policy.staticStrings[idxValue])
+                }
+
+                guard value != nil else {
+                    throw EvaluationError.internalError(
+                        reason: "unable to resolve target value for WithStmt patching")
+                }
+
+                // Next look up the object we'll be upserting in to
+                var patched: AST.RegoValue? = try framePtr.v.resolveLocal(ctx: ctx, idx: stmt.local)
+
+                guard patched != nil else {
+                    // undefined // TODO: is this the right behavior? Or we should just "patch" a fresh empty object?
+                    currentScopePtr.v.blockIdx += 1
+                    currentScopePtr.v.statementIdx = 0
+                    break blockLoop
+                }
+
+                guard case .object(var patchedObj) = patched! else {
+                    throw EvaluationError.internalError(
+                        reason: "unexpected value type \(type(of: statement)) for WithStmt patch")
+                }
+
+                // TODO: patch that object at the specified path
+                // I guess this only works on objects? Is it possible to "with" something else in rego?
+
+                // Push a new scope that includes that patched local (likely shadowing a previous
+                // scopes values) and start evaluating the new block
+                currentScopePtr = framePtr.v.pushScope(
+                    blocks: [stmt.block],
+                    locals: [stmt.local: try AST.RegoValue(from: patchedObj)]
+                )
                 break blockLoop
             default:
                 throw EvaluationError.internalError(

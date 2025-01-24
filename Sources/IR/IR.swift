@@ -274,20 +274,20 @@ public struct Func: Codable, Equatable, Sendable {
 public typealias Local = UInt32
 
 public struct Operand: Equatable, Sendable {
-    enum OpType: String, Codable, Equatable {
+    public enum OpType: String, Codable, Equatable, Sendable {
         case local = "local"
         case bool = "bool"
         case stringIndex = "string_index"
     }
 
-    enum Value: Equatable {
+    public enum Value: Equatable, Sendable {
         case number(Int)
         case bool(Bool)
         case stringIndex(Int)
     }
 
-    var type: OpType
-    var value: Value
+    public var type: OpType
+    public var value: Value
 }
 
 // Apparently, when defining a custom initializer in the struct, it suppresses generation

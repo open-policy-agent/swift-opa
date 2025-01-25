@@ -323,7 +323,7 @@ private func evalFrame(
                 // scopes values) and start evaluating the new block
                 currentScopePtr = framePtr.v.pushScope(
                     blocks: [stmt.block],
-                    locals: [stmt.local: patched]  // TODO figure out how to coerce RegoValue.object regoValue
+                    locals: [stmt.local: .object(patchedObj)]  // TODO figure out how to coerce RegoValue.object regoValue
                 )
                 break blockLoop
             default:

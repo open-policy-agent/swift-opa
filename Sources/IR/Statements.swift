@@ -625,7 +625,7 @@ public struct WithStatement: Statement, Codable, Equatable {
     }
 
     public var local: Local
-    public var path: [Int32]?
+    public var path: [Int32]?  // TODO when is this ever allowed to be null/missing?
     public var value: Operand
     public var block: Block
 

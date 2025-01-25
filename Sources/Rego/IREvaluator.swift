@@ -70,6 +70,19 @@ private struct IndexedIRPolicy {
             self.staticStrings.append(string.value)
         }
     }
+
+    func resolveStaticString(_ index: Int) -> String? {
+        switch index {
+        case self.staticStrings.startIndex..<self.staticStrings.endIndex:
+            // All good
+            break
+        default:
+            // Out-of-bounds
+            return nil
+        }
+
+        return self.staticStrings[index]
+    }
 }
 
 private struct IREvaluationContext {
@@ -111,7 +124,7 @@ private struct Frame {
         return self.scopeStack.last!
     }
 
-    func resolveLocal(ctx: IREvaluationContext, idx: IR.Local) throws -> AST.RegoValue? {
+    func resolveLocal(ctx: IREvaluationContext, idx: IR.Local) -> AST.RegoValue? {
         // walk the scope stack backwards looking for the first hit
         // stride sequence is empty if we gave an impossible range (-1..0 with -1 stride)
         // so we correctly don't enter the loop with an empty scopeStack.
@@ -130,6 +143,25 @@ private struct Frame {
                 reason: "attempted to assign local with no scope on the frame")
         }
         self.scopeStack.last!.v.locals[idx] = value
+    }
+
+    // TODO, should we throw or return optional on lookup failures?
+    func resolveOperand(ctx: IREvaluationContext, _ op: IR.Operand) throws -> AST.RegoValue {
+        switch op.value {
+        case .localIndex(let idx):
+            guard let v = resolveLocal(ctx: ctx, idx: Local(idx)) else {
+                throw EvaluationError.invalidOperand(reason: "unable to resolve local: \(idx)")
+            }
+            return v
+        case .bool(let boolValue):
+            return .boolean(boolValue)
+        case .stringIndex(let idx):
+            guard let v = ctx.policy.resolveStaticString(idx) else {
+                throw EvaluationError.invalidOperand(
+                    reason: "unable to resolve static string: \(idx)")
+            }
+            return .string(v)
+        }
     }
 }
 
@@ -281,49 +313,40 @@ private func evalFrame(
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.WithStatement:
                 // First we need to resolve the value that will be upserted
-                var value: AST.RegoValue?
-                switch stmt.value.value {
-                case .localIndex(let numberValue):
-                    value = try framePtr.v.resolveLocal(ctx: ctx, idx: Local(numberValue))
-                case .bool(let boolValue):
-                    value = AST.RegoValue.boolean(boolValue)
-                case .stringIndex(let stringIdx):
-                    guard stringIdx >= 0 && stringIdx < ctx.policy.staticStrings.endIndex else {
-                        throw EvaluationError.invalidOperand(
-                            reason:
-                                "string index out of bounds 0..\(stringIdx)..\(ctx.policy.staticStrings.endIndex)"
-                        )
-                    }
-                    value = AST.RegoValue.string(ctx.policy.staticStrings[stringIdx])
-                }
+                var overlayValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
 
-                guard let value else {
-                    throw EvaluationError.internalError(
-                        reason: "unable to resolve target value for WithStmt patching")
-                }
-                // TODO what do we do with the value now?
+                //                guard let overlayValue else {
+                //                    throw EvaluationError.internalError(
+                //                        reason: "unable to resolve target value for WithStmt patching")
+                //                }
 
-                // Next look up the object we'll be upserting in to
-                guard let patched = try framePtr.v.resolveLocal(ctx: ctx, idx: stmt.local) else {
+                // Next look up the object we'll be upserting into
+                guard let toPatch = framePtr.v.resolveLocal(ctx: ctx, idx: stmt.local) else {
                     // undefined // TODO: is this the right behavior? Or we should just "patch" a fresh empty object?
                     currentScopePtr.v.blockIdx += 1
                     currentScopePtr.v.statementIdx = 0
                     break blockLoop
                 }
 
-                guard case .object(var patchedObj) = patched else {
+                // Resolve the patching path elements (composed of references to static strings
+                let pathOfInts = stmt.path ?? []
+                let path: [String] = pathOfInts.compactMap {
+                    ctx.policy.resolveStaticString(Int($0))
+                }
+                if path.count != pathOfInts.count {
                     throw EvaluationError.internalError(
-                        reason: "unexpected value type \(type(of: statement)) for WithStmt patch")
+                        reason: "invalid path - some segments could not resolve to strings")
                 }
 
-                // TODO: patch that object at the specified path
-                // I guess this only works on objects? Is it possible to "with" something else in rego?
+                let patched = toPatch.patch(with: overlayValue, at: path)
 
                 // Push a new scope that includes that patched local (likely shadowing a previous
                 // scopes values) and start evaluating the new block
+                var newLocals = currentScopePtr.v.locals
+                newLocals[stmt.local] = patched
                 currentScopePtr = framePtr.v.pushScope(
                     blocks: [stmt.block],
-                    locals: [stmt.local: .object(patchedObj)]  // TODO figure out how to coerce RegoValue.object regoValue
+                    locals: newLocals
                 )
                 break blockLoop
             default:

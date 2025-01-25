@@ -66,13 +66,27 @@ struct PatchTests {
                     ])
                 ])
             ),
+            TestCase(
+                description: "empty path will overwrite the whole document",
+                data: .object([
+                    "foo": .string("bar")
+                ]),
+                with: .number(42),
+                path: [],
+                expected: .number(42)
+            ),
         ]
     }
 
     @Test(arguments: allTests)
     func testPatch(tc: TestCase) throws {
-        let patched = try tc.data.patch(with: tc.with, at: tc.path)
+        let original = tc.data
+        let patched = tc.data.patch(with: tc.with, at: tc.path)
         #expect(patched == tc.expected)
+
+        // Original should be unmodified
+        #expect(tc.data == original)
+        #expect(tc.data != patched)
     }
 }
 

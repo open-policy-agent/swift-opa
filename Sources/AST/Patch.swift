@@ -18,26 +18,13 @@ extension RegoValue {
     public func patch(with overlay: RegoValue, at path: ArraySlice<String>) throws(PatchError)
         -> RegoValue
     {
-        // Base cases
-        guard !path.isEmpty else {
-            throw .emptyPath
+        // Base case
+        if path.isEmpty {
+            return overlay
         }
 
         let i = path.startIndex
         let k = path[i]
-
-        // Merge in the overlay value when we hit the leaf
-        if path.count == 1 {
-            switch self {
-            case .object(var o):
-                // copy-on-write
-                o[k] = overlay
-                return .object(o)
-            default:
-                let o: [String: RegoValue] = [k: overlay]
-                return .object(o)
-            }
-        }
 
         switch self {
         case .object(var o):

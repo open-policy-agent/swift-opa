@@ -1,8 +1,18 @@
-fmt:
-	@swift format format --configuration swift-format.config.json --parallel --recursive -i .
-lint:
-	@swift format lint --configuration swift-format.config.json --parallel --recursive .
-test:
-	@swift test
+.PHONY: all
+all: fmt lint test build
 
-.PHONY: fmt lint
+.PHONY: fmt
+fmt:
+	swift format format --configuration swift-format.config.json --parallel --recursive -i .
+
+.PHONY: lint
+lint:
+	swift format lint --configuration swift-format.config.json --parallel --recursive .
+
+.PHONY: test
+test:
+	swift test
+
+.PHONY: build
+build:
+	swift build

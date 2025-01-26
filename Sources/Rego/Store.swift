@@ -7,6 +7,7 @@ public protocol Store {
 
 public enum StoreError: Error {
     case notFound(StoreKeyPath)
+    case internalError(reason: String)
 }
 
 // StoreKeyPath represents the path to a value in the Store
@@ -16,10 +17,10 @@ public struct StoreKeyPath: Sendable {
 
 struct NullStore: Store {
     public func read(path: StoreKeyPath) async throws(StoreError) -> AST.RegoValue {
-        throw StoreError.notFound(path)
+        return AST.RegoValue.object([:])
     }
 
     public func write(path: StoreKeyPath, value: AST.RegoValue) async throws(StoreError) {
-        throw StoreError.notFound(path)
+        throw StoreError.internalError(reason: "not implemented!")
     }
 }

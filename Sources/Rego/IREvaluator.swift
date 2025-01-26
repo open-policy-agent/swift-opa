@@ -2,8 +2,8 @@ import AST
 import Foundation
 import IR
 
-let LOCAL_IDX_DATA = Local(0)
-let LOCAL_IDX_INPUT = Local(1)
+let localIdxData = Local(0)
+let localIdxInput = Local(1)
 
 internal struct IREvaluator {
     private var policies: [IndexedIRPolicy] = []
@@ -184,7 +184,7 @@ private func evalPlan(
     plan: IR.Plan
 ) async throws -> ResultSet {
     // Initialize the starting Frame+Scope from the top level Plan blocks and kick off evaluation.
-    var frame = Frame(
+    let frame = Frame(
         blocks: plan.blocks,
         locals: [
             // TODO: ?? are we going to hide stuff under special roots like OPA does?
@@ -192,11 +192,11 @@ private func evalPlan(
             // instead special case the DotStmt for local 0 and do a smaller read on the store?
             // ¯\_(ツ)_/¯ for now we'll just drop the whole thang in here as it simplifies the
             // other statments. We can refactor that part later to optimize.
-            LOCAL_IDX_DATA: try await ctx.ctx.store.read(path: StoreKeyPath(segments: ["data"])),
-            LOCAL_IDX_INPUT: ctx.ctx.input,
+            localIdxData: try await ctx.ctx.store.read(path: StoreKeyPath(segments: ["data"])),
+            localIdxInput: ctx.ctx.input,
         ]
     )
-    var pFrame = Ptr(toCopyOf: frame)
+    let pFrame = Ptr(toCopyOf: frame)
     return try await evalFrame(withContext: ctx, framePtr: pFrame)
 }
 

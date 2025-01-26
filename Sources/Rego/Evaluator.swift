@@ -6,11 +6,11 @@ protocol Evaluator {
     func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet
 }
 
-public enum EvaluatorError: Error {
+public enum EvaluatorError: Error, Equatable {
     case bundleInitializationFailed(bundle: String, reason: String)
 }
 
-public enum EvaluationError: Error {
+public enum EvaluationError: Error, Equatable {
     case unknownQuery(query: String)
     case evaluationCancelled(reason: String)
     case internalError(reason: String)
@@ -19,11 +19,10 @@ public enum EvaluationError: Error {
 }
 
 // EvaluationContext is the common evaluation context that is passed to the common Engine.
-struct EvaluationContext {
-    let query: String = ""
-    let input: AST.RegoValue = AST.RegoValue.null
-    let store: Store = NullStore()
-    var results: ResultSet = ResultSet()
+public struct EvaluationContext {
+    public let query: String
+    public let input: AST.RegoValue
+    public let store: Store = NullStore()
 }
 
 typealias ResultSet = Set<EvalResult>

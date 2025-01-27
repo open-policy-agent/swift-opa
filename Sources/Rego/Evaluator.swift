@@ -28,4 +28,4 @@ public struct EvaluationContext {
 
 typealias ResultSet = Set<EvalResult>
 
-typealias EvalResult = [String: AST.RegoValue]
+typealias EvalResult = [AST.RegoValue: AST.RegoValue]

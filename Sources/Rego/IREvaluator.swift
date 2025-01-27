@@ -173,6 +173,11 @@ private struct Scope {
         self.locals = locals
         self.blocks = blocks
     }
+
+    mutating func nextBlock() {
+        self.blockIdx += 1
+        self.statementIdx = 0
+    }
 }
 
 // Evaluate an IR Plan from start to finish for the given IREvaluationContext
@@ -255,7 +260,6 @@ private func evalFrame(
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
                 let keyValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
 
-                // This statement is undefined if the key does not exist in the source value.
                 var targetValue: AST.RegoValue?
                 switch sourceValue {
                 case .object(let sourceObj):
@@ -278,10 +282,10 @@ private func evalFrame(
                         reason: "cannot perform DotStmt on \(type(of:sourceValue))")
                 }
 
+                // This statement is undefined if the key does not exist in the source value.
                 guard let targetValue else {
                     // undefined
-                    currentScopePtr.v.blockIdx += 1
-                    currentScopePtr.v.statementIdx = 0
+                    currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
 
@@ -327,16 +331,15 @@ private func evalFrame(
             case let stmt as IR.ResetLocalStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.ResultSetAddStatement:
-                guard let value = try framePtr.v.resolveLocal(ctx: ctx, idx: stmt.value) else {
+                let value = framePtr.v.resolveLocal(idx: stmt.value)
+                guard value != .undefined else {
                     // undefined
-                    currentScopePtr.v.blockIdx += 1
-                    currentScopePtr.v.statementIdx = 0
+                    currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
                 guard case .object(let objValue) = value else {
                     // undefined
-                    currentScopePtr.v.blockIdx += 1
-                    currentScopePtr.v.statementIdx = 0
+                    currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
                 framePtr.v.results.insert(objValue)
@@ -356,10 +359,9 @@ private func evalFrame(
                 //                }
 
                 // Next look up the object we'll be upserting into
-                guard let toPatch = framePtr.v.resolveLocal(ctx: ctx, idx: stmt.local) else {
+                guard let toPatch = framePtr.v.resolveLocal(idx: stmt.local) else {
                     // undefined // TODO: is this the right behavior? Or we should just "patch" a fresh empty object?
-                    currentScopePtr.v.blockIdx += 1
-                    currentScopePtr.v.statementIdx = 0
+                    currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
 

@@ -30,25 +30,6 @@ struct IREvaluatorTests {
     static var validTestCases: [TestCase] {
         return [
             TestCase(
-                //
-                // Requires..
-                //
-                // Statements:
-                //     AssignVarOnceStmt
-                //     AssignVarStmt
-                //     CallStmt
-                //     DotStmt
-                //     IsDefinedStmt
-                //     MakeObjectStmt
-                //     NotEqualStmt
-                //     ObjectInsertStmt
-                //     ResetLocalStmt
-                //     ResultSetAddStmt
-                //     ReturnLocalStmt
-                //
-                // Builtins:
-                //    N/A
-                //
                 description: "happy path basic policy with input allow",
                 sourceBundle: relPath("TestData/Bundles/basic-policy-with-input-bundle"),
                 query: "main/allow",

@@ -9,6 +9,7 @@ public enum RegoValue: Equatable, Sendable, Hashable {
     case object([String: RegoValue])
     //    case set(SetType) // TODO Implement sets
     case string(String)
+    case undefined
 
     public enum ValueError: Error {
         case unsupportedArrayElement

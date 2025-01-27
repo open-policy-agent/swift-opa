@@ -16,7 +16,7 @@ extension RegoValue {
         }
 
         let i = path.startIndex
-        let k = path[i]
+        let k = RegoValue.string(path[i])
 
         switch self {
         case .object(var o):
@@ -34,7 +34,7 @@ extension RegoValue {
         default:
             // Intermediate node which is not an object - pave it over with a new object
             let v = RegoValue.null.patch(with: overlay, at: path[i.advanced(by: 1)...])
-            let o: [String: RegoValue] = [k: v]
+            let o: [RegoValue: RegoValue] = [k: v]
             return .object(o)
         }
     }

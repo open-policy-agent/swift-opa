@@ -6,8 +6,8 @@ public enum RegoValue: Equatable, Sendable, Hashable {
     case boolean(Bool)
     case null
     case number(NSNumber)
-    case object([String: RegoValue])
-    //    case set(SetType) // TODO Implement sets
+    case object([RegoValue: RegoValue])
+    case set(Set<RegoValue>)
     case string(String)
     case undefined
 
@@ -31,8 +31,8 @@ public enum RegoValue: Equatable, Sendable, Hashable {
             }
         case let v as [String: Any]:
             do {
-                let values: [String: RegoValue] = try v.reduce(into: [:]) { m, elem in
-                    m[elem.key] = try RegoValue(from: elem.value)
+                let values: [RegoValue: RegoValue] = try v.reduce(into: [:]) { m, elem in
+                    m[try RegoValue(from: elem.key)] = try RegoValue(from: elem.value)
                 }
                 self = .object(values)
             } catch {
@@ -57,6 +57,13 @@ public enum RegoValue: Equatable, Sendable, Hashable {
         // TODO throws deserializationerror, valuerror
         let d = try JSONSerialization.jsonObject(with: rawJson, options: [])
         try self.init(from: d)
+    }
+
+    public func isUndefined() -> Bool {
+        guard case .undefined = self else {
+            return false
+        }
+        return true
     }
 }
 

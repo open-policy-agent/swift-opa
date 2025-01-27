@@ -16,6 +16,7 @@ public enum EvaluationError: Error, Equatable {
     case internalError(reason: String)
     case invalidDataType(reason: String)
     case invalidOperand(reason: String)
+    case assignOnceError(reason: String)
 }
 
 // EvaluationContext is the common evaluation context that is passed to the common Engine.

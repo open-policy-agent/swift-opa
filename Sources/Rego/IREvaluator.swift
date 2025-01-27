@@ -120,7 +120,7 @@ private struct Frame {
         return self.scopeStack.last!
     }
 
-    func resolveLocal(ctx: IREvaluationContext, idx: IR.Local) -> AST.RegoValue? {
+    func resolveLocal(idx: IR.Local) -> AST.RegoValue {
         // walk the scope stack backwards looking for the first hit
         // stride sequence is empty if we gave an impossible range (-1..0 with -1 stride)
         // so we correctly don't enter the loop with an empty scopeStack.
@@ -130,7 +130,7 @@ private struct Frame {
             }
         }
 
-        return nil
+        return .undefined
     }
 
     mutating func assignLocal(idx: IR.Local, value: AST.RegoValue) throws {
@@ -145,10 +145,7 @@ private struct Frame {
     func resolveOperand(ctx: IREvaluationContext, _ op: IR.Operand) throws -> AST.RegoValue {
         switch op.value {
         case .localIndex(let idx):
-            guard let v = resolveLocal(ctx: ctx, idx: Local(idx)) else {
-                throw EvaluationError.invalidOperand(reason: "unable to resolve local: \(idx)")
-            }
-            return v
+            return resolveLocal(idx: Local(idx))
         case .bool(let boolValue):
             return .boolean(boolValue)
         case .stringIndex(let idx):
@@ -228,9 +225,18 @@ private func evalFrame(
             case let stmt as IR.AssignIntStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.AssignVarOnceStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
+                let targetValue = framePtr.v.resolveLocal(idx: stmt.target)
+
+                // if the target value is already defined, and not the same value as the source,
+                // we should raise an exception
+                if targetValue != .undefined && targetValue != sourceValue {
+                    throw EvaluationError.assignOnceError(reason: "local already assigned")
+                }
+                try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
             case let stmt as IR.AssignVarStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
+                try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
             case let stmt as IR.BlockStatement:
                 currentScopePtr = framePtr.v.pushScope(blocks: stmt.blocks)
                 break blockLoop
@@ -246,7 +252,40 @@ private func evalFrame(
             case let stmt as IR.CallDynamicStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.DotStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
+                let keyValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
+
+                // This statement is undefined if the key does not exist in the source value.
+                var targetValue: AST.RegoValue?
+                switch sourceValue {
+                case .object(let sourceObj):
+                    targetValue = sourceObj[keyValue]
+                case .array(let sourceArray):
+                    if case .number(let numberValue) = keyValue {
+                        let idx = numberValue.intValue
+                        if idx < 0 || idx >= sourceArray.count {
+                            throw EvaluationError.internalError(
+                                reason: "DotStmt key array index out of bounds")
+                        }
+                        targetValue = sourceArray[idx]
+                    }
+                case .set(let sourceSet):
+                    if sourceSet.contains(keyValue) {
+                        targetValue = keyValue
+                    }
+                default:
+                    throw EvaluationError.invalidDataType(
+                        reason: "cannot perform DotStmt on \(type(of:sourceValue))")
+                }
+
+                guard let targetValue else {
+                    // undefined
+                    currentScopePtr.v.blockIdx += 1
+                    currentScopePtr.v.statementIdx = 0
+                    break blockLoop
+                }
+
+                try framePtr.v.assignLocal(idx: stmt.target, value: targetValue)
             case let stmt as IR.EqualStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.IsArrayStatement:

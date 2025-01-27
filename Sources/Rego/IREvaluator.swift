@@ -72,11 +72,7 @@ private struct IndexedIRPolicy {
     }
 
     func resolveStaticString(_ index: Int) -> String? {
-        switch index {
-        case self.staticStrings.startIndex..<self.staticStrings.endIndex:
-            // All good
-            break
-        default:
+        guard case self.staticStrings.startIndex..<self.staticStrings.endIndex = index else {
             // Out-of-bounds
             return nil
         }

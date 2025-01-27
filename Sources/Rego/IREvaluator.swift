@@ -336,7 +336,13 @@ private func evalFrame(
             case let stmt as IR.NopStatement:
                 break
             case let stmt as IR.NotEqualStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                //This statement is undefined if a is equal to b.
+                let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
+                let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
+                if a == .undefined || b == .undefined || a == b {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
             case let stmt as IR.NotStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.ObjectInsertOnceStatement:

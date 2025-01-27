@@ -152,7 +152,7 @@ private struct Frame {
             return try .string(resolveStaticString(ctx: ctx, Int(idx)))
         }
     }
-    
+
     func resolveStaticString(ctx: IREvaluationContext, _ idx: Int) throws -> String {
         guard let v = ctx.policy.resolveStaticString(idx) else {
             throw EvaluationError.invalidOperand(
@@ -317,13 +317,16 @@ private func evalFrame(
             case let stmt as IR.MakeNullStatement:
                 try framePtr.v.assignLocal(idx: stmt.target, value: .null)
             case let stmt as IR.MakeNumberStatement:
-                try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
+                try framePtr.v.assignLocal(
+                    idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
             case let stmt as IR.MakeNumberRefStatement:
-                let sourceStringValue = try framePtr.v.resolveStaticString(ctx: ctx, Int(stmt.index))
+                let sourceStringValue = try framePtr.v.resolveStaticString(
+                    ctx: ctx, Int(stmt.index))
                 let formatter = NumberFormatter()
                 formatter.numberStyle = .decimal
                 guard let n = formatter.number(from: sourceStringValue) else {
-                    throw EvaluationError.invalidDataType(reason: "invalid number literal with MakeNumberRefStatement")
+                    throw EvaluationError.invalidDataType(
+                        reason: "invalid number literal with MakeNumberRefStatement")
                 }
                 try framePtr.v.assignLocal(idx: stmt.target, value: .number(n))
             case let stmt as IR.MakeObjectStatement:

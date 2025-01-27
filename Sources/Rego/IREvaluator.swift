@@ -348,7 +348,20 @@ private func evalFrame(
             case let stmt as IR.ObjectInsertOnceStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.ObjectInsertStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
+                let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
+                let target = framePtr.v.resolveLocal(idx: stmt.object)
+                guard value != .undefined && key != .undefined && target != .undefined else {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
+                guard case .object(var objValue) = target else {
+                    throw EvaluationError.invalidDataType(
+                        reason:
+                            "unable to perform ObjectInsertStatement on target value of type \(type(of: target))"
+                    )
+                }
+                objValue[key] = value
             case let stmt as IR.ObjectMergeStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.ResetLocalStatement:

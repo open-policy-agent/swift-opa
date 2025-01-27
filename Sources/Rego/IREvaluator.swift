@@ -149,12 +149,16 @@ private struct Frame {
         case .bool(let boolValue):
             return .boolean(boolValue)
         case .stringIndex(let idx):
-            guard let v = ctx.policy.resolveStaticString(idx) else {
-                throw EvaluationError.invalidOperand(
-                    reason: "unable to resolve static string: \(idx)")
-            }
-            return .string(v)
+            return try .string(resolveStaticString(ctx: ctx, Int(idx)))
         }
+    }
+    
+    func resolveStaticString(ctx: IREvaluationContext, _ idx: Int) throws -> String {
+        guard let v = ctx.policy.resolveStaticString(idx) else {
+            throw EvaluationError.invalidOperand(
+                reason: "unable to resolve static string: \(idx)")
+        }
+        return v
     }
 }
 
@@ -309,17 +313,23 @@ private func evalFrame(
             case let stmt as IR.LenStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.MakeArrayStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                try framePtr.v.assignLocal(idx: stmt.target, value: .array([]))
             case let stmt as IR.MakeNullStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                try framePtr.v.assignLocal(idx: stmt.target, value: .null)
             case let stmt as IR.MakeNumberStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
             case let stmt as IR.MakeNumberRefStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                let sourceStringValue = try framePtr.v.resolveStaticString(ctx: ctx, Int(stmt.index))
+                let formatter = NumberFormatter()
+                formatter.numberStyle = .decimal
+                guard let n = formatter.number(from: sourceStringValue) else {
+                    throw EvaluationError.invalidDataType(reason: "invalid number literal with MakeNumberRefStatement")
+                }
+                try framePtr.v.assignLocal(idx: stmt.target, value: .number(n))
             case let stmt as IR.MakeObjectStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                try framePtr.v.assignLocal(idx: stmt.target, value: .object([:]))
             case let stmt as IR.MakeSetStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                try framePtr.v.assignLocal(idx: stmt.target, value: .set([]))
             case let stmt as IR.NopStatement:
                 break
             case let stmt as IR.NotEqualStatement:

@@ -365,7 +365,7 @@ private func evalFrame(
             case let stmt as IR.ObjectMergeStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.ResetLocalStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                try framePtr.v.assignLocal(idx: stmt.target, value: .undefined)
             case let stmt as IR.ResultSetAddStatement:
                 let value = framePtr.v.resolveLocal(idx: stmt.value)
                 guard value != .undefined else {

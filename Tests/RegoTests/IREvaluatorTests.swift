@@ -51,7 +51,7 @@ struct IREvaluatorTests {
                 ]),
                 expectedResult: Rego.ResultSet([
                     AST.RegoValue([
-                        "allow": AST.RegoValue.boolean(false)
+                        "result": AST.RegoValue.boolean(false)
                     ])
                 ])
             ),
@@ -62,7 +62,7 @@ struct IREvaluatorTests {
                 input: AST.RegoValue.object([:]),
                 expectedResult: Rego.ResultSet([
                     AST.RegoValue([
-                        "allow": AST.RegoValue.boolean(false)
+                        "result": AST.RegoValue.boolean(false)
                     ])
                 ])
             ),
@@ -81,7 +81,7 @@ struct IREvaluatorTests {
                 ]),
                 expectedResult: Rego.ResultSet([
                     AST.RegoValue([
-                        "allow": AST.RegoValue.boolean(true)
+                        "result": AST.RegoValue.boolean(true)
                     ])
                 ])
             ),
@@ -96,7 +96,7 @@ struct IREvaluatorTests {
                 ]),
                 expectedResult: Rego.ResultSet([
                     AST.RegoValue([
-                        "allow": AST.RegoValue.boolean(true)
+                        "result": AST.RegoValue.boolean(true)
                     ])
                 ])
             ),
@@ -111,7 +111,7 @@ struct IREvaluatorTests {
                 ]),
                 expectedResult: Rego.ResultSet([
                     AST.RegoValue([
-                        "allow": AST.RegoValue.boolean(false)
+                        "result": AST.RegoValue.boolean(false)
                     ])
                 ])
             ),

@@ -312,7 +312,10 @@ private func evalFrame(
                     break blockLoop
                 }
             case let stmt as IR.IsArrayStatement:
-                throw EvaluationError.internalError(reason: "IsArrayStatement not implemented")
+                guard case .array = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
 
             case let stmt as IR.IsDefinedStatement:
                 // This statement is undefined if source is undefined.
@@ -322,10 +325,16 @@ private func evalFrame(
                 }
 
             case let stmt as IR.IsObjectStatement:
-                throw EvaluationError.internalError(reason: "IsObjectStatement not implemented")
+                guard case .object = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
 
             case let stmt as IR.IsSetStatement:
-                throw EvaluationError.internalError(reason: "IsSetStatement not implemented")
+                guard case .set = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
 
             case let stmt as IR.IsUndefinedStatement:
                 // This statement is undefined if source is not undefined.

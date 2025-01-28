@@ -78,7 +78,7 @@ extension Block: Codable {
 
             switch anyStmt.type {
             case .arrayAppendStmt:
-                outStmt = try inner.decode(AssignAppendStatement.self, forKey: .innerStatement)
+                outStmt = try inner.decode(ArrayAppendStatement.self, forKey: .innerStatement)
             case .assignIntStmt:
                 outStmt = try inner.decode(AssignIntStatement.self, forKey: .innerStatement)
             case .assignVarOnceStmt:
@@ -114,7 +114,7 @@ extension Block: Codable {
             case .makeNullStmt:
                 outStmt = try inner.decode(MakeNullStatement.self, forKey: .innerStatement)
             case .makeNumberIntStmt:
-                outStmt = try inner.decode(MakeNumberStatement.self, forKey: .innerStatement)
+                outStmt = try inner.decode(MakeNumberIntStatement.self, forKey: .innerStatement)
             case .makeNumberRefStmt:
                 outStmt = try inner.decode(MakeNumberRefStatement.self, forKey: .innerStatement)
             case .makeObjectStmt:

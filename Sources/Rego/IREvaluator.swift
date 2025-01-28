@@ -229,10 +229,12 @@ private func evalFrame(
             let statement = currentBlock.statements[currentScopePtr.v.statementIdx]
 
             switch statement {
-            case let stmt as IR.AssignAppendStatement:
+            case let stmt as IR.ArrayAppendStatement:
                 throw EvaluationError.internalError(reason: "AssignAppendStatement not implemented")
+
             case let stmt as IR.AssignIntStatement:
                 throw EvaluationError.internalError(reason: "AssignIntStatement not implemented")
+
             case let stmt as IR.AssignVarOnceStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
                 let targetValue = framePtr.v.resolveLocal(idx: stmt.target)
@@ -243,12 +245,15 @@ private func evalFrame(
                     throw EvaluationError.assignOnceError(reason: "local already assigned")
                 }
                 try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
+
             case let stmt as IR.AssignVarStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
                 try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
+
             case let stmt as IR.BlockStatement:
                 currentScopePtr = framePtr.v.pushScope(blocks: stmt.blocks)
                 break blockLoop
+
             case let stmt as IR.BreakStatement:
                 // Pop N scopes for the "index" and resume processing from
                 // that saved scope. Drop all scopes that are popped.
@@ -256,11 +261,13 @@ private func evalFrame(
                     currentScopePtr = try framePtr.v.popScope()
                 }
                 break blockLoop
-            case let stmt as IR.CallStatement:
-                try await evalCallStmt(ctx: ctx, frame: framePtr, stmt: stmt)
 
             case let stmt as IR.CallDynamicStatement:
                 throw EvaluationError.internalError(reason: "CallDynamicStatement not implemented")
+
+            case let stmt as IR.CallStatement:
+                try await evalCallStmt(ctx: ctx, frame: framePtr, stmt: stmt)
+
             case let stmt as IR.DotStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
                 let keyValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
@@ -305,33 +312,42 @@ private func evalFrame(
                 }
             case let stmt as IR.IsArrayStatement:
                 throw EvaluationError.internalError(reason: "IsArrayStatement not implemented")
+
             case let stmt as IR.IsDefinedStatement:
                 // This statement is undefined if source is undefined.
                 if case .undefined = framePtr.v.resolveLocal(idx: stmt.source) {
                     currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
+
             case let stmt as IR.IsObjectStatement:
                 throw EvaluationError.internalError(reason: "IsObjectStatement not implemented")
+
             case let stmt as IR.IsSetStatement:
                 throw EvaluationError.internalError(reason: "IsSetStatement not implemented")
+
             case let stmt as IR.IsUndefinedStatement:
                 // This statement is undefined if source is not undefined.
                 guard case .undefined = framePtr.v.resolveLocal(idx: stmt.source) else {
                     currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
+
             case let stmt as IR.LenStatement:
                 throw EvaluationError.internalError(reason: "LenStatement not implemented")
+
             case let stmt as IR.MakeArrayStatement:
                 var arr: [AST.RegoValue] = []
                 arr.reserveCapacity(Int(stmt.capacity))
                 try framePtr.v.assignLocal(idx: stmt.target, value: .array(arr))
+
             case let stmt as IR.MakeNullStatement:
                 try framePtr.v.assignLocal(idx: stmt.target, value: .null)
-            case let stmt as IR.MakeNumberStatement:
+
+            case let stmt as IR.MakeNumberIntStatement:
                 try framePtr.v.assignLocal(
                     idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
+
             case let stmt as IR.MakeNumberRefStatement:
                 let sourceStringValue = try framePtr.v.resolveStaticString(
                     ctx: ctx, Int(stmt.index))
@@ -342,12 +358,16 @@ private func evalFrame(
                         reason: "invalid number literal with MakeNumberRefStatement")
                 }
                 try framePtr.v.assignLocal(idx: stmt.target, value: .number(n))
+
             case let stmt as IR.MakeObjectStatement:
                 try framePtr.v.assignLocal(idx: stmt.target, value: .object([:]))
+
             case let stmt as IR.MakeSetStatement:
                 try framePtr.v.assignLocal(idx: stmt.target, value: .set([]))
+
             case let stmt as IR.NopStatement:
                 break
+
             case let stmt as IR.NotEqualStatement:
                 //This statement is undefined if a is equal to b.
                 let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
@@ -358,8 +378,11 @@ private func evalFrame(
                 }
             case let stmt as IR.NotStatement:
                 throw EvaluationError.internalError(reason: "NotStatement not implemented")
+
             case let stmt as IR.ObjectInsertOnceStatement:
-                throw EvaluationError.internalError(reason: "ObjectInsertOnceStatement not implemented")
+                throw EvaluationError.internalError(
+                    reason: "ObjectInsertOnceStatement not implemented")
+
             case let stmt as IR.ObjectInsertStatement:
                 let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
                 let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
@@ -376,10 +399,13 @@ private func evalFrame(
                 }
                 targetObjectValue[key] = value
                 try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
+
             case let stmt as IR.ObjectMergeStatement:
                 throw EvaluationError.internalError(reason: "ObjectMergeStatement not implemented")
+
             case let stmt as IR.ResetLocalStatement:
                 try framePtr.v.assignLocal(idx: stmt.target, value: .undefined)
+
             case let stmt as IR.ResultSetAddStatement:
                 let value = framePtr.v.resolveLocal(idx: stmt.value)
                 guard value != .undefined else {
@@ -393,11 +419,14 @@ private func evalFrame(
                     break blockLoop
                 }
                 framePtr.v.results.insert(value)
+
             case let stmt as IR.ReturnLocalStatement:
-                let result = try framePtr.v.resolveLocal(idx: stmt.source)
+                let result = framePtr.v.resolveLocal(idx: stmt.source)
                 return ResultSet([result])
+
             case let stmt as IR.ScanStatement:
                 throw EvaluationError.internalError(reason: "ScanStatement not implemented")
+
             case let stmt as IR.SetAddStatement:
                 let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
                 let target = framePtr.v.resolveLocal(idx: stmt.set)
@@ -413,14 +442,10 @@ private func evalFrame(
                 }
                 targetSetValue.insert(value)
                 try framePtr.v.assignLocal(idx: stmt.set, value: .set(targetSetValue))
+
             case let stmt as IR.WithStatement:
                 // First we need to resolve the value that will be upserted
                 let overlayValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
-
-                //                guard let overlayValue else {
-                //                    throw EvaluationError.internalError(
-                //                        reason: "unable to resolve target value for WithStmt patching")
-                //                }
 
                 // Next look up the object we'll be upserting into
                 let toPatch = framePtr.v.resolveLocal(idx: stmt.local)

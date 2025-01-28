@@ -1,4 +1,4 @@
-public struct AssignAppendStatement: Statement, Codable, Equatable {
+public struct ArrayAppendStatement: Statement, Codable, Equatable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -332,7 +332,7 @@ public struct MakeNullStatement: Statement, Codable, Equatable {
     }
 }
 
-public struct MakeNumberStatement: Statement, Codable, Equatable {
+public struct MakeNumberIntStatement: Statement, Codable, Equatable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {

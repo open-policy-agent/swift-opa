@@ -396,7 +396,20 @@ private func evalFrame(
             case let stmt as IR.ScanStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.SetAddStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
+                let target = framePtr.v.resolveLocal(idx: stmt.set)
+                guard value != .undefined && target != .undefined else {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
+                guard case .set(var targetSetValue) = target else {
+                    throw EvaluationError.invalidDataType(
+                        reason:
+                            "unable to perform SetAddStatement on target value of type \(type(of: target))"
+                    )
+                }
+                targetSetValue.insert(value)
+                try framePtr.v.assignLocal(idx: stmt.set, value: .set(targetSetValue))
             case let stmt as IR.WithStatement:
                 // First we need to resolve the value that will be upserted
                 let overlayValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)

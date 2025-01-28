@@ -402,8 +402,20 @@ private func evalFrame(
                 try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
 
             case let stmt as IR.ObjectMergeStatement:
-                throw EvaluationError.internalError(reason: "ObjectMergeStatement not implemented")
-
+                let a = framePtr.v.resolveLocal(idx: stmt.a)
+                let b = framePtr.v.resolveLocal(idx: stmt.b)
+                if a == .undefined || b == .undefined {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
+                guard case .object(var objectValueA) = a, case .object(var objectValueB) = b else {
+                    throw EvaluationError.invalidDataType(
+                        reason:
+                            "unable to perform ObjectMergeStatement with types \(type(of: a)) and \(type(of: b))"
+                    )
+                }
+                let merged = objectValueA.merge(with: objectValueB)
+                try framePtr.v.assignLocal(idx: stmt.target, value: .object(merged))
             case let stmt as IR.ResetLocalStatement:
                 try framePtr.v.assignLocal(idx: stmt.target, value: .undefined)
 

@@ -80,3 +80,18 @@ extension NSNumber {
         return type(of: self) == type(of: boolLiteral)
     }
 }
+
+extension [RegoValue: RegoValue] {
+    public func merge(with other: [RegoValue: RegoValue]) -> [RegoValue: RegoValue] {
+        var result = self
+        for (k, v) in other {
+            if case .object(let objValueSelf) = self[k], case .object(let objValueOther) = v {
+                // both self and other have objects at this key, merge them recursively
+                result[k] = .object(objValueSelf.merge(with: objValueOther))
+            } else {
+                result[k] = v
+            }
+        }
+        return result
+    }
+}

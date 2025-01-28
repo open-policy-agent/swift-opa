@@ -99,7 +99,7 @@ struct BuiltinTests {
 
     @Test(arguments: allTests)
     func testBuiltins(tc: TestCase) async throws {
-        let reg = DefaultBuiltinRegistry
+        let reg = defaultBuiltinRegistry
         let result = await Result { try await reg.invoke(name: tc.name, args: tc.args) }
         switch tc.expected {
         case .success:

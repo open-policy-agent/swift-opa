@@ -25,7 +25,7 @@ public struct EvaluationContext {
     public let query: String
     public let input: AST.RegoValue
     public var store: Store = NullStore()
-    public var builtins: BuiltinRegistry = DefaultBuiltinRegistry
+    public var builtins: BuiltinRegistry = defaultBuiltinRegistry
 }
 
 public typealias ResultSet = Set<EvalResult>

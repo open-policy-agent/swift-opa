@@ -24,7 +24,7 @@ public struct BuiltinRegistry {
 }
 
 // DefaultBuiltinRegistry is the BuiltinRegistry with all capabilities enabled
-public var DefaultBuiltinRegistry: BuiltinRegistry {
+public var defaultBuiltinRegistry: BuiltinRegistry {
     BuiltinRegistry(
         builtins: BuiltinRegistry.defaultBuiltins
     )

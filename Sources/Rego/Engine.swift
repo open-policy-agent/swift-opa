@@ -50,7 +50,7 @@ public struct Engine {
             query: query,
             input: input,
             store: self.store,
-            builtins: DefaultBuiltinRegistry
+            builtins: defaultBuiltinRegistry
         )
 
         guard let evaluator = self.evaluator else {

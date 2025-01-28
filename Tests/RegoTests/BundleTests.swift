@@ -230,7 +230,8 @@ struct BundleDirectoryLoaderTests {
     func testDirectoryLoader(tc: TestCase) throws {
         let bdl = DirectoryLoader(baseURL: tc.sourceBundle)
 
-        let results: [BundleFile] = bdl.compactMap { try? $0.get() }  // Unwrap the success values, nils will get dumped by compactMap
+        // Unwrap the success values, nils will get dumped by compactMap
+        let results: [BundleFile] = bdl.compactMap { try? $0.get() }
 
         let actualPaths = results.map { $0.url.path }.sorted()
         let expectedPaths = tc.expected.map { $0.url.path }.sorted()

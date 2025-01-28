@@ -356,13 +356,14 @@ private func evalFrame(
                     currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
-                guard case .object(var objValue) = target else {
+                guard case .object(var targetObjectValue) = target else {
                     throw EvaluationError.invalidDataType(
                         reason:
                             "unable to perform ObjectInsertStatement on target value of type \(type(of: target))"
                     )
                 }
-                objValue[key] = value
+                targetObjectValue[key] = value
+                try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
             case let stmt as IR.ObjectMergeStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.ResetLocalStatement:

@@ -238,10 +238,11 @@ private func evalFrame(
                 }
                 arrayValue.append(value)
                 try framePtr.v.assignLocal(idx: stmt.array, value: .array(arrayValue))
-                
+
             case let stmt as IR.AssignIntStatement:
-                try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
-                
+                try framePtr.v.assignLocal(
+                    idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
+
             case let stmt as IR.AssignVarOnceStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
                 let targetValue = framePtr.v.resolveLocal(idx: stmt.target)
@@ -271,10 +272,38 @@ private func evalFrame(
                 break blockLoop
 
             case let stmt as IR.CallDynamicStatement:
-                throw EvaluationError.internalError(reason: "CallDynamicStatement not implemented")
+                var path: [String] = []
+                for p in stmt.path {
+                    let segment = try framePtr.v.resolveOperand(ctx: ctx, p)
+                    guard case .string(let stringValue) = segment else {
+                        currentScopePtr.v.nextBlock()
+                        break blockLoop
+                    }
+                    path.append(stringValue)
+                }
+
+                let funcName = path.joined(separator: ".")
+
+                try await evalCall(
+                    ctx: ctx,
+                    frame: framePtr,
+                    funcName: funcName,
+                    args: stmt.args.map {  // (╯°□°)╯︵ ┻━┻
+                        // TODO: make the CallDynamicStatement "args" match the CallStatement ones upstream..
+                        IR.Operand(
+                            type: Operand.OpType.local, value: Operand.Value.localIndex(Int($0)))
+                    },
+                    resultIdx: stmt.result
+                )
 
             case let stmt as IR.CallStatement:
-                try await evalCallStmt(ctx: ctx, frame: framePtr, stmt: stmt)
+                try await evalCall(
+                    ctx: ctx,
+                    frame: framePtr,
+                    funcName: stmt.callFunc,
+                    args: stmt.args,
+                    resultIdx: stmt.result
+                )
 
             case let stmt as IR.DotStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
@@ -352,7 +381,7 @@ private func evalFrame(
 
             case let stmt as IR.LenStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
-                guard  case .undefined = sourceValue else {
+                guard case .undefined = sourceValue else {
                     currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
@@ -361,10 +390,11 @@ private func evalFrame(
                 case let c as any Collection:
                     len = c.count
                 default:
-                    throw EvaluationError.invalidOperand(reason: "len source must be a collection, got \(type(of: sourceValue))")
+                    throw EvaluationError.invalidOperand(
+                        reason: "len source must be a collection, got \(type(of: sourceValue))")
                 }
                 try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: len)))
-                
+
             case let stmt as IR.MakeArrayStatement:
                 var arr: [AST.RegoValue] = []
                 arr.reserveCapacity(Int(stmt.capacity))
@@ -405,7 +435,7 @@ private func evalFrame(
                     currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
-                
+
             case let stmt as IR.NotStatement:
                 // TODO: oh no.. does this mean we should refactor to something like an `evalBlock()` helper that
                 // can indicate if it was undefined? .. this might impact how we do ScanStmt too
@@ -426,11 +456,12 @@ private func evalFrame(
                     )
                 }
                 guard let currentValue = targetObjectValue[key], currentValue != targetValue else {
-                    throw EvaluationError.objectInsertOnceError(reason: "key '\(key)' already exists in object")
+                    throw EvaluationError.objectInsertOnceError(
+                        reason: "key '\(key)' already exists in object")
                 }
                 targetObjectValue[key] = targetValue
                 try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
-                
+
             case let stmt as IR.ObjectInsertStatement:
                 let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
                 let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
@@ -463,7 +494,7 @@ private func evalFrame(
                 }
                 let merged = objectValueA.merge(with: objectValueB)
                 try framePtr.v.assignLocal(idx: stmt.target, value: .object(merged))
-                
+
             case let stmt as IR.ResetLocalStatement:
                 try framePtr.v.assignLocal(idx: stmt.target, value: .undefined)
 
@@ -601,39 +632,50 @@ private func evalFrame(
     return framePtr.v.results
 }
 
-private func evalCallStmt(ctx: IREvaluationContext, frame: Ptr<Frame>, stmt: IR.CallStatement)
-    async throws
-{
+private func evalCall(
+    ctx: IREvaluationContext,
+    frame: Ptr<Frame>,
+    funcName: String,
+    args: [IR.Operand],
+    resultIdx: IR.Local
+) async throws {
+    // TODO: We should check the args "input" for undefined
+
     // Handle plan-defined functions first
-    if ctx.policy.funcs[stmt.callFunc] != nil {
-        try await callPlanFunc(ctx: ctx, frame: frame, stmt: stmt)
+    if ctx.policy.funcs[funcName] != nil {
+        try await callPlanFunc(
+            ctx: ctx, frame: frame, funcName: funcName, args: args, resultIdx: resultIdx)
         return
     }
 
     // Handle built-in functions second
-    let args = try stmt.args.map {
+    let args = try args.map {
         try frame.v.resolveOperand(ctx: ctx, $0)
     }
-    let result = try await ctx.ctx.builtins.invoke(name: stmt.callFunc, args: args)
+    let result = try await ctx.ctx.builtins.invoke(name: funcName, args: args)
 
-    try frame.v.assignLocal(idx: stmt.result, value: result)
+    try frame.v.assignLocal(idx: resultIdx, value: result)
 
 }
 
 // callPlanFunc will evaluate calling a function defined on the plan
-private func callPlanFunc(ctx: IREvaluationContext, frame: Ptr<Frame>, stmt: IR.CallStatement)
-    async throws
-{
-    guard let fn = ctx.policy.funcs[stmt.callFunc] else {
+private func callPlanFunc(
+    ctx: IREvaluationContext,
+    frame: Ptr<Frame>,
+    funcName: String,
+    args: [IR.Operand],
+    resultIdx: IR.Local
+) async throws {
+    guard let fn = ctx.policy.funcs[funcName] else {
         throw EvaluationError.internalError(
-            reason: "function definition not found: \(stmt.callFunc)")
+            reason: "function definition not found: \(funcName)")
     }
-    guard fn.params.count == stmt.args.count else {
+    guard fn.params.count == args.count else {
         throw EvaluationError.internalError(
-            reason: "mismatched argument count for function \(stmt.callFunc)")
+            reason: "mismatched argument count for function \(funcName)")
     }
 
-    let args = try stmt.args.map {
+    let args = try args.map {
         try frame.v.resolveOperand(ctx: ctx, $0)
     }
 
@@ -664,5 +706,5 @@ private func callPlanFunc(ctx: IREvaluationContext, frame: Ptr<Frame>, stmt: IR.
             reason: "unexpected number of results from function call: \(resultSet.count)")
     }
     let result = resultSet.first ?? .undefined
-    try frame.v.assignLocal(idx: stmt.result, value: result)
+    try frame.v.assignLocal(idx: resultIdx, value: result)
 }

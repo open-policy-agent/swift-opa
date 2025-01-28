@@ -283,6 +283,11 @@ public struct Operand: Equatable, Sendable {
 
     public var type: OpType
     public var value: Value
+
+    public init(type: OpType, value: Value) {
+        self.type = type
+        self.value = value
+    }
 }
 
 // Apparently, when defining a custom initializer in the struct, it suppresses generation

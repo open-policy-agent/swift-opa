@@ -230,9 +230,9 @@ private func evalFrame(
 
             switch statement {
             case let stmt as IR.AssignAppendStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                throw EvaluationError.internalError(reason: "AssignAppendStatement not implemented")
             case let stmt as IR.AssignIntStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                throw EvaluationError.internalError(reason: "AssignIntStatement not implemented")
             case let stmt as IR.AssignVarOnceStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
                 let targetValue = framePtr.v.resolveLocal(idx: stmt.target)
@@ -260,7 +260,7 @@ private func evalFrame(
                 try await evalCallStmt(ctx: ctx, frame: framePtr, stmt: stmt)
 
             case let stmt as IR.CallDynamicStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                throw EvaluationError.internalError(reason: "CallDynamicStatement not implemented")
             case let stmt as IR.DotStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
                 let keyValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
@@ -304,7 +304,7 @@ private func evalFrame(
                     break blockLoop
                 }
             case let stmt as IR.IsArrayStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                throw EvaluationError.internalError(reason: "IsArrayStatement not implemented")
             case let stmt as IR.IsDefinedStatement:
                 // This statement is undefined if source is undefined.
                 if case .undefined = framePtr.v.resolveLocal(idx: stmt.source) {
@@ -312,9 +312,9 @@ private func evalFrame(
                     break blockLoop
                 }
             case let stmt as IR.IsObjectStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                throw EvaluationError.internalError(reason: "IsObjectStatement not implemented")
             case let stmt as IR.IsSetStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                throw EvaluationError.internalError(reason: "IsSetStatement not implemented")
             case let stmt as IR.IsUndefinedStatement:
                 // This statement is undefined if source is not undefined.
                 guard case .undefined = framePtr.v.resolveLocal(idx: stmt.source) else {
@@ -322,7 +322,7 @@ private func evalFrame(
                     break blockLoop
                 }
             case let stmt as IR.LenStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                throw EvaluationError.internalError(reason: "LenStatement not implemented")
             case let stmt as IR.MakeArrayStatement:
                 var arr: [AST.RegoValue] = []
                 arr.reserveCapacity(Int(stmt.capacity))
@@ -357,9 +357,9 @@ private func evalFrame(
                     break blockLoop
                 }
             case let stmt as IR.NotStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                throw EvaluationError.internalError(reason: "NotStatement not implemented")
             case let stmt as IR.ObjectInsertOnceStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                throw EvaluationError.internalError(reason: "ObjectInsertOnceStatement not implemented")
             case let stmt as IR.ObjectInsertStatement:
                 let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
                 let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
@@ -377,7 +377,7 @@ private func evalFrame(
                 targetObjectValue[key] = value
                 try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
             case let stmt as IR.ObjectMergeStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                throw EvaluationError.internalError(reason: "ObjectMergeStatement not implemented")
             case let stmt as IR.ResetLocalStatement:
                 try framePtr.v.assignLocal(idx: stmt.target, value: .undefined)
             case let stmt as IR.ResultSetAddStatement:
@@ -394,9 +394,10 @@ private func evalFrame(
                 }
                 framePtr.v.results.insert(value)
             case let stmt as IR.ReturnLocalStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                let result = try framePtr.v.resolveLocal(idx: stmt.source)
+                return ResultSet([result])
             case let stmt as IR.ScanStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                throw EvaluationError.internalError(reason: "ScanStatement not implemented")
             case let stmt as IR.SetAddStatement:
                 let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
                 let target = framePtr.v.resolveLocal(idx: stmt.set)

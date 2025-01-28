@@ -38,7 +38,7 @@ struct IREvaluatorTests {
                 ]),
                 expectedResult: Rego.ResultSet([
                     AST.RegoValue([
-                        "allow": AST.RegoValue.boolean(true)
+                        "result": AST.RegoValue.boolean(true)
                     ])
                 ])
             ),

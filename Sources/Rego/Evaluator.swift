@@ -24,10 +24,10 @@ public enum EvaluationError: Error, Equatable {
 public struct EvaluationContext {
     public let query: String
     public let input: AST.RegoValue
-    public let store: Store = NullStore()
-    public let builtins: BuiltinRegistry = DefaultBuiltinRegistry
+    public var store: Store = NullStore()
+    public var builtins: BuiltinRegistry = DefaultBuiltinRegistry
 }
 
-typealias ResultSet = Set<EvalResult>
+public typealias ResultSet = Set<EvalResult>
 
-typealias EvalResult = AST.RegoValue
+public typealias EvalResult = AST.RegoValue

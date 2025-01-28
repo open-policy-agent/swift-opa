@@ -147,32 +147,20 @@ struct IREvaluatorTests {
 
     @Test(arguments: validTestCases)
     func testValidEvaluations(tc: TestCase) async throws {
-        let b = try BundleLoader.load(fromDirectory: tc.sourceBundle)
-        let e = try await IREvaluator(bundles: [tc.sourceBundle.lastPathComponent: b])
-        let actual = try await e.evaluate(
-            withContext: Rego.EvaluationContext(
-                // TODO: How do we get the store set on here hydrated from the bundle?
-                // I guess we need a step after loading the bundle but before making this eval context?
-                query: tc.query,
-                input: tc.input
-            )
-        )
+        var engine = try Engine(withBundlePaths: [Engine.BundlePath(name: "default", url: tc.sourceBundle)])
+        try await engine.prepare()
+        let actual = try await engine.evaluate(query: tc.query, input: tc.input)
+
         #expect(tc.expectedResult == actual)
     }
 
     @Test(arguments: errorTestCases)
     func testInvalidEvaluations(tc: ErrorCase) async throws {
-        let b = try BundleLoader.load(fromDirectory: tc.sourceBundle)
+        var engine = try Engine(withBundlePaths: [Engine.BundlePath(name: "default", url: tc.sourceBundle)])
+
         await #expect(Comment(rawValue: tc.description)) {
-            let e = try await IREvaluator(bundles: [tc.sourceBundle.lastPathComponent: b])
-            let _ = try await e.evaluate(
-                withContext: Rego.EvaluationContext(
-                    // TODO: How do we get the store set on here hydrated from the bundle?
-                    // I guess we need a step after loading the bundle but before making this eval context?
-                    query: tc.query,
-                    input: tc.input
-                )
-            )
+            try await engine.prepare()
+            let actual = try await engine.evaluate(query: tc.query, input: tc.input)
         } throws: { error in
             let gotMirror = Mirror(reflecting: error)
             let wantMirror = Mirror(reflecting: tc.expectedError)

@@ -8,7 +8,7 @@ let localIdxData = Local(1)
 internal struct IREvaluator {
     private var policies: [IndexedIRPolicy] = []
 
-    init(bundles: [String: Bundle]) async throws {
+    init(bundles: [String: Bundle]) throws {
         for (bundleName, bundle) in bundles {
             for planFile in bundle.planFiles {
                 do {

@@ -52,6 +52,7 @@ struct InMemoryStore: Store {
     }
 
     mutating func write(path: StoreKeyPath, value: AST.RegoValue) async throws {
-        throw StoreError.internalError(reason: "not implemented!")
+        // TODO this is not achieving our goal of thread safety
+        data = data.patch(with: value, at: path.segments)
     }
 }

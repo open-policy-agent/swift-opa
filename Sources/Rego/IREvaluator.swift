@@ -230,10 +230,18 @@ private func evalFrame(
 
             switch statement {
             case let stmt as IR.ArrayAppendStatement:
-                throw EvaluationError.internalError(reason: "AssignAppendStatement not implemented")
-
+                let array = framePtr.v.resolveLocal(idx: stmt.array)
+                let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
+                guard case .array(var arrayValue) = array, value != .undefined else {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
+                arrayValue.append(value)
+                try framePtr.v.assignLocal(idx: stmt.array, value: .array(arrayValue))
+                
             case let stmt as IR.AssignIntStatement:
                 try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
+                
             case let stmt as IR.AssignVarOnceStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
                 let targetValue = framePtr.v.resolveLocal(idx: stmt.target)

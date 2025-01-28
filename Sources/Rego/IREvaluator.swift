@@ -296,7 +296,13 @@ private func evalFrame(
 
                 try framePtr.v.assignLocal(idx: stmt.target, value: targetValue)
             case let stmt as IR.EqualStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                //This statement is undefined if a is not equal to b.
+                let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
+                let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
+                if a == .undefined || b == .undefined || a != b {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
             case let stmt as IR.IsArrayStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.IsDefinedStatement:

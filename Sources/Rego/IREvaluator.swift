@@ -316,7 +316,11 @@ private func evalFrame(
             case let stmt as IR.IsSetStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.IsUndefinedStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                // This statement is undefined if source is not undefined.
+                guard case .undefined = framePtr.v.resolveLocal(idx: stmt.source) else {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
             case let stmt as IR.LenStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.MakeArrayStatement:

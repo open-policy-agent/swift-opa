@@ -38,9 +38,9 @@ func testJsonToRegoValues() throws {
     let d = try JSONSerialization.jsonObject(with: input.data(using: .utf8)!)
     let val = try AST.RegoValue(from: d)
 
-    let expected = AST.RegoValue.object([
+    let expected = AST.RegoValue([
         "pets": .array([
-            .object([
+            RegoValue([
                 "name": .string("Mr. Meowgi"),
                 "age": .number(4),
                 "sibling": .null,
@@ -54,7 +54,7 @@ func testJsonToRegoValues() throws {
                 "zero": .number(0),
                 "one": .number(1),
             ]),
-            .object([
+            RegoValue([
                 "name": .string("Shadow"),
                 "age": .number(4),
                 "sibling": .string("Light"),

@@ -220,7 +220,7 @@ private func evalFrame(
 
         let currentBlock = currentScopePtr.v.blocks[currentScopePtr.v.blockIdx]
 
-        stmtLoop: while currentScopePtr.v.statementIdx < currentBlock.statements.count {
+        while currentScopePtr.v.statementIdx < currentBlock.statements.count {
 
             if Task.isCancelled {
                 throw EvaluationError.evaluationCancelled(reason: "parent task cancelled")
@@ -257,7 +257,8 @@ private func evalFrame(
                 }
                 break blockLoop
             case let stmt as IR.CallStatement:
-                throw EvaluationError.internalError(reason: "not implemented")
+                try await evalCallStmt(ctx: ctx, frame: framePtr, stmt: stmt)
+
             case let stmt as IR.CallDynamicStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.DotStatement:
@@ -373,12 +374,12 @@ private func evalFrame(
                     currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
-                guard case .object(let objValue) = value else {
+                guard case .object = value else {
                     // undefined
                     currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
-                framePtr.v.results.insert(objValue)
+                framePtr.v.results.insert(value)
             case let stmt as IR.ReturnLocalStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.ScanStatement:
@@ -387,7 +388,7 @@ private func evalFrame(
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.WithStatement:
                 // First we need to resolve the value that will be upserted
-                var overlayValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
+                let overlayValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
 
                 //                guard let overlayValue else {
                 //                    throw EvaluationError.internalError(
@@ -395,11 +396,7 @@ private func evalFrame(
                 //                }
 
                 // Next look up the object we'll be upserting into
-                guard let toPatch = framePtr.v.resolveLocal(idx: stmt.local) else {
-                    // undefined // TODO: is this the right behavior? Or we should just "patch" a fresh empty object?
-                    currentScopePtr.v.nextBlock()
-                    break blockLoop
-                }
+                let toPatch = framePtr.v.resolveLocal(idx: stmt.local)
 
                 // Resolve the patching path elements (composed of references to static strings
                 let pathOfInts = stmt.path ?? []
@@ -433,4 +430,70 @@ private func evalFrame(
     }
 
     return framePtr.v.results
+}
+
+private func evalCallStmt(ctx: IREvaluationContext, frame: Ptr<Frame>, stmt: IR.CallStatement)
+    async throws
+{
+    // Handle plan-defined functions first
+    if ctx.policy.funcs[stmt.callFunc] != nil {
+        try await callPlanFunc(ctx: ctx, frame: frame, stmt: stmt)
+        return
+    }
+
+    // Handle built-in functions second
+    let args = try stmt.args.map {
+        try frame.v.resolveOperand(ctx: ctx, $0)
+    }
+    let result = try await ctx.ctx.builtins.invoke(name: stmt.callFunc, args: args)
+
+    try frame.v.assignLocal(idx: stmt.result, value: result)
+
+}
+
+// callPlanFunc will evaluate calling a function defined on the plan
+private func callPlanFunc(ctx: IREvaluationContext, frame: Ptr<Frame>, stmt: IR.CallStatement)
+    async throws
+{
+    guard let fn = ctx.policy.funcs[stmt.callFunc] else {
+        throw EvaluationError.internalError(
+            reason: "function definition not found: \(stmt.callFunc)")
+    }
+    guard fn.params.count == stmt.args.count else {
+        throw EvaluationError.internalError(
+            reason: "mismatched argument count for function \(stmt.callFunc)")
+    }
+
+    let args = try stmt.args.map {
+        try frame.v.resolveOperand(ctx: ctx, $0)
+    }
+
+    // Match source arguments to target params
+    // to construct the locals map for the callee.
+    // args are the resolved values to pass.
+    // fn.params are the Local indecies to pass them in to
+    // in the new frame.
+    var callLocals: [IR.Local: AST.RegoValue] = zip(args, fn.params).reduce(into: [:]) {
+        out, pair in
+        out[pair.1] = pair.0
+    }
+
+    // Add in implicit input + data locals
+    callLocals[localIdxInput] = frame.v.resolveLocal(idx: localIdxInput)
+    callLocals[localIdxData] = frame.v.resolveLocal(idx: localIdxData)  // TODO deal with optional
+
+    // Setup a new frame for the function call
+    let callFrame = Frame(
+        blocks: fn.blocks,
+        locals: callLocals
+    )
+    let callFramePtr = Ptr(toCopyOf: callFrame)
+    let resultSet = try await evalFrame(withContext: ctx, framePtr: callFramePtr)
+
+    guard case 0...1 = resultSet.count else {
+        throw EvaluationError.internalError(
+            reason: "unexpected number of results from function call: \(resultSet.count)")
+    }
+    let result = resultSet.first ?? .undefined
+    try frame.v.assignLocal(idx: stmt.result, value: result)
 }

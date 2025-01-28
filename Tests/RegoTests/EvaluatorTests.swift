@@ -17,48 +17,48 @@ struct ResultSetTests {
             TestCase(
                 description: "simple depdup",
                 evalResults: [
-                    ["some.query.path": AST.RegoValue.string("some value")],
-                    ["some.query.path": AST.RegoValue.string("some other value")],
-                    ["some.query.path": AST.RegoValue.string("some value")],
+                    AST.RegoValue(["some.query.path": AST.RegoValue.string("some value")]),
+                    AST.RegoValue(["some.query.path": AST.RegoValue.string("some other value")]),
+                    AST.RegoValue(["some.query.path": AST.RegoValue.string("some value")]),
                 ],
                 expectedResults: [
-                    ["some.query.path": AST.RegoValue.string("some value")],
-                    ["some.query.path": AST.RegoValue.string("some other value")],
+                    AST.RegoValue(["some.query.path": AST.RegoValue.string("some value")]),
+                    AST.RegoValue(["some.query.path": AST.RegoValue.string("some other value")]),
                 ]
             ),
             TestCase(
                 description: "more depdup",
                 evalResults: [
-                    [
+                    AST.RegoValue([
                         "some.query.path": AST.RegoValue.string("some value"),
-                        "some.other.query": AST.RegoValue.object([
-                            "key": AST.RegoValue.object(
+                        "some.other.query": AST.RegoValue([
+                            "key": AST.RegoValue(
                                 ["nested.key": AST.RegoValue.string("nested value")]
                             )
                         ]),
-                    ],
-                    ["some.query.path": AST.RegoValue.string("some other value")],
-                    ["some.query.path": AST.RegoValue.string("some value")],
-                    [
+                    ]),
+                    AST.RegoValue(["some.query.path": AST.RegoValue.string("some other value")]),
+                    AST.RegoValue(["some.query.path": AST.RegoValue.string("some value")]),
+                    AST.RegoValue([
                         "some.query.path": AST.RegoValue.string("some value"),
-                        "some.other.query": AST.RegoValue.object([
-                            "key": AST.RegoValue.object(
+                        "some.other.query": AST.RegoValue([
+                            "key": AST.RegoValue(
                                 ["nested.key": AST.RegoValue.string("nested value")]
                             )
                         ]),
-                    ],
+                    ]),
                 ],
                 expectedResults: [
-                    ["some.query.path": AST.RegoValue.string("some value")],
-                    ["some.query.path": AST.RegoValue.string("some other value")],
-                    [
+                    AST.RegoValue(["some.query.path": AST.RegoValue.string("some value")]),
+                    AST.RegoValue(["some.query.path": AST.RegoValue.string("some other value")]),
+                    AST.RegoValue([
                         "some.query.path": AST.RegoValue.string("some value"),
-                        "some.other.query": AST.RegoValue.object([
-                            "key": AST.RegoValue.object(
+                        "some.other.query": AST.RegoValue([
+                            "key": AST.RegoValue(
                                 ["nested.key": AST.RegoValue.string("nested value")]
                             )
                         ]),
-                    ],
+                    ]),
                 ]
             ),
         ]

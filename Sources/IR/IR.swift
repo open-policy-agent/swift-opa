@@ -246,11 +246,6 @@ public protocol Statement: Sendable {
     func isEqual(to other: any Statement) -> Bool
 }
 
-public struct Argument: Codable, Equatable, Sendable {
-    public var type: String
-    public var value: Int
-}
-
 public struct Funcs: Codable, Equatable, Sendable {
     public var funcs: [Func] = []
 }
@@ -258,7 +253,7 @@ public struct Funcs: Codable, Equatable, Sendable {
 public struct Func: Codable, Equatable, Sendable {
     public var name: String
     public var path: [String]
-    public var params: [Int]
+    public var params: [Local]
     public var returnVar: Local
     public var blocks: [Block]
 

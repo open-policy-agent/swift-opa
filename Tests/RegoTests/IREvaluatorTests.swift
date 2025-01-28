@@ -33,26 +33,26 @@ struct IREvaluatorTests {
                 description: "happy path basic policy with input allow",
                 sourceBundle: relPath("TestData/Bundles/basic-policy-with-input-bundle"),
                 query: "main/allow",
-                input: AST.RegoValue.object([
+                input: AST.RegoValue([
                     "should_allow": AST.RegoValue.boolean(true)
                 ]),
                 expectedResult: Rego.ResultSet([
-                    [
+                    AST.RegoValue([
                         "allow": AST.RegoValue.boolean(true)
-                    ]
+                    ])
                 ])
             ),
             TestCase(
                 description: "happy path basic policy with input deny explicit",
                 sourceBundle: relPath("TestData/Bundles/basic-policy-with-input-bundle"),
                 query: "main/allow",
-                input: AST.RegoValue.object([
+                input: AST.RegoValue([
                     "should_allow": AST.RegoValue.boolean(false)
                 ]),
                 expectedResult: Rego.ResultSet([
-                    [
+                    AST.RegoValue([
                         "allow": AST.RegoValue.boolean(false)
-                    ]
+                    ])
                 ])
             ),
             TestCase(
@@ -61,9 +61,9 @@ struct IREvaluatorTests {
                 query: "main/allow",
                 input: AST.RegoValue.object([:]),
                 expectedResult: Rego.ResultSet([
-                    [
+                    AST.RegoValue([
                         "allow": AST.RegoValue.boolean(false)
-                    ]
+                    ])
                 ])
             ),
             TestCase(
@@ -95,45 +95,45 @@ struct IREvaluatorTests {
                 description: "happy path rbac allow non-admin",
                 sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
                 query: "app/rbac/allow",
-                input: AST.RegoValue.object([
+                input: AST.RegoValue([
                     "user": AST.RegoValue.string("bob"),
                     "type": AST.RegoValue.string("dog"),
                     "action": AST.RegoValue.string("update"),
                 ]),
                 expectedResult: Rego.ResultSet([
-                    [
+                    AST.RegoValue([
                         "allow": AST.RegoValue.boolean(true)
-                    ]
+                    ])
                 ])
             ),
             TestCase(
                 description: "happy path rbac allow admin",
                 sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
                 query: "app/rbac/allow",
-                input: AST.RegoValue.object([
+                input: AST.RegoValue([
                     "user": AST.RegoValue.string("alice"),
                     "type": AST.RegoValue.string("iMac"),
                     "action": AST.RegoValue.string("purchase"),
                 ]),
                 expectedResult: Rego.ResultSet([
-                    [
+                    AST.RegoValue([
                         "allow": AST.RegoValue.boolean(true)
-                    ]
+                    ])
                 ])
             ),
             TestCase(
                 description: "happy path rbac deny missing grant in data json",
                 sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
                 query: "app/rbac/allow",
-                input: AST.RegoValue.object([
+                input: AST.RegoValue([
                     "user": AST.RegoValue.string("bob"),
                     "type": AST.RegoValue.string("parakeet"),
                     "action": AST.RegoValue.string("read"),
                 ]),
                 expectedResult: Rego.ResultSet([
-                    [
+                    AST.RegoValue([
                         "allow": AST.RegoValue.boolean(false)
-                    ]
+                    ])
                 ])
             ),
         ]

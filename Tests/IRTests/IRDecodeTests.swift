@@ -75,15 +75,16 @@ func decodeIRStatements() throws {
                                             location: Location(row: 0, col: 8, file: 9),
                                             callFunc: "g0.data.policy.hello",
                                             args: [
-                                                Argument(
-                                                    type: "local",
-                                                    value: 0
+                                                Operand(
+                                                    type: .local,
+                                                    value: .localIndex(0)
                                                 ),
-                                                Argument(
-                                                    type: "local",
-                                                    value: 1
+                                                Operand(
+                                                    type: .local,
+                                                    value: .localIndex(1)
                                                 ),
-                                            ]
+                                            ],
+                                            result: 2
                                         ),
                                         AssignVarStatement(
                                             location: Location(row: 1, col: 2, file: 3),
@@ -91,11 +92,11 @@ func decodeIRStatements() throws {
                                                 type: .local,
                                                 value: .localIndex(2)
                                             ),
-                                            target: 3
+                                            target: Local(3)
                                         ),
                                         MakeObjectStatement(
                                             location: Location(row: 0, col: 0, file: 0),
-                                            target: 4
+                                            target: Local(4)
                                         ),
                                         ObjectInsertStatement(
                                             location: Location(row: 0, col: 0, file: 0),
@@ -107,11 +108,11 @@ func decodeIRStatements() throws {
                                                 type: .local,
                                                 value: .localIndex(3)
                                             ),
-                                            object: 4
+                                            object: Local(4)
                                         ),
                                         ResultSetAddStatement(
                                             location: Location(row: 0, col: 0, file: 0),
-                                            value: 4
+                                            value: Local(4)
                                         ),
                                     ]
                                 )
@@ -246,9 +247,9 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                     location: Location(row: 0, col: 1, file: 2),
                     callFunc: "myfunc",
                     args: [
-                        Argument(
-                            type: "something",
-                            value: 0
+                        Operand(
+                            type: .local,
+                            value: .localIndex(789)
                         )
                     ]
                 ),
@@ -267,9 +268,9 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                     location: Location(row: 0, col: 1, file: 2),
                     callFunc: "myfunc",
                     args: [
-                        Argument(
-                            type: "something",
-                            value: 0
+                        Operand(
+                            type: .local,
+                            value: .localIndex(789)
                         )
                     ]
                 ),
@@ -299,9 +300,9 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                     location: Location(row: 0, col: 1, file: 2),
                     callFunc: "myfunc",
                     args: [
-                        Argument(
-                            type: "something",
-                            value: 0
+                        Operand(
+                            type: .local,
+                            value: .localIndex(789)
                         )
                     ]
                 ),
@@ -313,9 +314,9 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                     location: Location(row: 0, col: 1, file: 2),
                     callFunc: "myfunc",
                     args: [
-                        Argument(
-                            type: "something",
-                            value: 0
+                        Operand(
+                            type: .local,
+                            value: .localIndex(789)
                         )
                     ]
                 ),
@@ -338,9 +339,9 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                     location: Location(row: 0, col: 1, file: 2),
                     callFunc: "myfunc",
                     args: [
-                        Argument(
-                            type: "something",
-                            value: 0
+                        Operand(
+                            type: .local,
+                            value: .localIndex(789)
                         )
                     ]
                 ),
@@ -359,9 +360,9 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                     location: Location(row: 0, col: 1, file: 2),
                     callFunc: "myfunc",
                     args: [
-                        Argument(
-                            type: "something else",
-                            value: 0
+                        Operand(
+                            type: .local,
+                            value: .localIndex(790)
                         )
                     ]
                 ),

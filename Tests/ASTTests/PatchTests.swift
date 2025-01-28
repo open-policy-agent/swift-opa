@@ -20,25 +20,25 @@ struct PatchTests {
                 data: .null,
                 with: .number(42),
                 path: ["foo"],
-                expected: .object(["foo": .number(42)])
+                expected: .object([.string("foo"): .number(42)])
             ),
             TestCase(
                 description: "simple replace",
-                data: .object(["foo": .string("fr fr")]),
+                data: .object([.string("foo"): .string("fr fr")]),
                 with: .number(42),
                 path: ["foo"],
-                expected: .object(["foo": .number(42)])
+                expected: .object([.string("foo"): .number(42)])
             ),
             TestCase(
                 description: "deeper, no conflicts",
-                data: .object(["foo": .string("fr fr")]),
-                with: .object(["answer": .number(42)]),
+                data: .object([.string("foo"): .string("fr fr")]),
+                with: .object([.string("answer"): .number(42)]),
                 path: ["sibling", "nested"],
                 expected: .object([
-                    "foo": .string("fr fr"),
-                    "sibling": .object([
-                        "nested": .object([
-                            "answer": .number(42)
+                    .string("foo"): .string("fr fr"),
+                    .string("sibling"): .object([
+                        .string("nested"): .object([
+                            .string("answer"): .number(42)
                         ])
                     ]),
                 ])
@@ -46,20 +46,20 @@ struct PatchTests {
             TestCase(
                 description: "intermediate node which is not an object is overwritten",
                 data: .object([
-                    "foo": .object([
-                        "other": .string("stuff"),
-                        "bar": .number(1),
+                    .string("foo"): .object([
+                        .string("other"): .string("stuff"),
+                        .string("bar"): .number(1),
                     ])
                 ]),
-                with: .object(["answer": .number(42)]),
+                with: .object([.string("answer"): .number(42)]),
                 path: ["foo", "bar", "baz", "buz"],
                 expected: .object([
-                    "foo": .object([
-                        "other": .string("stuff"),
-                        "bar": .object([
-                            "baz": .object([
-                                "buz": .object([
-                                    "answer": .number(42)
+                    .string("foo"): .object([
+                        .string("other"): .string("stuff"),
+                        .string("bar"): .object([
+                            .string("baz"): .object([
+                                .string("buz"): .object([
+                                    .string("answer"): .number(42)
                                 ])
                             ])
                         ]),
@@ -69,7 +69,7 @@ struct PatchTests {
             TestCase(
                 description: "empty path will overwrite the whole document",
                 data: .object([
-                    "foo": .string("bar")
+                    .string("foo"): .string("bar")
                 ]),
                 with: .number(42),
                 path: [],

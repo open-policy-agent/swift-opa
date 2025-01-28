@@ -133,11 +133,13 @@ public struct CallStatement: Statement, Codable, Equatable {
     public var location: Location = Location()
 
     public var callFunc: String = ""
-    public var args: [Argument] = []
+    public var args: [Operand] = []
+    public var result: Local = 0
 
     enum CodingKeys: String, CodingKey {
         case callFunc = "func"
         case args
+        case result
     }
 
     public func isEqual(to other: any Statement) -> Bool {

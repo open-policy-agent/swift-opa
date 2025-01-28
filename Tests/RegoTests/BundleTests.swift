@@ -32,7 +32,7 @@ struct BundleDecodingTests {
                         revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
                         roots: ["roles", "http/example/authz"],
                         regoVersion: .regoV1,
-                        metadata: [:]
+                        metadata: .null
                     )
             ),
             TestCase(
@@ -52,10 +52,10 @@ struct BundleDecodingTests {
                         revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
                         roots: ["roles", "http/example/authz"],
                         regoVersion: .regoV1,
-                        metadata: [
-                            "foo": .string("bar"),
-                            "number": .number(42),
-                        ]
+                        metadata: .object([
+                            .string("foo"): .string("bar"),
+                            .string("number"): .number(42),
+                        ])
                     )
             ),
             TestCase(
@@ -72,7 +72,7 @@ struct BundleDecodingTests {
                         revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
                         roots: ["roles", "http/example/authz"],
                         regoVersion: .regoV0,
-                        metadata: [:]
+                        metadata: .null
                     )
             ),
             TestCase(
@@ -89,7 +89,7 @@ struct BundleDecodingTests {
                         revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
                         roots: ["roles", "http/example/authz"],
                         regoVersion: .regoV1,
-                        metadata: [:]
+                        metadata: .null
                     )
             ),
             TestCase(
@@ -106,7 +106,7 @@ struct BundleDecodingTests {
                         // Empty roots is coerced into one root empty string
                         roots: [""],
                         regoVersion: .regoV1,
-                        metadata: [:]
+                        metadata: .null
                     )
             ),
             TestCase(
@@ -121,7 +121,7 @@ struct BundleDecodingTests {
                         revision: "",
                         roots: ["roles", "http/example/authz"],
                         regoVersion: .regoV1,
-                        metadata: [:]
+                        metadata: .null
                     )
             ),
             TestCase(
@@ -258,7 +258,7 @@ struct BundleLoaderTests {
                     manifest: Rego.Manifest(
                         revision: "e6f1a8ad-5b47-498f-a6eb-d1ecc86b63ae",
                         roots: [""], regoVersion: Rego.Manifest.Version.regoV1,
-                        metadata: ["name": AST.RegoValue.string("example-rbac")]),
+                        metadata: .object([.string("name"): AST.RegoValue.string("example-rbac")])),
 
                     planFiles: [
                         Rego.BundleFile(
@@ -274,63 +274,63 @@ struct BundleLoaderTests {
                     ],
                     data:
                         AST.RegoValue.object([
-                            "user_roles": AST.RegoValue.object([
-                                "eve": AST.RegoValue.array([
-                                    AST.RegoValue.string("customer")
+                            .string("user_roles"): .object([
+                                .string("eve"): .array([
+                                    .string("customer")
                                 ]),
-                                "bob": AST.RegoValue.array([
-                                    AST.RegoValue.string("employee"),
-                                    AST.RegoValue.string("billing"),
+                                .string("bob"): AST.RegoValue.array([
+                                    .string("employee"),
+                                    .string("billing"),
                                 ]),
-                                "alice": AST.RegoValue.array([
-                                    AST.RegoValue.string("admin")
+                                .string("alice"): AST.RegoValue.array([
+                                    .string("admin")
                                 ]),
                             ]),
-                            "role_grants": AST.RegoValue.object([
-                                "billing": AST.RegoValue.array([
-                                    AST.RegoValue.object([
-                                        "action": AST.RegoValue.string("read"),
-                                        "type": AST.RegoValue.string("finance"),
+                            .string("role_grants"): .object([
+                                .string("billing"): .array([
+                                    .object([
+                                        .string("action"): .string("read"),
+                                        .string("type"): .string("finance"),
                                     ]),
-                                    AST.RegoValue.object([
-                                        "type": AST.RegoValue.string("finance"),
-                                        "action": AST.RegoValue.string("update"),
-                                    ]),
-                                ]),
-                                "customer": AST.RegoValue.array([
-                                    AST.RegoValue.object([
-                                        "type": AST.RegoValue.string("dog"),
-                                        "action": AST.RegoValue.string("read"),
-                                    ]),
-                                    AST.RegoValue.object([
-                                        "action": AST.RegoValue.string("read"),
-                                        "type": AST.RegoValue.string("cat"),
-                                    ]),
-                                    AST.RegoValue.object([
-                                        "action": AST.RegoValue.string("adopt"),
-                                        "type": AST.RegoValue.string("dog"),
-                                    ]),
-                                    AST.RegoValue.object([
-                                        "type": AST.RegoValue.string("cat"),
-                                        "action": AST.RegoValue.string("adopt"),
+                                    .object([
+                                        .string("type"): .string("finance"),
+                                        .string("action"): .string("update"),
                                     ]),
                                 ]),
-                                "employee": AST.RegoValue.array([
-                                    AST.RegoValue.object([
-                                        "action": AST.RegoValue.string("read"),
-                                        "type": AST.RegoValue.string("dog"),
+                                .string("customer"): .array([
+                                    .object([
+                                        .string("type"): .string("dog"),
+                                        .string("action"): .string("read"),
                                     ]),
-                                    AST.RegoValue.object([
-                                        "type": AST.RegoValue.string("cat"),
-                                        "action": AST.RegoValue.string("read"),
+                                    .object([
+                                        .string("action"): .string("read"),
+                                        .string("type"): .string("cat"),
                                     ]),
-                                    AST.RegoValue.object([
-                                        "action": AST.RegoValue.string("update"),
-                                        "type": AST.RegoValue.string("dog"),
+                                    .object([
+                                        .string("action"): .string("adopt"),
+                                        .string("type"): .string("dog"),
                                     ]),
-                                    AST.RegoValue.object([
-                                        "action": AST.RegoValue.string("update"),
-                                        "type": AST.RegoValue.string("cat"),
+                                    .object([
+                                        .string("type"): .string("cat"),
+                                        .string("action"): .string("adopt"),
+                                    ]),
+                                ]),
+                                .string("employee"): .array([
+                                    .object([
+                                        .string("action"): .string("read"),
+                                        .string("type"): .string("dog"),
+                                    ]),
+                                    .object([
+                                        .string("type"): .string("cat"),
+                                        .string("action"): .string("read"),
+                                    ]),
+                                    .object([
+                                        .string("action"): .string("update"),
+                                        .string("type"): .string("dog"),
+                                    ]),
+                                    .object([
+                                        .string("action"): .string("update"),
+                                        .string("type"): .string("cat"),
                                     ]),
                                 ]),
                             ]),

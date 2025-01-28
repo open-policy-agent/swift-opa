@@ -12,7 +12,7 @@ struct Manifest: Equatable, Sendable {
     var revision: String = ""
     var roots: [String] = [""]
     var regoVersion: Version = .regoV1
-    var metadata: [String: AST.RegoValue] = [:]
+    var metadata: AST.RegoValue = .null
 
     enum Version: Int {
         case regoV0 = 0
@@ -53,19 +53,13 @@ extension Manifest {
 
         guard let metadataAny = jsonDict["metadata"] else {
             // No metadata, use default
-            self.metadata = [:]
+            self.metadata = .null
             return
         }
 
         // Parse metadata
         let metadataValue = try AST.RegoValue(from: metadataAny)
-        guard case .object(let metadataDict) = metadataValue else {
-            throw DecodingError.typeMismatch(
-                [String: AST.RegoValue].self,
-                DecodingError.Context(
-                    codingPath: [CodingKeys.metadata], debugDescription: "Invalid metadata value"))
-        }
-        self.metadata = metadataDict
+        self.metadata = metadataValue
     }
 
     enum CodingKeys: String, CodingKey {

@@ -59,6 +59,13 @@ public enum RegoValue: Equatable, Sendable, Hashable {
         try self.init(from: d)
     }
 
+    public init(_ obj: [String: RegoValue]) {
+        let d: [RegoValue: RegoValue] = obj.reduce(into: [:]) { m, elem in
+            m[.string(elem.key)] = elem.value
+        }
+        self = .object(d)
+    }
+
     public func isUndefined() -> Bool {
         guard case .undefined = self else {
             return false

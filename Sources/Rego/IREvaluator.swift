@@ -486,7 +486,7 @@ private func evalFrame(
                     currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
-                guard case .object(var objectValueA) = a, case .object(var objectValueB) = b else {
+                guard case .object(let objectValueA) = a, case .object(let objectValueB) = b else {
                     throw EvaluationError.invalidDataType(
                         reason:
                             "unable to perform ObjectMergeStatement with types \(type(of: a)) and \(type(of: b))"

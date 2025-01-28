@@ -251,7 +251,8 @@ private func evalFrame(
                 try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
 
             case let stmt as IR.BlockStatement:
-                currentScopePtr = framePtr.v.pushScope(blocks: stmt.blocks)
+                currentScopePtr = framePtr.v.pushScope(
+                    blocks: stmt.blocks, locals: currentScopePtr.v.locals)
                 break blockLoop
 
             case let stmt as IR.BreakStatement:
@@ -425,7 +426,63 @@ private func evalFrame(
                 return ResultSet([result])
 
             case let stmt as IR.ScanStatement:
-                throw EvaluationError.internalError(reason: "ScanStatement not implemented")
+                // This statement is undefined if source is a scalar value or empty collection.
+                let source = framePtr.v.resolveLocal(idx: stmt.source)
+                guard let sourceCollection = source as? any Collection<AST.RegoValue> else {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
+
+                for i in sourceCollection.indices {
+                    let currentKey = try AST.RegoValue(from: i)
+
+                    var currentValue: AST.RegoValue?
+                    switch source {
+                    case .array(let sourceArray):
+                        guard case .number(let keyInt) = currentKey else {
+                            throw EvaluationError.internalError(
+                                reason: "ScanStatement: array index must be an integer"
+                            )
+                        }
+                        guard keyInt.intValue > 0 && keyInt.intValue < sourceArray.count else {
+                            throw EvaluationError.internalError(
+                                reason: "ScanStatement: index out of bounds"
+                            )
+                        }
+                        currentValue = sourceArray[keyInt.intValue]
+                    case .object(let sourceObject):
+                        currentValue = sourceObject[currentKey]
+                    case .set:
+                        // TODO: Is this right? What would be the key and value for a set?
+                        currentValue = currentKey
+                    default:
+                        // let it fall through to the guard below
+                        break
+                    }
+
+                    guard let currentValue = currentValue else {
+                        currentScopePtr.v.nextBlock()
+                        break blockLoop
+                    }
+
+                    // Treat each block we iterate over as a frame and let it evaluate to completion. This
+                    // lets us drop any state on it and work around trying to jump around in this loop.
+                    // Note: This is assuming that the ".locals" on a scope is a full set we can propagate.
+                    // TODO: verify that this is OK to do... I _think_ we've pushed all the state we needed through... maybe..
+                    var subFrame = Frame(
+                        blocks: [stmt.block],
+                        locals: currentScopePtr.v.locals
+                    )
+                    try subFrame.assignLocal(idx: stmt.key, value: currentKey)
+                    try subFrame.assignLocal(idx: stmt.value, value: currentValue)
+                    let subFramePtr = Ptr(toCopyOf: subFrame)
+                    let resultSet = try await evalFrame(withContext: ctx, framePtr: subFramePtr)
+
+                    // Propagate any results from the block's sub frame into the parent frame
+                    for result in resultSet {
+                        framePtr.v.results.insert(result)
+                    }
+                }
 
             case let stmt as IR.SetAddStatement:
                 let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)

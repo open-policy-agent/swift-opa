@@ -68,27 +68,6 @@ struct IREvaluatorTests {
             ),
             TestCase(
                 // Requires..
-                //
-                // Statements:
-                //     AssignVarOnceStmt
-                //     AssignVarStmt
-                //     BlockStmt
-                //     BreakStmt
-                //     CallStmt
-                //     DotStmt
-                //     EqualStmt
-                //     IsDefinedStmt
-                //     IsUndefinedStmt
-                //     MakeObjectStmt
-                //     MakeSetStmt
-                //     NotEqualStmt
-                //     ObjectInsertStmt
-                //     ResetLocalStmt
-                //     ResultSetAddStmt
-                //     ReturnLocalStmt
-                //     ScanStmt
-                //     SetAddStmt
-                //
                 // Builtins:
                 //    internal.member_2 (aka "in", ref https://github.com/open-policy-agent/opa/blob/6e83f2ac535b501d8d26859f71d32e31ec931ca6/v1/ast/builtins.go#L351-L362)
                 //

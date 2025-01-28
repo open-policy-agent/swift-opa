@@ -344,8 +344,20 @@ private func evalFrame(
                 }
 
             case let stmt as IR.LenStatement:
-                throw EvaluationError.internalError(reason: "LenStatement not implemented")
-
+                let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
+                guard  case .undefined = sourceValue else {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
+                var len: Int = 0
+                switch sourceValue {
+                case let c as any Collection:
+                    len = c.count
+                default:
+                    throw EvaluationError.invalidOperand(reason: "len source must be a collection, got \(type(of: sourceValue))")
+                }
+                try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: len)))
+                
             case let stmt as IR.MakeArrayStatement:
                 var arr: [AST.RegoValue] = []
                 arr.reserveCapacity(Int(stmt.capacity))
@@ -386,6 +398,7 @@ private func evalFrame(
                     currentScopePtr.v.nextBlock()
                     break blockLoop
                 }
+                
             case let stmt as IR.NotStatement:
                 // TODO: oh no.. does this mean we should refactor to something like an `evalBlock()` helper that
                 // can indicate if it was undefined? .. this might impact how we do ScanStmt too
@@ -410,6 +423,7 @@ private func evalFrame(
                 }
                 targetObjectValue[key] = targetValue
                 try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
+                
             case let stmt as IR.ObjectInsertStatement:
                 let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
                 let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
@@ -442,6 +456,7 @@ private func evalFrame(
                 }
                 let merged = objectValueA.merge(with: objectValueB)
                 try framePtr.v.assignLocal(idx: stmt.target, value: .object(merged))
+                
             case let stmt as IR.ResetLocalStatement:
                 try framePtr.v.assignLocal(idx: stmt.target, value: .undefined)
 

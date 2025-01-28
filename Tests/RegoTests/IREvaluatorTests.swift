@@ -202,3 +202,7 @@ struct IREvaluatorTests {
         }
     }
 }
+
+extension IREvaluatorTests.TestCase: CustomTestStringConvertible {
+    var testDescription: String { description }
+}

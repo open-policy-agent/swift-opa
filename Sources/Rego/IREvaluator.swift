@@ -2,8 +2,8 @@ import AST
 import Foundation
 import IR
 
-let localIdxData = Local(0)
-let localIdxInput = Local(1)
+let localIdxInput = Local(0)
+let localIdxData = Local(1)
 
 internal struct IREvaluator {
     private var policies: [IndexedIRPolicy] = []
@@ -198,8 +198,8 @@ private func evalPlan(
             // instead special case the DotStmt for local 0 and do a smaller read on the store?
             // ¯\_(ツ)_/¯ for now we'll just drop the whole thang in here as it simplifies the
             // other statments. We can refactor that part later to optimize.
-            localIdxData: try await ctx.ctx.store.read(path: StoreKeyPath(segments: ["data"])),
             localIdxInput: ctx.ctx.input,
+            localIdxData: try await ctx.ctx.store.read(path: StoreKeyPath(segments: ["data"])),
         ]
     )
     let pFrame = Ptr(toCopyOf: frame)

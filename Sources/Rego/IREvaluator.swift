@@ -378,12 +378,29 @@ private func evalFrame(
                     break blockLoop
                 }
             case let stmt as IR.NotStatement:
+                // TODO: oh no.. does this mean we should refactor to something like an `evalBlock()` helper that
+                // can indicate if it was undefined? .. this might impact how we do ScanStmt too
                 throw EvaluationError.internalError(reason: "NotStatement not implemented")
 
             case let stmt as IR.ObjectInsertOnceStatement:
-                throw EvaluationError.internalError(
-                    reason: "ObjectInsertOnceStatement not implemented")
-
+                let targetValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
+                let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
+                let target = framePtr.v.resolveLocal(idx: stmt.object)
+                guard targetValue != .undefined && key != .undefined && target != .undefined else {
+                    currentScopePtr.v.nextBlock()
+                    break blockLoop
+                }
+                guard case .object(var targetObjectValue) = target else {
+                    throw EvaluationError.invalidDataType(
+                        reason:
+                            "unable to perform ObjectInsertStatement on target value of type \(type(of: target))"
+                    )
+                }
+                guard let currentValue = targetObjectValue[key], currentValue != targetValue else {
+                    throw EvaluationError.objectInsertOnceError(reason: "key '\(key)' already exists in object")
+                }
+                targetObjectValue[key] = targetValue
+                try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
             case let stmt as IR.ObjectInsertStatement:
                 let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
                 let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)

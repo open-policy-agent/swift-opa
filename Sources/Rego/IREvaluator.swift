@@ -233,8 +233,7 @@ private func evalFrame(
                 throw EvaluationError.internalError(reason: "AssignAppendStatement not implemented")
 
             case let stmt as IR.AssignIntStatement:
-                throw EvaluationError.internalError(reason: "AssignIntStatement not implemented")
-
+                try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
             case let stmt as IR.AssignVarOnceStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
                 let targetValue = framePtr.v.resolveLocal(idx: stmt.target)

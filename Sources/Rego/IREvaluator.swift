@@ -199,7 +199,7 @@ private func evalPlan(
             // ¯\_(ツ)_/¯ for now we'll just drop the whole thang in here as it simplifies the
             // other statments. We can refactor that part later to optimize.
             localIdxInput: ctx.ctx.input,
-            localIdxData: try await ctx.ctx.store.read(path: StoreKeyPath(segments: ["data"])),
+            localIdxData: try await ctx.ctx.store.read(path: StoreKeyPath(["data"])),
         ]
     )
     let pFrame = Ptr(toCopyOf: frame)
@@ -424,7 +424,7 @@ private func evalFrame(
             case let stmt as IR.MakeSetStatement:
                 try framePtr.v.assignLocal(idx: stmt.target, value: .set([]))
 
-            case let stmt as IR.NopStatement:
+            case _ as IR.NopStatement:
                 break
 
             case let stmt as IR.NotEqualStatement:
@@ -655,7 +655,6 @@ private func evalCall(
     let result = try await ctx.ctx.builtins.invoke(name: funcName, args: args)
 
     try frame.v.assignLocal(idx: resultIdx, value: result)
-
 }
 
 // callPlanFunc will evaluate calling a function defined on the plan

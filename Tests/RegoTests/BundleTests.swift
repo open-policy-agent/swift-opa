@@ -244,6 +244,10 @@ struct BundleLoaderTests {
         let sourceBundle: URL
         let expected: Rego.Bundle
     }
+    struct ErrorCase {
+        let sourceBundle: URL
+        let expectedError: Error
+    }
 
     static func relPath(_ path: String) -> URL {
         let resourcesURL = Bundle.module.resourceURL!
@@ -257,7 +261,8 @@ struct BundleLoaderTests {
                 expected: Rego.Bundle(
                     manifest: Rego.Manifest(
                         revision: "e6f1a8ad-5b47-498f-a6eb-d1ecc86b63ae",
-                        roots: [""], regoVersion: Rego.Manifest.Version.regoV1,
+                        roots: [""],
+                        regoVersion: Rego.Manifest.Version.regoV1,
                         metadata: .object([.string("name"): AST.RegoValue.string("example-rbac")])),
 
                     planFiles: [
@@ -336,6 +341,43 @@ struct BundleLoaderTests {
                             ]),
                         ])
                 )
+            ),
+            TestCase(
+                sourceBundle: relPath("TestData/Bundles/nested-data-trees"),
+                expected: Rego.Bundle(
+                    manifest: Manifest(
+                        revision: "",
+                        roots: [""],
+                        regoVersion: Rego.Manifest.Version.regoV1,
+                        metadata: .null
+                    ),
+                    data: AST.RegoValue([
+                        "roles": .array([
+                            .string("admin"),
+                            .string("readonly"),
+                            .string("readwrite"),
+                        ]),
+                        "users": .array([
+                            .string("alice"),
+                            .string("bob"),
+                            .string("mary"),
+                        ]),
+                        "extras": AST.RegoValue([
+                            "metadata": AST.RegoValue([
+                                "version": .string("1.2.3")
+                            ])
+                        ]),
+                    ])
+                )
+            ),
+        ]
+    }
+
+    static var errorCases: [ErrorCase] {
+        [
+            ErrorCase(
+                sourceBundle: relPath("TestData/Bundles/invalid-manifest-not-in-root"),
+                expectedError: BundleLoader.LoadError.unexpectedManifest(URL(string: "/")!)
             )
         ]
     }
@@ -345,6 +387,18 @@ struct BundleLoaderTests {
         let b = try BundleLoader.load(fromDirectory: tc.sourceBundle)
         // #expect(b == tc.expected)
         #expect(fuzzyBundleEquals(b, tc.expected))
+    }
+
+    @Test(arguments: errorCases)
+    func testInvalidLoadingBundleFromDirectory(tc: ErrorCase) async throws {
+        #expect {
+            let _ = try BundleLoader.load(fromDirectory: tc.sourceBundle)
+        } throws: { error in
+            print("Caught error: \(error)")
+            let gotMirror = Mirror(reflecting: error)
+            let wantMirror = Mirror(reflecting: tc.expectedError)
+            return gotMirror.subjectType == wantMirror.subjectType
+        }
     }
 
     func fuzzyBundleEquals(_ lhs: Rego.Bundle, _ rhs: Rego.Bundle) -> Bool {
@@ -379,6 +433,7 @@ struct BundleLoaderTests {
         return true
     }
 
+    // TODO rework this to compare absolutePath?
     func fuzzyBundleFileEquals(_ lhs: BundleFile, _ rhs: BundleFile) -> Bool {
         // TODO check paths relative to the bundle base
         guard lhs.url.lastPathComponent == rhs.url.lastPathComponent else {
@@ -388,6 +443,58 @@ struct BundleLoaderTests {
 
         // TODO ignore data for now
         return true
+    }
+}
+
+@Suite
+struct RelativePathTests {
+    struct TestCase {
+        var description: String
+        var baseURL: URL
+        var childURL: URL
+        var expected: String
+    }
+
+    static var allTests: [TestCase] {
+        return [
+            TestCase(
+                description: "simple relative",
+                baseURL: URL(fileURLWithPath: "/foo/bar"),
+                childURL: URL(fileURLWithPath: "/foo/bar/baz/qux"),
+                expected: "baz/qux"
+            ),
+            TestCase(
+                description: "simple relative with trailing slash",
+                baseURL: URL(fileURLWithPath: "/foo/bar/"),
+                childURL: URL(fileURLWithPath: "/foo/bar/baz/qux"),
+                expected: "baz/qux"
+            ),
+            TestCase(
+                description: "not file urls",
+                baseURL: URL(string: "http://localhost:8080/foo/bar")!,
+                childURL: URL(string: "http://localhost:8080/foo/bar/baz/qux")!,
+                expected: ""
+            ),
+            TestCase(
+                description: "not an descendent path",
+                baseURL: URL(fileURLWithPath: "/foo/bar"),
+                childURL: URL(fileURLWithPath: "/nope/bar/baz/qux"),
+                expected: ""
+            ),
+            TestCase(
+                description: "equal",
+                baseURL: URL(fileURLWithPath: "/foo/bar"),
+                childURL: URL(fileURLWithPath: "/foo/bar"),
+                expected: "."
+            ),
+        ]
+    }
+
+    @Test(arguments: allTests)
+    func testRelativePath(_ tc: TestCase) {
+        let actual = makeRelativeURL(from: tc.baseURL, to: tc.childURL)
+        let relPath = actual?.relativePath ?? ""
+        #expect(relPath == tc.expected)
     }
 
 }

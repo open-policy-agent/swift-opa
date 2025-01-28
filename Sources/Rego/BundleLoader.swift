@@ -30,26 +30,34 @@ struct BundleLoader {
         var regoFiles: [BundleFile] = []
         var planFiles: [BundleFile] = []
         var manifest: Manifest?
-        var data: AST.RegoValue?
+        var data: AST.RegoValue = AST.RegoValue.object([:])
 
         for f in files {
             switch f.url.lastPathComponent {
             case ".manifest":
                 guard manifest == nil else {
+                    // Only allow a single manifest in the bundle
                     throw LoadError.unexpectedManifest(f.url)
                 }
+                guard f.url.relativePath == ".manifest" else {
+                    // Manifest must be at the root of the bundle
+                    throw LoadError.unexpectedManifest(f.url)
+                }
+
                 manifest = try Manifest(from: f.data)
 
             case "data.json":
-                guard data == nil else {
-                    // TODO - just for now, support only a single data file per-bundle
-                    throw LoadError.unexpectedData(f.url)
-                }
+                // Parse JSON into AST values
+                var parsed: AST.RegoValue
                 do {
-                    data = try AST.RegoValue(fromJson: f.data)
+                    parsed = try AST.RegoValue(fromJson: f.data)
                 } catch {
                     throw LoadError.dataParseError(f.url, error)
                 }
+
+                // Determine the relative path and patch the data into the data tree
+                let relPath = f.url.relativePath.split(separator: "/").dropLast().map { String($0) }
+                data = data.patch(with: parsed, at: relPath)
 
             case "plan.json":
                 planFiles.append(f)
@@ -66,8 +74,7 @@ struct BundleLoader {
         planFiles.sort(by: { $0.url.path < $1.url.path })
 
         manifest = manifest ?? Manifest()  // Default manifest if none was provided
-        data = data ?? AST.RegoValue.object([:])  // Default data if none was provided
-        return Bundle(manifest: manifest!, planFiles: planFiles, regoFiles: regoFiles, data: data!)
+        return Bundle(manifest: manifest!, planFiles: planFiles, regoFiles: regoFiles, data: data)
     }
 
     public static func load(fromDirectory url: URL) throws -> Bundle {
@@ -104,6 +111,7 @@ struct DirectoryLoader: Sequence {
                 return $0
             case .success(let bundleFile):
                 // TODO is there a cool way to limit file sizes we're willing to read?
+                print("loading \(bundleFile.url.absoluteString)")
                 let data = Result { try Data(contentsOf: bundleFile.url) }
                 guard let data = try? data.get() else {
                     // TODO wrap the underlying error
@@ -126,11 +134,14 @@ private struct DirectorySequence: Sequence {
     let baseURL: URL
 
     struct DirectoryIterator: IteratorProtocol {
+        var baseURL: URL
         var innerIter: (any IteratorProtocol)?
         fileprivate var fileError: Box<(any Error)?> = .init(nil)
         var done: Bool = false
 
         init(baseURL: URL) {
+            self.baseURL = baseURL
+
             // Trick to allow the errorHandler below to retain a reference to the
             // captureError. It can't directly hold a reference to self, so instead self and
             // the current scope share the same underlying error storage.
@@ -177,18 +188,25 @@ private struct DirectorySequence: Sequence {
                 // Iteration from underlying iterator complete
                 return nil
             }
+
             guard let url = nextResult as? URL else {
                 done = true
                 return .failure(Err.unexpectedType)
             }
 
+            guard let relativeURL = makeRelativeURL(from: baseURL, to: url) else {
+                done = true
+                return .failure(Err.relativeURLError)
+            }
+
             // TODO
-            return .success(BundleFile(url: url, data: Data()))
+            return .success(BundleFile(url: relativeURL, data: Data()))
         }
 
         enum Err: Error {
             case unknownError
             case unexpectedType
+            case relativeURLError
         }
     }
 
@@ -197,33 +215,44 @@ private struct DirectorySequence: Sequence {
     }
 }
 
-// InMemBundleLoader implements BundleLoader over an in-memory bundle representation
-//struct InMemBundleLoader: BundleLoader {
-//    let rawPolicy: Data
-//    let rawData: Data
-//
-//    func load() async throws -> Bundle {
-//        // TODO
-//        return Bundle(
-//            manifest: Manifest(
-//                revision: "",
-//                roots: [],
-//                regoVersion: .regoV1,
-//                metadata: [:]
-//            ),
-//            planFiles: [],
-//            data: AST.RegoValue.object([:])
-//        )
-//        //        let policy = try IR.Policy(fromJson: rawPolicy)
-//        //        let data = try AST.RegoValue(fromJson: rawData)
-//        //
-//        //        return Bundle(policy: policy, data: data)
-//    }
-//}
+// makeRelativeURL takes a base URL and a child URL and returns a new URL that is relative to the
+// base URL.
+// Internally, the URL keeps track of the base and relative portions, and the relative portion can
+// be extracted with URL.relativePath.
+// This function only works for file:// URLs.
+func makeRelativeURL(from base: URL, to child: URL) -> URL? {
+    // Only support filesystem URLs
+    guard base.isFileURL, child.isFileURL else {
+        return nil
+    }
+    let baseComponents = base.pathComponents
+    let childComponents = child.pathComponents
 
-//struct Rego: Sequence {
-//
-//}
+    if !childComponents.starts(with: baseComponents) {
+        // childURL is not an ancestor of baseURL
+        return nil
+    }
+
+    if baseComponents == childComponents {
+        // Both URLs were equal
+        return URL(string: ".", relativeTo: base)
+    }
+
+    let relativeComponents = childComponents.dropFirst(baseComponents.count)
+
+    // Ensure there is a trailing slash on the baseURL
+    // This is apparently necessary, otherwise the last path component will
+    // be dropped when we create the new relative URL.
+    // See documentation: https://developer.apple.com/documentation/foundation/nsurl/1417949-init
+    // specifically:
+    // ...you can construct a URL for the file by providing the folder’s URL as the base path
+    // (with a trailing slash) and the filename as the string part.
+    var absBase = base.absoluteURL
+    if absBase.lastPathComponent != "/" {
+        absBase = absBase.appendingPathComponent("/")
+    }
+    return URL(string: relativeComponents.joined(separator: "/"), relativeTo: absBase)
+}
 
 private class Box<T> {
     var value: T

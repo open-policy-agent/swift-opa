@@ -324,7 +324,9 @@ private func evalFrame(
             case let stmt as IR.LenStatement:
                 throw EvaluationError.internalError(reason: "not implemented")
             case let stmt as IR.MakeArrayStatement:
-                try framePtr.v.assignLocal(idx: stmt.target, value: .array([]))
+                var arr: [AST.RegoValue] = []
+                arr.reserveCapacity(Int(stmt.capacity))
+                try framePtr.v.assignLocal(idx: stmt.target, value: .array(arr))
             case let stmt as IR.MakeNullStatement:
                 try framePtr.v.assignLocal(idx: stmt.target, value: .null)
             case let stmt as IR.MakeNumberStatement:

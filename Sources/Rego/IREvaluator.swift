@@ -169,6 +169,7 @@ private struct Scope {
     var blockIdx: Int = 0
     var statementIdx: Int = 0
     let blocks: [IR.Block]
+    var undefinedBlockIndexes: [Int] = []
     var locals: Locals
 
     // Initialize a fresh scope given a set of blocks to process
@@ -178,7 +179,12 @@ private struct Scope {
         self.blocks = blocks
     }
 
-    mutating func nextBlock() {
+    // markBlockUndefinedAndContinue will add the block index to the list of undefined blocks
+    // for this scope. It will then increment the block index and reset the statement
+    // index in preparation of continuing the evaluation at the start of the next block.
+    // ref: https://www.openpolicyagent.org/docs/latest/ir/#block-execution
+    mutating func markBlockUndefinedAndContinue() {
+        self.undefinedBlockIndexes.append(self.blockIdx)
         self.blockIdx += 1
         self.statementIdx = 0
     }
@@ -216,6 +222,8 @@ private func evalFrame(
     // To evaluate a Frame we iterate through each block of the current scope, evaluating
     // statements in the block one at a time. We will jump between blocks being executed but
     // never go backwards, only early exit maneuvers jumping "forward" in the plan.
+    // ref: https://www.openpolicyagent.org/docs/latest/ir/#execution
+
     blockLoop: while currentScopePtr.v.blockIdx < currentScopePtr.v.blocks.count {
 
         let currentBlock = currentScopePtr.v.blocks[currentScopePtr.v.blockIdx]
@@ -233,7 +241,7 @@ private func evalFrame(
                 let array = framePtr.v.resolveLocal(idx: stmt.array)
                 let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
                 guard case .array(var arrayValue) = array, value != .undefined else {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
                 arrayValue.append(value)
@@ -276,7 +284,7 @@ private func evalFrame(
                 for p in stmt.path {
                     let segment = try framePtr.v.resolveOperand(ctx: ctx, p)
                     guard case .string(let stringValue) = segment else {
-                        currentScopePtr.v.nextBlock()
+                        currentScopePtr.v.markBlockUndefinedAndContinue()
                         break blockLoop
                     }
                     path.append(stringValue)
@@ -334,7 +342,7 @@ private func evalFrame(
                 // This statement is undefined if the key does not exist in the source value.
                 guard let targetValue else {
                     // undefined
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
 
@@ -344,45 +352,45 @@ private func evalFrame(
                 let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
                 let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
                 if a == .undefined || b == .undefined || a != b {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
             case let stmt as IR.IsArrayStatement:
                 guard case .array = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
 
             case let stmt as IR.IsDefinedStatement:
                 // This statement is undefined if source is undefined.
                 if case .undefined = framePtr.v.resolveLocal(idx: stmt.source) {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
 
             case let stmt as IR.IsObjectStatement:
                 guard case .object = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
 
             case let stmt as IR.IsSetStatement:
                 guard case .set = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
 
             case let stmt as IR.IsUndefinedStatement:
                 // This statement is undefined if source is not undefined.
                 guard case .undefined = framePtr.v.resolveLocal(idx: stmt.source) else {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
 
             case let stmt as IR.LenStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
                 guard case .undefined = sourceValue else {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
                 var len: Int = 0
@@ -428,25 +436,45 @@ private func evalFrame(
                 break
 
             case let stmt as IR.NotEqualStatement:
-                //This statement is undefined if a is equal to b.
+                // This statement is undefined if a is equal to b.
                 let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
                 let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
                 if a == .undefined || b == .undefined || a == b {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
 
             case let stmt as IR.NotStatement:
-                // TODO: oh no.. does this mean we should refactor to something like an `evalBlock()` helper that
-                // can indicate if it was undefined? .. this might impact how we do ScanStmt too
-                throw EvaluationError.internalError(reason: "NotStatement not implemented")
+                // We're going to evalaute the block in an isolated frame, propagating
+                // local state, so that we can more easily see whether it succeeded.
+                var subFrame = Frame(
+                    blocks: [stmt.block],
+                    locals: currentScopePtr.v.locals
+                )
+                let subFramePtr = Ptr(toCopyOf: subFrame)
+                let resultSet = try await evalFrame(withContext: ctx, framePtr: subFramePtr)
+
+                // Look at the frame's current context, we derive whether it was undefined
+                // iff the number of blocks planned == the number of undefined blocks.
+                // This statement is undefined if the contained block is defined.
+                let lastScope = try subFramePtr.v.currentScope()
+                let allBlocksUndefined = lastScope.v.blocks.count == lastScope.v.undefinedBlockIndexes.count
+                if !allBlocksUndefined {
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
+                    break blockLoop
+                }
+
+                // Propagate any results from the block's sub frame into the parent frame
+                for result in resultSet {
+                    framePtr.v.results.insert(result)
+                }
 
             case let stmt as IR.ObjectInsertOnceStatement:
                 let targetValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
                 let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
                 let target = framePtr.v.resolveLocal(idx: stmt.object)
                 guard targetValue != .undefined && key != .undefined && target != .undefined else {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
                 guard case .object(var targetObjectValue) = target else {
@@ -467,7 +495,7 @@ private func evalFrame(
                 let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
                 let target = framePtr.v.resolveLocal(idx: stmt.object)
                 guard value != .undefined && key != .undefined && target != .undefined else {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
                 guard case .object(var targetObjectValue) = target else {
@@ -483,7 +511,7 @@ private func evalFrame(
                 let a = framePtr.v.resolveLocal(idx: stmt.a)
                 let b = framePtr.v.resolveLocal(idx: stmt.b)
                 if a == .undefined || b == .undefined {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
                 guard case .object(let objectValueA) = a, case .object(let objectValueB) = b else {
@@ -502,12 +530,12 @@ private func evalFrame(
                 let value = framePtr.v.resolveLocal(idx: stmt.value)
                 guard value != .undefined else {
                     // undefined
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
                 guard case .object = value else {
                     // undefined
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
                 framePtr.v.results.insert(value)
@@ -520,7 +548,7 @@ private func evalFrame(
                 // This statement is undefined if source is a scalar value or empty collection.
                 let source = framePtr.v.resolveLocal(idx: stmt.source)
                 guard let sourceCollection = source as? any Collection<AST.RegoValue> else {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
 
@@ -552,7 +580,7 @@ private func evalFrame(
                     }
 
                     guard let currentValue = currentValue else {
-                        currentScopePtr.v.nextBlock()
+                        currentScopePtr.v.markBlockUndefinedAndContinue()
                         break blockLoop
                     }
 
@@ -579,7 +607,7 @@ private func evalFrame(
                 let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
                 let target = framePtr.v.resolveLocal(idx: stmt.set)
                 guard value != .undefined && target != .undefined else {
-                    currentScopePtr.v.nextBlock()
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
                     break blockLoop
                 }
                 guard case .set(var targetSetValue) = target else {

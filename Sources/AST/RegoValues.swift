@@ -1,7 +1,7 @@
 import Foundation
 
 // RegoValue represents any concrete JSON-representable value consumable by Rego
-public enum RegoValue: Equatable, Sendable, Hashable {
+public enum RegoValue: Encodable, Equatable, Sendable, Hashable {
     case array([RegoValue])
     case boolean(Bool)
     case null
@@ -71,6 +71,11 @@ public enum RegoValue: Equatable, Sendable, Hashable {
             return false
         }
         return true
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self)
     }
 }
 

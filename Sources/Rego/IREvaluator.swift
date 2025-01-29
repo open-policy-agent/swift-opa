@@ -222,19 +222,20 @@ private struct Scope {
             return
         }
         let stmt = self.blocks[self.blockIdx].statements[self.statementIdx]
-        let message =
+        let formattedMessage = message.isEmpty ? "" : "message='\(message)'"
+        let eventMessage =
             switch op {
             case .enter:
                 "push scope"
             case .exit:
                 "pop scope"
             default:
-                "\(type(of: stmt)):\(self.blockIdx):\(self.statementIdx): \(message) -> \(stmt.debugString)"
+                "\(type(of: stmt)) block=\(self.blockIdx) stmt=\(self.statementIdx)\(formattedMessage) -> \(stmt.debugString)"
             }
         tracer.traceEvent(
             IRTraceEvent(
                 operation: op,
-                message: message,
+                message: eventMessage,
                 location: TraceLocation(
                     row: stmt.location.row,
                     col: stmt.location.col,

@@ -162,7 +162,8 @@ extension Block: Codable {
     }
 
     public func encode(to encoder: any Encoder) throws {
-        throw EncodingError.unsupported
+        var container = encoder.singleValueContainer()
+        try container.encode("block(stmt_count=\(statements.count))")
     }
 }
 
@@ -251,9 +252,11 @@ public protocol Statement: Sendable, Codable {
 extension Statement {
     public var debugString: String {
         do {
-            return String(data: try JSONEncoder().encode(self), encoding: .utf8)!
+            let data = try JSONEncoder().encode(self)
+            let str = String(data: data, encoding: .utf8)!
+            return str
         } catch {
-            return "\(type(of: self)) statement encoding failed"
+            return "\(type(of: self)) statement encoding failed: \(error)"
         }
     }
 }
@@ -287,7 +290,7 @@ public struct Operand: Equatable, Sendable {
         case stringIndex = "string_index"
     }
 
-    public enum Value: Equatable, Sendable {
+    public enum Value: Codable, Equatable, Sendable {
         case localIndex(Int)
         case bool(Bool)
         case stringIndex(Int)
@@ -330,6 +333,8 @@ extension Operand: Codable {
     }
 
     public func encode(to encoder: any Encoder) throws {
-        throw EncodingError.unsupported
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.value, forKey: .value)
+        try container.encode(self.type, forKey: .type)
     }
 }

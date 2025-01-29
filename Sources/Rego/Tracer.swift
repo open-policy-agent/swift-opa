@@ -23,7 +23,7 @@ public enum TraceOperation: String, Codable, Equatable, Sendable {
 // TraceEvent is defined as a protocol and may be implemented by the
 // different evaluators as they will likely have additional metadata and
 // requirements for serialization/formatting
-public protocol TraceableEvent: Codable, Sendable {
+public protocol TraceableEvent: Encodable, Sendable {
     var operation: TraceOperation { get }
     var message: String { get }
     var location: TraceLocation { get }

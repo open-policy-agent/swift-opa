@@ -7,7 +7,7 @@ enum BuiltinFuncs {
         case argumentTypeMismatch(arg: String)
     }
 
-    static func arrayConcat(args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func arrayConcat(ctx: inout BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         // x: array - the first array
         // y: array - the second array
         guard args.count == 2 else {
@@ -25,7 +25,7 @@ enum BuiltinFuncs {
 
     // memberOf is a membership check - memberOf(x: any, y: any) checks if y in x
     // For objects, we are checking the values, not the keys.
-    static func isMemberOf(args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func isMemberOf(ctx: inout BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
         }
@@ -40,5 +40,27 @@ enum BuiltinFuncs {
         default:
             return .boolean(false)
         }
+    }
+
+    // trace(note) allows for inserting events into the trace from a Rego policy.
+    // The note must be a string.
+    static func trace(ctx: inout BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+        }
+
+        guard case .string(let msg) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "note")
+        }
+
+        if let tracer = ctx.tracer {
+            tracer.traceEvent(
+                BuiltinNoteEvent(
+                    message: msg,
+                    location: ctx.location
+                ))
+        }
+
+        return AST.RegoValue.boolean(true)
     }
 }

@@ -44,13 +44,18 @@ public struct Engine {
         self.evaluator = try IREvaluator(bundles: bundles)
     }
 
-    public func evaluate(query: String, input: AST.RegoValue = .null) async throws -> ResultSet {
+    public func evaluate(
+        query: String,
+        input: AST.RegoValue = .null,
+        tracer: QueryTracer? = nil
+    ) async throws -> ResultSet {
         // withContext ctx: EvaluationContext
         let ctx = EvaluationContext(
             query: query,
             input: input,
             store: self.store,
-            builtins: defaultBuiltinRegistry
+            builtins: defaultBuiltinRegistry,
+            tracer: tracer
         )
 
         guard let evaluator = self.evaluator else {

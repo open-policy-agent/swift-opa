@@ -188,7 +188,8 @@ struct BuiltinTests {
     @Test(arguments: allTests)
     func testBuiltins(tc: TestCase) async throws {
         let reg = defaultBuiltinRegistry
-        let result = await Result { try await reg.invoke(name: tc.name, args: tc.args) }
+        var bctx = BuiltinContext()
+        let result = await Result { try await reg.invoke(withCtx: &bctx, name: tc.name, args: tc.args) }
         switch tc.expected {
         case .success:
             #expect(successEquals(result, tc.expected))

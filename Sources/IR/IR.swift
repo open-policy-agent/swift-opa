@@ -1,3 +1,5 @@
+import Foundation
+
 public struct Policy: Codable, Equatable, Sendable {
     public var staticData: Static?
     public var plans: Plans? = nil
@@ -238,12 +240,22 @@ public enum EncodingError: Error {
 }
 
 // Statement is implemented by each conctete statement type
-public protocol Statement: Sendable {
+public protocol Statement: Sendable, Codable {
     // Location coordinates, shared by all concrete statement
     var location: Location { get set }
 
     // This will be used to implement Equatable dynamically between heterogenous statement types
     func isEqual(to other: any Statement) -> Bool
+}
+
+extension Statement {
+    public var debugString: String {
+        do {
+            return String(data: try JSONEncoder().encode(self), encoding: .utf8)!
+        } catch {
+            return "\(type(of: self)) statement encoding failed"
+        }
+    }
 }
 
 public struct Funcs: Codable, Equatable, Sendable {

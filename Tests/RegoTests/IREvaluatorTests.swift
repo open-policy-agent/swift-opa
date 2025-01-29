@@ -145,8 +145,20 @@ struct IREvaluatorTests {
     func testValidEvaluations(tc: TestCase) async throws {
         var engine = try Engine(withBundlePaths: [Engine.BundlePath(name: "default", url: tc.sourceBundle)])
         try await engine.prepare()
-        let actual = try await engine.evaluate(query: tc.query, input: tc.input)
-
+        var bufferTracer = BufferedQueryTracer(level: .full)
+        let actual = try await engine.evaluate(
+            query: tc.query,
+            input: tc.input,
+            tracer: QueryTracer(wrapping: bufferTracer)
+        )
+        if tc.expectedResult != actual {
+            let tempDirectoryURL = FileManager.default.temporaryDirectory
+            let tempFileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
+            FileManager.default.createFile(atPath: tempFileURL.path, contents: Data(), attributes: nil)
+            let tempFileHandle = try FileHandle(forWritingTo: tempFileURL)
+            bufferTracer.prettyPrint(out: tempFileHandle)
+            print("Debug Trace: \(tempFileURL.path)")
+        }
         #expect(tc.expectedResult == actual)
     }
 

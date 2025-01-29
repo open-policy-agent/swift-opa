@@ -1,7 +1,18 @@
 import AST
 import Foundation
 
-typealias Builtin = ([AST.RegoValue]) async throws -> AST.RegoValue
+typealias Builtin = (inout BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
+
+public struct BuiltinContext {
+    public let location: TraceLocation
+    public var tracer: QueryTracer?
+
+    init(location: TraceLocation = TraceLocation(), tracer: QueryTracer? = nil) {
+        self.location = location
+        self.tracer = tracer
+    }
+}
+
 public struct BuiltinRegistry {
     var builtins: [String: Builtin]
 
@@ -9,14 +20,15 @@ public struct BuiltinRegistry {
         return [
             "array.concat": BuiltinFuncs.arrayConcat,
             "internal.member_2": BuiltinFuncs.isMemberOf,
+            "trace": BuiltinFuncs.trace,
         ]
     }
 
-    func invoke(name: String, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    func invoke(withCtx ctx: inout BuiltinContext, name: String, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard let builtin = builtins[name] else {
             throw RegistryError.builtinNotFound(name: name)
         }
-        return try await builtin(args)
+        return try await builtin(&ctx, args)
     }
 
     func hasBuiltin(_ name: String) -> Bool {
@@ -35,4 +47,10 @@ extension BuiltinRegistry {
     enum RegistryError: Error {
         case builtinNotFound(name: String)
     }
+}
+
+public struct BuiltinNoteEvent: TraceableEvent {
+    public var operation: TraceOperation = .note
+    public var message: String
+    public var location: TraceLocation
 }

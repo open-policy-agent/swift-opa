@@ -184,7 +184,7 @@ private struct Frame {
 // Scopes are children of a Frame, representing a logical Rego scope. Each time
 // a statement has nested blocks a new Scope is pushed. These are primarily used
 // for further protecting locals and tracking "with" value overrides.
-private struct Scope {
+private struct Scope: Encodable {
     var blockIdx: Int = 0
     var statementIdx: Int = 0
     let blocks: [IR.Block]
@@ -241,10 +241,7 @@ private struct Scope {
                     col: stmt.location.col,
                     file: ctx.policy.ir.staticData?.files?[stmt.location.file].value ?? "<unknown>"
                 ),
-                blockIdx: self.blockIdx,
-                statementIdx: self.statementIdx,
-                blocks: self.blocks,
-                undefinedBlockIndexes: self.undefinedBlockIndexes
+                scope: self
             ))
     }
 }
@@ -258,10 +255,7 @@ private struct IRTraceEvent: TraceableEvent {
     // Note: this won't be seen in pretty prints but should be dumped in super verbose JSON output
     // TODO: Ideally we can just dump a copy of the scope in here, but it isn't Codable, so for now
     // leave some choice bread crums
-    var blockIdx: Int = 0
-    var statementIdx: Int = 0
-    let blocks: [IR.Block]
-    var undefinedBlockIndexes: [Int] = []
+    var scope: Scope
 }
 
 // Evaluate an IR Plan from start to finish for the given IREvaluationContext

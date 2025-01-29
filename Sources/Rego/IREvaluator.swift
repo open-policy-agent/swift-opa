@@ -799,24 +799,13 @@ private func evalScan(
     stmt: ScanStatement,
     source: AST.RegoValue
 ) async throws -> ResultSet {
-    // Treat each block we iterate over as a frame and let it evaluate to completion. This
-    // lets us drop any state on it and work around trying to jump around in this loop.
-    // Note: This is assuming that the ".locals" on a scope is a full set we can propagate.
-    // TODO: verify that this is OK to do... I _think_ we've pushed all the state we needed through... maybe..
-    let subFramePtr = Ptr(
-        toCopyOf: Frame(
-            withCtx: ctx,
-            blocks: [stmt.block],
-            locals: try frame.v.currentScope().v.locals
-        ))
-
     var results: ResultSet = []
     switch source {
     case .array(let arr):
         for i in 0..<arr.count {
             let k = try RegoValue(from: i)
             let v = arr[i] as AST.RegoValue
-            let rs = try await evalScanBlock(ctx: ctx, subFrame: subFramePtr, stmt: stmt, key: k, value: v)
+            let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
             print("key: \(k), value: \(v), rs: \(rs)")
 
             results.formUnion(rs)
@@ -824,14 +813,14 @@ private func evalScan(
 
     case .object(let o):
         for (k, v) in o {
-            let rs = try await evalScanBlock(ctx: ctx, subFrame: subFramePtr, stmt: stmt, key: k, value: v)
+            let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
             print("key: \(k), value: \(v), rs: \(rs)")
 
             results.formUnion(rs)
         }
     case .set(let set):
         for v in set {
-            let rs = try await evalScanBlock(ctx: ctx, subFrame: subFramePtr, stmt: stmt, key: v, value: v)
+            let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: v, value: v)
             print("key: \(v), value: \(v), rs: \(rs)")
 
             results.formUnion(rs)
@@ -843,10 +832,19 @@ private func evalScan(
 }
 
 private func evalScanBlock(
-    ctx: IREvaluationContext, subFrame: Ptr<Frame>, stmt: ScanStatement, key: AST.RegoValue, value: AST.RegoValue
+    ctx: IREvaluationContext, frame: Ptr<Frame>, stmt: ScanStatement, key: AST.RegoValue, value: AST.RegoValue
 ) async throws -> ResultSet {
-    try subFrame.v.assignLocal(idx: stmt.key, value: key)
-    try subFrame.v.assignLocal(idx: stmt.value, value: value)
+    // Treat each block we iterate over as a frame and let it evaluate to completion. This
+    // lets us drop any state on it and work around trying to jump around in this loop.
+    // Note: This is assuming that the ".locals" on a scope is a full set we can propagate.
+    let subFramePtr = Ptr(
+        toCopyOf: Frame(
+            withCtx: ctx,
+            blocks: [stmt.block],
+            locals: try frame.v.currentScope().v.locals
+        ))
+    try subFramePtr.v.assignLocal(idx: stmt.key, value: key)
+    try subFramePtr.v.assignLocal(idx: stmt.value, value: value)
 
-    return try await evalFrame(withContext: ctx, framePtr: subFrame)
+    return try await evalFrame(withContext: ctx, framePtr: subFramePtr)
 }

@@ -1,7 +1,7 @@
 import Foundation
 import IR
 
-public protocol EventTracer {
+public protocol QueryTracer {
     func traceEvent(_ event: any TraceableEvent)
 }
 
@@ -39,25 +39,12 @@ public struct TraceLocation: Codable, Equatable, Sendable {
     }
 }
 
-// To avoid sprawling inout parameters all over we're going to use a class and some inheritence
-public class QueryTracer: EventTracer {
-    private var eventSink: EventTracer
-
-    public init(wrapping eventSink: EventTracer = NoOpQueryTracer()) {
-        self.eventSink = eventSink
-    }
-
-    public func traceEvent(_ event: any TraceableEvent) {
-        self.eventSink.traceEvent(event)
-    }
-}
-
-public struct NoOpQueryTracer: EventTracer {
+public struct NoOpQueryTracer: QueryTracer {
     public func traceEvent(_ event: any TraceableEvent) {}
     public init() {}
 }
 
-public class BufferedQueryTracer: EventTracer {
+public class BufferedQueryTracer: QueryTracer {
     var level: TraceLevel
     var traceEvents: [any TraceableEvent] = []
 
@@ -102,7 +89,7 @@ public class BufferedQueryTracer: EventTracer {
                 out.write(" ".data(using: .utf8)!)
             }
 
-            for i in 0..<currentIndent {
+            for _ in 0..<currentIndent {
                 out.write("| ".data(using: .utf8)!)
             }
 

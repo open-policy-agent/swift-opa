@@ -119,9 +119,11 @@ private struct Frame {
     }
 
     // Create a new Scope, seed with some locals, push it to the stack, and return it.
-    mutating func pushScope(withCtx ctx: IREvaluationContext, blocks: [IR.Block], locals: Locals = [:]) -> Ptr<
-        Scope
-    > {
+    mutating func pushScope(
+        withCtx ctx: IREvaluationContext,
+        blocks: [IR.Block],
+        locals: Locals = [:]
+    ) -> Ptr<Scope> {
         let scopePtr = Ptr(toCopyOf: Scope(blocks: blocks, locals: locals))
         self.scopeStack.append(scopePtr)
         scopePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.enter)
@@ -645,7 +647,7 @@ private func evalFrame(
                     stmt: stmt,
                     source: source
                 )
-                
+
                 // Propagate any results from the block's sub frame into the parent frame
                 framePtr.v.results.formUnion(results)
 
@@ -806,12 +808,13 @@ private func evalScan(
     // lets us drop any state on it and work around trying to jump around in this loop.
     // Note: This is assuming that the ".locals" on a scope is a full set we can propagate.
     // TODO: verify that this is OK to do... I _think_ we've pushed all the state we needed through... maybe..
-    let subFramePtr = Ptr(toCopyOf: Frame(
-        withCtx: ctx,
-        blocks: [stmt.block],
-        locals: try frame.v.currentScope().v.locals
-    ))
-    
+    let subFramePtr = Ptr(
+        toCopyOf: Frame(
+            withCtx: ctx,
+            blocks: [stmt.block],
+            locals: try frame.v.currentScope().v.locals
+        ))
+
     var results: ResultSet = []
     switch source {
     case .array(let arr):
@@ -844,10 +847,11 @@ private func evalScan(
     return results
 }
 
-private func evalScanBlock(ctx: IREvaluationContext, subFrame: Ptr<Frame>, stmt: ScanStatement, key: AST.RegoValue, value: AST.RegoValue) async throws -> ResultSet {
-    try subFrame.v.assignLocal(idx: stmt.key, value: key )
+private func evalScanBlock(
+    ctx: IREvaluationContext, subFrame: Ptr<Frame>, stmt: ScanStatement, key: AST.RegoValue, value: AST.RegoValue
+) async throws -> ResultSet {
+    try subFrame.v.assignLocal(idx: stmt.key, value: key)
     try subFrame.v.assignLocal(idx: stmt.value, value: value)
 
     return try await evalFrame(withContext: ctx, framePtr: subFrame)
 }
-

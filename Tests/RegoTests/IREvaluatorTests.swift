@@ -137,11 +137,11 @@ struct IREvaluatorTests {
     func testValidEvaluations(tc: TestCase) async throws {
         var engine = try Engine(withBundlePaths: [Engine.BundlePath(name: "default", url: tc.sourceBundle)])
         try await engine.prepare()
-        var bufferTracer = BufferedQueryTracer(level: .full)
+        let bufferTracer = BufferedQueryTracer(level: .full)
         let actual = try await engine.evaluate(
             query: tc.query,
             input: tc.input,
-            tracer: QueryTracer(wrapping: bufferTracer)
+            tracer: bufferTracer
         )
         if tc.expectedResult != actual {
             let tempDirectoryURL = FileManager.default.temporaryDirectory

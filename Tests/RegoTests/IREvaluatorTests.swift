@@ -160,7 +160,8 @@ struct IREvaluatorTests {
 
         await #expect(Comment(rawValue: tc.description)) {
             try await engine.prepare()
-            let actual = try await engine.evaluate(query: tc.query, input: tc.input)
+            let _ = try await engine.evaluate(query: tc.query, input: tc.input)
+            #expect(Bool(false), "expected evaluation to throw an error")
         } throws: { error in
             let gotMirror = Mirror(reflecting: error)
             let wantMirror = Mirror(reflecting: tc.expectedError)

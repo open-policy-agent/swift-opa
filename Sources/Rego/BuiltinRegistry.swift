@@ -7,7 +7,8 @@ public struct BuiltinRegistry {
 
     fileprivate static var defaultBuiltins: [String: Builtin] {
         return [
-            "array.concat": BuiltinFuncs.arrayConcat
+            "array.concat": BuiltinFuncs.arrayConcat,
+            "internal.member_2": BuiltinFuncs.isMemberOf,
         ]
     }
 

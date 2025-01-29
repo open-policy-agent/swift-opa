@@ -630,6 +630,7 @@ private func evalFrame(
 
             case let stmt as IR.ReturnLocalStatement:
                 let result = framePtr.v.resolveLocal(idx: stmt.source)
+                currentScopePtr.v.traceEvent(withCtx: ctx, op: .exit)
                 return ResultSet([result])
 
             case let stmt as IR.ScanStatement:

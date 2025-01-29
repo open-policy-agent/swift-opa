@@ -852,8 +852,8 @@ private func evalScan(
         blocks: [stmt.block],
         locals: try frame.v.currentScope().v.locals
     ))
-//    var innerCtx = ctx  // TODO we can't capture the inout in the closure or something
-    let eval: ( (inout IREvaluationContext, AST.RegoValue, AST.RegoValue) async throws -> ResultSet) = { ctx, k, v in
+    var innerCtx = ctx  // TODO we can't capture the inout in the closure or something
+    let eval: ( (AST.RegoValue, AST.RegoValue) async throws -> ResultSet) = { k, v in
         try subFramePtr.v.assignLocal(idx: stmt.key, value: k )
         try subFramePtr.v.assignLocal(idx: stmt.value, value: v)
         return try await evalFrame(withContext: &ctx, framePtr: subFramePtr)
@@ -866,7 +866,7 @@ private func evalScan(
         for i in 0..<arr.count {
             let k = try RegoValue(from: i)
             let v = arr[i] as AST.RegoValue
-            let rs = try await eval(&ctx, k, v)
+            let rs = try await eval(k, v)
             print("key: \(k), value: \(v), rs: \(rs)")
 
             results.formUnion(rs)
@@ -874,14 +874,14 @@ private func evalScan(
         
     case .object(let o):
         for (k, v) in o {
-            let rs = try await eval(&ctx, k, v)
+            let rs = try await eval(k, v)
             print("key: \(k), value: \(v), rs: \(rs)")
             
             results.formUnion(rs)
         }
     case .set(let set):
         for elem in set {
-            let rs = try await eval(&ctx, elem, elem)
+            let rs = try await eval(elem, elem)
             print("key: \(elem), value: \(elem), rs: \(rs)")
             
             results.formUnion(rs)

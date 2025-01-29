@@ -67,10 +67,6 @@ struct IREvaluatorTests {
                 ])
             ),
             TestCase(
-                // Requires..
-                // Builtins:
-                //    internal.member_2 (aka "in", ref https://github.com/open-policy-agent/opa/blob/6e83f2ac535b501d8d26859f71d32e31ec931ca6/v1/ast/builtins.go#L351-L362)
-                //
                 description: "happy path rbac allow non-admin",
                 sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
                 query: "app/rbac/allow",

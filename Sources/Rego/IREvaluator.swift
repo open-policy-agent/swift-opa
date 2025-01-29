@@ -292,7 +292,7 @@ private func evalFrame(
 
                 let funcName = path.joined(separator: ".")
 
-                try await evalCall(
+                let result = try await evalCall(
                     ctx: ctx,
                     frame: framePtr,
                     funcName: funcName,
@@ -300,18 +300,30 @@ private func evalFrame(
                         // TODO: make the CallDynamicStatement "args" match the CallStatement ones upstream..
                         IR.Operand(
                             type: Operand.OpType.local, value: Operand.Value.localIndex(Int($0)))
-                    },
-                    resultIdx: stmt.result
+                    }
                 )
 
+                guard result != .undefined else {
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
+                    break blockLoop
+                }
+
+                try framePtr.v.assignLocal(idx: stmt.result, value: result)
+
             case let stmt as IR.CallStatement:
-                try await evalCall(
+                let result = try await evalCall(
                     ctx: ctx,
                     frame: framePtr,
                     funcName: stmt.callFunc,
-                    args: stmt.args,
-                    resultIdx: stmt.result
+                    args: stmt.args
                 )
+
+                guard result != .undefined else {
+                    currentScopePtr.v.markBlockUndefinedAndContinue()
+                    break blockLoop
+                }
+
+                try framePtr.v.assignLocal(idx: stmt.result, value: result)
 
             case let stmt as IR.DotStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
@@ -664,25 +676,33 @@ private func evalCall(
     ctx: IREvaluationContext,
     frame: Ptr<Frame>,
     funcName: String,
-    args: [IR.Operand],
-    resultIdx: IR.Local
-) async throws {
-    // TODO: We should check the args "input" for undefined
+    args: [IR.Operand]
+) async throws -> AST.RegoValue {
+    var argValues: [AST.RegoValue] = []
+    for arg in args {
+        let arg = try frame.v.resolveOperand(ctx: ctx, arg)
+
+        // If any argument (ie, statement "input") is undefined, bail out early
+        // and let the call statement become undefined too
+        guard arg != .undefined else {
+            return AST.RegoValue.undefined
+        }
+
+        argValues.append(arg)
+    }
 
     // Handle plan-defined functions first
     if ctx.policy.funcs[funcName] != nil {
-        try await callPlanFunc(
-            ctx: ctx, frame: frame, funcName: funcName, args: args, resultIdx: resultIdx)
-        return
+        return try await callPlanFunc(
+            ctx: ctx,
+            frame: frame,
+            funcName: funcName,
+            args: argValues
+        )
     }
 
     // Handle built-in functions second
-    let args = try args.map {
-        try frame.v.resolveOperand(ctx: ctx, $0)
-    }
-    let result = try await ctx.ctx.builtins.invoke(name: funcName, args: args)
-
-    try frame.v.assignLocal(idx: resultIdx, value: result)
+    return try await ctx.ctx.builtins.invoke(name: funcName, args: argValues)
 }
 
 // callPlanFunc will evaluate calling a function defined on the plan
@@ -690,9 +710,8 @@ private func callPlanFunc(
     ctx: IREvaluationContext,
     frame: Ptr<Frame>,
     funcName: String,
-    args: [IR.Operand],
-    resultIdx: IR.Local
-) async throws {
+    args: [AST.RegoValue]
+) async throws -> AST.RegoValue {
     guard let fn = ctx.policy.funcs[funcName] else {
         throw EvaluationError.internalError(
             reason: "function definition not found: \(funcName)")
@@ -700,10 +719,6 @@ private func callPlanFunc(
     guard fn.params.count == args.count else {
         throw EvaluationError.internalError(
             reason: "mismatched argument count for function \(funcName)")
-    }
-
-    let args = try args.map {
-        try frame.v.resolveOperand(ctx: ctx, $0)
     }
 
     // Match source arguments to target params
@@ -732,6 +747,5 @@ private func callPlanFunc(
         throw EvaluationError.internalError(
             reason: "unexpected number of results from function call: \(resultSet.count)")
     }
-    let result = resultSet.first ?? .undefined
-    try frame.v.assignLocal(idx: resultIdx, value: result)
+    return resultSet.first ?? .undefined
 }

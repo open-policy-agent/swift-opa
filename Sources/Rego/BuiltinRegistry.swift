@@ -1,7 +1,7 @@
 import AST
 import Foundation
 
-typealias Builtin = (inout BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
+typealias Builtin = (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
 
 public struct BuiltinContext {
     public let location: TraceLocation
@@ -24,11 +24,11 @@ public struct BuiltinRegistry {
         ]
     }
 
-    func invoke(withCtx ctx: inout BuiltinContext, name: String, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    func invoke(withCtx ctx: BuiltinContext, name: String, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard let builtin = builtins[name] else {
             throw RegistryError.builtinNotFound(name: name)
         }
-        return try await builtin(&ctx, args)
+        return try await builtin(ctx, args)
     }
 
     func hasBuiltin(_ name: String) -> Bool {

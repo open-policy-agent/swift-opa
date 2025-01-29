@@ -639,56 +639,15 @@ private func evalFrame(
                 // This statement is undefined if source is a scalar value or empty collection.
                 let source = framePtr.v.resolveLocal(idx: stmt.source)
 
-                let resultSet = try await evalScan(
+                let results = try await evalScan(
                     ctx: ctx,
                     frame: framePtr,
                     stmt: stmt,
                     source: source
                 )
-
-                //
-                ////                var sourceCollection: any Collection
-                //                switch source {
-                //                case .array(let arr):
-                ////                    sourceCollection = arr
-                //                    let resultSet = try await evalScan(
-                //                        ctx: &ctx,
-                //                        frame: framePtr,
-                //                        stmt: stmt,
-                //                        source: arr
-                //                    )
-                //                case .set(let set):
-                ////                    sourceCollection = set
-                //                    let resultSet = try await evalScan(
-                //                        ctx: &ctx,
-                //                        frame: framePtr,
-                //                        stmt: stmt,
-                //                        source: set
-                //                    )
-                //                case .object(let obj):
-                ////                    sourceCollection = obj
-                //                    let resultSet = try await evalScan(
-                //                        ctx: &ctx,
-                //                        frame: framePtr,
-                //                        stmt: stmt,
-                //                        source: obj.Values
-                //                    )
-                //                default:
-                //                    currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                //                    continue blockLoop
-                //                }
-
-                //                let resultSet = try evalScan(
-                //                    ctx: &ctx,
-                //                    frame: framePtr,
-                //                    stmt: stmt,
-                //                    source: sourceCollection
-                //                )
-
+                
                 // Propagate any results from the block's sub frame into the parent frame
-                for result in resultSet {
-                    framePtr.v.results.insert(result)
-                }
+                framePtr.v.results.formUnion(results)
 
             case let stmt as IR.SetAddStatement:
                 let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
@@ -843,34 +802,23 @@ private func evalScan(
     stmt: ScanStatement,
     source: AST.RegoValue
 ) async throws -> ResultSet {
-    let eval: ((AST.RegoValue, AST.RegoValue) async throws -> ResultSet) = { k, v in
-        /*
-        var innerCtx = ctx  // TODO we can't capture the inout in the closure or something
-        // Treat each block we iterate over as a frame and let it evaluate to completion. This
-        // lets us drop any state on it and work around trying to jump around in this loop.
-        // Note: This is assuming that the ".locals" on a scope is a full set we can propagate.
-        // TODO: verify that this is OK to do... I _think_ we've pushed all the state we needed through... maybe..
-        let subFramePtr = Ptr(toCopyOf: Frame(
-            withCtx: &innerCtx,
-            blocks: [stmt.block],
-            locals: try frame.v.currentScope().v.locals
-        ))
-        try subFramePtr.v.assignLocal(idx: stmt.key, value: k )
-        try subFramePtr.v.assignLocal(idx: stmt.value, value: v)
-
-        return try await evalFrame(withContext: &innerCtx, framePtr: subFramePtr)
-        return results
-         */
-        return []
-    }
-
+    // Treat each block we iterate over as a frame and let it evaluate to completion. This
+    // lets us drop any state on it and work around trying to jump around in this loop.
+    // Note: This is assuming that the ".locals" on a scope is a full set we can propagate.
+    // TODO: verify that this is OK to do... I _think_ we've pushed all the state we needed through... maybe..
+    let subFramePtr = Ptr(toCopyOf: Frame(
+        withCtx: ctx,
+        blocks: [stmt.block],
+        locals: try frame.v.currentScope().v.locals
+    ))
+    
     var results: ResultSet = []
     switch source {
     case .array(let arr):
         for i in 0..<arr.count {
             let k = try RegoValue(from: i)
             let v = arr[i] as AST.RegoValue
-            let rs = try await eval(k, v)
+            let rs = try await evalScanBlock(ctx: ctx, subFrame: subFramePtr, stmt: stmt, key: k, value: v)
             print("key: \(k), value: \(v), rs: \(rs)")
 
             results.formUnion(rs)
@@ -878,15 +826,15 @@ private func evalScan(
 
     case .object(let o):
         for (k, v) in o {
-            let rs = try await eval(k, v)
+            let rs = try await evalScanBlock(ctx: ctx, subFrame: subFramePtr, stmt: stmt, key: k, value: v)
             print("key: \(k), value: \(v), rs: \(rs)")
 
             results.formUnion(rs)
         }
     case .set(let set):
-        for elem in set {
-            let rs = try await eval(elem, elem)
-            print("key: \(elem), value: \(elem), rs: \(rs)")
+        for v in set {
+            let rs = try await evalScanBlock(ctx: ctx, subFrame: subFramePtr, stmt: stmt, key: v, value: v)
+            print("key: \(v), value: \(v), rs: \(rs)")
 
             results.formUnion(rs)
         }
@@ -895,3 +843,11 @@ private func evalScan(
     }
     return results
 }
+
+private func evalScanBlock(ctx: IREvaluationContext, subFrame: Ptr<Frame>, stmt: ScanStatement, key: AST.RegoValue, value: AST.RegoValue) async throws -> ResultSet {
+    try subFrame.v.assignLocal(idx: stmt.key, value: key )
+    try subFrame.v.assignLocal(idx: stmt.value, value: value)
+
+    return try await evalFrame(withContext: ctx, framePtr: subFrame)
+}
+

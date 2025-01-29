@@ -316,7 +316,7 @@ private func evalFrame(
                 let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
                 guard case .array(var arrayValue) = array, value != .undefined else {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
                 arrayValue.append(value)
                 try framePtr.v.assignLocal(idx: stmt.array, value: .array(arrayValue))
@@ -342,8 +342,11 @@ private func evalFrame(
 
             case let stmt as IR.BlockStatement:
                 currentScopePtr = framePtr.v.pushScope(
-                    withCtx: &ctx, blocks: stmt.blocks, locals: currentScopePtr.v.locals)
-                break blockLoop
+                    withCtx: &ctx,
+                    blocks: stmt.blocks,
+                    locals: currentScopePtr.v.locals
+                )
+                continue blockLoop
 
             case let stmt as IR.BreakStatement:
                 // Pop N scopes for the "index" and resume processing from
@@ -351,7 +354,7 @@ private func evalFrame(
                 for _ in 0...stmt.index {
                     currentScopePtr = try framePtr.v.popScope(withCtx: &ctx)
                 }
-                break blockLoop
+                // flow down to the next statement in the new current scope/block
 
             case let stmt as IR.CallDynamicStatement:
                 var path: [String] = []
@@ -359,7 +362,7 @@ private func evalFrame(
                     let segment = try framePtr.v.resolveOperand(ctx: ctx, p)
                     guard case .string(let stringValue) = segment else {
                         currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                        break blockLoop
+                        continue blockLoop
                     }
                     path.append(stringValue)
                 }
@@ -379,7 +382,7 @@ private func evalFrame(
 
                 guard result != .undefined else {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
 
                 try framePtr.v.assignLocal(idx: stmt.result, value: result)
@@ -394,7 +397,7 @@ private func evalFrame(
 
                 guard result != .undefined else {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
 
                 try framePtr.v.assignLocal(idx: stmt.result, value: result)
@@ -429,55 +432,56 @@ private func evalFrame(
                 guard let targetValue else {
                     // undefined
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
-
                 try framePtr.v.assignLocal(idx: stmt.target, value: targetValue)
+                
             case let stmt as IR.EqualStatement:
                 //This statement is undefined if a is not equal to b.
                 let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
                 let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
                 if a == .undefined || b == .undefined || a != b {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
+                
             case let stmt as IR.IsArrayStatement:
                 guard case .array = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
 
             case let stmt as IR.IsDefinedStatement:
                 // This statement is undefined if source is undefined.
                 if case .undefined = framePtr.v.resolveLocal(idx: stmt.source) {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
 
             case let stmt as IR.IsObjectStatement:
                 guard case .object = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
 
             case let stmt as IR.IsSetStatement:
                 guard case .set = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
 
             case let stmt as IR.IsUndefinedStatement:
                 // This statement is undefined if source is not undefined.
                 guard case .undefined = framePtr.v.resolveLocal(idx: stmt.source) else {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
 
             case let stmt as IR.LenStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
                 guard case .undefined = sourceValue else {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
                 var len: Int = 0
                 switch sourceValue {
@@ -527,7 +531,7 @@ private func evalFrame(
                 let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
                 if a == .undefined || b == .undefined || a == b {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
 
             case let stmt as IR.NotStatement:
@@ -548,7 +552,7 @@ private func evalFrame(
                 let allBlocksUndefined = lastScope.v.blocks.count == lastScope.v.undefinedBlockIndexes.count
                 if !allBlocksUndefined {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
 
                 // Propagate any results from the block's sub frame into the parent frame
@@ -562,7 +566,7 @@ private func evalFrame(
                 let target = framePtr.v.resolveLocal(idx: stmt.object)
                 guard targetValue != .undefined && key != .undefined && target != .undefined else {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
                 guard case .object(var targetObjectValue) = target else {
                     throw EvaluationError.invalidDataType(
@@ -583,7 +587,7 @@ private func evalFrame(
                 let target = framePtr.v.resolveLocal(idx: stmt.object)
                 guard value != .undefined && key != .undefined && target != .undefined else {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
                 guard case .object(var targetObjectValue) = target else {
                     throw EvaluationError.invalidDataType(
@@ -599,7 +603,7 @@ private func evalFrame(
                 let b = framePtr.v.resolveLocal(idx: stmt.b)
                 if a == .undefined || b == .undefined {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
                 guard case .object(let objectValueA) = a, case .object(let objectValueB) = b else {
                     throw EvaluationError.invalidDataType(
@@ -618,12 +622,12 @@ private func evalFrame(
                 guard value != .undefined else {
                     // undefined
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
                 guard case .object = value else {
                     // undefined
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
                 framePtr.v.results.insert(value)
 
@@ -634,61 +638,56 @@ private func evalFrame(
             case let stmt as IR.ScanStatement:
                 // This statement is undefined if source is a scalar value or empty collection.
                 let source = framePtr.v.resolveLocal(idx: stmt.source)
-                guard let sourceCollection = source as? any Collection<AST.RegoValue> else {
-                    currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
-                }
+                
+                let resultSet = try await evalScan(
+                    ctx: &ctx,
+                    frame: framePtr,
+                    stmt: stmt,
+                    source: source
+                )
+                
+//                
+////                var sourceCollection: any Collection
+//                switch source {
+//                case .array(let arr):
+////                    sourceCollection = arr
+//                    let resultSet = try await evalScan(
+//                        ctx: &ctx,
+//                        frame: framePtr,
+//                        stmt: stmt,
+//                        source: arr
+//                    )
+//                case .set(let set):
+////                    sourceCollection = set
+//                    let resultSet = try await evalScan(
+//                        ctx: &ctx,
+//                        frame: framePtr,
+//                        stmt: stmt,
+//                        source: set
+//                    )
+//                case .object(let obj):
+////                    sourceCollection = obj
+//                    let resultSet = try await evalScan(
+//                        ctx: &ctx,
+//                        frame: framePtr,
+//                        stmt: stmt,
+//                        source: obj.Values 
+//                    )
+//                default:
+//                    currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
+//                    continue blockLoop
+//                }
 
-                for i in sourceCollection.indices {
-                    let currentKey = try AST.RegoValue(from: i)
-
-                    var currentValue: AST.RegoValue?
-                    switch source {
-                    case .array(let sourceArray):
-                        guard case .number(let keyInt) = currentKey else {
-                            throw EvaluationError.internalError(
-                                reason: "ScanStatement: array index must be an integer"
-                            )
-                        }
-                        guard keyInt.intValue > 0 && keyInt.intValue < sourceArray.count else {
-                            throw EvaluationError.internalError(
-                                reason: "ScanStatement: index out of bounds"
-                            )
-                        }
-                        currentValue = sourceArray[keyInt.intValue]
-                    case .object(let sourceObject):
-                        currentValue = sourceObject[currentKey]
-                    case .set:
-                        // TODO: Is this right? What would be the key and value for a set?
-                        currentValue = currentKey
-                    default:
-                        // let it fall through to the guard below
-                        break
-                    }
-
-                    guard let currentValue = currentValue else {
-                        currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                        break blockLoop
-                    }
-
-                    // Treat each block we iterate over as a frame and let it evaluate to completion. This
-                    // lets us drop any state on it and work around trying to jump around in this loop.
-                    // Note: This is assuming that the ".locals" on a scope is a full set we can propagate.
-                    // TODO: verify that this is OK to do... I _think_ we've pushed all the state we needed through... maybe..
-                    var subFrame = Frame(
-                        withCtx: &ctx,
-                        blocks: [stmt.block],
-                        locals: currentScopePtr.v.locals
-                    )
-                    try subFrame.assignLocal(idx: stmt.key, value: currentKey)
-                    try subFrame.assignLocal(idx: stmt.value, value: currentValue)
-                    let subFramePtr = Ptr(toCopyOf: subFrame)
-                    let resultSet = try await evalFrame(withContext: &ctx, framePtr: subFramePtr)
-
-                    // Propagate any results from the block's sub frame into the parent frame
-                    for result in resultSet {
-                        framePtr.v.results.insert(result)
-                    }
+//                let resultSet = try evalScan(
+//                    ctx: &ctx,
+//                    frame: framePtr,
+//                    stmt: stmt,
+//                    source: sourceCollection
+//                )
+                
+                // Propagate any results from the block's sub frame into the parent frame
+                for result in resultSet {
+                    framePtr.v.results.insert(result)
                 }
 
             case let stmt as IR.SetAddStatement:
@@ -696,7 +695,7 @@ private func evalFrame(
                 let target = framePtr.v.resolveLocal(idx: stmt.set)
                 guard value != .undefined && target != .undefined else {
                     currentScopePtr.v.markBlockUndefinedAndContinue(withCtx: &ctx)
-                    break blockLoop
+                    continue blockLoop
                 }
                 guard case .set(var targetSetValue) = target else {
                     throw EvaluationError.invalidDataType(
@@ -735,13 +734,19 @@ private func evalFrame(
                     blocks: [stmt.block],
                     locals: newLocals
                 )
-                break blockLoop
+                // Start executing the block on the new scope we just pushed
+                continue blockLoop
+                
             default:
                 throw EvaluationError.internalError(
                     reason: "unexpected statement type \(type(of: statement))")
             }
+            
+            // Next statement of current block
             currentScopePtr.v.statementIdx += 1
         }
+        
+        // Next block
         currentScopePtr.v.blockIdx += 1
         currentScopePtr.v.statementIdx = 0
     }
@@ -830,4 +835,59 @@ private func callPlanFunc(
             reason: "unexpected number of results from function call: \(resultSet.count)")
     }
     return resultSet.first ?? .undefined
+}
+
+private func evalScan(
+    ctx: inout IREvaluationContext,
+    frame: Ptr<Frame>,
+    stmt: ScanStatement,
+    source: AST.RegoValue
+) async throws -> ResultSet {
+    // Treat each block we iterate over as a frame and let it evaluate to completion. This
+    // lets us drop any state on it and work around trying to jump around in this loop.
+    // Note: This is assuming that the ".locals" on a scope is a full set we can propagate.
+    // TODO: verify that this is OK to do... I _think_ we've pushed all the state we needed through... maybe..
+    let subFramePtr = Ptr(toCopyOf: Frame(
+        withCtx: &ctx,
+        blocks: [stmt.block],
+        locals: try frame.v.currentScope().v.locals
+    ))
+//    var innerCtx = ctx  // TODO we can't capture the inout in the closure or something
+    let eval: ( (inout IREvaluationContext, AST.RegoValue, AST.RegoValue) async throws -> ResultSet) = { ctx, k, v in
+        try subFramePtr.v.assignLocal(idx: stmt.key, value: k )
+        try subFramePtr.v.assignLocal(idx: stmt.value, value: v)
+        return try await evalFrame(withContext: &ctx, framePtr: subFramePtr)
+        return results
+    }
+    
+    var results: ResultSet = []
+    switch source {
+    case .array(let arr):
+        for i in 0..<arr.count {
+            let k = try RegoValue(from: i)
+            let v = arr[i] as AST.RegoValue
+            let rs = try await eval(&ctx, k, v)
+            print("key: \(k), value: \(v), rs: \(rs)")
+
+            results.formUnion(rs)
+        }
+        
+    case .object(let o):
+        for (k, v) in o {
+            let rs = try await eval(&ctx, k, v)
+            print("key: \(k), value: \(v), rs: \(rs)")
+            
+            results.formUnion(rs)
+        }
+    case .set(let set):
+        for elem in set {
+            let rs = try await eval(&ctx, elem, elem)
+            print("key: \(elem), value: \(elem), rs: \(rs)")
+            
+            results.formUnion(rs)
+        }
+    default:
+        return []
+    }
+    return results
 }

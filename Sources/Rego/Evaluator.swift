@@ -46,3 +46,9 @@ public struct EvaluationContext {
 public typealias ResultSet = Set<EvalResult>
 
 public typealias EvalResult = AST.RegoValue
+
+extension ResultSet {
+    public static var empty: ResultSet {
+        return []
+    }
+}

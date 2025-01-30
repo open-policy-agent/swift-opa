@@ -212,6 +212,14 @@ private struct Scope: Encodable {
         self.statementIdx = 0
     }
 
+    var currentBlock: IR.Block {
+        self.blocks[self.blockIdx]
+    }
+
+    var currentStatement: any IR.Statement {
+        currentBlock.statements[self.statementIdx]
+    }
+
     func traceEvent(
         withCtx ctx: IREvaluationContext,
         op: TraceOperation,
@@ -295,15 +303,13 @@ private func evalFrame(
 
     blockLoop: while currentScopePtr.v.blockIdx < currentScopePtr.v.blocks.count {
 
-        let currentBlock = currentScopePtr.v.blocks[currentScopePtr.v.blockIdx]
-
-        while currentScopePtr.v.statementIdx < currentBlock.statements.count {
+        while currentScopePtr.v.statementIdx < currentScopePtr.v.currentBlock.statements.count {
 
             if Task.isCancelled {
                 throw EvaluationError.evaluationCancelled(reason: "parent task cancelled")
             }
 
-            let statement = currentBlock.statements[currentScopePtr.v.statementIdx]
+            let statement = currentScopePtr.v.currentStatement
 
             currentScopePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.eval)
 
@@ -348,8 +354,12 @@ private func evalFrame(
             case let stmt as IR.BreakStatement:
                 // Pop N scopes for the "index" and resume processing from
                 // that saved scope. Drop all scopes that are popped.
-                for _ in 0...stmt.index {
+                for _ in 0..<stmt.index {
+                    let currentLocals = currentScopePtr.v.locals
                     currentScopePtr = try framePtr.v.popScope(withCtx: ctx)
+
+                    // Copy out any modified locals from the previously top scope
+                    currentScopePtr.v.locals = currentLocals
                 }
             // flow down to the next statement in the new current scope/block
 
@@ -807,23 +817,17 @@ private func evalScan(
             let k = try RegoValue(from: i)
             let v = arr[i] as AST.RegoValue
             let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
-            print("key: \(k), value: \(v), rs: \(rs)")
-
             results.formUnion(rs)
         }
 
     case .object(let o):
         for (k, v) in o {
             let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
-            print("key: \(k), value: \(v), rs: \(rs)")
-
             results.formUnion(rs)
         }
     case .set(let set):
         for v in set {
             let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: v, value: v)
-            print("key: \(v), value: \(v), rs: \(rs)")
-
             results.formUnion(rs)
         }
     default:
@@ -847,5 +851,10 @@ private func evalScanBlock(
     try subFramePtr.v.assignLocal(idx: stmt.key, value: key)
     try subFramePtr.v.assignLocal(idx: stmt.value, value: value)
 
-    return try await evalFrame(withContext: ctx, framePtr: subFramePtr)
+    let results = try await evalFrame(withContext: ctx, framePtr: subFramePtr)
+
+    // Copy out any locals set on the nested block
+    try frame.v.currentScope().v.locals = subFramePtr.v.currentScope().v.locals
+
+    return results
 }

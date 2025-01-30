@@ -111,7 +111,6 @@ struct DirectoryLoader: Sequence {
                 return $0
             case .success(let bundleFile):
                 // TODO is there a cool way to limit file sizes we're willing to read?
-                print("loading \(bundleFile.url.absoluteString)")
                 let data = Result { try Data(contentsOf: bundleFile.url) }
                 guard let data = try? data.get() else {
                     // TODO wrap the underlying error

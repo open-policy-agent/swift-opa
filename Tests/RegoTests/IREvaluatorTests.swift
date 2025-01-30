@@ -29,35 +29,35 @@ struct IREvaluatorTests {
 
     static var validTestCases: [TestCase] {
         return [
-            //            TestCase(
-            //                description: "happy path basic policy with input allow",
-            //                sourceBundle: relPath("TestData/Bundles/basic-policy-with-input-bundle"),
-            //                query: "main/allow",
-            //                input: AST.RegoValue([
-            //                    "should_allow": AST.RegoValue.boolean(true)
-            //                ]),
-            //                expectedResult: Rego.ResultSet([
-            //                    AST.RegoValue([
-            //                        "result": AST.RegoValue.boolean(true)
-            //                    ])
-            //                ])
-            //            ),
-            //            TestCase(
-            //                description: "happy path basic policy with input deny explicit",
-            //                sourceBundle: relPath("TestData/Bundles/basic-policy-with-input-bundle"),
-            //                query: "main/allow",
-            //                input: AST.RegoValue([
-            //                    "should_allow": AST.RegoValue.boolean(false)
-            //                ]),
-            //                expectedResult: Rego.ResultSet.empty
-            //            ),
-            //            TestCase(
-            //                description: "happy path basic policy with input deny undefined input key",
-            //                sourceBundle: relPath("TestData/Bundles/basic-policy-with-input-bundle"),
-            //                query: "main/allow",
-            //                input: AST.RegoValue.object([:]),
-            //                expectedResult: Rego.ResultSet.empty
-            //            ),
+            TestCase(
+                description: "happy path basic policy with input allow",
+                sourceBundle: relPath("TestData/Bundles/basic-policy-with-input-bundle"),
+                query: "main/allow",
+                input: AST.RegoValue([
+                    "should_allow": AST.RegoValue.boolean(true)
+                ]),
+                expectedResult: Rego.ResultSet([
+                    AST.RegoValue([
+                        "result": AST.RegoValue.boolean(true)
+                    ])
+                ])
+            ),
+            TestCase(
+                description: "happy path basic policy with input deny explicit",
+                sourceBundle: relPath("TestData/Bundles/basic-policy-with-input-bundle"),
+                query: "main/allow",
+                input: AST.RegoValue([
+                    "should_allow": AST.RegoValue.boolean(false)
+                ]),
+                expectedResult: Rego.ResultSet.empty
+            ),
+            TestCase(
+                description: "happy path basic policy with input deny undefined input key",
+                sourceBundle: relPath("TestData/Bundles/basic-policy-with-input-bundle"),
+                query: "main/allow",
+                input: AST.RegoValue.object([:]),
+                expectedResult: Rego.ResultSet.empty
+            ),
             TestCase(
                 description: "happy path rbac allow non-admin",
                 sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
@@ -72,64 +72,64 @@ struct IREvaluatorTests {
                         "result": AST.RegoValue.boolean(true)
                     ])
                 ])
-            )
-            //            TestCase(
-            //                description: "happy path rbac allow admin",
-            //                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
-            //                query: "app/rbac/allow",
-            //                input: AST.RegoValue([
-            //                    "user": AST.RegoValue.string("alice"),
-            //                    "type": AST.RegoValue.string("iMac"),
-            //                    "action": AST.RegoValue.string("purchase"),
-            //                ]),
-            //                expectedResult: Rego.ResultSet([
-            //                    AST.RegoValue([
-            //                        "result": AST.RegoValue.boolean(true)
-            //                    ])
-            //                ])
-            //            ),
-            //            TestCase(
-            //                description: "happy path rbac deny missing grant in data json",
-            //                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
-            //                query: "app/rbac/allow",
-            //                input: AST.RegoValue([
-            //                    "user": AST.RegoValue.string("bob"),
-            //                    "type": AST.RegoValue.string("parakeet"),
-            //                    "action": AST.RegoValue.string("read"),
-            //                ]),
-            //                expectedResult: Rego.ResultSet([
-            //                    AST.RegoValue([
-            //                        "result": AST.RegoValue.boolean(false)
-            //                    ])
-            //                ])
-            //            ),
+            ),
+            TestCase(
+                description: "happy path rbac allow admin",
+                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                query: "app/rbac/allow",
+                input: AST.RegoValue([
+                    "user": AST.RegoValue.string("alice"),
+                    "type": AST.RegoValue.string("iMac"),
+                    "action": AST.RegoValue.string("purchase"),
+                ]),
+                expectedResult: Rego.ResultSet([
+                    AST.RegoValue([
+                        "result": AST.RegoValue.boolean(true)
+                    ])
+                ])
+            ),
+            TestCase(
+                description: "happy path rbac deny missing grant in data json",
+                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                query: "app/rbac/allow",
+                input: AST.RegoValue([
+                    "user": AST.RegoValue.string("bob"),
+                    "type": AST.RegoValue.string("parakeet"),
+                    "action": AST.RegoValue.string("read"),
+                ]),
+                expectedResult: Rego.ResultSet([
+                    AST.RegoValue([
+                        "result": AST.RegoValue.boolean(false)
+                    ])
+                ])
+            ),
         ]
     }
 
     static var errorTestCases: [ErrorCase] {
         return [
-            //            ErrorCase(
-            //                description: "query not found in valid bundle",
-            //                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
-            //                query: "not/found/query",
-            //                input: AST.RegoValue.object([:]),
-            //                expectedError: Rego.EvaluationError.unknownQuery(query: "not/found/query").self
-            //            ),
-            //            ErrorCase(
-            //                description: "bundle with no plan json",
-            //                sourceBundle: relPath("TestData/Bundles/simple-directory-no-plan-bundle"),
-            //                query: "not/found/query",
-            //                input: AST.RegoValue.object([:]),
-            //                expectedError: Rego.EvaluationError.unknownQuery(query: "not/found/query").self
-            //            ),
-            //            ErrorCase(
-            //                description: "bundle with invalid plan json",
-            //                sourceBundle: relPath("TestData/Bundles/invalid-plan-json-bundle"),
-            //                expectedError: Rego.EvaluatorError.bundleInitializationFailed(
-            //                    bundle: "invalid-plan-json-bundle",
-            //                    reason: ""
-            //                ).self
-            //            ),
+            ErrorCase(
+                description: "query not found in valid bundle",
+                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                query: "not/found/query",
+                input: AST.RegoValue.object([:]),
+                expectedError: Rego.EvaluationError.unknownQuery(query: "not/found/query").self
+            ),
+            ErrorCase(
+                description: "bundle with no plan json",
+                sourceBundle: relPath("TestData/Bundles/simple-directory-no-plan-bundle"),
+                query: "not/found/query",
+                input: AST.RegoValue.object([:]),
+                expectedError: Rego.EvaluationError.unknownQuery(query: "not/found/query").self
+            ),
+            ErrorCase(
+                description: "bundle with invalid plan json",
+                sourceBundle: relPath("TestData/Bundles/invalid-plan-json-bundle"),
+                expectedError: Rego.EvaluatorError.bundleInitializationFailed(
+                    bundle: "invalid-plan-json-bundle",
+                    reason: ""
+                ).self
+            ),
         ]
     }
 

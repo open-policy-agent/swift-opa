@@ -2,8 +2,6 @@ import AST
 import Foundation
 
 extension BuiltinFuncs {
-
-    // bitsShiftLeft implements
     static func concat(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)

@@ -11,6 +11,7 @@ public enum EvaluatorError: Error, Equatable {
 }
 
 public enum EvaluationError: Error, Equatable {
+    case unsupportedQuery(query: String)
     case unknownQuery(query: String)
     case evaluationCancelled(reason: String)
     case internalError(reason: String)

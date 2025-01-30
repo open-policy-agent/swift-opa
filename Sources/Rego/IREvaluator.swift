@@ -28,8 +28,11 @@ internal struct IREvaluator {
 extension IREvaluator: Evaluator {
     func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet {
         // TODO: We're assuming that queries are only ever defined in a single policy... that _should_ hold true.. but who's checkin?
+
+        let entrypoint = try queryToEntryPoint(ctx.query)
+
         for policy in policies {
-            if let plan = policy.plans[ctx.query] {
+            if let plan = policy.plans[entrypoint] {
                 let ctx = IREvaluationContext(ctx: ctx, policy: policy)
                 return try await evalPlan(
                     withContext: ctx,
@@ -39,6 +42,18 @@ extension IREvaluator: Evaluator {
         }
         throw EvaluationError.unknownQuery(query: ctx.query)
     }
+}
+
+func queryToEntryPoint(_ query: String) throws -> String {
+    let prefix = "data"
+    guard query.hasPrefix(prefix) else {
+        throw EvaluationError.unsupportedQuery(query: query)
+    }
+    if query == prefix {
+        // done!
+        return query
+    }
+    return query.dropFirst(prefix.count + 1).replacingOccurrences(of: ".", with: "/")
 }
 
 // Policy wraps an IR.Policy with some more optimized accessors for use in evaluations.

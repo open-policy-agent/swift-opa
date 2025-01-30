@@ -26,7 +26,7 @@ public struct Engine {
         for path in bundlePaths {
             var b: Bundle
             do {
-                b = try BundleLoader.load(fromDirectory: path.url)
+                b = try BundleLoader.load(fromFile: path.url)
             } catch {
                 throw Err.bundleLoadError(bundle: path.name, error: error)
             }
@@ -46,7 +46,7 @@ public struct Engine {
 
     public func evaluate(
         query: String,
-        input: AST.RegoValue = .null,
+        input: AST.RegoValue = .object([:]),
         tracer: QueryTracer? = nil
     ) async throws -> ResultSet {
         // withContext ctx: EvaluationContext
@@ -65,9 +65,14 @@ public struct Engine {
         return try await evaluator.evaluate(withContext: ctx)
     }
 
-    public struct BundlePath {
-        let name: String
-        let url: URL
+    public struct BundlePath: Codable {
+        public let name: String
+        public let url: URL
+
+        public init(name: String, url: URL) {
+            self.name = name
+            self.url = url
+        }
     }
 
     public enum Err: Error {

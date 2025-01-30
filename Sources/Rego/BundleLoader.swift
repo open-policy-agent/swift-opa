@@ -13,6 +13,7 @@ struct BundleLoader {
         case unexpectedData(URL)
         case manifestParseError(URL, Error)
         case dataParseError(URL, Error)
+        case unsupported(String)
     }
 
     func load() throws -> Bundle {
@@ -80,6 +81,16 @@ struct BundleLoader {
     public static func load(fromDirectory url: URL) throws -> Bundle {
         let files = DirectoryLoader(baseURL: url)
         return try BundleLoader(fromFileSequence: files).load()
+    }
+
+    // Accept either a directory to load a bundle from or a path to an individual file
+    // which will be treated as a bundle tarball.
+    public static func load(fromFile url: URL) throws -> Bundle {
+        let isDir = (try url.resourceValues(forKeys: [.isDirectoryKey])).isDirectory ?? false
+        if isDir {
+            return try load(fromDirectory: url)
+        }
+        throw LoadError.unsupported("only directories can be loaded as bundles")
     }
 }
 

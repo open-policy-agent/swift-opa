@@ -7,6 +7,7 @@ public protocol QueryTracer {
 
 public enum TraceLevel: String, Codable, Equatable, Sendable {
     // Subset of the standard OPA "explain" levels, add more as needed
+    case none
     case full
     case note
 }

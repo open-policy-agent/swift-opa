@@ -1,7 +1,7 @@
 import Foundation
 
 // RegoValue represents any concrete JSON-representable value consumable by Rego
-public enum RegoValue: Encodable, Equatable, Sendable, Hashable {
+public enum RegoValue: Codable, Equatable, Sendable, Hashable {
     case array([RegoValue])
     case boolean(Bool)
     case null
@@ -73,9 +73,47 @@ public enum RegoValue: Encodable, Equatable, Sendable, Hashable {
         return true
     }
 
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self = try container.decode(RegoValue.self)
+    }
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        try container.encode(self)
+        switch self {
+        case .string(let s):
+            try container.encode(s)
+        case .array(let a):
+            try container.encode(a)
+        case .object(let o):
+            // *sigh* https://medium.com/@iostechset/dictionary-encoded-as-an-array-991d3f2608d0
+            // I guess thats still a thing? Anyway, to get [RegoValue: RegoValue] to
+            // encode matching Go, and not just make an array of alternating keys and
+            // values, we'll do it ourselves.. Assume that at some point in the recursive
+            // encoding we hit non-object (or empty object) values with concrete types for
+            // the keys... then let the standard dictionary encoder handle the values.
+            let partiallyEncoded = try o.reduce(into: [String: RegoValue]()) { (result, elem) in
+                let strKey =
+                    switch elem.key {
+                    case .string(let s):
+                        s
+                    default:
+                        String(data: try JSONEncoder().encode(elem.key), encoding: .utf8)!
+                    }
+                result[strKey] = elem.value
+            }
+            try container.encode(partiallyEncoded)
+        case .boolean(let b):
+            try container.encode(b)
+        case .number(let n):
+            try container.encode(n.stringValue)
+        case .null:
+            try container.encodeNil()
+        case .set(let s):
+            try container.encode(s)
+        case .undefined:
+            try container.encode("<undefined>")
+        }
     }
 }
 

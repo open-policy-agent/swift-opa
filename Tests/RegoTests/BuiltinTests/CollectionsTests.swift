@@ -4,7 +4,7 @@ import Testing
 
 @testable import Rego
 
-@Suite("BuiltinTests")
+@Suite("BuiltinTests - Collections")
 struct CollectionsTests {
     // Tests isMemberOf
     static let isMemberOfTests: [BuiltinTests.TestCase] = [
@@ -81,4 +81,15 @@ struct CollectionsTests {
             expected: .success(.boolean(false))
         ),
     ]
+
+    static var allTests: [BuiltinTests.TestCase] {
+        [
+            isMemberOfTests
+        ].flatMap { $0 }
+    }
+
+    @Test(arguments: allTests)
+    func testBuiltins(tc: BuiltinTests.TestCase) async throws {
+        try await BuiltinTests.testBuiltin(tc: tc)
+    }
 }

@@ -22,26 +22,7 @@ struct BuiltinTests {
         }
     }
 
-    static var allTests: [TestCase] {
-        [
-            ArrayTests.arrayConcatTests,
-            BitsTests.bitsShiftLeftTests,
-            CollectionsTests.isMemberOfTests,
-        ].flatMap { $0 }
-    }
-
-    func successEquals<T, E>(_ lhs: Result<T, E>, _ rhs: Result<T, E>) -> Bool where T: Equatable {
-        guard case .success(let lhsValue) = lhs else {
-            return false
-        }
-        guard case .success(let rhsValue) = rhs else {
-            return false
-        }
-        return lhsValue == rhsValue
-    }
-
-    @Test(arguments: allTests)
-    func testBuiltins(tc: TestCase) async throws {
+    static func testBuiltin(tc: TestCase) async throws {
         let reg = defaultBuiltinRegistry
         let bctx = BuiltinContext()
         let result = await Result { try await reg.invoke(withCtx: bctx, name: tc.name, args: tc.args) }
@@ -53,6 +34,16 @@ struct BuiltinTests {
                 try result.get()
             }
         }
+    }
+
+    static func successEquals<T, E>(_ lhs: Result<T, E>, _ rhs: Result<T, E>) -> Bool where T: Equatable {
+        guard case .success(let lhsValue) = lhs else {
+            return false
+        }
+        guard case .success(let rhsValue) = rhs else {
+            return false
+        }
+        return lhsValue == rhsValue
     }
 }
 

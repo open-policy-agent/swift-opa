@@ -4,7 +4,7 @@ import Testing
 
 @testable import Rego
 
-@Suite("BuiltinTests")
+@Suite("BuiltinTests - Bits")
 struct BitsTests {
     static let bitsShiftLeftTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
@@ -68,4 +68,15 @@ struct BitsTests {
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b"))
         ),
     ]
+
+    static var allTests: [BuiltinTests.TestCase] {
+        [
+            bitsShiftLeftTests
+        ].flatMap { $0 }
+    }
+
+    @Test(arguments: allTests)
+    func testBuiltins(tc: BuiltinTests.TestCase) async throws {
+        try await BuiltinTests.testBuiltin(tc: tc)
+    }
 }

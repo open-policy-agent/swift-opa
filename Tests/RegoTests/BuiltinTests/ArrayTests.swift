@@ -4,7 +4,7 @@ import Testing
 
 @testable import Rego
 
-@Suite("BuiltinTests")
+@Suite("BuiltinTests - Array")
 struct ArrayTests {
     static let arrayConcatTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
@@ -75,4 +75,15 @@ struct ArrayTests {
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
         ),
     ]
+
+    static var allTests: [BuiltinTests.TestCase] {
+        [
+            arrayConcatTests
+        ].flatMap { $0 }
+    }
+
+    @Test(arguments: allTests)
+    func testBuiltins(tc: BuiltinTests.TestCase) async throws {
+        try await BuiltinTests.testBuiltin(tc: tc)
+    }
 }

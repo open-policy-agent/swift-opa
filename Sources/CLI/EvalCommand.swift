@@ -80,7 +80,9 @@ struct EvalCommand: AsyncParsableCommand {
             tracer: tracer
         )
 
-        guard let output = String(data: try JSONEncoder().encode(resultSet), encoding: .utf8) else {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted]
+        guard let output = String(data: try encoder.encode(resultSet), encoding: .utf8) else {
             print("Failed to encode result set to JSON string")
             throw ExitCode.failure
         }

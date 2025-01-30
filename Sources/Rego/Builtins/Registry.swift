@@ -27,6 +27,9 @@ public struct BuiltinRegistry {
             // Collections
             "internal.member_2": BuiltinFuncs.isMemberOf,
 
+            // String
+            "concat": BuiltinFuncs.concat,
+
             // Trace
             "trace": BuiltinFuncs.trace,
         ]

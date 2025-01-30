@@ -18,8 +18,16 @@ public struct BuiltinRegistry {
 
     fileprivate static var defaultBuiltins: [String: Builtin] {
         return [
+            // Array
             "array.concat": BuiltinFuncs.arrayConcat,
+
+            // Bits
+            "bits.lsh": BuiltinFuncs.bitsShiftLeft,
+
+            // Collections
             "internal.member_2": BuiltinFuncs.isMemberOf,
+
+            // Trace
             "trace": BuiltinFuncs.trace,
         ]
     }

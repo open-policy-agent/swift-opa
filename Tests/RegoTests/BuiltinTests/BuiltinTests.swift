@@ -4,7 +4,7 @@ import Testing
 
 @testable import Rego
 
-@Suite
+@Suite("BuiltinTests")
 struct BuiltinTests {
     struct TestCase {
         let description: String
@@ -25,6 +25,7 @@ struct BuiltinTests {
     static var allTests: [TestCase] {
         [
             ArrayTests.arrayConcatTests,
+            BitsTests.bitsShiftLeftTests,
             CollectionsTests.isMemberOfTests,
         ].flatMap { $0 }
     }

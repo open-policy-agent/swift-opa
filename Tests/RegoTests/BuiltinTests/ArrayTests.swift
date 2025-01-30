@@ -4,7 +4,7 @@ import Testing
 
 @testable import Rego
 
-@Suite
+@Suite("BuiltinTests")
 struct ArrayTests {
     static let arrayConcatTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(

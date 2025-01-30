@@ -1,3 +1,10 @@
+import AST
+import Foundation
+import Testing
+
+@testable import Rego
+
+@Suite("BuiltinTests")
 struct CollectionsTests {
     // Tests isMemberOf
     static let isMemberOfTests: [BuiltinTests.TestCase] = [

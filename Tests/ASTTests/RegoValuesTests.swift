@@ -67,3 +67,42 @@ func testJsonToRegoValues() throws {
     ])
     #expect(expected == val)
 }
+
+@Test
+func testNumberIsInteger() throws {
+    // Integers
+    #expect(AST.RegoValue.number(0).integerValue == 0)
+    #expect(AST.RegoValue.number(123).integerValue == 123)
+    #expect(AST.RegoValue.number(-123).integerValue == -123)
+    #expect(AST.RegoValue.number(NSNumber(value: UInt8(123))).integerValue == 123)
+    #expect(AST.RegoValue.number(NSNumber(value: Int8(123))).integerValue == 123)
+    #expect(AST.RegoValue.number(NSNumber(value: UInt16(123))).integerValue == 123)
+    #expect(AST.RegoValue.number(NSNumber(value: Int16(123))).integerValue == 123)
+    #expect(AST.RegoValue.number(NSNumber(value: UInt32(123))).integerValue == 123)
+    #expect(AST.RegoValue.number(NSNumber(value: Int32(123))).integerValue == 123)
+    #expect(AST.RegoValue.number(NSNumber(value: UInt64(123))).integerValue == 123)
+    #expect(AST.RegoValue.number(NSNumber(value: Double(0.0))).integerValue == 0)
+    #expect(AST.RegoValue.number(NSNumber(value: 0.0)).integerValue == 0)
+    #expect(AST.RegoValue.number(NSNumber(value: Float(0.0))).integerValue == 0)
+    #expect(AST.RegoValue.number(NSNumber(value: Float(0))).integerValue == 0)
+    #expect(AST.RegoValue.number(NSNumber(value: Bool(false))).integerValue == 0)
+    #expect(AST.RegoValue.number(NSNumber(value: Bool(true))).integerValue == 1)
+
+    // Not integers
+    #expect(AST.RegoValue.number(NSNumber(value: Double(1.234567890))).integerValue == nil)
+    #expect(AST.RegoValue.number(NSNumber(value: Float(1.23))).integerValue == nil)
+    #expect(AST.RegoValue.string("").integerValue == nil)
+    #expect(AST.RegoValue.string("foo").integerValue == nil)
+    #expect(AST.RegoValue.string("123").integerValue == nil)
+    #expect(AST.RegoValue.string("1.23").integerValue == nil)
+    #expect(AST.RegoValue.boolean(false).integerValue == nil)
+    #expect(AST.RegoValue.boolean(true).integerValue == nil)
+    #expect(AST.RegoValue.array([]).integerValue == nil)
+    #expect(AST.RegoValue.array([.number(1)]).integerValue == nil)
+    #expect(AST.RegoValue.object([:]).integerValue == nil)
+    #expect(AST.RegoValue.object([.string("foo"): .number(1)]).integerValue == nil)
+    #expect(AST.RegoValue.set([]).integerValue == nil)
+    #expect(AST.RegoValue.set([.number(1)]).integerValue == nil)
+    #expect(AST.RegoValue.null.integerValue == nil)
+    #expect(AST.RegoValue.undefined.integerValue == nil)
+}

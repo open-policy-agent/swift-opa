@@ -73,6 +73,41 @@ public enum RegoValue: Codable, Equatable, Sendable, Hashable {
         return true
     }
 
+    public var integerValue: Int? {
+        guard case .number(let number) = self else {
+            return nil
+        }
+
+        // TODO: Whats more sketchy? This switch that might not be exhaustive or the math check that might be lossy and more slow?
+        //switch numberType {
+        //    case
+        //        .sInt8Type,
+        //        .sInt16Type,
+        //        .sInt32Type,
+        //        .sInt64Type,
+        //        .shortType,
+        //        .intType,
+        //        .longType,
+        //        .longLongType,
+        //        .charType,
+        //        .cfIndexType,
+        //        .nsIntegerType:
+        //    return true
+        //default:
+        //    return false
+
+        let decimalValue = Decimal(number.doubleValue)
+        let integerValue = number.intValue
+
+        // Check if there is a fractional part comparing between coerced types
+        // to detect truncation of the number when its an Integer
+        let fractionalRemainder = decimalValue - Decimal(integerValue)
+        guard fractionalRemainder == Decimal(0) else {
+            return nil
+        }
+        return integerValue
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         self = try container.decode(RegoValue.self)
@@ -121,6 +156,10 @@ private let boolLiteral = NSNumber(booleanLiteral: true)
 extension NSNumber {
     var isBool: Bool {
         return type(of: self) == type(of: boolLiteral)
+    }
+
+    var numberType: CFNumberType {
+        return CFNumberGetType(self as CFNumber)
     }
 }
 

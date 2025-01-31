@@ -256,122 +256,124 @@ struct BundleLoaderTests {
     }
 
     static var testCases: [TestCase] {
-        return [
-            TestCase(
-                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
-                expected: Rego.Bundle(
-                    manifest: Rego.Manifest(
-                        revision: "e6f1a8ad-5b47-498f-a6eb-d1ecc86b63ae",
-                        roots: [""],
-                        regoVersion: Rego.Manifest.Version.regoV1,
-                        metadata: .object([.string("name"): AST.RegoValue.string("example-rbac")])),
+        get throws {
+            return [
+                TestCase(
+                    sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                    expected: try Rego.Bundle(
+                        manifest: Rego.Manifest(
+                            revision: "e6f1a8ad-5b47-498f-a6eb-d1ecc86b63ae",
+                            roots: [""],
+                            regoVersion: Rego.Manifest.Version.regoV1,
+                            metadata: .object([.string("name"): AST.RegoValue.string("example-rbac")])),
 
-                    planFiles: [
-                        Rego.BundleFile(
-                            url: relPath("TestData/Bundles/simple-directory-bundle/plan.json"),
-                            data: Data()
-                        )
-                    ],
-                    regoFiles: [
-                        Rego.BundleFile(
-                            url: relPath("TestData/Bundles/simple-directory-bundle/rbac.rego"),
-                            data: Data()
-                        )
-                    ],
-                    data:
-                        AST.RegoValue.object([
-                            .string("user_roles"): .object([
-                                .string("eve"): .array([
-                                    .string("customer")
+                        planFiles: [
+                            Rego.BundleFile(
+                                url: relPath("TestData/Bundles/simple-directory-bundle/plan.json"),
+                                data: Data()
+                            )
+                        ],
+                        regoFiles: [
+                            Rego.BundleFile(
+                                url: relPath("TestData/Bundles/simple-directory-bundle/rbac.rego"),
+                                data: Data()
+                            )
+                        ],
+                        data:
+                            AST.RegoValue.object([
+                                .string("user_roles"): .object([
+                                    .string("eve"): .array([
+                                        .string("customer")
+                                    ]),
+                                    .string("bob"): AST.RegoValue.array([
+                                        .string("employee"),
+                                        .string("billing"),
+                                    ]),
+                                    .string("alice"): AST.RegoValue.array([
+                                        .string("admin")
+                                    ]),
                                 ]),
-                                .string("bob"): AST.RegoValue.array([
-                                    .string("employee"),
-                                    .string("billing"),
+                                .string("role_grants"): .object([
+                                    .string("billing"): .array([
+                                        .object([
+                                            .string("action"): .string("read"),
+                                            .string("type"): .string("finance"),
+                                        ]),
+                                        .object([
+                                            .string("type"): .string("finance"),
+                                            .string("action"): .string("update"),
+                                        ]),
+                                    ]),
+                                    .string("customer"): .array([
+                                        .object([
+                                            .string("type"): .string("dog"),
+                                            .string("action"): .string("read"),
+                                        ]),
+                                        .object([
+                                            .string("action"): .string("read"),
+                                            .string("type"): .string("cat"),
+                                        ]),
+                                        .object([
+                                            .string("action"): .string("adopt"),
+                                            .string("type"): .string("dog"),
+                                        ]),
+                                        .object([
+                                            .string("type"): .string("cat"),
+                                            .string("action"): .string("adopt"),
+                                        ]),
+                                    ]),
+                                    .string("employee"): .array([
+                                        .object([
+                                            .string("action"): .string("read"),
+                                            .string("type"): .string("dog"),
+                                        ]),
+                                        .object([
+                                            .string("type"): .string("cat"),
+                                            .string("action"): .string("read"),
+                                        ]),
+                                        .object([
+                                            .string("action"): .string("update"),
+                                            .string("type"): .string("dog"),
+                                        ]),
+                                        .object([
+                                            .string("action"): .string("update"),
+                                            .string("type"): .string("cat"),
+                                        ]),
+                                    ]),
                                 ]),
-                                .string("alice"): AST.RegoValue.array([
-                                    .string("admin")
-                                ]),
+                            ])
+                    )
+                ),
+                TestCase(
+                    sourceBundle: relPath("TestData/Bundles/nested-data-trees"),
+                    expected: try Rego.Bundle(
+                        manifest: Manifest(
+                            revision: "",
+                            roots: [""],
+                            regoVersion: Rego.Manifest.Version.regoV1,
+                            metadata: .null
+                        ),
+                        data: AST.RegoValue([
+                            "roles": .array([
+                                .string("admin"),
+                                .string("readonly"),
+                                .string("readwrite"),
                             ]),
-                            .string("role_grants"): .object([
-                                .string("billing"): .array([
-                                    .object([
-                                        .string("action"): .string("read"),
-                                        .string("type"): .string("finance"),
-                                    ]),
-                                    .object([
-                                        .string("type"): .string("finance"),
-                                        .string("action"): .string("update"),
-                                    ]),
-                                ]),
-                                .string("customer"): .array([
-                                    .object([
-                                        .string("type"): .string("dog"),
-                                        .string("action"): .string("read"),
-                                    ]),
-                                    .object([
-                                        .string("action"): .string("read"),
-                                        .string("type"): .string("cat"),
-                                    ]),
-                                    .object([
-                                        .string("action"): .string("adopt"),
-                                        .string("type"): .string("dog"),
-                                    ]),
-                                    .object([
-                                        .string("type"): .string("cat"),
-                                        .string("action"): .string("adopt"),
-                                    ]),
-                                ]),
-                                .string("employee"): .array([
-                                    .object([
-                                        .string("action"): .string("read"),
-                                        .string("type"): .string("dog"),
-                                    ]),
-                                    .object([
-                                        .string("type"): .string("cat"),
-                                        .string("action"): .string("read"),
-                                    ]),
-                                    .object([
-                                        .string("action"): .string("update"),
-                                        .string("type"): .string("dog"),
-                                    ]),
-                                    .object([
-                                        .string("action"): .string("update"),
-                                        .string("type"): .string("cat"),
-                                    ]),
-                                ]),
+                            "users": .array([
+                                .string("alice"),
+                                .string("bob"),
+                                .string("mary"),
+                            ]),
+                            "extras": AST.RegoValue([
+                                "metadata": AST.RegoValue([
+                                    "version": .string("1.2.3")
+                                ])
                             ]),
                         ])
-                )
-            ),
-            TestCase(
-                sourceBundle: relPath("TestData/Bundles/nested-data-trees"),
-                expected: Rego.Bundle(
-                    manifest: Manifest(
-                        revision: "",
-                        roots: [""],
-                        regoVersion: Rego.Manifest.Version.regoV1,
-                        metadata: .null
-                    ),
-                    data: AST.RegoValue([
-                        "roles": .array([
-                            .string("admin"),
-                            .string("readonly"),
-                            .string("readwrite"),
-                        ]),
-                        "users": .array([
-                            .string("alice"),
-                            .string("bob"),
-                            .string("mary"),
-                        ]),
-                        "extras": AST.RegoValue([
-                            "metadata": AST.RegoValue([
-                                "version": .string("1.2.3")
-                            ])
-                        ]),
-                    ])
-                )
-            ),
-        ]
+                    )
+                ),
+            ]
+        }
     }
 
     static var errorCases: [ErrorCase] {
@@ -379,19 +381,23 @@ struct BundleLoaderTests {
             ErrorCase(
                 sourceBundle: relPath("TestData/Bundles/invalid-manifest-not-in-root"),
                 expectedError: BundleLoader.LoadError.unexpectedManifest(URL(string: "/")!)
-            )
+            ),
+            ErrorCase(
+                sourceBundle: relPath("TestData/Bundles/invalid-data-escaped-chroot"),
+                expectedError: BundleLoader.LoadError.dataEscapedRoot
+            ),
         ]
     }
 
-    @Test(arguments: testCases)
-    func testLoadingBundleFromDirectory(tc: TestCase) async throws {
+    @Test(arguments: try testCases)
+    func testLoadingBundleFromDirectory(tc: TestCase) throws {
         let b = try BundleLoader.load(fromDirectory: tc.sourceBundle)
         // #expect(b == tc.expected)
         #expect(fuzzyBundleEquals(b, tc.expected))
     }
 
     @Test(arguments: errorCases)
-    func testInvalidLoadingBundleFromDirectory(tc: ErrorCase) async throws {
+    func testInvalidLoadingBundleFromDirectory(tc: ErrorCase) throws {
         #expect {
             let _ = try BundleLoader.load(fromDirectory: tc.sourceBundle)
         } throws: { error in
@@ -445,6 +451,85 @@ struct BundleLoaderTests {
         // TODO ignore data for now
         return true
     }
+
+    struct BundleConsistencyTestCase {
+        let description: String
+        let sourceBundle: URL
+        let rootsOverride: [String]
+        let isValid: Bool
+    }
+    static var consistencyTests: [BundleConsistencyTestCase] {
+        [
+            BundleConsistencyTestCase(
+                description: "simple bundle, roots allow all",
+                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                rootsOverride: [""],
+                isValid: true
+            ),
+            BundleConsistencyTestCase(
+                description: "be explicit about the roots within data.json",
+                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                rootsOverride: ["role_grants", "user_roles"],
+                isValid: true
+            ),
+            BundleConsistencyTestCase(
+                description: "be explicit about the roots one is out of bounds",
+                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                rootsOverride: ["not_role_grants", "user_roles"],
+                isValid: false
+            ),
+            BundleConsistencyTestCase(
+                description: "roots internal conflict with wildcard",
+                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                rootsOverride: ["", "user_roles"],
+                isValid: false
+            ),
+            BundleConsistencyTestCase(
+                // TODO we might decide to make this legal in the future (within a bundle, not across bundles)
+                // and double check upstream reference architecture behavior
+                description: "roots internal conflict",
+                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                rootsOverride: ["role_grants", "user_roles", "user_roles/uh-oh"],
+                isValid: false
+            ),
+        ]
+    }
+
+    @Test(arguments: consistencyTests)
+    func testBundleConsistency(tc: BundleConsistencyTestCase) throws {
+        let result = Result {
+            // Intercept .manifest files in the sequence and rewrite their data according to the test case
+            let files: any Sequence<Result<BundleFile, any Error>> = try DirectoryLoader(baseURL: tc.sourceBundle).lazy
+                .map { fileResult in
+                    let file = try fileResult.get()
+                    if file.url.lastPathComponent == ".manifest" {
+                        // Serialize a new manifest with the roots override
+                        let d = ["roots": tc.rootsOverride]
+                        let manifestData = try JSONEncoder().encode(d)
+
+                        return .success(
+                            BundleFile(url: file.url, data: manifestData)
+                        )
+                    }
+                    return .success(file)
+                }
+
+            let loader = BundleLoader(fromFileSequence: files)
+            _ = try loader.load()
+        }
+
+        if !tc.isValid {
+            #expect(throws: (any Error).self, "expected error, but got none") {
+                try result.get()
+            }
+        } else {
+            #expect(throws: Never.self, "expected sucess, but got unexpected error") {
+                try result.get()
+            }
+        }
+
+    }
+
 }
 
 @Suite
@@ -498,6 +583,213 @@ struct RelativePathTests {
         #expect(relPath == tc.expected)
     }
 
+}
+
+@Suite
+struct PathTests {
+    struct TestCase {
+        var paths: [[String]]
+        var otherPaths: [[String]]
+        var hasConflict: Bool
+    }
+
+    static var testCases: [TestCase] {
+        [
+            TestCase(
+                paths: [
+                    ["a", "b"]
+                ],
+                otherPaths: [
+                    ["c", "d"]
+                ],
+                hasConflict: false
+            ),
+            TestCase(
+                paths: [
+                    ["a", "b"]
+                ],
+                otherPaths: [
+                    ["a", "d"]
+                ],
+                hasConflict: false
+            ),
+            TestCase(
+                paths: [
+                    ["a", "b"]
+                ],
+                otherPaths: [
+                    ["a", "b", "c"]
+                ],
+                hasConflict: true
+            ),
+            TestCase(
+                paths: [
+                    ["a", "b", "c"]
+                ],
+                otherPaths: [
+                    ["a", "b"]
+                ],
+                hasConflict: true
+            ),
+            TestCase(
+                paths: [
+                    ["a", "b"],
+                    ["a", "c"],
+                ],
+                otherPaths: [
+                    ["a", "d"],
+                    ["a", "e"],
+                ],
+                hasConflict: false
+            ),
+            TestCase(
+                paths: [
+                    ["a", "b"],
+                    ["a", "c"],
+                ],
+                otherPaths: [
+                    ["a", "c"],
+                    ["a", "e"],
+                ],
+                hasConflict: true
+            ),
+            TestCase(
+                paths: [
+                    ["a", "b"],
+                    ["a", "c"],
+                ],
+                otherPaths: [
+                    ["a", "c", "z"],
+                    ["a", "e"],
+                ],
+                hasConflict: true
+            ),
+            TestCase(
+                paths: [
+                    ["a"]
+                ],
+                otherPaths: [
+                    ["a", "c", "z"]
+                ],
+                hasConflict: true
+            ),
+            TestCase(
+                paths: [
+                    ["a", "b"],
+                    ["a", "b", "c"],
+                ],
+                otherPaths: [
+                    ["a", "c", "z"]
+                ],
+                hasConflict: false
+            ),
+        ]
+    }
+
+    // This test verifies whether multiple sets of root path segments conflict with
+    // each other.
+    // Root paths conflict if one is a strict prefix of the other.
+    @Test(arguments: testCases)
+    func testOverlap(tc: TestCase) {
+        let trieA: TrieNode = tc.paths.reduce(into: TrieNode(value: "data", isLeaf: false, children: [:])) {
+            (node, path) in
+            let (merged, _) = TrieNode.merge(node: node, withSegments: path[...])
+            node = merged
+        }
+        let trieB: TrieNode = tc.otherPaths.reduce(into: TrieNode(value: "data", isLeaf: false, children: [:])) {
+            (node, path) in
+            let (merged, _) = TrieNode.merge(node: node, withSegments: path[...])
+            node = merged
+        }
+
+        #expect(trieA.overlaps(with: trieB) == tc.hasConflict)
+    }
+
+    struct DataTreeContainedTestCase {
+        var paths: [[String]]
+        var data: AST.RegoValue
+        var isValid: Bool
+    }
+
+    static var dataTreeContainedTests: [DataTreeContainedTestCase] {
+        [
+            DataTreeContainedTestCase(
+                paths: [["foo", "bar"]],
+                data: AST.RegoValue([
+                    "foo": AST.RegoValue([
+                        "bar": .number(42)
+                    ])
+                ]),
+                isValid: true
+            ),
+            DataTreeContainedTestCase(
+                paths: [[""]],
+                data: AST.RegoValue([
+                    "foo": AST.RegoValue([
+                        "bar": .number(42)
+                    ]),
+                    "baz": .number(777),
+                ]),
+                isValid: true
+            ),
+            DataTreeContainedTestCase(
+                paths: [["foo", "bar"]],
+                data: AST.RegoValue([
+                    "foo": AST.RegoValue([
+                        "bar": .number(42)
+                    ]),
+                    "baz": .number(777),
+                ]),
+                isValid: false
+            ),
+            DataTreeContainedTestCase(
+                paths: [["foo", "bar"]],
+                data: AST.RegoValue([
+                    "foo": AST.RegoValue([
+                        "baz": .number(42)
+                    ])
+                ]),
+                isValid: false
+            ),
+            DataTreeContainedTestCase(
+                paths: [["foo", "bar"]],
+                data: .object([:]),
+                isValid: true
+            ),
+            DataTreeContainedTestCase(
+                paths: [[""]],
+                data: .object([
+                    .string("foo"): .number(42)
+                ]),
+                isValid: true
+            ),
+            DataTreeContainedTestCase(
+                paths: [],
+                data: .object([
+                    .string("foo"): .number(42)
+                ]),
+                isValid: true
+            ),
+        ]
+    }
+
+    // Verify whether data trees fall under defined roots path segments.
+    // A data tree is valid if all its keys fall within the scope of the roots.
+    @Test(arguments: dataTreeContainedTests)
+    func testDataTreeContained(tc: DataTreeContainedTestCase) {
+        var trie: TrieNode = tc.paths.reduce(into: TrieNode(value: "data", isLeaf: false, children: [:])) {
+            (node, path) in
+            // NOTE! We filter out empty string paths and address them below if needed
+            let (merged, _) = TrieNode.merge(node: node, withSegments: path.filter { $0 != "" }[...])
+            node = merged
+        }
+        // Hack for when we have no paths at all
+        if trie.children.isEmpty {
+            trie.isLeaf = true
+        }
+
+        #expect(trie.contains(dataTree: tc.data) == tc.isValid)
+    }
 }
 
 extension BundleDecodingTests.TestCase: CustomTestStringConvertible {

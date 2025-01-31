@@ -33,10 +33,11 @@ public struct Engine {
             bundles[path.name] = b
         }
 
+        // Verify correctness of this bundle set
+        try checkBundlesForOverlap(bundleSet: bundles)
+
         // Patch all the bundle data into the data tree on the store
-        for (name, bundle) in bundles {
-            // TODO do all the cross-bundle root overlap checks
-            let roots = bundle.manifest.roots
+        for (_, bundle) in bundles {
             try await store.write(path: StoreKeyPath(["data"]), value: bundle.data)
         }
 
@@ -49,7 +50,6 @@ public struct Engine {
         input: AST.RegoValue = .object([:]),
         tracer: QueryTracer? = nil
     ) async throws -> ResultSet {
-        // withContext ctx: EvaluationContext
         let ctx = EvaluationContext(
             query: query,
             input: input,
@@ -76,7 +76,9 @@ public struct Engine {
     }
 
     public enum Err: Error {
+        case internalError(String)
         case bundleLoadError(bundle: String, error: Error)
         case unpreparedError
+        case bundleConflictError(bundle: String)
     }
 }

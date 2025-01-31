@@ -13,6 +13,7 @@ struct BundleLoader {
         case unexpectedData(URL)
         case manifestParseError(URL, Error)
         case dataParseError(URL, Error)
+        case dataEscapedRoot
         case unsupported(String)
     }
 
@@ -75,7 +76,14 @@ struct BundleLoader {
         planFiles.sort(by: { $0.url.path < $1.url.path })
 
         manifest = manifest ?? Manifest()  // Default manifest if none was provided
-        return Bundle(manifest: manifest!, planFiles: planFiles, regoFiles: regoFiles, data: data)
+        let bundle = try Bundle(manifest: manifest!, planFiles: planFiles, regoFiles: regoFiles, data: data)
+
+        // Validate the data paths are all under the declared roots
+        if !bundle.rootsTrie.contains(dataTree: data) {
+            throw LoadError.dataEscapedRoot
+        }
+
+        return bundle
     }
 
     public static func load(fromDirectory url: URL) throws -> Bundle {

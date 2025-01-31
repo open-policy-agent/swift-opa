@@ -6,6 +6,35 @@ struct Bundle: Equatable, Sendable {
     var planFiles: [BundleFile] = []
     var regoFiles: [BundleFile] = []
     var data: AST.RegoValue = .object([:])
+
+    // Internal - trie built from the manifest roots
+    var rootsTrie: TrieNode
+
+    init(
+        manifest: Manifest = Manifest(), planFiles: [BundleFile] = [], regoFiles: [BundleFile] = [],
+        data: AST.RegoValue = .object([:])
+    ) throws(BundleError) {
+        self.manifest = manifest
+        self.planFiles = planFiles
+        self.regoFiles = regoFiles
+        self.data = data
+
+        guard !manifest.roots.isEmpty else {
+            // Expect [""], not [] when roots were undefined.
+            // We rely on that below to enter the loop and
+            // set the isLeaf on the trie accordingly.
+            throw .internalError("no roots in manifest")
+        }
+
+        let trieRoot = TrieNode(value: "data", isLeaf: false, children: [:])
+        let trie: TrieNode = try mergeTrie(trieRoot, withBundleRoots: manifest.roots)
+        self.rootsTrie = trie
+    }
+
+    enum BundleError: Error {
+        case overlappingRoots(String)
+        case internalError(String)
+    }
 }
 
 struct Manifest: Equatable, Sendable {

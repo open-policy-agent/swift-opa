@@ -105,9 +105,85 @@ struct StringsTests {
         ),
     ]
 
+    static let containsTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "base case positive",
+            name: "contains",
+            args: [.string("hello, world!"), .string("world")],
+            expected: .success(.boolean(true))
+        ),
+        BuiltinTests.TestCase(
+            description: "base case negative",
+            name: "contains",
+            args: [.string("hello, world!"), .string("zzzzz")],
+            expected: .success(.boolean(false))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty needle",
+            name: "contains",
+            args: [.string("hello, world!"), .string("")],
+            expected: .success(.boolean(true))
+        ),
+        BuiltinTests.TestCase(
+            description: "full match",
+            name: "contains",
+            args: [.string("abc"), .string("abc")],
+            expected: .success(.boolean(true))
+        ),
+        BuiltinTests.TestCase(
+            description: "more than a full match",
+            name: "contains",
+            args: [.string("bc"), .string("abcd")],
+            expected: .success(.boolean(false))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty haystack",
+            name: "contains",
+            args: [.string(""), .string("abc")],
+            expected: .success(.boolean(false))
+        ),
+        BuiltinTests.TestCase(
+            description: "both empty",
+            name: "contains",
+            args: [.string(""), .string("")],
+            expected: .success(.boolean(true))
+        ),
+        BuiltinTests.TestCase(
+            description: "too many args",
+            name: "contains",
+            args: [.string("hello, world!"), .string("world"), .string("extra")],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "not enough args",
+            name: "contains",
+            args: [.string("hello, world!")],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "no args",
+            name: "contains",
+            args: [],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong type needle",
+            name: "contains",
+            args: [.string("hello, world!"), .number(1)],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "needle"))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong type haystack",
+            name: "contains",
+            args: [.number(1), .string("hello, world!")],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "needle"))
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
-            concatTests
+            concatTests,
+            containsTests,
         ].flatMap { $0 }
     }
 

@@ -29,6 +29,7 @@ public struct BuiltinRegistry {
 
             // String
             "concat": BuiltinFuncs.concat,
+            "contains": BuiltinFuncs.contains,
 
             // Trace
             "trace": BuiltinFuncs.trace,

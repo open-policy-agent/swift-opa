@@ -32,4 +32,24 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "collection")
         }
     }
+
+    static func contains(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .string(let haystack) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "haystack")
+        }
+
+        guard case .string(let needle) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "needle")
+        }
+
+        // Special logic to mimic the Go strings.Contains() behavior for empty strings..
+        if needle.isEmpty {
+            return .boolean(true)
+        }
+        return .boolean(haystack.contains(needle))
+    }
 }

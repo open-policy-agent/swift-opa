@@ -211,6 +211,16 @@ public enum RegoValue: Codable, Comparable, Sendable, Hashable {
         return lhs.hashValue < rhs.hashValue
     }
 
+    public static func compare(_ lhs: RegoValue, _ rhs: RegoValue) -> ComparisonResult {
+        if lhs < rhs {
+            return .orderedAscending
+        } else if lhs > rhs {
+            return .orderedDescending
+        } else {
+            return .orderedSame
+        }
+    }
+
     public var sortOrder: Int {
         return switch self {
         case .undefined: 0

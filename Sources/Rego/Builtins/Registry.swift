@@ -30,6 +30,14 @@ public struct BuiltinRegistry {
             // Collections
             "internal.member_2": BuiltinFuncs.isMemberOf,
 
+            // Comparison
+            "gt": BuiltinFuncs.greaterThan,
+            "gte": BuiltinFuncs.greaterThanEq,
+            "lt": BuiltinFuncs.lessThan,
+            "lte": BuiltinFuncs.lessThanEq,
+            "neq": BuiltinFuncs.notEq,
+            "equal": BuiltinFuncs.equal,
+
             // String
             "concat": BuiltinFuncs.concat,
             "contains": BuiltinFuncs.contains,

@@ -49,6 +49,10 @@ public struct BuiltinRegistry {
             "neq": BuiltinFuncs.notEq,
             "equal": BuiltinFuncs.equal,
 
+            // Objects
+            "object.get": BuiltinFuncs.objectGet,
+            "object.keys": BuiltinFuncs.objectKeys,
+
             // Sets
             "and": BuiltinFuncs.and,
             "intersection": BuiltinFuncs.intersection,

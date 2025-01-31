@@ -49,6 +49,12 @@ public struct BuiltinRegistry {
             "neq": BuiltinFuncs.notEq,
             "equal": BuiltinFuncs.equal,
 
+            // Sets
+            "and": BuiltinFuncs.and,
+            "intersection": BuiltinFuncs.intersection,
+            "or": BuiltinFuncs.or,
+            "union": BuiltinFuncs.union,
+
             // String
             "concat": BuiltinFuncs.concat,
             "contains": BuiltinFuncs.contains,

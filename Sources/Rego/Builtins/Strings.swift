@@ -4,7 +4,7 @@ import Foundation
 extension BuiltinFuncs {
     static func concat(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
         }
 
         guard case .string(let delimiter) = args[0] else {

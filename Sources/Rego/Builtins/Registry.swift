@@ -18,6 +18,9 @@ public struct BuiltinRegistry {
 
     fileprivate static var defaultBuiltins: [String: Builtin] {
         return [
+            // Aggregates
+            "count": BuiltinFuncs.count,
+
             // Array
             "array.concat": BuiltinFuncs.arrayConcat,
 

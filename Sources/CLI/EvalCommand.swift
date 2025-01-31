@@ -21,6 +21,15 @@ struct EvalCommand: AsyncParsableCommand {
     var inputValue: AST.RegoValue = .object([:])
     var bundlePaths: [Rego.Engine.BundlePath] = []
 
+    enum CodingKeys: String, CodingKey {
+        // Skip inputValue until we can make AST.RegoValue actually Decodable
+        case bundles
+        case explain
+        case inputFile
+        case query
+        case rawInput
+    }
+
     mutating func validate() throws {
         var inputData: Data?
 

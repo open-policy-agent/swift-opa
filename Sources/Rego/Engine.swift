@@ -1,9 +1,10 @@
 import AST
 import Foundation
+import IR
 
 public struct Engine {
     // bundlePaths are pointers to directories we should load as bundles
-    private var bundlePaths: [BundlePath]
+    private var bundlePaths: [BundlePath]?
 
     // bundles are bundles after loading from disk
     private var bundles: [String: Bundle] = [:]
@@ -12,18 +13,25 @@ public struct Engine {
     private var evaluator: IREvaluator?
 
     // store is an interface for passing data to the evaluator
-    private var store: any Store
+    private var store: any Store = InMemoryStore(initialData: .object([:]))
 
     public init(withBundlePaths: [BundlePath]) throws {
         self.bundlePaths = withBundlePaths
-        self.store = InMemoryStore(initialData: .object([:]))
+    }
+
+    init(withBundles: [String: Bundle]) {
+        self.bundles = withBundles
+    }
+
+    init(withPolicies policies: [IR.Policy], andStore store: any Store) {
+        self.evaluator = IREvaluator(withPolicies: policies)
+        self.store = store
     }
 
     public mutating func prepare() async throws {
         // Load all the bundles from disk
         // This includes parsing their data trees, etc.
-        bundles = [:]
-        for path in bundlePaths {
+        for path in bundlePaths ?? [] {
             var b: Bundle
             do {
                 b = try BundleLoader.load(fromFile: path.url)

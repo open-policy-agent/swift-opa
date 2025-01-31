@@ -1,0 +1,1242 @@
+{
+	"cases": [
+		{
+			"note": "cryptox509parsecertificates/uri_strings",
+			"query": "data.generated.uri_strings = x",
+			"modules": [
+				"package generated\n\ncerts := \"LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUIxekNDQVh5Z0F3SUJBZ0lJZGxpT1dVY1NXM3N3Q2dZSUtvWkl6ajBFQXdJd1BURUxNQWtHQTFVRUJoTUMKUjBJeEVEQU9CZ05WQkFvVEIwVjRZVzF3YkdVeEhEQWFCZ05WQkFVVEV6RTFPREV4TnpnNU56UTJPRFkxTmpneQpOalF3SUJjTk1qTXhNVEl3TVRZMU5USTRXaGdQTWpFeU1qRXdNamN4TmpVMU1qaGFNRDB4Q3pBSkJnTlZCQVlUCkFrZENNUkF3RGdZRFZRUUtFd2RGZUdGdGNHeGxNUnd3R2dZRFZRUUZFeE00TlRJM056SXlOREE0TlRJeE5qVXoKTVRFMU1Ga3dFd1lIS29aSXpqMENBUVlJS29aSXpqMERBUWNEUWdBRXp0UDNrQnNpQXY4UUF5eWxUalJZSFlWegpjWTB5YmpBdC9VbWpZb3Fxb0o4SEtIdXF1ckRaUmVwa05qUXdwV3pmZndZZ0xaNk42SisyVUlPdlZ0TDZEcU5rCk1HSXdEZ1lEVlIwUEFRSC9CQVFEQWdlQU1CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUNCZ2dyQmdFRkJRY0QKQVRBTUJnTlZIUk1CQWY4RUFqQUFNQ01HQTFVZEVRUWNNQnFHR0hOd2FXWm1aVG92TDJWNFlXMXdiR1V1WTI5dApMMjl3WVRBS0JnZ3Foa2pPUFFRREFnTkpBREJHQWlFQXlRNDhPd25lTHkzMjZqYitEUjd5RjJhcS94Wnl1cW9qCitUU3ZLVVB5NEU0Q0lRQ0VMUlp3K0dWTjhJR0drVGV4MGxxTDNxY21mWldJbm15VitrbnQ0d3p3L3c9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==\"\n\nuri_strings := crypto.x509.parse_certificates(certs)[0].URIStrings\n"
+			],
+			"want_result": [
+				{
+					"x": [
+						"spiffe://example.com/opa"
+					]
+				}
+			],
+			"entrypoints": [
+				"generated"
+			],
+			"plan": {
+				"funcs": {
+					"funcs": [
+						{
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 3,
+												"target": 3
+											},
+											"type": "ResetLocalStmt"
+										},
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 3,
+												"source": {
+													"type": "string_index",
+													"value": 2
+												},
+												"target": 3
+											},
+											"type": "AssignVarOnceStmt"
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 3,
+												"source": 3
+											},
+											"type": "IsDefinedStmt"
+										},
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 3,
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2
+											},
+											"type": "AssignVarOnceStmt"
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 3,
+												"source": 2
+											},
+											"type": "ReturnLocalStmt"
+										}
+									]
+								}
+							],
+							"name": "g0.data.generated.certs",
+							"params": [
+								0,
+								1
+							],
+							"path": [
+								"g0",
+								"generated",
+								"certs"
+							],
+							"return": 2
+						},
+						{
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 5,
+												"target": 3
+											},
+											"type": "ResetLocalStmt"
+										},
+										{
+											"stmt": {
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"col": 47,
+												"file": 0,
+												"func": "g0.data.generated.certs",
+												"result": 4,
+												"row": 5
+											},
+											"type": "CallStmt"
+										},
+										{
+											"stmt": {
+												"col": 47,
+												"file": 0,
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5
+											},
+											"type": "AssignVarStmt"
+										},
+										{
+											"stmt": {
+												"args": [
+													{
+														"type": "local",
+														"value": 5
+													}
+												],
+												"col": 16,
+												"file": 0,
+												"func": "crypto.x509.parse_certificates",
+												"result": 6,
+												"row": 5
+											},
+											"type": "CallStmt"
+										},
+										{
+											"stmt": {
+												"col": 16,
+												"file": 0,
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 6
+												},
+												"target": 7
+											},
+											"type": "AssignVarStmt"
+										},
+										{
+											"stmt": {
+												"Index": 4,
+												"col": 16,
+												"file": 0,
+												"row": 5,
+												"target": 8
+											},
+											"type": "MakeNumberRefStmt"
+										},
+										{
+											"stmt": {
+												"col": 16,
+												"file": 0,
+												"key": {
+													"type": "local",
+													"value": 8
+												},
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 7
+												},
+												"target": 9
+											},
+											"type": "DotStmt"
+										},
+										{
+											"stmt": {
+												"col": 16,
+												"file": 0,
+												"key": {
+													"type": "string_index",
+													"value": 5
+												},
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 9
+												},
+												"target": 10
+											},
+											"type": "DotStmt"
+										},
+										{
+											"stmt": {
+												"col": 16,
+												"file": 0,
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 10
+												},
+												"target": 11
+											},
+											"type": "AssignVarStmt"
+										},
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 11
+												},
+												"target": 3
+											},
+											"type": "AssignVarOnceStmt"
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 5,
+												"source": 3
+											},
+											"type": "IsDefinedStmt"
+										},
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2
+											},
+											"type": "AssignVarOnceStmt"
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 5,
+												"source": 2
+											},
+											"type": "ReturnLocalStmt"
+										}
+									]
+								}
+							],
+							"name": "g0.data.generated.uri_strings",
+							"params": [
+								0,
+								1
+							],
+							"path": [
+								"g0",
+								"generated",
+								"uri_strings"
+							],
+							"return": 2
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 0,
+												"file": 0,
+												"row": 0,
+												"target": 2
+											},
+											"type": "MakeObjectStmt"
+										},
+										{
+											"stmt": {
+												"blocks": [
+													{
+														"stmts": [
+															{
+																"stmt": {
+																	"args": [
+																		{
+																			"type": "local",
+																			"value": 0
+																		},
+																		{
+																			"type": "local",
+																			"value": 1
+																		}
+																	],
+																	"col": 0,
+																	"file": 0,
+																	"func": "g0.data.generated.certs",
+																	"result": 3,
+																	"row": 0
+																},
+																"type": "CallStmt"
+															},
+															{
+																"stmt": {
+																	"col": 0,
+																	"file": 0,
+																	"key": {
+																		"type": "string_index",
+																		"value": 1
+																	},
+																	"object": 2,
+																	"row": 0,
+																	"value": {
+																		"type": "local",
+																		"value": 3
+																	}
+																},
+																"type": "ObjectInsertStmt"
+															}
+														]
+													}
+												],
+												"col": 0,
+												"file": 0,
+												"row": 0
+											},
+											"type": "BlockStmt"
+										},
+										{
+											"stmt": {
+												"blocks": [
+													{
+														"stmts": [
+															{
+																"stmt": {
+																	"args": [
+																		{
+																			"type": "local",
+																			"value": 0
+																		},
+																		{
+																			"type": "local",
+																			"value": 1
+																		}
+																	],
+																	"col": 0,
+																	"file": 0,
+																	"func": "g0.data.generated.uri_strings",
+																	"result": 4,
+																	"row": 0
+																},
+																"type": "CallStmt"
+															},
+															{
+																"stmt": {
+																	"col": 0,
+																	"file": 0,
+																	"key": {
+																		"type": "string_index",
+																		"value": 3
+																	},
+																	"object": 2,
+																	"row": 0,
+																	"value": {
+																		"type": "local",
+																		"value": 4
+																	}
+																},
+																"type": "ObjectInsertStmt"
+															}
+														]
+													}
+												],
+												"col": 0,
+												"file": 0,
+												"row": 0
+											},
+											"type": "BlockStmt"
+										},
+										{
+											"stmt": {
+												"blocks": [
+													{
+														"stmts": [
+															{
+																"stmt": {
+																	"blocks": [
+																		{
+																			"stmts": [
+																				{
+																					"stmt": {
+																						"col": 0,
+																						"file": 0,
+																						"key": {
+																							"type": "string_index",
+																							"value": 6
+																						},
+																						"row": 0,
+																						"source": {
+																							"type": "local",
+																							"value": 1
+																						},
+																						"target": 6
+																					},
+																					"type": "DotStmt"
+																				},
+																				{
+																					"stmt": {
+																						"a": 6,
+																						"b": 2,
+																						"col": 0,
+																						"file": 0,
+																						"row": 0,
+																						"target": 5
+																					},
+																					"type": "ObjectMergeStmt"
+																				},
+																				{
+																					"stmt": {
+																						"col": 0,
+																						"file": 0,
+																						"index": 1,
+																						"row": 0
+																					},
+																					"type": "BreakStmt"
+																				}
+																			]
+																		}
+																	],
+																	"col": 0,
+																	"file": 0,
+																	"row": 0
+																},
+																"type": "BlockStmt"
+															},
+															{
+																"stmt": {
+																	"col": 0,
+																	"file": 0,
+																	"row": 0,
+																	"source": {
+																		"type": "local",
+																		"value": 2
+																	},
+																	"target": 5
+																},
+																"type": "AssignVarStmt"
+															}
+														]
+													}
+												],
+												"col": 0,
+												"file": 0,
+												"row": 0
+											},
+											"type": "BlockStmt"
+										},
+										{
+											"stmt": {
+												"col": 0,
+												"file": 0,
+												"row": 0,
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 7
+											},
+											"type": "AssignVarStmt"
+										},
+										{
+											"stmt": {
+												"col": 0,
+												"file": 0,
+												"row": 0,
+												"target": 8
+											},
+											"type": "MakeObjectStmt"
+										},
+										{
+											"stmt": {
+												"col": 0,
+												"file": 0,
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"object": 8,
+												"row": 0,
+												"value": {
+													"type": "local",
+													"value": 7
+												}
+											},
+											"type": "ObjectInsertStmt"
+										},
+										{
+											"stmt": {
+												"col": 0,
+												"file": 0,
+												"row": 0,
+												"value": 8
+											},
+											"type": "ResultSetAddStmt"
+										}
+									]
+								}
+							],
+							"name": "generated"
+						}
+					]
+				},
+				"static": {
+					"builtin_funcs": [
+						{
+							"decl": {
+								"args": [
+									{
+										"description": "base64 encoded DER or PEM data containing one or more certificates or a PEM string of one or more certificates",
+										"name": "certs",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "parsed X.509 certificates represented as objects",
+									"dynamic": {
+										"dynamic": {
+											"key": {
+												"type": "string"
+											},
+											"value": {
+												"type": "any"
+											}
+										},
+										"type": "object"
+									},
+									"name": "output",
+									"type": "array"
+								},
+								"type": "function"
+							},
+							"name": "crypto.x509.parse_certificates"
+						}
+					],
+					"files": [
+						{
+							"value": "mod_0"
+						}
+					],
+					"strings": [
+						{
+							"value": "result"
+						},
+						{
+							"value": "certs"
+						},
+						{
+							"value": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUIxekNDQVh5Z0F3SUJBZ0lJZGxpT1dVY1NXM3N3Q2dZSUtvWkl6ajBFQXdJd1BURUxNQWtHQTFVRUJoTUMKUjBJeEVEQU9CZ05WQkFvVEIwVjRZVzF3YkdVeEhEQWFCZ05WQkFVVEV6RTFPREV4TnpnNU56UTJPRFkxTmpneQpOalF3SUJjTk1qTXhNVEl3TVRZMU5USTRXaGdQTWpFeU1qRXdNamN4TmpVMU1qaGFNRDB4Q3pBSkJnTlZCQVlUCkFrZENNUkF3RGdZRFZRUUtFd2RGZUdGdGNHeGxNUnd3R2dZRFZRUUZFeE00TlRJM056SXlOREE0TlRJeE5qVXoKTVRFMU1Ga3dFd1lIS29aSXpqMENBUVlJS29aSXpqMERBUWNEUWdBRXp0UDNrQnNpQXY4UUF5eWxUalJZSFlWegpjWTB5YmpBdC9VbWpZb3Fxb0o4SEtIdXF1ckRaUmVwa05qUXdwV3pmZndZZ0xaNk42SisyVUlPdlZ0TDZEcU5rCk1HSXdEZ1lEVlIwUEFRSC9CQVFEQWdlQU1CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUNCZ2dyQmdFRkJRY0QKQVRBTUJnTlZIUk1CQWY4RUFqQUFNQ01HQTFVZEVRUWNNQnFHR0hOd2FXWm1aVG92TDJWNFlXMXdiR1V1WTI5dApMMjl3WVRBS0JnZ3Foa2pPUFFRREFnTkpBREJHQWlFQXlRNDhPd25lTHkzMjZqYitEUjd5RjJhcS94Wnl1cW9qCitUU3ZLVVB5NEU0Q0lRQ0VMUlp3K0dWTjhJR0drVGV4MGxxTDNxY21mWldJbm15VitrbnQ0d3p3L3c9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg=="
+						},
+						{
+							"value": "uri_strings"
+						},
+						{
+							"value": "0"
+						},
+						{
+							"value": "URIStrings"
+						},
+						{
+							"value": "generated"
+						}
+					]
+				}
+			},
+			"want_plan_result": {
+				"data_generated": {
+					"certs": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUIxekNDQVh5Z0F3SUJBZ0lJZGxpT1dVY1NXM3N3Q2dZSUtvWkl6ajBFQXdJd1BURUxNQWtHQTFVRUJoTUMKUjBJeEVEQU9CZ05WQkFvVEIwVjRZVzF3YkdVeEhEQWFCZ05WQkFVVEV6RTFPREV4TnpnNU56UTJPRFkxTmpneQpOalF3SUJjTk1qTXhNVEl3TVRZMU5USTRXaGdQTWpFeU1qRXdNamN4TmpVMU1qaGFNRDB4Q3pBSkJnTlZCQVlUCkFrZENNUkF3RGdZRFZRUUtFd2RGZUdGdGNHeGxNUnd3R2dZRFZRUUZFeE00TlRJM056SXlOREE0TlRJeE5qVXoKTVRFMU1Ga3dFd1lIS29aSXpqMENBUVlJS29aSXpqMERBUWNEUWdBRXp0UDNrQnNpQXY4UUF5eWxUalJZSFlWegpjWTB5YmpBdC9VbWpZb3Fxb0o4SEtIdXF1ckRaUmVwa05qUXdwV3pmZndZZ0xaNk42SisyVUlPdlZ0TDZEcU5rCk1HSXdEZ1lEVlIwUEFRSC9CQVFEQWdlQU1CMEdBMVVkSlFRV01CUUdDQ3NHQVFVRkJ3TUNCZ2dyQmdFRkJRY0QKQVRBTUJnTlZIUk1CQWY4RUFqQUFNQ01HQTFVZEVRUWNNQnFHR0hOd2FXWm1aVG92TDJWNFlXMXdiR1V1WTI5dApMMjl3WVRBS0JnZ3Foa2pPUFFRREFnTkpBREJHQWlFQXlRNDhPd25lTHkzMjZqYitEUjd5RjJhcS94Wnl1cW9qCitUU3ZLVVB5NEU0Q0lRQ0VMUlp3K0dWTjhJR0drVGV4MGxxTDNxY21mWldJbm15VitrbnQ0d3p3L3c9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==",
+					"uri_strings": [
+						"spiffe://example.com/opa"
+					]
+				}
+			}
+		},
+		{
+			"note": "cryptox509parsecertificates/uri_strings_no_uris",
+			"query": "data.generated.uri_strings = x",
+			"modules": [
+				"package generated\n\ncerts := \"LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNTakNDQWJPZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRMEZBREJDTVFzd0NRWURWUVFHRXdKMWN6RUwKTUFrR0ExVUVDQXdDUTBFeEVEQU9CZ05WQkFvTUIwVjRZVzF3YkdVeEZEQVNCZ05WQkFNTUMyVjRZVzF3YkdVdQpZMjl0TUI0WERUSXpNVEV5T1RFMk5ESXdPRm9YRFRJME1URXlPREUyTkRJd09Gb3dRakVMTUFrR0ExVUVCaE1DCmRYTXhDekFKQmdOVkJBZ01Ba05CTVJBd0RnWURWUVFLREFkRmVHRnRjR3hsTVJRd0VnWURWUVFEREF0bGVHRnQKY0d4bExtTnZiVENCbnpBTkJna3Foa2lHOXcwQkFRRUZBQU9CalFBd2dZa0NnWUVBempOT1puY05DL25MdEZQYwpUNnNlSzZ0ditTbU9GaGk3NVBKRm9sQ0dFZUFiTHJHTzhaUmR2cXY2OStTTk41MUhrNFBJUDUrejk4aHZIdWJQClVtcGdOMVdVM3FKK2tOVTJXL3poR3pLMTdIL2c3YjVJTjRHZmx3bXJlRWZscnRicnZKSGRlRkVhVGtmYnVld0YKVmZvLzRiaG0yYUthczNHcUo3RnlBNDVxeVUwQ0F3RUFBYU5RTUU0d0hRWURWUjBPQkJZRUZOUStDMUVOK0dSYwpGS1dyTll6ZWdnbFc3TE9lTUI4R0ExVWRJd1FZTUJhQUZOUStDMUVOK0dSY0ZLV3JOWXplZ2dsVzdMT2VNQXdHCkExVWRFd1FGTUFNQkFmOHdEUVlKS29aSWh2Y05BUUVOQlFBRGdZRUF1cXdVVWVXbTFJaURRbmphK1hqd1VCaXUKQXBYWEx5NlFZRG9jUkhoRHlJS3BKSWRJOXltNi9RcVhkOFQ2WGlYUTJDbFNJbGxBSTByQWJYNUZvYzNxaWRkUAp0d2huT1pxd3NZdFhUNy9XOHFLSm5FVnhZckJuRmZSdk9SU3ZlOEtwSDErVHQ2elZEYlJ5bENacTR1TTNrZXN2CmJabXlVdlM1bldBVm44ZmhFdUU9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0=\"\n\nuri_strings := crypto.x509.parse_certificates(certs)[0].URIStrings\n"
+			],
+			"want_result": [
+				{
+					"x": null
+				}
+			],
+			"entrypoints": [
+				"generated"
+			],
+			"plan": {
+				"funcs": {
+					"funcs": [
+						{
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 3,
+												"target": 3
+											},
+											"type": "ResetLocalStmt"
+										},
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 3,
+												"source": {
+													"type": "string_index",
+													"value": 2
+												},
+												"target": 3
+											},
+											"type": "AssignVarOnceStmt"
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 3,
+												"source": 3
+											},
+											"type": "IsDefinedStmt"
+										},
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 3,
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2
+											},
+											"type": "AssignVarOnceStmt"
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 3,
+												"source": 2
+											},
+											"type": "ReturnLocalStmt"
+										}
+									]
+								}
+							],
+							"name": "g0.data.generated.certs",
+							"params": [
+								0,
+								1
+							],
+							"path": [
+								"g0",
+								"generated",
+								"certs"
+							],
+							"return": 2
+						},
+						{
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 5,
+												"target": 3
+											},
+											"type": "ResetLocalStmt"
+										},
+										{
+											"stmt": {
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"col": 47,
+												"file": 0,
+												"func": "g0.data.generated.certs",
+												"result": 4,
+												"row": 5
+											},
+											"type": "CallStmt"
+										},
+										{
+											"stmt": {
+												"col": 47,
+												"file": 0,
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5
+											},
+											"type": "AssignVarStmt"
+										},
+										{
+											"stmt": {
+												"args": [
+													{
+														"type": "local",
+														"value": 5
+													}
+												],
+												"col": 16,
+												"file": 0,
+												"func": "crypto.x509.parse_certificates",
+												"result": 6,
+												"row": 5
+											},
+											"type": "CallStmt"
+										},
+										{
+											"stmt": {
+												"col": 16,
+												"file": 0,
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 6
+												},
+												"target": 7
+											},
+											"type": "AssignVarStmt"
+										},
+										{
+											"stmt": {
+												"Index": 4,
+												"col": 16,
+												"file": 0,
+												"row": 5,
+												"target": 8
+											},
+											"type": "MakeNumberRefStmt"
+										},
+										{
+											"stmt": {
+												"col": 16,
+												"file": 0,
+												"key": {
+													"type": "local",
+													"value": 8
+												},
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 7
+												},
+												"target": 9
+											},
+											"type": "DotStmt"
+										},
+										{
+											"stmt": {
+												"col": 16,
+												"file": 0,
+												"key": {
+													"type": "string_index",
+													"value": 5
+												},
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 9
+												},
+												"target": 10
+											},
+											"type": "DotStmt"
+										},
+										{
+											"stmt": {
+												"col": 16,
+												"file": 0,
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 10
+												},
+												"target": 11
+											},
+											"type": "AssignVarStmt"
+										},
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 11
+												},
+												"target": 3
+											},
+											"type": "AssignVarOnceStmt"
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 5,
+												"source": 3
+											},
+											"type": "IsDefinedStmt"
+										},
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 5,
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2
+											},
+											"type": "AssignVarOnceStmt"
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 1,
+												"file": 0,
+												"row": 5,
+												"source": 2
+											},
+											"type": "ReturnLocalStmt"
+										}
+									]
+								}
+							],
+							"name": "g0.data.generated.uri_strings",
+							"params": [
+								0,
+								1
+							],
+							"path": [
+								"g0",
+								"generated",
+								"uri_strings"
+							],
+							"return": 2
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"stmt": {
+												"col": 0,
+												"file": 0,
+												"row": 0,
+												"target": 2
+											},
+											"type": "MakeObjectStmt"
+										},
+										{
+											"stmt": {
+												"blocks": [
+													{
+														"stmts": [
+															{
+																"stmt": {
+																	"args": [
+																		{
+																			"type": "local",
+																			"value": 0
+																		},
+																		{
+																			"type": "local",
+																			"value": 1
+																		}
+																	],
+																	"col": 0,
+																	"file": 0,
+																	"func": "g0.data.generated.certs",
+																	"result": 3,
+																	"row": 0
+																},
+																"type": "CallStmt"
+															},
+															{
+																"stmt": {
+																	"col": 0,
+																	"file": 0,
+																	"key": {
+																		"type": "string_index",
+																		"value": 1
+																	},
+																	"object": 2,
+																	"row": 0,
+																	"value": {
+																		"type": "local",
+																		"value": 3
+																	}
+																},
+																"type": "ObjectInsertStmt"
+															}
+														]
+													}
+												],
+												"col": 0,
+												"file": 0,
+												"row": 0
+											},
+											"type": "BlockStmt"
+										},
+										{
+											"stmt": {
+												"blocks": [
+													{
+														"stmts": [
+															{
+																"stmt": {
+																	"args": [
+																		{
+																			"type": "local",
+																			"value": 0
+																		},
+																		{
+																			"type": "local",
+																			"value": 1
+																		}
+																	],
+																	"col": 0,
+																	"file": 0,
+																	"func": "g0.data.generated.uri_strings",
+																	"result": 4,
+																	"row": 0
+																},
+																"type": "CallStmt"
+															},
+															{
+																"stmt": {
+																	"col": 0,
+																	"file": 0,
+																	"key": {
+																		"type": "string_index",
+																		"value": 3
+																	},
+																	"object": 2,
+																	"row": 0,
+																	"value": {
+																		"type": "local",
+																		"value": 4
+																	}
+																},
+																"type": "ObjectInsertStmt"
+															}
+														]
+													}
+												],
+												"col": 0,
+												"file": 0,
+												"row": 0
+											},
+											"type": "BlockStmt"
+										},
+										{
+											"stmt": {
+												"blocks": [
+													{
+														"stmts": [
+															{
+																"stmt": {
+																	"blocks": [
+																		{
+																			"stmts": [
+																				{
+																					"stmt": {
+																						"col": 0,
+																						"file": 0,
+																						"key": {
+																							"type": "string_index",
+																							"value": 6
+																						},
+																						"row": 0,
+																						"source": {
+																							"type": "local",
+																							"value": 1
+																						},
+																						"target": 6
+																					},
+																					"type": "DotStmt"
+																				},
+																				{
+																					"stmt": {
+																						"a": 6,
+																						"b": 2,
+																						"col": 0,
+																						"file": 0,
+																						"row": 0,
+																						"target": 5
+																					},
+																					"type": "ObjectMergeStmt"
+																				},
+																				{
+																					"stmt": {
+																						"col": 0,
+																						"file": 0,
+																						"index": 1,
+																						"row": 0
+																					},
+																					"type": "BreakStmt"
+																				}
+																			]
+																		}
+																	],
+																	"col": 0,
+																	"file": 0,
+																	"row": 0
+																},
+																"type": "BlockStmt"
+															},
+															{
+																"stmt": {
+																	"col": 0,
+																	"file": 0,
+																	"row": 0,
+																	"source": {
+																		"type": "local",
+																		"value": 2
+																	},
+																	"target": 5
+																},
+																"type": "AssignVarStmt"
+															}
+														]
+													}
+												],
+												"col": 0,
+												"file": 0,
+												"row": 0
+											},
+											"type": "BlockStmt"
+										},
+										{
+											"stmt": {
+												"col": 0,
+												"file": 0,
+												"row": 0,
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 7
+											},
+											"type": "AssignVarStmt"
+										},
+										{
+											"stmt": {
+												"col": 0,
+												"file": 0,
+												"row": 0,
+												"target": 8
+											},
+											"type": "MakeObjectStmt"
+										},
+										{
+											"stmt": {
+												"col": 0,
+												"file": 0,
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"object": 8,
+												"row": 0,
+												"value": {
+													"type": "local",
+													"value": 7
+												}
+											},
+											"type": "ObjectInsertStmt"
+										},
+										{
+											"stmt": {
+												"col": 0,
+												"file": 0,
+												"row": 0,
+												"value": 8
+											},
+											"type": "ResultSetAddStmt"
+										}
+									]
+								}
+							],
+							"name": "generated"
+						}
+					]
+				},
+				"static": {
+					"builtin_funcs": [
+						{
+							"decl": {
+								"args": [
+									{
+										"description": "base64 encoded DER or PEM data containing one or more certificates or a PEM string of one or more certificates",
+										"name": "certs",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "parsed X.509 certificates represented as objects",
+									"dynamic": {
+										"dynamic": {
+											"key": {
+												"type": "string"
+											},
+											"value": {
+												"type": "any"
+											}
+										},
+										"type": "object"
+									},
+									"name": "output",
+									"type": "array"
+								},
+								"type": "function"
+							},
+							"name": "crypto.x509.parse_certificates"
+						}
+					],
+					"files": [
+						{
+							"value": "mod_0"
+						}
+					],
+					"strings": [
+						{
+							"value": "result"
+						},
+						{
+							"value": "certs"
+						},
+						{
+							"value": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNTakNDQWJPZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRMEZBREJDTVFzd0NRWURWUVFHRXdKMWN6RUwKTUFrR0ExVUVDQXdDUTBFeEVEQU9CZ05WQkFvTUIwVjRZVzF3YkdVeEZEQVNCZ05WQkFNTUMyVjRZVzF3YkdVdQpZMjl0TUI0WERUSXpNVEV5T1RFMk5ESXdPRm9YRFRJME1URXlPREUyTkRJd09Gb3dRakVMTUFrR0ExVUVCaE1DCmRYTXhDekFKQmdOVkJBZ01Ba05CTVJBd0RnWURWUVFLREFkRmVHRnRjR3hsTVJRd0VnWURWUVFEREF0bGVHRnQKY0d4bExtTnZiVENCbnpBTkJna3Foa2lHOXcwQkFRRUZBQU9CalFBd2dZa0NnWUVBempOT1puY05DL25MdEZQYwpUNnNlSzZ0ditTbU9GaGk3NVBKRm9sQ0dFZUFiTHJHTzhaUmR2cXY2OStTTk41MUhrNFBJUDUrejk4aHZIdWJQClVtcGdOMVdVM3FKK2tOVTJXL3poR3pLMTdIL2c3YjVJTjRHZmx3bXJlRWZscnRicnZKSGRlRkVhVGtmYnVld0YKVmZvLzRiaG0yYUthczNHcUo3RnlBNDVxeVUwQ0F3RUFBYU5RTUU0d0hRWURWUjBPQkJZRUZOUStDMUVOK0dSYwpGS1dyTll6ZWdnbFc3TE9lTUI4R0ExVWRJd1FZTUJhQUZOUStDMUVOK0dSY0ZLV3JOWXplZ2dsVzdMT2VNQXdHCkExVWRFd1FGTUFNQkFmOHdEUVlKS29aSWh2Y05BUUVOQlFBRGdZRUF1cXdVVWVXbTFJaURRbmphK1hqd1VCaXUKQXBYWEx5NlFZRG9jUkhoRHlJS3BKSWRJOXltNi9RcVhkOFQ2WGlYUTJDbFNJbGxBSTByQWJYNUZvYzNxaWRkUAp0d2huT1pxd3NZdFhUNy9XOHFLSm5FVnhZckJuRmZSdk9SU3ZlOEtwSDErVHQ2elZEYlJ5bENacTR1TTNrZXN2CmJabXlVdlM1bldBVm44ZmhFdUU9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0="
+						},
+						{
+							"value": "uri_strings"
+						},
+						{
+							"value": "0"
+						},
+						{
+							"value": "URIStrings"
+						},
+						{
+							"value": "generated"
+						}
+					]
+				}
+			},
+			"want_plan_result": {
+				"data_generated": {
+					"certs": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNTakNDQWJPZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRMEZBREJDTVFzd0NRWURWUVFHRXdKMWN6RUwKTUFrR0ExVUVDQXdDUTBFeEVEQU9CZ05WQkFvTUIwVjRZVzF3YkdVeEZEQVNCZ05WQkFNTUMyVjRZVzF3YkdVdQpZMjl0TUI0WERUSXpNVEV5T1RFMk5ESXdPRm9YRFRJME1URXlPREUyTkRJd09Gb3dRakVMTUFrR0ExVUVCaE1DCmRYTXhDekFKQmdOVkJBZ01Ba05CTVJBd0RnWURWUVFLREFkRmVHRnRjR3hsTVJRd0VnWURWUVFEREF0bGVHRnQKY0d4bExtTnZiVENCbnpBTkJna3Foa2lHOXcwQkFRRUZBQU9CalFBd2dZa0NnWUVBempOT1puY05DL25MdEZQYwpUNnNlSzZ0ditTbU9GaGk3NVBKRm9sQ0dFZUFiTHJHTzhaUmR2cXY2OStTTk41MUhrNFBJUDUrejk4aHZIdWJQClVtcGdOMVdVM3FKK2tOVTJXL3poR3pLMTdIL2c3YjVJTjRHZmx3bXJlRWZscnRicnZKSGRlRkVhVGtmYnVld0YKVmZvLzRiaG0yYUthczNHcUo3RnlBNDVxeVUwQ0F3RUFBYU5RTUU0d0hRWURWUjBPQkJZRUZOUStDMUVOK0dSYwpGS1dyTll6ZWdnbFc3TE9lTUI4R0ExVWRJd1FZTUJhQUZOUStDMUVOK0dSY0ZLV3JOWXplZ2dsVzdMT2VNQXdHCkExVWRFd1FGTUFNQkFmOHdEUVlKS29aSWh2Y05BUUVOQlFBRGdZRUF1cXdVVWVXbTFJaURRbmphK1hqd1VCaXUKQXBYWEx5NlFZRG9jUkhoRHlJS3BKSWRJOXltNi9RcVhkOFQ2WGlYUTJDbFNJbGxBSTByQWJYNUZvYzNxaWRkUAp0d2huT1pxd3NZdFhUNy9XOHFLSm5FVnhZckJuRmZSdk9SU3ZlOEtwSDErVHQ2elZEYlJ5bENacTR1TTNrZXN2CmJabXlVdlM1bldBVm44ZmhFdUU9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0=",
+					"uri_strings": null
+				}
+			}
+		}
+	]
+}

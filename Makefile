@@ -17,10 +17,10 @@ test:
 build:
 	swift build
 
-.PHONY: bench
-bench:
-	OPA_BENCHMARK=enabled swift package benchmark
-
 .PHONY: clean
 clean:
 	rm -rf .build
+
+.PHONY: bench
+bench:
+	OPA_BENCHMARK=enabled swift package benchmark

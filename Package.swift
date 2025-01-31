@@ -58,6 +58,11 @@ let package = Package(
             name: "SwiftRegoTests",
             dependencies: ["SwiftRego"]
         ),
+        .testTarget(
+            name: "ComplianceTests",
+            dependencies: ["Rego"],
+            resources: [.copy("TestData")]
+        ),
         .executableTarget(
             name: "CLI",
             dependencies: [

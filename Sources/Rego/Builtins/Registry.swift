@@ -33,6 +33,7 @@ public struct BuiltinRegistry {
             // String
             "concat": BuiltinFuncs.concat,
             "contains": BuiltinFuncs.contains,
+            "endswith": BuiltinFuncs.endsWith,
 
             // Trace
             "trace": BuiltinFuncs.trace,

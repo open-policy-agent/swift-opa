@@ -180,10 +180,86 @@ struct StringsTests {
         ),
     ]
 
+    static let endsWithTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "base case positive",
+            name: "endswith",
+            args: [.string("hello, world!"), .string("world!")],
+            expected: .success(.boolean(true))
+        ),
+        BuiltinTests.TestCase(
+            description: "base case negative",
+            name: "endswith",
+            args: [.string("hello, world!"), .string("zzzzz")],
+            expected: .success(.boolean(false))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty base",
+            name: "endswith",
+            args: [.string("hello, world!"), .string("")],
+            expected: .success(.boolean(true))
+        ),
+        BuiltinTests.TestCase(
+            description: "full match",
+            name: "endswith",
+            args: [.string("abc"), .string("abc")],
+            expected: .success(.boolean(true))
+        ),
+        BuiltinTests.TestCase(
+            description: "more than a full match",
+            name: "endswith",
+            args: [.string("bc"), .string("abcd")],
+            expected: .success(.boolean(false))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty search",
+            name: "endswith",
+            args: [.string(""), .string("abc")],
+            expected: .success(.boolean(false))
+        ),
+        BuiltinTests.TestCase(
+            description: "both empty",
+            name: "endswith",
+            args: [.string(""), .string("")],
+            expected: .success(.boolean(true))
+        ),
+        BuiltinTests.TestCase(
+            description: "too many args",
+            name: "endswith",
+            args: [.string("hello, world!"), .string("world!"), .string("extra")],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "not enough args",
+            name: "endswith",
+            args: [.string("hello, world!")],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "no args",
+            name: "endswith",
+            args: [],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong type search",
+            name: "endswith",
+            args: [.string("hello, world!"), .number(1)],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "search"))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong type base",
+            name: "endswith",
+            args: [.number(1), .string("hello, world!")],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "base"))
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
             concatTests,
             containsTests,
+            endsWithTests,
         ].flatMap { $0 }
     }
 

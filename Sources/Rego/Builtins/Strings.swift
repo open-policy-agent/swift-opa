@@ -52,4 +52,20 @@ extension BuiltinFuncs {
         }
         return .boolean(haystack.contains(needle))
     }
+
+    static func endsWith(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .string(let search) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "search")
+        }
+
+        guard case .string(let base) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "base")
+        }
+
+        return .boolean(search.hasSuffix(base))
+    }
 }

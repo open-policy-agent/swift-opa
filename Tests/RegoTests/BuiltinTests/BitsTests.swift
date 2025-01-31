@@ -45,25 +45,25 @@ struct BitsTests {
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
-            name: "array.concat",
+            name: "bits.lsh",
             args: [.number(1)],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
-            name: "array.concat",
+            name: "bits.lsh",
             args: [.number(1), .number(1), .number(1)],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong lhs arg type",
-            name: "array.concat",
+            name: "bits.lsh",
             args: [.string("1"), .number(1)],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "a"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
-            name: "array.concat",
+            name: "bits.lsh",
             args: [.number(1), .string("1")],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b"))
         ),

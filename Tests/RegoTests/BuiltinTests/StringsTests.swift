@@ -255,11 +255,87 @@ struct StringsTests {
         ),
     ]
 
+    static let indexOfTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "base case positive",
+            name: "indexof",
+            args: [.string("hello, world!"), .string("world")],
+            expected: .success(.number(7))
+        ),
+        BuiltinTests.TestCase(
+            description: "base case negative",
+            name: "indexof",
+            args: [.string("hello, world!"), .string("zzzzz")],
+            expected: .success(.number(-1))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty needle",
+            name: "indexof",
+            args: [.string("hello, world!"), .string("")],
+            expected: .success(.undefined)
+        ),
+        BuiltinTests.TestCase(
+            description: "full match",
+            name: "indexof",
+            args: [.string("abc"), .string("abc")],
+            expected: .success(.number(0))
+        ),
+        BuiltinTests.TestCase(
+            description: "more than a full match",
+            name: "indexof",
+            args: [.string("bc"), .string("abcd")],
+            expected: .success(.number(-1))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty haystack",
+            name: "indexof",
+            args: [.string(""), .string("abc")],
+            expected: .success(.number(-1))
+        ),
+        BuiltinTests.TestCase(
+            description: "both empty",
+            name: "indexof",
+            args: [.string(""), .string("")],
+            expected: .success(.undefined)
+        ),
+        BuiltinTests.TestCase(
+            description: "too many args",
+            name: "indexof",
+            args: [.string("hello, world!"), .string("world"), .string("extra")],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "not enough args",
+            name: "indexof",
+            args: [.string("hello, world!")],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "no args",
+            name: "indexof",
+            args: [],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong type needle",
+            name: "indexof",
+            args: [.string("hello, world!"), .number(1)],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "needle"))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong type haystack",
+            name: "indexof",
+            args: [.number(1), .string("hello, world!")],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "needle"))
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
             concatTests,
             containsTests,
             endsWithTests,
+            indexOfTests,
         ].flatMap { $0 }
     }
 

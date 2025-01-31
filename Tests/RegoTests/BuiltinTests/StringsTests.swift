@@ -330,12 +330,103 @@ struct StringsTests {
         ),
     ]
 
+    static let lowerTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "base",
+            name: "lower",
+            args: [.string("aAaAAaaAAAA A A a")],
+            expected: .success(.string("aaaaaaaaaaa a a a"))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty string",
+            name: "lower",
+            args: [.string("")],
+            expected: .success(.string(""))
+        ),
+        BuiltinTests.TestCase(
+            description: "all lowercase",
+            name: "lower",
+            args: [.string("aaaa")],
+            expected: .success(.string("aaaa"))
+        ),
+        BuiltinTests.TestCase(
+            description: "all uppercase",
+            name: "lower",
+            args: [.string("AAAA")],
+            expected: .success(.string("aaaa"))
+        ),
+        BuiltinTests.TestCase(
+            description: "too many args",
+            name: "lower",
+            args: [.string("hello, world!"), .string("world")],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
+        ),
+        BuiltinTests.TestCase(
+            description: "not enough args",
+            name: "lower",
+            args: [],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 1))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong type arg",
+            name: "lower",
+            args: [.number(1)],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+        ),
+    ]
+
+    static let upperTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "base",
+            name: "upper",
+            args: [.string("aAaAAaaAAAA A A a")],
+            expected: .success(.string("AAAAAAAAAAA A A A"))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty string",
+            name: "upper",
+            args: [.string("")],
+            expected: .success(.string(""))
+        ),
+        BuiltinTests.TestCase(
+            description: "all lowercase",
+            name: "upper",
+            args: [.string("aaaa")],
+            expected: .success(.string("AAAA"))
+        ),
+        BuiltinTests.TestCase(
+            description: "all uppercase",
+            name: "upper",
+            args: [.string("AAAA")],
+            expected: .success(.string("AAAA"))
+        ),
+        BuiltinTests.TestCase(
+            description: "too many args",
+            name: "upper",
+            args: [.string("hello, world!"), .string("world")],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
+        ),
+        BuiltinTests.TestCase(
+            description: "not enough args",
+            name: "upper",
+            args: [],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 1))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong type arg",
+            name: "upper",
+            args: [.number(1)],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
             concatTests,
             containsTests,
             endsWithTests,
             indexOfTests,
+            lowerTests,
         ].flatMap { $0 }
     }
 

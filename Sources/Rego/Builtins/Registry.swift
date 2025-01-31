@@ -43,6 +43,8 @@ public struct BuiltinRegistry {
             "contains": BuiltinFuncs.contains,
             "endswith": BuiltinFuncs.endsWith,
             "indexof": BuiltinFuncs.indexOf,
+            "lower": BuiltinFuncs.lower,
+            "upper": BuiltinFuncs.upper,
 
             // Trace
             "trace": BuiltinFuncs.trace,

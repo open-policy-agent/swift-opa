@@ -93,4 +93,28 @@ extension BuiltinFuncs {
         }
         return .number(NSNumber(value: haystack.distance(from: haystack.startIndex, to: range.lowerBound)))
     }
+
+    static func lower(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+        }
+
+        guard case .string(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x")
+        }
+
+        return .string(x.lowercased())
+    }
+
+    static func upper(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+        }
+
+        guard case .string(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x")
+        }
+
+        return .string(x.uppercased())
+    }
 }

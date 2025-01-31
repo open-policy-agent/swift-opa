@@ -1,0 +1,164 @@
+import AST
+import Foundation
+
+// A bunch of these rego builtins shadow global functions
+// this probably isn't the best idea... but we'll alias them here
+let _round = round
+let _ceil = ceil
+let _floor = floor
+
+extension BuiltinFuncs {
+    static func plus(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .number(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x")
+        }
+
+        guard case .number(let y) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "y")
+        }
+
+        return .number(NSDecimalNumber(decimal: x.decimalValue + y.decimalValue))
+    }
+
+    static func minus(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        switch args[0] {
+        case .number(let x):
+            guard case .number(let y) = args[1] else {
+                throw BuiltinError.argumentTypeMismatch(arg: "y")
+            }
+            return .number(NSDecimalNumber(decimal: x.decimalValue - y.decimalValue))
+        case .set(let x):
+            guard case .set(let y) = args[1] else {
+                throw BuiltinError.argumentTypeMismatch(arg: "y")
+            }
+            return .set(x.subtracting(y))
+        default:
+            throw BuiltinError.argumentTypeMismatch(arg: "x")
+        }
+    }
+
+    static func mult(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .number(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x")
+        }
+
+        guard case .number(let y) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "y")
+        }
+
+        return .number(NSDecimalNumber(decimal: x.decimalValue * y.decimalValue))
+    }
+
+    static func div(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .number(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x")
+        }
+
+        guard case .number(let y) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "y")
+        }
+
+        guard y.decimalValue != 0 else {
+            return .undefined
+        }
+
+        return .number(NSDecimalNumber(decimal: x.decimalValue / y.decimalValue))
+    }
+
+    static func round(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+        }
+
+        guard case .number(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x")
+        }
+
+        if args[0].integerValue != nil {
+            return args[0]
+        }
+
+        return .number(NSNumber(value: _round(x.doubleValue)))
+    }
+
+    static func ceil(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+        }
+
+        guard case .number(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x")
+        }
+
+        if args[0].integerValue != nil {
+            return args[0]
+        }
+
+        return .number(NSNumber(value: _ceil(x.doubleValue)))
+    }
+
+    static func floor(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+        }
+
+        guard case .number(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x")
+        }
+
+        if args[0].integerValue != nil {
+            return args[0]
+        }
+
+        return .number(NSNumber(value: _floor(x.doubleValue)))
+    }
+
+    static func abs(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+        }
+
+        guard case .number(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x")
+        }
+
+        return .number(NSDecimalNumber(decimal: x.decimalValue.magnitude))
+    }
+
+    static func rem(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .number = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x")
+        }
+
+        guard case .number = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "y")
+        }
+
+        // Matching upstream behavior
+        guard let x = args[0].integerValue, let y = args[1].integerValue else {
+            return .undefined
+        }
+
+        return .number(NSNumber(value: x % y))
+    }
+}

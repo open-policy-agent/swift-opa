@@ -21,6 +21,17 @@ public struct BuiltinRegistry {
             // Aggregates
             "count": BuiltinFuncs.count,
 
+            // Arithmetic
+            "plus": BuiltinFuncs.plus,
+            "minus": BuiltinFuncs.minus,
+            "mult": BuiltinFuncs.mult,
+            "div": BuiltinFuncs.div,
+            "round": BuiltinFuncs.round,
+            "ceil": BuiltinFuncs.ceil,
+            "floor": BuiltinFuncs.floor,
+            "abs": BuiltinFuncs.abs,
+            "rem": BuiltinFuncs.rem,
+
             // Array
             "array.concat": BuiltinFuncs.arrayConcat,
 

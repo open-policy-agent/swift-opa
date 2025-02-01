@@ -106,6 +106,30 @@ extension BuiltinFuncs {
         return .string(x.lowercased())
     }
 
+    // split returns an array containing elements of the input string split on a delimiter
+    static func split(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .string(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x")
+        }
+        guard case .string(let delimiter) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "delimiter")
+        }
+
+        // If sep is empty, Split splits after each UTF-8 sequence
+        if delimiter.isEmpty {
+            let chars: [AST.RegoValue] = x.map { .string(String($0)) }
+            return .array(chars)
+        }
+
+        // Note String.split(separator:) behaves completely different and not how we need
+        let parts = x.components(separatedBy: delimiter)
+        return .array(parts.map { .string(String($0)) })
+    }
+
     static func upper(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)

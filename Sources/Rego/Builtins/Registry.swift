@@ -64,6 +64,7 @@ public struct BuiltinRegistry {
             "contains": BuiltinFuncs.contains,
             "endswith": BuiltinFuncs.endsWith,
             "indexof": BuiltinFuncs.indexOf,
+            "split": BuiltinFuncs.split,
             "lower": BuiltinFuncs.lower,
             "upper": BuiltinFuncs.upper,
 

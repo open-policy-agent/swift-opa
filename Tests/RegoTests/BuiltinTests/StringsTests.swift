@@ -375,6 +375,57 @@ struct StringsTests {
         ),
     ]
 
+    static let splitTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "base",
+            name: "split",
+            args: [.string("foo/bar/baz"), .string("/")],
+            expected: .success(.array([.string("foo"), .string("bar"), .string("baz")]))
+        ),
+        BuiltinTests.TestCase(
+            description: "delimiter not found",
+            name: "split",
+            args: [.string("aaaa"), .string("b")],
+            expected: .success(.array([.string("aaaa")]))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty delimiter, split after each character",
+            name: "split",
+            args: [.string("aaaa"), .string("")],
+            expected: .success(.array([.string("a"), .string("a"), .string("a"), .string("a")]))
+        ),
+        BuiltinTests.TestCase(
+            description: "both empty",
+            name: "split",
+            args: [.string(""), .string("")],
+            expected: .success(.array([]))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty string",
+            name: "split",
+            args: [.string(""), .string("/")],
+            expected: .success(.array([.string("")]))
+        ),
+        BuiltinTests.TestCase(
+            description: "prefix and then empty splits",
+            name: "split",
+            args: [.string("baaa"), .string("a")],
+            expected: .success(.array([.string("b"), .string(""), .string(""), .string("")]))
+        ),
+        BuiltinTests.TestCase(
+            description: "aaaa->aaa",
+            name: "split",
+            args: [.string("aaaa"), .string("aaa")],
+            expected: .success(.array([.string(""), .string("a")]))
+        ),
+        BuiltinTests.TestCase(
+            description: "aaaa->aa",
+            name: "split",
+            args: [.string("aaaa"), .string("aa")],
+            expected: .success(.array([.string(""), .string(""), .string("")]))
+        ),
+    ]
+
     static let upperTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "base",
@@ -427,6 +478,8 @@ struct StringsTests {
             endsWithTests,
             indexOfTests,
             lowerTests,
+            splitTests,
+            upperTests,
         ].flatMap { $0 }
     }
 

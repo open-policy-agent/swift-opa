@@ -65,6 +65,7 @@ public struct BuiltinRegistry {
             "endswith": BuiltinFuncs.endsWith,
             "indexof": BuiltinFuncs.indexOf,
             "split": BuiltinFuncs.split,
+            "trim": BuiltinFuncs.trim,
             "lower": BuiltinFuncs.lower,
             "upper": BuiltinFuncs.upper,
 

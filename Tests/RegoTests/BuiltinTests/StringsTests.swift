@@ -426,6 +426,33 @@ struct StringsTests {
         ),
     ]
 
+    static let trimTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "base",
+            name: "trim",
+            args: [.string("    lorem ipsum        "), .string("     ")],
+            expected: .success(.string("lorem ipsum"))
+        ),
+        BuiltinTests.TestCase(
+            description: "cutset empty",
+            name: "trim",
+            args: [.string("    lorem ipsum    "), .string("")],
+            expected: .success(.string("    lorem ipsum    "))
+        ),
+        BuiltinTests.TestCase(
+            description: "non-whitespace",
+            name: "trim",
+            args: [.string("01234number 1!43210"), .string("0123456789")],
+            expected: .success(.string("number 1!"))
+        ),
+        BuiltinTests.TestCase(
+            description: "value empty",
+            name: "trim",
+            args: [.string(""), .string("0123456789")],
+            expected: .success(.string(""))
+        ),
+    ]
+    
     static let upperTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "base",
@@ -479,6 +506,7 @@ struct StringsTests {
             indexOfTests,
             lowerTests,
             splitTests,
+            trimTests,
             upperTests,
         ].flatMap { $0 }
     }

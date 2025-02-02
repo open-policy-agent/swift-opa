@@ -136,7 +136,6 @@ struct ComplianceTests {
 
         let queries = tc.entrypoints?.map(entrypointToQuery) ?? []
 
-        var allResults: AST.RegoValue = .object([:])
         for query in queries {
             let wantError = (tc.wantError != nil) || (tc.wantErrorCode != nil)
 
@@ -157,16 +156,24 @@ struct ComplianceTests {
             try #require(resultSet.count == 1, "expected single result")
             let resultObj: AST.RegoValue = resultSet.first!
             guard case .object(let result) = resultObj else {
-                throw Error.testFailed
+                throw Error.testFailed(reason: "unexpected result type \(resultObj)")
             }
             let innerResult = result[.string("result")] ?? .object([:])
+            let translated = translateSetsToArrays(innerResult)  // translate away any sets so we can compare below
 
-            // TODO this part isn't quite right, we need to transform data.ex to data_ex in the aggregate resultset. Or something.
-            allResults = allResults.patch(with: innerResult, at: ["__all__"])
+            // The test generator (https://github.com/borgeby/opa-compliance-test) will encode each
+            // entrypoint expected output into wantPlanResult, transorming the entrypoint to an underscore-delimited key,
+            // e.g. opa/example -> data_opa_example
+            let key = queryToResultsKey(query)
+
+            guard case .object(let wantPlanResult) = tc.wantPlanResult else {
+                throw Error.testFailed(reason: "unexpected wantPlanResult type \(tc.wantPlanResult)")
+            }
+
+            let expected = wantPlanResult[.string(key)]
+
+            #expect(translated == expected, "comparing results for \(query)")
         }
-
-        // allResults should have everything merged under __all__ now:
-        print("allResults: \(allResults)")
     }
 
     // entrypointToQuery converts from entrypoint "foo/bar/baz" format to query
@@ -176,8 +183,37 @@ struct ComplianceTests {
         return parts.joined(separator: ".")
     }
 
+    func queryToResultsKey(_ entrypoint: String) -> String {
+        return entrypoint.replacingOccurrences(of: ".", with: "_")
+    }
+
+    // translateSetsToArrays returns the provided RegoValue, translated recursively
+    // such that any sets are translated into sorted arrays.
+    // This will allow comparing to parsed RegoValues, where sets are not round-tripped.
+    func translateSetsToArrays(_ v: AST.RegoValue) -> AST.RegoValue {
+        switch v {
+        case .array(let arr):
+            return .array(arr.map { translateSetsToArrays($0) })
+
+        case .object(let o):
+            let newObj: [AST.RegoValue: AST.RegoValue] = o.reduce(
+                into: [:],
+                { out, e in
+                    let k = translateSetsToArrays(e.key)
+                    out[k] = translateSetsToArrays(e.value)
+                })
+            return AST.RegoValue.object(newObj)
+
+        case .set(let s):
+            return .array(s.map { translateSetsToArrays($0) }.sorted())
+
+        default:
+            return v
+        }
+    }
+
     enum Error: Swift.Error {
-        case testFailed
+        case testFailed(reason: String)
     }
 }
 

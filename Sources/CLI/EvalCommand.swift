@@ -81,7 +81,7 @@ struct EvalCommand: AsyncParsableCommand {
         )
 
         let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted]
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         guard let output = String(data: try encoder.encode(resultSet), encoding: .utf8) else {
             print("Failed to encode result set to JSON string")
             throw ExitCode.failure

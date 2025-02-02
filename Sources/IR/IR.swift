@@ -250,11 +250,13 @@ public protocol Statement: Sendable, Codable {
 }
 
 extension Statement {
+    // called while serializing trace events
     public var debugString: String {
         do {
-            let data = try JSONEncoder().encode(self)
-            let str = String(data: data, encoding: .utf8)!
-            return str
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.sortedKeys]
+            let data = try encoder.encode(self)
+            return String(data: data, encoding: .utf8)!
         } catch {
             return "\(type(of: self)) statement encoding failed: \(error)"
         }

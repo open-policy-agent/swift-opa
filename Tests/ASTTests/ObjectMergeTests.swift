@@ -180,7 +180,7 @@ struct ObjectMergeTests {
     }
 
     @Test(arguments: allTests)
-    func testPatch(tc: TestCase) throws {
+    func testMerge(tc: TestCase) throws {
         let originalA = tc.a
         let originalB = tc.b
         let merged = tc.a.merge(with: tc.b)

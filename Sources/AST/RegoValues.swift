@@ -176,6 +176,8 @@ public enum RegoValue: Codable, Comparable, Sendable, Hashable {
     //
     // Since we have a subset of these types we'll keep the order, skipping any that we
     // don't have implemented here (yet).
+    //
+    // ref: https://github.com/open-policy-agent/opa/blob/da69c328192f0ec4b9b4b4bcce9ca88d02c291cf/v1/types/types.go#L845
     public static func < (lhs: RegoValue, rhs: RegoValue) -> Bool {
         // Check their type sort orders first
         if lhs.sortOrder != rhs.sortOrder {
@@ -183,32 +185,59 @@ public enum RegoValue: Codable, Comparable, Sendable, Hashable {
         }
 
         // Handle the case where the lhs and rhs are the same types
-        // For the collection types compare by size first, fall back
-        // to the default hash behavior
+        // For the collection types compare by keys, then values, then length as appropriate.
+        // Fallback to the default hash behavior for remaining types (null, undefined)
         switch (lhs, rhs) {
         case (.array(let lhs), .array(let rhs)):
-            if lhs.count != rhs.count {
-                return lhs.count < rhs.count
+            // compare elements first
+            // ref: https://github.com/open-policy-agent/opa/blob/da69c328192f0ec4b9b4b4bcce9ca88d02c291cf/v1/types/types.go#L1171
+            for (l, r) in zip(lhs, rhs) {
+                if l != r {
+                    return l < r
+                }
             }
+
+            // All shared elements are equal, compare length as tie breaker
+            return lhs.count < rhs.count
+
         case (.boolean(let lhs), .boolean(let rhs)):
             return rhs && !lhs
+
         case (.number(let lhs), .number(let rhs)):
             return lhs.compare(rhs) == .orderedAscending
+
         case (.object(let lhs), .object(let rhs)):
-            if lhs.count != rhs.count {
-                return lhs.count < rhs.count
+            // Objects - compare keys, then values, then length
+            let lSortedKeys = lhs.keys.sorted()
+            let rSortedKeys = rhs.keys.sorted()
+
+            for (lk, rk) in zip(lSortedKeys, rSortedKeys) {
+                if lk != rk {
+                    return lk < rk
+                }
+                let lv = lhs[lk]!
+                let rv = rhs[rk]!
+
+                if lv != rv {
+                    return lv < rv
+                }
             }
+
+            // All shared keys and values are equal, compare length as tie breaker
+            return lhs.count < rhs.count
+
         case (.set(let lhs), .set(let rhs)):
-            if lhs.count != rhs.count {
-                return lhs.count < rhs.count
-            }
+            let l: RegoValue = .array(Array(lhs).sorted())
+            let r: RegoValue = .array(Array(rhs).sorted())
+
+            return l < r
+
         case (.string(let lhs), .string(let rhs)):
             return lhs < rhs
-        default:
-            break
-        }
 
-        return lhs.hashValue < rhs.hashValue
+        default:
+            return lhs.hashValue < rhs.hashValue
+        }
     }
 
     public static func compare(_ lhs: RegoValue, _ rhs: RegoValue) -> ComparisonResult {
@@ -221,6 +250,7 @@ public enum RegoValue: Codable, Comparable, Sendable, Hashable {
         }
     }
 
+    // ref: https://github.com/open-policy-agent/opa/blob/da69c328192f0ec4b9b4b4bcce9ca88d02c291cf/v1/types/types.go#L1189
     public var sortOrder: Int {
         return switch self {
         case .undefined: 0

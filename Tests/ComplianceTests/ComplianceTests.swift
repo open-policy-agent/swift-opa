@@ -9,12 +9,34 @@ extension Tag {
     @Tag static var compliance: Self
 }
 
+private let complianceFilterFlag = "OPA_COMPLIANCE_TESTS"
+
+// Feature flag compliance tests, set OPA_COMPLIANCE_TESTS=... to run
+func complianceEnabled() -> Bool {
+    return ProcessInfo.processInfo.environment[complianceFilterFlag] != nil
+}
+
 // Compliance test suite generated from upstream cases
 // https://github.com/open-policy-agent/opa/tree/main/v1/test/cases/testdata/v1
 // https://github.com/open-policy-agent/opa/tree/97b8572fdc79f6fb433c53aaa013a586dd476615/v1/test/cases/testdata/v1
 
-@Suite("Compliance Tests", .tags(.compliance))
+@Suite("Compliance Tests", .tags(.compliance), .enabled(if: complianceEnabled()))
 struct ComplianceTests {
+    // testFilter is an environment-variable based mechanism for running only
+    // conformance tests from files matching the filter.
+    // To set a filter, set OPA_COMPLIANCE_TESTS to the filenames to include tests from.
+    // (note: filenames must have a .json extension)
+    static var testFilter: String? {
+        let v = ProcessInfo.processInfo.environment[complianceFilterFlag]
+        guard let v else {
+            return nil
+        }
+        if !v.hasSuffix(".json") {
+            return nil
+        }
+        return v
+    }
+
     static var testDescriptors: [TestURL] {
         get throws {
             let enumerator = FileManager.default.enumerator(
@@ -28,10 +50,13 @@ struct ComplianceTests {
                 guard url.lastPathComponent.hasSuffix(".json") else {
                     continue
                 }
-                // TODO DELETEME filtering out everything except what we want to debug
-                guard url.lastPathComponent == "test-example-1070.json" /*"test-functions-0990.json"*/ else {
-                    continue
+                // If a filter was set, skip non-matching files
+                if let testFilter {
+                    if url.lastPathComponent != testFilter {
+                        continue
+                    }
                 }
+
                 files.append(url)
             }
 
@@ -121,7 +146,7 @@ struct ComplianceTests {
         }
     }
 
-    @Test(arguments: try allCases.lazy.prefix(10))
+    @Test(arguments: try allCases /*.lazy.prefix(10)*/)
     func testCompliance(tc: TestCase) async throws {
         let store = InMemoryStore(
             initialData: .object([
@@ -136,18 +161,23 @@ struct ComplianceTests {
 
         let queries = tc.entrypoints?.map(entrypointToQuery) ?? []
 
-        for query in queries {
+        queryLoop: for query in queries {
             let wantError = (tc.wantError != nil) || (tc.wantErrorCode != nil)
 
             var resultSet: ResultSet
             if wantError {
                 let wantErrorMsg = "expected error \(tc.wantError ?? "") / \(tc.wantErrorCode ?? "")"
 
-                try await #require(throws: (any Swift.Error).self, "\(wantErrorMsg)") {
-                    let _ = try await engine.evaluate(query: query, input: tc.input)
+                do {
+                    try await #require(throws: (any Swift.Error).self, "\(wantErrorMsg)") {
+                        let _ = try await engine.evaluate(query: query, input: tc.input)
+                    }
+                } catch {
+                    print("\t❌ \(tc.testDescription) (\(query))")
+                    continue queryLoop
                 }
-                // TODO do we need to verify errors for _all_ entrypoints?
-                return
+                // TODO does wantError apply to all entrypoints in the tests?
+                continue queryLoop
             } else {
                 resultSet = try await engine.evaluate(query: query, input: tc.input)
             }
@@ -172,7 +202,13 @@ struct ComplianceTests {
 
             let expected = wantPlanResult[.string(key)]
 
-            #expect(translated == expected, "comparing results for \(query)")
+            do {
+                try #require(translated == expected, "comparing results for \(query)")
+            } catch {
+                print("\t❌ \(tc.testDescription) (\(query))")
+                continue queryLoop
+            }
+            print("\t✅ \(tc.testDescription) (\(query))")
         }
     }
 

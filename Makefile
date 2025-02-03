@@ -13,6 +13,10 @@ lint:
 test:
 	swift test
 
+.PHONY: test-compliance
+test-compliance:
+	OPA_COMPLIANCE_TESTS=enabled swift test
+
 .PHONY: build
 build:
 	swift build

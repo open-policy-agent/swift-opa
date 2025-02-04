@@ -11,13 +11,12 @@ struct ObjectTests {
             description: "simple key exists",
             name: "object.get",
             args: [
-                AST.RegoValue([
-                    "a": .number(1),
-                    "b": .number(2),
-                ]),
-                .string("b"),
-                .string("default_value"),
-
+                [
+                    "a": 1,
+                    "b": 2,
+                ],
+                "b",
+                "default_value",
             ],
             expected: .success(.number(2))
         ),
@@ -25,13 +24,12 @@ struct ObjectTests {
             description: "simple key does not exist",
             name: "object.get",
             args: [
-                AST.RegoValue([
-                    "a": .number(1),
-                    "b": .number(2),
-                ]),
-                .string("zz"),
-                .string("default_value"),
-
+                [
+                    "a": 1,
+                    "b": 2,
+                ],
+                "zz",
+                "default_value",
             ],
             expected: .success(.string("default_value"))
         ),
@@ -39,10 +37,9 @@ struct ObjectTests {
             description: "simple key empty object",
             name: "object.get",
             args: [
-                .object([:]),
-                .string("zz"),
-                .string("default_value"),
-
+                [:],
+                "zz",
+                "default_value",
             ],
             expected: .success(.string("default_value"))
         ),
@@ -50,29 +47,29 @@ struct ObjectTests {
             description: "array key exists level 0",
             name: "object.get",
             args: [
-                AST.RegoValue([
-                    "a": .number(1),
-                    "b": .number(2),
-                ]),
+                [
+                    "a": 1,
+                    "b": 2,
+                ],
                 .array([]),
-                .string("default_value"),
+                "default_value",
             ],
             expected: .success(
-                AST.RegoValue([
-                    "a": .number(1),
-                    "b": .number(2),
-                ]))
+                [
+                    "a": 1,
+                    "b": 2,
+                ])
         ),
         BuiltinTests.TestCase(
             description: "array key exists level 1",
             name: "object.get",
             args: [
-                AST.RegoValue([
-                    "a": .number(1),
-                    "b": .number(2),
-                ]),
-                .array([.string("b")]),
-                .string("default_value"),
+                [
+                    "a": 1,
+                    "b": 2,
+                ],
+                ["b"],
+                "default_value",
             ],
             expected: .success(.number(2))
         ),
@@ -80,13 +77,13 @@ struct ObjectTests {
             description: "array key exists level 2",
             name: "object.get",
             args: [
-                AST.RegoValue([
-                    "a": AST.RegoValue([
-                        "b": .number(2)
-                    ])
-                ]),
-                .array([.string("a"), .string("b")]),
-                .string("default_value"),
+                [
+                    "a": [
+                        "b": 2
+                    ]
+                ],
+                ["a", "b"],
+                "default_value",
             ],
             expected: .success(.number(2))
         ),
@@ -94,21 +91,21 @@ struct ObjectTests {
             description: "array key exists level 6",
             name: "object.get",
             args: [
-                AST.RegoValue([
-                    "a": AST.RegoValue([
-                        "b": AST.RegoValue([
-                            "c": AST.RegoValue([
-                                "d": AST.RegoValue([
-                                    "e": AST.RegoValue([
-                                        "f": .number(2)
-                                    ])
-                                ])
-                            ])
-                        ])
-                    ])
-                ]),
-                .array([.string("a"), .string("b"), .string("c"), .string("d"), .string("e"), .string("f")]),
-                .string("default_value"),
+                [
+                    "a": [
+                        "b": [
+                            "c": [
+                                "d": [
+                                    "e": [
+                                        "f": 2
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                ["a", "b", "c", "d", "e", "f"],
+                "default_value",
             ],
             expected: .success(.number(2))
         ),
@@ -116,12 +113,12 @@ struct ObjectTests {
             description: "array key does not exist level 1",
             name: "object.get",
             args: [
-                AST.RegoValue([
-                    "a": .number(1),
-                    "b": .number(2),
-                ]),
-                .array([.string("zz")]),
-                .string("default_value"),
+                [
+                    "a": 1,
+                    "b": 2,
+                ],
+                ["zz"],
+                "default_value",
             ],
             expected: .success(.string("default_value"))
         ),
@@ -129,13 +126,13 @@ struct ObjectTests {
             description: "array key does not exist level 2",
             name: "object.get",
             args: [
-                AST.RegoValue([
-                    "a": AST.RegoValue([
-                        "b": .number(2)
-                    ])
-                ]),
-                .array([.string("a"), .string("zz")]),
-                .string("default_value"),
+                [
+                    "a": [
+                        "b": 2
+                    ]
+                ],
+                ["a", "zz"],
+                "default_value",
             ],
             expected: .success(.string("default_value"))
         ),
@@ -143,21 +140,21 @@ struct ObjectTests {
             description: "array key does not exist level 6",
             name: "object.get",
             args: [
-                AST.RegoValue([
-                    "a": AST.RegoValue([
-                        "b": AST.RegoValue([
-                            "c": AST.RegoValue([
-                                "d": AST.RegoValue([
-                                    "e": AST.RegoValue([
-                                        "f": .number(2)
-                                    ])
-                                ])
-                            ])
-                        ])
-                    ])
-                ]),
-                .array([.string("a"), .string("b"), .string("c"), .string("d"), .string("e"), .string("zz")]),
-                .string("default_value"),
+                [
+                    "a": [
+                        "b": [
+                            "c": [
+                                "d": [
+                                    "e": [
+                                        "f": 2
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                ["a", "b", "c", "d", "e", "zz"],
+                "default_value",
             ],
             expected: .success(.string("default_value"))
         ),
@@ -165,10 +162,9 @@ struct ObjectTests {
             description: "array key empty object",
             name: "object.get",
             args: [
-                .object([:]),
-                .array([.string("zz")]),
-                .string("default_value"),
-
+                [:],
+                ["zz"],
+                "default_value",
             ],
             expected: .success(.string("default_value"))
         ),
@@ -177,8 +173,8 @@ struct ObjectTests {
             name: "object.get",
             args: [
                 .null,
-                .array([.string("c"), .string("d")]),
-                .string("default_value"),
+                ["c", "d"],
+                "default_value",
             ],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "object"))
         ),
@@ -186,11 +182,11 @@ struct ObjectTests {
             description: "not enough args",
             name: "object.get",
             args: [
-                AST.RegoValue([
-                    "a": .number(1),
-                    "b": .number(2),
-                ]),
-                .array([.string("c"), .string("d")]),
+                [
+                    "a": 1,
+                    "b": 2,
+                ],
+                ["c", "d"],
             ],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 3))
         ),
@@ -198,13 +194,13 @@ struct ObjectTests {
             description: "too many args",
             name: "object.get",
             args: [
-                AST.RegoValue([
-                    "a": .number(1),
-                    "b": .number(2),
-                ]),
-                .array([.string("a"), .string("b")]),
-                .array([.string("c"), .string("d")]),
-                .string("default_value"),
+                [
+                    "a": 1,
+                    "b": 2,
+                ],
+                ["a", "b"],
+                ["c", "d"],
+                "default_value",
             ],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 4, expected: 3))
         ),
@@ -215,18 +211,18 @@ struct ObjectTests {
             description: "simple key exists",
             name: "object.keys",
             args: [
-                AST.RegoValue([
-                    "a": .number(1),
-                    "b": .number(2),
-                ])
+                [
+                    "a": 1,
+                    "b": 2,
+                ]
             ],
-            expected: .success(.set([.string("a"), .string("b")]))
+            expected: .success(.set(["a", "b"]))
         ),
         BuiltinTests.TestCase(
             description: "empty object",
             name: "object.keys",
             args: [
-                .object([:])
+                [:]
             ],
             expected: .success(.set([]))
         ),
@@ -234,7 +230,7 @@ struct ObjectTests {
             description: "non object arg 0",
             name: "object.keys",
             args: [
-                .array([.string("c"), .string("d")])
+                ["c", "d"]
             ],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "object"))
         ),
@@ -248,14 +244,14 @@ struct ObjectTests {
             description: "too many args",
             name: "object.keys",
             args: [
-                AST.RegoValue([
-                    "a": .number(1),
-                    "b": .number(2),
-                ]),
-                AST.RegoValue([
-                    "b": .number(1),
-                    "c": .number(2),
-                ]),
+                [
+                    "a": 1,
+                    "b": 2,
+                ],
+                [
+                    "b": 1,
+                    "c": 2,
+                ],
             ],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
         ),

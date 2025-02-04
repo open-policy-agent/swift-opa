@@ -265,8 +265,8 @@ struct BundleLoaderTests {
                             revision: "e6f1a8ad-5b47-498f-a6eb-d1ecc86b63ae",
                             roots: [""],
                             regoVersion: Rego.Manifest.Version.regoV1,
-                            metadata: .object([.string("name"): AST.RegoValue.string("example-rbac")])),
-
+                            metadata: ["name": "example-rbac"]
+                        ),
                         planFiles: [
                             Rego.BundleFile(
                                 url: relPath("TestData/Bundles/simple-directory-bundle/plan.json"),
@@ -279,69 +279,68 @@ struct BundleLoaderTests {
                                 data: Data()
                             )
                         ],
-                        data:
-                            AST.RegoValue.object([
-                                .string("user_roles"): .object([
-                                    .string("eve"): .array([
-                                        .string("customer")
-                                    ]),
-                                    .string("bob"): AST.RegoValue.array([
-                                        .string("employee"),
-                                        .string("billing"),
-                                    ]),
-                                    .string("alice"): AST.RegoValue.array([
-                                        .string("admin")
-                                    ]),
-                                ]),
-                                .string("role_grants"): .object([
-                                    .string("billing"): .array([
-                                        .object([
-                                            .string("action"): .string("read"),
-                                            .string("type"): .string("finance"),
-                                        ]),
-                                        .object([
-                                            .string("type"): .string("finance"),
-                                            .string("action"): .string("update"),
-                                        ]),
-                                    ]),
-                                    .string("customer"): .array([
-                                        .object([
-                                            .string("type"): .string("dog"),
-                                            .string("action"): .string("read"),
-                                        ]),
-                                        .object([
-                                            .string("action"): .string("read"),
-                                            .string("type"): .string("cat"),
-                                        ]),
-                                        .object([
-                                            .string("action"): .string("adopt"),
-                                            .string("type"): .string("dog"),
-                                        ]),
-                                        .object([
-                                            .string("type"): .string("cat"),
-                                            .string("action"): .string("adopt"),
-                                        ]),
-                                    ]),
-                                    .string("employee"): .array([
-                                        .object([
-                                            .string("action"): .string("read"),
-                                            .string("type"): .string("dog"),
-                                        ]),
-                                        .object([
-                                            .string("type"): .string("cat"),
-                                            .string("action"): .string("read"),
-                                        ]),
-                                        .object([
-                                            .string("action"): .string("update"),
-                                            .string("type"): .string("dog"),
-                                        ]),
-                                        .object([
-                                            .string("action"): .string("update"),
-                                            .string("type"): .string("cat"),
-                                        ]),
-                                    ]),
-                                ]),
-                            ])
+                        data: [
+                            "user_roles": [
+                                "eve": [
+                                    "customer"
+                                ],
+                                "bob": [
+                                    "employee",
+                                    "billing",
+                                ],
+                                "alice": [
+                                    "admin"
+                                ],
+                            ],
+                            "role_grants": [
+                                "billing": [
+                                    [
+                                        "action": "read",
+                                        "type": "finance",
+                                    ],
+                                    [
+                                        "type": "finance",
+                                        "action": "update",
+                                    ],
+                                ],
+                                "customer": [
+                                    [
+                                        "type": "dog",
+                                        "action": "read",
+                                    ],
+                                    [
+                                        "action": "read",
+                                        "type": "cat",
+                                    ],
+                                    [
+                                        "action": "adopt",
+                                        "type": "dog",
+                                    ],
+                                    [
+                                        "type": "cat",
+                                        "action": "adopt",
+                                    ],
+                                ],
+                                "employee": [
+                                    [
+                                        "action": "read",
+                                        "type": "dog",
+                                    ],
+                                    [
+                                        "type": "cat",
+                                        "action": "read",
+                                    ],
+                                    [
+                                        "action": "update",
+                                        "type": "dog",
+                                    ],
+                                    [
+                                        "action": "update",
+                                        "type": "cat",
+                                    ],
+                                ],
+                            ],
+                        ]
                     )
                 ),
                 TestCase(
@@ -353,23 +352,23 @@ struct BundleLoaderTests {
                             regoVersion: Rego.Manifest.Version.regoV1,
                             metadata: .null
                         ),
-                        data: AST.RegoValue([
-                            "roles": .array([
-                                .string("admin"),
-                                .string("readonly"),
-                                .string("readwrite"),
-                            ]),
-                            "users": .array([
-                                .string("alice"),
-                                .string("bob"),
-                                .string("mary"),
-                            ]),
-                            "extras": AST.RegoValue([
-                                "metadata": AST.RegoValue([
-                                    "version": .string("1.2.3")
-                                ])
-                            ]),
-                        ])
+                        data: [
+                            "roles": [
+                                "admin",
+                                "readonly",
+                                "readwrite",
+                            ],
+                            "users": [
+                                "alice",
+                                "bob",
+                                "mary",
+                            ],
+                            "extras": [
+                                "metadata": [
+                                    "version": "1.2.3"
+                                ]
+                            ],
+                        ]
                     )
                 ),
             ]
@@ -715,59 +714,55 @@ struct PathTests {
         [
             DataTreeContainedTestCase(
                 paths: [["foo", "bar"]],
-                data: AST.RegoValue([
-                    "foo": AST.RegoValue([
-                        "bar": .number(42)
-                    ])
-                ]),
+                data: [
+                    "foo": [
+                        "bar": 42
+                    ]
+                ],
                 isValid: true
             ),
             DataTreeContainedTestCase(
                 paths: [[""]],
-                data: AST.RegoValue([
-                    "foo": AST.RegoValue([
-                        "bar": .number(42)
-                    ]),
-                    "baz": .number(777),
-                ]),
+                data: [
+                    "foo": [
+                        "bar": 42
+                    ],
+                    "baz": 777,
+                ],
                 isValid: true
             ),
             DataTreeContainedTestCase(
                 paths: [["foo", "bar"]],
-                data: AST.RegoValue([
-                    "foo": AST.RegoValue([
-                        "bar": .number(42)
-                    ]),
-                    "baz": .number(777),
-                ]),
+                data: [
+                    "foo": [
+                        "bar": 42
+                    ],
+                    "baz": 777,
+                ],
                 isValid: false
             ),
             DataTreeContainedTestCase(
                 paths: [["foo", "bar"]],
-                data: AST.RegoValue([
-                    "foo": AST.RegoValue([
-                        "baz": .number(42)
-                    ])
-                ]),
+                data: [
+                    "foo": [
+                        "baz": 42
+                    ]
+                ],
                 isValid: false
             ),
             DataTreeContainedTestCase(
                 paths: [["foo", "bar"]],
-                data: .object([:]),
+                data: [:],
                 isValid: true
             ),
             DataTreeContainedTestCase(
                 paths: [[""]],
-                data: .object([
-                    .string("foo"): .number(42)
-                ]),
+                data: ["foo": 42],
                 isValid: true
             ),
             DataTreeContainedTestCase(
                 paths: [],
-                data: .object([
-                    .string("foo"): .number(42)
-                ]),
+                data: ["foo": 42],
                 isValid: true
             ),
         ]

@@ -111,11 +111,11 @@ extension BuiltinFuncs {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
         }
-        
+
         guard case .string(let x) = args[0] else {
             throw BuiltinError.argumentTypeMismatch(arg: "x")
         }
-        
+
         guard case .string(let delimiter) = args[1] else {
             throw BuiltinError.argumentTypeMismatch(arg: "delimiter")
         }
@@ -130,21 +130,21 @@ extension BuiltinFuncs {
         let parts = x.components(separatedBy: delimiter)
         return .array(parts.map { .string(String($0)) })
     }
-    
+
     // trim returns value with all leading or trailing instances of the cutset characters removed.
     static func trim(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
         }
-        
+
         guard case .string(let value) = args[0] else {
             throw BuiltinError.argumentTypeMismatch(arg: "value")
         }
-        
+
         guard case .string(let cutset) = args[1] else {
             throw BuiltinError.argumentTypeMismatch(arg: "cutset")
         }
-        
+
         let trimmedValue = value.trimmingCharacters(in: CharacterSet(charactersIn: cutset))
         return .string(trimmedValue)
     }

@@ -10,21 +10,21 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "simple array csv",
             name: "concat",
-            args: [.string(","), .array([.string("a"), .string("b"), .string("c")])],
-            expected: .success(.string("a,b,c"))
+            args: [",", ["a", "b", "c"]],
+            expected: .success("a,b,c")
         ),
         BuiltinTests.TestCase(
             description: "empty array csv",
             name: "concat",
-            args: [.string(","), .array([])],
-            expected: .success(.string(""))
+            args: [",", []],
+            expected: .success("")
         ),
         BuiltinTests.TestCase(
             description: "array multi character separator",
             name: "concat",
             args: [
-                .string("a really big delineator compared to the usual comma"),
-                .array([.string("a"), .string("b"), .string("c")]),
+                "a really big delineator compared to the usual comma",
+                ["a", "b", "c"],
             ],
             expected: .success(
                 .string(
@@ -34,21 +34,21 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "simple set csv",
             name: "concat",
-            args: [.string(","), .set([.string("a"), .string("b"), .string("c")])],
-            expected: .success(.string("a,b,c"))
+            args: [",", .set(["a", "b", "c"])],
+            expected: .success("a,b,c")
         ),
         BuiltinTests.TestCase(
             description: "empty set csv",
             name: "concat",
-            args: [.string(","), .set([])],
-            expected: .success(.string(""))
+            args: [",", .set([])],
+            expected: .success("")
         ),
         BuiltinTests.TestCase(
             description: "set multi character separator",
             name: "concat",
             args: [
-                .string("a really big delineator compared to the usual comma"),
-                .set([.string("a"), .string("b"), .string("c")]),
+                "a really big delineator compared to the usual comma",
+                .set(["a", "b", "c"]),
             ],
             expected: .success(
                 .string(
@@ -58,49 +58,49 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "empty delineator",
             name: "concat",
-            args: [.string(""), .array([.string("a"), .string("b"), .string("c")])],
-            expected: .success(.string("abc"))
+            args: ["", ["a", "b", "c"]],
+            expected: .success("abc")
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "array.concat",
-            args: [.number(1), .number(1), .number(1)],
+            args: [1, 1, 1],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
         ),
         BuiltinTests.TestCase(
             description: "too few args 1",
             name: "array.concat",
-            args: [.string(",")],
+            args: [","],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
         ),
         BuiltinTests.TestCase(
             description: "too few args 2",
             name: "array.concat",
-            args: [.array([.string("a")])],
+            args: [["a"]],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong delineator type",
             name: "concat",
-            args: [.number(123), .array([.string("a"), .string("b"), .string("c")])],
+            args: [123, ["a", "b", "c"]],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "delineator"))
         ),
         BuiltinTests.TestCase(
             description: "wrong collection type",
             name: "concat",
-            args: [.string(","), .object([.string("not an array or set"): .string("but still a swift Collection")])],
+            args: [",", .object(["not an array or set": "but still a swift Collection"])],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "collection"))
         ),
         BuiltinTests.TestCase(
             description: "wrong collection element type in array",
             name: "concat",
-            args: [.string(","), .array([.string("a"), .number(123), .string("c")])],
+            args: [",", ["a", 123, "c"]],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "collection element 123"))
         ),
         BuiltinTests.TestCase(
             description: "wrong collection element type in set",
             name: "concat",
-            args: [.string(","), .set([.string("a"), .number(123), .string("c")])],
+            args: [",", .set(["a", 123, "c"])],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "collection element 123"))
         ),
     ]
@@ -109,55 +109,55 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "base case positive",
             name: "contains",
-            args: [.string("hello, world!"), .string("world")],
-            expected: .success(.boolean(true))
+            args: ["hello, world!", "world"],
+            expected: .success(true)
         ),
         BuiltinTests.TestCase(
             description: "base case negative",
             name: "contains",
-            args: [.string("hello, world!"), .string("zzzzz")],
-            expected: .success(.boolean(false))
+            args: ["hello, world!", "zzzzz"],
+            expected: .success(false)
         ),
         BuiltinTests.TestCase(
             description: "empty needle",
             name: "contains",
-            args: [.string("hello, world!"), .string("")],
-            expected: .success(.boolean(true))
+            args: ["hello, world!", ""],
+            expected: .success(true)
         ),
         BuiltinTests.TestCase(
             description: "full match",
             name: "contains",
-            args: [.string("abc"), .string("abc")],
-            expected: .success(.boolean(true))
+            args: ["abc", "abc"],
+            expected: .success(true)
         ),
         BuiltinTests.TestCase(
             description: "more than a full match",
             name: "contains",
-            args: [.string("bc"), .string("abcd")],
-            expected: .success(.boolean(false))
+            args: ["bc", "abcd"],
+            expected: .success(false)
         ),
         BuiltinTests.TestCase(
             description: "empty haystack",
             name: "contains",
-            args: [.string(""), .string("abc")],
-            expected: .success(.boolean(false))
+            args: ["", "abc"],
+            expected: .success(false)
         ),
         BuiltinTests.TestCase(
             description: "both empty",
             name: "contains",
-            args: [.string(""), .string("")],
-            expected: .success(.boolean(true))
+            args: ["", ""],
+            expected: .success(true)
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "contains",
-            args: [.string("hello, world!"), .string("world"), .string("extra")],
+            args: ["hello, world!", "world", "extra"],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
             name: "contains",
-            args: [.string("hello, world!")],
+            args: ["hello, world!"],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
         ),
         BuiltinTests.TestCase(
@@ -169,13 +169,13 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "wrong type needle",
             name: "contains",
-            args: [.string("hello, world!"), .number(1)],
+            args: ["hello, world!", 1],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "needle"))
         ),
         BuiltinTests.TestCase(
             description: "wrong type haystack",
             name: "contains",
-            args: [.number(1), .string("hello, world!")],
+            args: [1, "hello, world!"],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "needle"))
         ),
     ]
@@ -184,55 +184,55 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "base case positive",
             name: "endswith",
-            args: [.string("hello, world!"), .string("world!")],
-            expected: .success(.boolean(true))
+            args: ["hello, world!", "world!"],
+            expected: .success(true)
         ),
         BuiltinTests.TestCase(
             description: "base case negative",
             name: "endswith",
-            args: [.string("hello, world!"), .string("zzzzz")],
-            expected: .success(.boolean(false))
+            args: ["hello, world!", "zzzzz"],
+            expected: .success(false)
         ),
         BuiltinTests.TestCase(
             description: "empty base",
             name: "endswith",
-            args: [.string("hello, world!"), .string("")],
-            expected: .success(.boolean(true))
+            args: ["hello, world!", ""],
+            expected: .success(true)
         ),
         BuiltinTests.TestCase(
             description: "full match",
             name: "endswith",
-            args: [.string("abc"), .string("abc")],
-            expected: .success(.boolean(true))
+            args: ["abc", "abc"],
+            expected: .success(true)
         ),
         BuiltinTests.TestCase(
             description: "more than a full match",
             name: "endswith",
-            args: [.string("bc"), .string("abcd")],
-            expected: .success(.boolean(false))
+            args: ["bc", "abcd"],
+            expected: .success(false)
         ),
         BuiltinTests.TestCase(
             description: "empty search",
             name: "endswith",
-            args: [.string(""), .string("abc")],
-            expected: .success(.boolean(false))
+            args: ["", "abc"],
+            expected: .success(false)
         ),
         BuiltinTests.TestCase(
             description: "both empty",
             name: "endswith",
-            args: [.string(""), .string("")],
-            expected: .success(.boolean(true))
+            args: ["", ""],
+            expected: .success(true)
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "endswith",
-            args: [.string("hello, world!"), .string("world!"), .string("extra")],
+            args: ["hello, world!", "world!", "extra"],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
             name: "endswith",
-            args: [.string("hello, world!")],
+            args: ["hello, world!"],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
         ),
         BuiltinTests.TestCase(
@@ -244,13 +244,13 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "wrong type search",
             name: "endswith",
-            args: [.string("hello, world!"), .number(1)],
+            args: ["hello, world!", 1],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "search"))
         ),
         BuiltinTests.TestCase(
             description: "wrong type base",
             name: "endswith",
-            args: [.number(1), .string("hello, world!")],
+            args: [1, "hello, world!"],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "base"))
         ),
     ]
@@ -259,55 +259,55 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "base case positive",
             name: "indexof",
-            args: [.string("hello, world!"), .string("world")],
-            expected: .success(.number(7))
+            args: ["hello, world!", "world"],
+            expected: .success(7)
         ),
         BuiltinTests.TestCase(
             description: "base case negative",
             name: "indexof",
-            args: [.string("hello, world!"), .string("zzzzz")],
-            expected: .success(.number(-1))
+            args: ["hello, world!", "zzzzz"],
+            expected: .success(-1)
         ),
         BuiltinTests.TestCase(
             description: "empty needle",
             name: "indexof",
-            args: [.string("hello, world!"), .string("")],
+            args: ["hello, world!", ""],
             expected: .success(.undefined)
         ),
         BuiltinTests.TestCase(
             description: "full match",
             name: "indexof",
-            args: [.string("abc"), .string("abc")],
-            expected: .success(.number(0))
+            args: ["abc", "abc"],
+            expected: .success(0)
         ),
         BuiltinTests.TestCase(
             description: "more than a full match",
             name: "indexof",
-            args: [.string("bc"), .string("abcd")],
-            expected: .success(.number(-1))
+            args: ["bc", "abcd"],
+            expected: .success(-1)
         ),
         BuiltinTests.TestCase(
             description: "empty haystack",
             name: "indexof",
-            args: [.string(""), .string("abc")],
-            expected: .success(.number(-1))
+            args: ["", "abc"],
+            expected: .success(-1)
         ),
         BuiltinTests.TestCase(
             description: "both empty",
             name: "indexof",
-            args: [.string(""), .string("")],
+            args: ["", ""],
             expected: .success(.undefined)
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "indexof",
-            args: [.string("hello, world!"), .string("world"), .string("extra")],
+            args: ["hello, world!", "world", "extra"],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
             name: "indexof",
-            args: [.string("hello, world!")],
+            args: ["hello, world!"],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
         ),
         BuiltinTests.TestCase(
@@ -319,13 +319,13 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "wrong type needle",
             name: "indexof",
-            args: [.string("hello, world!"), .number(1)],
+            args: ["hello, world!", 1],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "needle"))
         ),
         BuiltinTests.TestCase(
             description: "wrong type haystack",
             name: "indexof",
-            args: [.number(1), .string("hello, world!")],
+            args: [1, "hello, world!"],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "needle"))
         ),
     ]
@@ -334,31 +334,31 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "base",
             name: "lower",
-            args: [.string("aAaAAaaAAAA A A a")],
-            expected: .success(.string("aaaaaaaaaaa a a a"))
+            args: ["aAaAAaaAAAA A A a"],
+            expected: .success("aaaaaaaaaaa a a a")
         ),
         BuiltinTests.TestCase(
             description: "empty string",
             name: "lower",
-            args: [.string("")],
-            expected: .success(.string(""))
+            args: [""],
+            expected: .success("")
         ),
         BuiltinTests.TestCase(
             description: "all lowercase",
             name: "lower",
-            args: [.string("aaaa")],
-            expected: .success(.string("aaaa"))
+            args: ["aaaa"],
+            expected: .success("aaaa")
         ),
         BuiltinTests.TestCase(
             description: "all uppercase",
             name: "lower",
-            args: [.string("AAAA")],
-            expected: .success(.string("aaaa"))
+            args: ["AAAA"],
+            expected: .success("aaaa")
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "lower",
-            args: [.string("hello, world!"), .string("world")],
+            args: ["hello, world!", "world"],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
         ),
         BuiltinTests.TestCase(
@@ -370,7 +370,7 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "wrong type arg",
             name: "lower",
-            args: [.number(1)],
+            args: [1],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
         ),
     ]
@@ -379,50 +379,50 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "base",
             name: "split",
-            args: [.string("foo/bar/baz"), .string("/")],
-            expected: .success(.array([.string("foo"), .string("bar"), .string("baz")]))
+            args: ["foo/bar/baz", "/"],
+            expected: .success(["foo", "bar", "baz"])
         ),
         BuiltinTests.TestCase(
             description: "delimiter not found",
             name: "split",
-            args: [.string("aaaa"), .string("b")],
-            expected: .success(.array([.string("aaaa")]))
+            args: ["aaaa", "b"],
+            expected: .success(["aaaa"])
         ),
         BuiltinTests.TestCase(
             description: "empty delimiter, split after each character",
             name: "split",
-            args: [.string("aaaa"), .string("")],
-            expected: .success(.array([.string("a"), .string("a"), .string("a"), .string("a")]))
+            args: ["aaaa", ""],
+            expected: .success(["a", "a", "a", "a"])
         ),
         BuiltinTests.TestCase(
             description: "both empty",
             name: "split",
-            args: [.string(""), .string("")],
-            expected: .success(.array([]))
+            args: ["", ""],
+            expected: .success([])
         ),
         BuiltinTests.TestCase(
             description: "empty string",
             name: "split",
-            args: [.string(""), .string("/")],
-            expected: .success(.array([.string("")]))
+            args: ["", "/"],
+            expected: .success([""])
         ),
         BuiltinTests.TestCase(
             description: "prefix and then empty splits",
             name: "split",
-            args: [.string("baaa"), .string("a")],
-            expected: .success(.array([.string("b"), .string(""), .string(""), .string("")]))
+            args: ["baaa", "a"],
+            expected: .success(["b", "", "", ""])
         ),
         BuiltinTests.TestCase(
             description: "aaaa->aaa",
             name: "split",
-            args: [.string("aaaa"), .string("aaa")],
-            expected: .success(.array([.string(""), .string("a")]))
+            args: ["aaaa", "aaa"],
+            expected: .success(["", "a"])
         ),
         BuiltinTests.TestCase(
             description: "aaaa->aa",
             name: "split",
-            args: [.string("aaaa"), .string("aa")],
-            expected: .success(.array([.string(""), .string(""), .string("")]))
+            args: ["aaaa", "aa"],
+            expected: .success(["", "", ""])
         ),
     ]
 
@@ -430,58 +430,58 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "base",
             name: "trim",
-            args: [.string("    lorem ipsum        "), .string("     ")],
-            expected: .success(.string("lorem ipsum"))
+            args: ["    lorem ipsum        ", "     "],
+            expected: .success("lorem ipsum")
         ),
         BuiltinTests.TestCase(
             description: "cutset empty",
             name: "trim",
-            args: [.string("    lorem ipsum    "), .string("")],
-            expected: .success(.string("    lorem ipsum    "))
+            args: ["    lorem ipsum    ", ""],
+            expected: .success("    lorem ipsum    ")
         ),
         BuiltinTests.TestCase(
             description: "non-whitespace",
             name: "trim",
-            args: [.string("01234number 1!43210"), .string("0123456789")],
-            expected: .success(.string("number 1!"))
+            args: ["01234number 1!43210", "0123456789"],
+            expected: .success("number 1!")
         ),
         BuiltinTests.TestCase(
             description: "value empty",
             name: "trim",
-            args: [.string(""), .string("0123456789")],
-            expected: .success(.string(""))
+            args: ["", "0123456789"],
+            expected: .success("")
         ),
     ]
-    
+
     static let upperTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "base",
             name: "upper",
-            args: [.string("aAaAAaaAAAA A A a")],
-            expected: .success(.string("AAAAAAAAAAA A A A"))
+            args: ["aAaAAaaAAAA A A a"],
+            expected: .success("AAAAAAAAAAA A A A")
         ),
         BuiltinTests.TestCase(
             description: "empty string",
             name: "upper",
-            args: [.string("")],
-            expected: .success(.string(""))
+            args: [""],
+            expected: .success("")
         ),
         BuiltinTests.TestCase(
             description: "all lowercase",
             name: "upper",
-            args: [.string("aaaa")],
-            expected: .success(.string("AAAA"))
+            args: ["aaaa"],
+            expected: .success("AAAA")
         ),
         BuiltinTests.TestCase(
             description: "all uppercase",
             name: "upper",
-            args: [.string("AAAA")],
-            expected: .success(.string("AAAA"))
+            args: ["AAAA"],
+            expected: .success("AAAA")
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "upper",
-            args: [.string("hello, world!"), .string("world")],
+            args: ["hello, world!", "world"],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
         ),
         BuiltinTests.TestCase(
@@ -493,7 +493,7 @@ struct StringsTests {
         BuiltinTests.TestCase(
             description: "wrong type arg",
             name: "upper",
-            args: [.number(1)],
+            args: [1],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
         ),
     ]

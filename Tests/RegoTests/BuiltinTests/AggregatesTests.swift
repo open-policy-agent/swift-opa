@@ -10,50 +10,54 @@ struct AggregatesTests {
         BuiltinTests.TestCase(
             description: "string count",
             name: "count",
-            args: [.string("abc")],
-            expected: .success(.number(3))
+            args: ["abc"],
+            expected: .success(3)
         ),
         BuiltinTests.TestCase(
             description: "string empty",
             name: "count",
-            args: [.string("")],
-            expected: .success(.number(0))
+            args: [""],
+            expected: .success(0)
         ),
         BuiltinTests.TestCase(
             description: "array count",
             name: "count",
-            args: [.array([.number(1), .number(2), .number(3)])],
-            expected: .success(.number(3))
+            args: [[1, 2, 3]],
+            expected: .success(3)
         ),
         BuiltinTests.TestCase(
             description: "array empty",
             name: "count",
-            args: [.array([])],
-            expected: .success(.number(0))
+            args: [[]],
+            expected: .success(0)
         ),
         BuiltinTests.TestCase(
             description: "set count",
             name: "count",
-            args: [.set([.number(1), .number(2), .number(3)])],
-            expected: .success(.number(3))
+            args: [.set([1, 2, 3])],
+            expected: .success(3)
         ),
         BuiltinTests.TestCase(
             description: "set empty",
             name: "count",
             args: [.set([])],
-            expected: .success(.number(0))
+            expected: .success(0)
         ),
         BuiltinTests.TestCase(
             description: "object count",
             name: "count",
-            args: [.object([.string("a"): .number(1), .string("b"): .number(2), .string("c"): .number(3)])],
-            expected: .success(.number(3))
+            args: [
+                ["a": 1, "b": 2, "c": 3]
+            ],
+            expected: .success(3)
         ),
         BuiltinTests.TestCase(
             description: "object empty",
             name: "count",
-            args: [.object([:])],
-            expected: .success(.number(0))
+            args: [
+                [:]
+            ],
+            expected: .success(0)
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
@@ -64,13 +68,13 @@ struct AggregatesTests {
         BuiltinTests.TestCase(
             description: "too many args",
             name: "count",
-            args: [.string("abc"), .array([.number(1), .number(2), .number(3)])],
+            args: ["abc", [1, 2, 3]],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 1))
         ),
         BuiltinTests.TestCase(
             description: "wrong arg type",
             name: "count",
-            args: [.number(1)],
+            args: [1],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "a"))
         ),
     ]

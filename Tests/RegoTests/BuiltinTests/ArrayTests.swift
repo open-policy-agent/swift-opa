@@ -11,66 +11,53 @@ struct ArrayTests {
             description: "simple concat",
             name: "array.concat",
             args: [
-                .array([.string("a"), .string("b")]),
-                .array([.string("c"), .string("d")]),
+                ["a", "b"],
+                ["c", "d"],
             ],
-            expected: .success(
-                .array([
-                    .string("a"), .string("b"), .string("c"), .string("d"),
-                ]))
+            expected: .success(["a", "b", "c", "d"])
         ),
         BuiltinTests.TestCase(
             description: "lhs empty",
             name: "array.concat",
             args: [
-                .array([]),
-                .array([.string("c"), .string("d")]),
+                [],
+                ["c", "d"],
             ],
-            expected: .success(
-                .array([
-                    .string("c"), .string("d"),
-                ]))
+            expected: .success(["c", "d"])
         ),
         BuiltinTests.TestCase(
             description: "rhs empty",
             name: "array.concat",
             args: [
-                .array([.string("a"), .string("b")]),
-                .array([]),
+                ["a", "b"],
+                [],
             ],
-            expected: .success(
-                .array([
-                    .string("a"), .string("b"),
-                ]))
+            expected: .success(["a", "b"])
         ),
         BuiltinTests.TestCase(
             description: "both empty",
             name: "array.concat",
             args: [
-                .array([]),
-                .array([]),
+                [],
+                [],
             ],
-            expected: .success(.array([]))
+            expected: .success([])
         ),
         BuiltinTests.TestCase(
             description: "mixed types",
             name: "array.concat",
             args: [
-                .array([.string("a"), .string("b")]),
-                .array([.number(1), .number(2)]),
+                ["a", "b"],
+                [1, 2],
             ],
-            expected: .success(
-                .array([
-                    .string("a"), .string("b"),
-                    .number(1), .number(2),
-                ]))
+            expected: .success(["a", "b", 1, 2])
         ),
         BuiltinTests.TestCase(
             description: "lhs null (fail)",
             name: "array.concat",
             args: [
                 .null,
-                .array([.string("c"), .string("d")]),
+                ["c", "d"],
             ],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
         ),

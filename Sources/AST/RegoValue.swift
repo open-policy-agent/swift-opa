@@ -17,13 +17,6 @@ public enum RegoValue: Sendable, Hashable {
         case unsupportedType(Any.Type)
     }
 
-    public init(_ obj: [String: RegoValue]) {
-        let d: [RegoValue: RegoValue] = obj.reduce(into: [:]) { m, elem in
-            m[.string(elem.key)] = elem.value
-        }
-        self = .object(d)
-    }
-
     public func isUndefined() -> Bool {
         guard case .undefined = self else {
             return false

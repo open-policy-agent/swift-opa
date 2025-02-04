@@ -35,7 +35,8 @@ func testJsonToRegoValues() throws {
           }
         """#
 
-    let d = try JSONSerialization.jsonObject(with: input.data(using: .utf8)!)
+    let inputData = input.data(using: .utf8)!
+    let d = try JSONSerialization.jsonObject(with: inputData)
     let val = try AST.RegoValue(from: d)
 
     let expected = AST.RegoValue([
@@ -65,7 +66,12 @@ func testJsonToRegoValues() throws {
             ]),
         ])
     ])
-    #expect(expected == val)
+    #expect(expected == val, "comparing JSONSerializer output")
+
+    // Neat, try Codable as well
+    let decoder = JSONDecoder()
+    let parsed = try decoder.decode(AST.RegoValue.self, from: inputData)
+    #expect(expected == parsed, "comparing Decodable output")
 }
 
 @Test

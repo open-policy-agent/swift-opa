@@ -418,6 +418,12 @@ struct ArithmeticTests {
             expected: .success(0)
         ),
         BuiltinTests.TestCase(
+            description: "divide by 0",
+            name: "rem",
+            args: [3, 0],
+            expected: .success(.undefined)
+        ),
+        BuiltinTests.TestCase(
             description: "not enough args",
             name: "rem",
             args: [1],

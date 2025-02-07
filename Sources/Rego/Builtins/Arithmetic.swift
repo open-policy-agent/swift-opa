@@ -61,6 +61,7 @@ extension BuiltinFuncs {
         return .number(NSDecimalNumber(decimal: x.decimalValue * y.decimalValue))
     }
 
+    // Divides the first number by the second number.
     static func div(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
@@ -74,6 +75,7 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "y")
         }
 
+        // No divide-by-zero
         guard y.decimalValue != 0 else {
             return .undefined
         }
@@ -141,6 +143,7 @@ extension BuiltinFuncs {
         return .number(NSDecimalNumber(decimal: x.decimalValue.magnitude))
     }
 
+    // Returns the remainder for of `x` divided by `y`, for `y != 0`.
     static func rem(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
@@ -156,6 +159,11 @@ extension BuiltinFuncs {
 
         // Matching upstream behavior
         guard let x = args[0].integerValue, let y = args[1].integerValue else {
+            return .undefined
+        }
+
+        // No divide-by-zero
+        guard y != 0 else {
             return .undefined
         }
 

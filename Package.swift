@@ -3,6 +3,8 @@
 
 import PackageDescription
 
+import class Foundation.ProcessInfo
+
 let package = Package(
     name: "SwiftRego",
     platforms: [
@@ -19,8 +21,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
-        .package(url: "https://github.com/ordo-one/package-benchmark", .upToNextMajor(from: "1.4.0")),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -64,6 +65,16 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
+    ]
+)
+
+// Workaround to jemalloc build failures in Xcode - we'll need to explicitly
+// enable benchmarks with OPA_BENCHMARK=enabled from CLI to use.
+if ProcessInfo.processInfo.environment["OPA_BENCHMARK"] != nil {
+    package.dependencies += [
+        .package(url: "https://github.com/ordo-one/package-benchmark", .upToNextMajor(from: "1.4.0"))
+    ]
+    package.targets += [
         .executableTarget(
             name: "RegoBenchmarks",
             dependencies: [
@@ -75,6 +86,6 @@ let package = Package(
             plugins: [
                 .plugin(name: "BenchmarkPlugin", package: "package-benchmark")
             ]
-        ),
+        )
     ]
-)
+}

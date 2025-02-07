@@ -19,4 +19,8 @@ build:
 
 .PHONY: bench
 bench:
-	swift package benchmark
+	OPA_BENCHMARK=enabled swift package benchmark
+
+.PHONY: clean
+clean:
+	rm -rf .build

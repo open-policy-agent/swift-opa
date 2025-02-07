@@ -16,3 +16,7 @@ test:
 .PHONY: build
 build:
 	swift build
+
+.PHONY: bench
+bench:
+	swift package benchmark

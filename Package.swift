@@ -19,7 +19,8 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0")
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
+        .package(url: "https://github.com/ordo-one/package-benchmark", .upToNextMajor(from: "1.4.0")),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -61,6 +62,18 @@ let package = Package(
             dependencies: [
                 "Rego",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+            ]
+        ),
+        .executableTarget(
+            name: "RegoBenchmarks",
+            dependencies: [
+                "AST",
+                .product(name: "Benchmark", package: "package-benchmark"),
+            ],
+            path: "Benchmarks/RegoBenchmarks",
+            resources: [.copy("TestData")],
+            plugins: [
+                .plugin(name: "BenchmarkPlugin", package: "package-benchmark")
             ]
         ),
     ]

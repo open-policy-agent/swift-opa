@@ -81,7 +81,7 @@ public struct BlockStatement: Statement, Codable, Equatable {
         case blocks
     }
 
-    public var blocks: [Block]
+    public var blocks: [Block]?
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -133,7 +133,7 @@ public struct CallStatement: Statement, Codable, Equatable {
     public var location: Location = Location()
 
     public var callFunc: String = ""
-    public var args: [Operand] = []
+    public var args: [Operand]? = []
     public var result: Local = 0
 
     enum CodingKeys: String, CodingKey {

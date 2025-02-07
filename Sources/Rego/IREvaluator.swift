@@ -23,6 +23,11 @@ internal struct IREvaluator {
             }
         }
     }
+
+    // Initialize directly with parsed policies - useful for testing
+    init(withPolicies: [IR.Policy]) {
+        self.policies = withPolicies.map { IndexedIRPolicy(policy: $0) }
+    }
 }
 
 extension IREvaluator: Evaluator {
@@ -414,9 +419,14 @@ private func evalFrame(
                 try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
 
             case let stmt as IR.BlockStatement:
+                guard let blocks = stmt.blocks else {
+                    // Some plans emit null blocks for some reason
+                    // Just skip this statement
+                    break
+                }
                 currentScopePtr = framePtr.v.pushScope(
                     withCtx: ctx,
-                    blocks: stmt.blocks,
+                    blocks: blocks,
                     locals: currentScopePtr.v.locals
                 )
                 continue blockLoop
@@ -474,7 +484,7 @@ private func evalFrame(
                     ctx: ctx,
                     frame: framePtr,
                     funcName: stmt.callFunc,
-                    args: stmt.args
+                    args: stmt.args ?? []
                 )
 
                 guard result != .undefined else {

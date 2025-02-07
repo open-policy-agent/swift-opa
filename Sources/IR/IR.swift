@@ -264,7 +264,7 @@ extension Statement {
 }
 
 public struct Funcs: Codable, Equatable, Sendable {
-    public var funcs: [Func] = []
+    public var funcs: [Func]? = []
 }
 
 public struct Func: Codable, Equatable, Sendable {

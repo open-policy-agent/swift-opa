@@ -20,7 +20,7 @@ func complianceEnabled() -> Bool {
 // https://github.com/open-policy-agent/opa/tree/main/v1/test/cases/testdata/v1
 // https://github.com/open-policy-agent/opa/tree/97b8572fdc79f6fb433c53aaa013a586dd476615/v1/test/cases/testdata/v1
 
-@Suite("Compliance Tests", .tags(.compliance), .enabled(if: complianceEnabled()))
+@Suite("Compliance Tests", .tags(.compliance), .enabled(if: complianceEnabled()), .serialized)
 struct ComplianceTests {
     // testFilter is an environment-variable based mechanism for running only
     // conformance tests from files matching the filter.
@@ -117,11 +117,11 @@ struct ComplianceTests {
         var note: String  // globally unique identifier for this test case
         var query: String = ""  // policy query to execute
         var modules: [String]?  // policies to test against
-        var data: AST.RegoValue = .object([:])  // data to test against
-        var input: AST.RegoValue = .object([:])  // parsed input data to use
+        var data: AST.RegoValue? = .object([:])  // data to test against
+        var input: AST.RegoValue? = .object([:])  // parsed input data to use
         var inputTerm: String?  // raw input data (serialized as a string, overrides input)
         var wantDefined: Bool? = false  // expect query result to be defined (or not)
-        var wantResult: AST.RegoValue = .object([:])  // expect query result (overrides defined)
+        var wantResult: AST.RegoValue? = .object([:])  // expect query result (overrides defined)
         var wantErrorCode: String?  // expect query error code (overrides result)
         var wantError: String?  // expect query error message (overrides error code)
         var sortBindings: Bool? = false  // indicates that binding values should be treated as sets
@@ -132,25 +132,33 @@ struct ComplianceTests {
         var wantPlanResult: AST.RegoValue = .object([:])
 
         enum CodingKeys: String, CodingKey {
-            case note
-            case modules
-            case inputTerm
-            case wantDefined
-            case wantErrorCode
-            case wantError
-            case sortBindings
-            case strictError
+            case note = "note"
+            case modules = "modules"
+            case data = "data"
+            case input = "input"
+            case inputTerm = "input_term"
+            case wantDefined = "want_defined"
+            case wantResult = "want_result"
+            case wantErrorCode = "want_error_code"
+            case wantError = "want_error"
+            case sortBindings = "sort_bindings"
+            case strictError = "strict_error"
 
-            case plan
-            case entrypoints
+            case plan = "plan"
+            case entrypoints = "entrypoints"
+            case wantPlanResult = "want_plan_result"
+        }
+
+        enum Error: Swift.Error {
+            case decodingFailed(filename: String, error: Swift.Error)
         }
     }
 
-    @Test(arguments: try allCases /*.lazy.prefix(10)*/)
+    @Test(arguments: try allCases)
     func testCompliance(tc: TestCase) async throws {
         let store = InMemoryStore(
             initialData: .object([
-                .string("data"): tc.data
+                .string("data"): tc.data ?? [:]
             ]))
         let engine = Engine(withPolicies: [tc.plan], andStore: store)
 
@@ -162,51 +170,50 @@ struct ComplianceTests {
         let queries = tc.entrypoints?.map(entrypointToQuery) ?? []
 
         queryLoop: for query in queries {
-            let wantError = (tc.wantError != nil) || (tc.wantErrorCode != nil)
+            print("\t🧬executing \(tc.testDescription) (\(query))")
 
-            var resultSet: ResultSet
-            if wantError {
-                let wantErrorMsg = "expected error \(tc.wantError ?? "") / \(tc.wantErrorCode ?? "")"
-
-                do {
-                    try await #require(throws: (any Swift.Error).self, "\(wantErrorMsg)") {
-                        let _ = try await engine.evaluate(query: query, input: tc.input)
-                    }
-                } catch {
-                    print("\t❌ \(tc.testDescription) (\(query))")
-                    continue queryLoop
-                }
-                // TODO does wantError apply to all entrypoints in the tests?
-                continue queryLoop
-            } else {
-                resultSet = try await engine.evaluate(query: query, input: tc.input)
-            }
-
-            // Aggregate the result sets
-            try #require(resultSet.count == 1, "expected single result")
-            let resultObj: AST.RegoValue = resultSet.first!
-            guard case .object(let result) = resultObj else {
-                throw Error.testFailed(reason: "unexpected result type \(resultObj)")
-            }
-            let innerResult = result[.string("result")] ?? .object([:])
-            let translated = translateSetsToArrays(innerResult)  // translate away any sets so we can compare below
-
-            // The test generator (https://github.com/borgeby/opa-compliance-test) will encode each
-            // entrypoint expected output into wantPlanResult, transorming the entrypoint to an underscore-delimited key,
-            // e.g. opa/example -> data_opa_example
-            let key = queryToResultsKey(query)
-
-            guard case .object(let wantPlanResult) = tc.wantPlanResult else {
-                throw Error.testFailed(reason: "unexpected wantPlanResult type \(tc.wantPlanResult)")
-            }
-
-            let expected = wantPlanResult[.string(key)]
+            let input = tc.input ?? [:]
 
             do {
+                let wantError = (tc.wantError != nil) || (tc.wantErrorCode != nil)
+
+                var resultSet: ResultSet
+                if wantError {
+                    let wantErrorMsg = "expected error \(tc.wantError ?? "") / \(tc.wantErrorCode ?? "")"
+
+                    try await #require(throws: (any Swift.Error).self, "\(wantErrorMsg)") {
+                        let _ = try await engine.evaluate(query: query, input: input)
+                    }
+                    // TODO does wantError apply to all entrypoints in the tests?
+                    continue queryLoop
+                } else {
+                    resultSet = try await engine.evaluate(query: query, input: input)
+                }
+
+                // Aggregate the result sets
+                try #require(resultSet.count == 1, "expected single result")
+                let resultObj: AST.RegoValue = resultSet.first!
+                guard case .object(let result) = resultObj else {
+                    throw Error.testFailed(reason: "unexpected result type \(resultObj)")
+                }
+                let innerResult = result[.string("result")] ?? .object([:])
+                let translated = translateSetsToArrays(innerResult)  // translate away any sets so we can compare below
+
+                // The test generator (https://github.com/borgeby/opa-compliance-test) will encode each
+                // entrypoint expected output into wantPlanResult, transorming the entrypoint to an underscore-delimited key,
+                // e.g. opa/example -> data_opa_example
+                let key = queryToResultsKey(query)
+
+                guard case .object(let wantPlanResult) = tc.wantPlanResult else {
+                    throw Error.testFailed(reason: "unexpected wantPlanResult type \(tc.wantPlanResult)")
+                }
+
+                let expected = wantPlanResult[.string(key)]
+
                 try #require(translated == expected, "comparing results for \(query)")
             } catch {
                 print("\t❌ \(tc.testDescription) (\(query))")
-                continue queryLoop
+                throw error
             }
             print("\t✅ \(tc.testDescription) (\(query))")
         }
@@ -253,71 +260,14 @@ struct ComplianceTests {
     }
 }
 
+// Decoding helpers for ComplianceTests.TestCases
 extension ComplianceTests.TestCases {
     init(from data: Data, withURL url: URL) throws {
-        var cases: [ComplianceTests.TestCase] = []
-
-        // We need to round-trip each case to access its Raw representation
-        let d = try JSONSerialization.jsonObject(with: data, options: [])
-        guard let jsonDict = d as? [String: Any] else {
-            throw DecodingError.typeMismatch(
-                [String: Any].self,
-                DecodingError.Context(codingPath: [], debugDescription: "Invalid JSON format")
-            )
-        }
-
-        let casesArray = jsonDict["cases"] as? [Any]
-        guard let casesArray else {
-            throw DecodingError.typeMismatch(
-                [Any].self,
-                DecodingError.Context(codingPath: [], debugDescription: "expected 'cases' array")
-            )
-        }
-
-        for c in casesArray {
-            // *sigh* round-trip back to Data
-            let caseData = try JSONSerialization.data(withJSONObject: c, options: [])
-
-            let tc = try ComplianceTests.TestCase(from: caseData)
-            cases.append(tc)
-        }
+        self = try JSONDecoder().decode(Self.self, from: data)
 
         // Use last two path components as the filename
         self.filename = url.pathComponents.suffix(from: url.pathComponents.endIndex.advanced(by: -2)).joined(
             separator: "/")
-        self.cases = cases
-    }
-}
-
-// Decoding initializers for ComplianceTests.TestCase
-extension ComplianceTests.TestCase {
-    init(from data: Data) throws {
-        // Multi-phase decoding
-        self = try JSONDecoder().decode(Self.self, from: data)
-
-        let d = try JSONSerialization.jsonObject(with: data, options: [])
-
-        guard let jsonDict = d as? [String: Any] else {
-            throw DecodingError.typeMismatch(
-                [String: Any].self,
-                DecodingError.Context(codingPath: [], debugDescription: "Invalid JSON format"))
-        }
-
-        if let dataTree = jsonDict["data"] {
-            self.data = try AST.RegoValue(from: dataTree)
-        }
-
-        if let inputTree = jsonDict["input"] {
-            self.input = try AST.RegoValue(from: inputTree)
-        }
-
-        if let wantPlanResult = jsonDict["want_plan_result"] {
-            self.wantPlanResult = try AST.RegoValue(from: wantPlanResult)
-        }
-    }
-
-    enum Error: Swift.Error {
-        case decodingFailed(filename: String, error: Swift.Error)
     }
 }
 

@@ -1,0 +1,161 @@
+import AST
+import Foundation
+import Testing
+
+@testable import Rego
+
+@Suite("BuiltinTests - Types")
+struct TypesTests {
+    static var allTests: [BuiltinTests.TestCase] {
+        [
+            generate(
+                name: "is_array",
+                expectedResults: [
+                    "array argument": true,
+                    "empty array argument": true,
+                ]),
+            generate(
+                name: "is_boolean",
+                expectedResults: [
+                    "boolean true argument": true,
+                    "boolean false argument": true,
+                ]),
+            generate(
+                name: "is_null",
+                expectedResults: [
+                    "null argument": true,
+                    "null argument expressed as nil": true,
+                ]),
+            generate(
+                name: "is_number",
+                expectedResults: [
+                    "integer argument": true,
+                    "float argument": true,
+                ]),
+            generate(
+                name: "is_object",
+                expectedResults: [
+                    "object argument": true,
+                    "empty object argument": true,
+                ]),
+            generate(
+                name: "is_set",
+                expectedResults: [
+                    "set argument": true,
+                    "empty set argument": true,
+                ]),
+            generate(
+                name: "is_string",
+                expectedResults: [
+                    "string argument": true,
+                    "empty string argument": true,
+                ]),
+        ].flatMap { $0 }
+    }
+
+    @Test(arguments: allTests)
+    func testBuiltins(tc: BuiltinTests.TestCase) async throws {
+        try await BuiltinTests.testBuiltin(tc: tc)
+    }
+
+    // For all types tests, we will generate standard list of named tests plus two failure tests,
+    // covering arguments size checks.
+    // Note that failure tests are the same and expected result is hardcoded here.
+    // To configure which tests should return true, we will provide expectedResults map that contains
+    // test names to boolean value entries.
+    // Name argument is expected to match the builtin's name.
+    static func generate(name: String, expectedResults: [String: Bool]) -> [BuiltinTests.TestCase] {
+        return [
+            BuiltinTests.TestCase(
+                description: "wrong number of arguments (too few)",
+                name: name,
+                args: [],
+                expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 1))
+            ),
+            BuiltinTests.TestCase(
+                description: "wrong number of arguments (too many)",
+                name: name,
+                args: [1, 2, 3],
+                expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 1))
+            ),
+            BuiltinTests.TestCase(
+                description: "boolean true argument",
+                name: name,
+                args: [true],
+                expected: .success(.boolean(expectedResults["boolean true argument"] ?? false))
+            ),
+            BuiltinTests.TestCase(
+                description: "boolean false argument",
+                name: name,
+                args: [true],
+                expected: .success(.boolean(expectedResults["boolean false argument"] ?? false))
+            ),
+            BuiltinTests.TestCase(
+                description: "null argument",
+                name: name,
+                args: [.null],
+                expected: .success(.boolean(expectedResults["null argument"] ?? false))
+            ),
+            BuiltinTests.TestCase(
+                description: "null argument expressed as nil",
+                name: name,
+                args: [nil],
+                expected: .success(.boolean(expectedResults["null argument expressed as nil"] ?? false))
+            ),
+            BuiltinTests.TestCase(
+                description: "integer argument",
+                name: name,
+                args: [1],
+                expected: .success(.boolean(expectedResults["integer argument"] ?? false))
+            ),
+            BuiltinTests.TestCase(
+                description: "float argument",
+                name: name,
+                args: [-2.71828],
+                expected: .success(.boolean(expectedResults["float argument"] ?? false))
+            ),
+            BuiltinTests.TestCase(
+                description: "string argument",
+                name: name,
+                args: ["123"],
+                expected: .success(.boolean(expectedResults["string argument"] ?? false))
+            ),
+            BuiltinTests.TestCase(
+                description: "empty string argument",
+                name: name,
+                args: [""],
+                expected: .success(.boolean(expectedResults["empty string argument"] ?? false))
+            ),
+            BuiltinTests.TestCase(
+                description: "set argument",
+                name: name,
+                args: [.set([1])],
+                expected: .success(.boolean(expectedResults["set argument"] ?? false))
+            ),
+            BuiltinTests.TestCase(
+                description: "empty set argument",
+                name: name,
+                args: [.set([])],
+                expected: .success(.boolean(expectedResults["empty set argument"] ?? false))
+            ),
+            BuiltinTests.TestCase(
+                description: "object argument",
+                name: name,
+                args: [["a": 123]],
+                expected: .success(.boolean(expectedResults["object argument"] ?? false))
+            ),
+            BuiltinTests.TestCase(
+                description: "empty object argument",
+                name: name,
+                args: [[:]],
+                expected: .success(.boolean(expectedResults["empty object argument"] ?? false))
+            ),
+            BuiltinTests.TestCase(
+                description: "undefined argument",
+                name: name,
+                args: [.undefined],
+                expected: .success(.boolean(expectedResults["undefined argument"] ?? false))
+            ),
+        ]
+    }
+}

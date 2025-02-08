@@ -71,6 +71,15 @@ public struct BuiltinRegistry {
 
             // Trace
             "trace": BuiltinFuncs.trace,
+
+            // Types
+            "is_array": BuiltinFuncs.isArray,
+            "is_boolean": BuiltinFuncs.isBoolean,
+            "is_null": BuiltinFuncs.isNull,
+            "is_number": BuiltinFuncs.isNumber,
+            "is_object": BuiltinFuncs.isObject,
+            "is_set": BuiltinFuncs.isSet,
+            "is_string": BuiltinFuncs.isString,
         ]
     }
 

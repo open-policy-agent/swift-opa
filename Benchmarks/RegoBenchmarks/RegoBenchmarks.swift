@@ -1,12 +1,12 @@
+import AST
 import Benchmark
 import Foundation
-import AST
 
 struct InMemFile: Sendable, Hashable, Comparable {
     static func < (lhs: InMemFile, rhs: InMemFile) -> Bool {
         return lhs.url.path < rhs.url.path
     }
-    
+
     let url: URL
     let data: Data
 }
@@ -16,7 +16,7 @@ func loadJsonFixtures() throws -> [InMemFile] {
         forResourcesWithExtension: "json",
         subdirectory: "TestData"
     )!
-    
+
     var out: [InMemFile] = []
     for url in files {
         let d = try Data(contentsOf: url)
@@ -41,7 +41,7 @@ nonisolated(unsafe) let benchmarks = {
         } setup: {
             return f
         }
-        
+
         Benchmark("JSONSerialize deserialize \(f.url.lastPathComponent)") { benchmark, setupState in
             for _ in benchmark.scaledIterations {
                 blackHole(
@@ -52,6 +52,6 @@ nonisolated(unsafe) let benchmarks = {
             return f
         }
     }
-    
+
     // Add additional benchmarks here
 }

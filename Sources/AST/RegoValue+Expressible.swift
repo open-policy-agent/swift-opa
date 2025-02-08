@@ -43,3 +43,9 @@ extension RegoValue: ExpressibleByBooleanLiteral {
         self = .boolean(value)
     }
 }
+
+extension RegoValue: ExpressibleByNilLiteral {
+    public init(nilLiteral: ()) {
+        self = .null
+    }
+}

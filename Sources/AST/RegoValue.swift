@@ -54,9 +54,31 @@ public enum RegoValue: Sendable, Hashable {
         // to detect truncation of the number when its an Integer
         let fractionalRemainder = decimalValue - Decimal(integerValue)
         guard fractionalRemainder == Decimal(0) else {
+            // It's probably a float
             return nil
         }
         return integerValue
+    }
+
+    public var typeName: String {
+        switch self {
+        case .array(_):
+            return "array"
+        case .boolean(_):
+            return "boolean"
+        case .null:
+            return "null"
+        case .number(_):
+            return "number"
+        case .object(_):
+            return "object"
+        case .set(_):
+            return "set"
+        case .string(_):
+            return "string"
+        case .undefined:
+            return "undefined"
+        }
     }
 }
 

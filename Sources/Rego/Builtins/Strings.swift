@@ -8,7 +8,7 @@ extension BuiltinFuncs {
         }
 
         guard case .string(let delimiter) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "delimiter")
+            throw BuiltinError.argumentTypeMismatch(arg: "delimiter", got: args[0].typeName, want: "string")
         }
 
         switch args[1] {
@@ -16,7 +16,8 @@ extension BuiltinFuncs {
             return try .string(
                 a.map {
                     guard case .string(let s) = $0 else {
-                        throw BuiltinError.argumentTypeMismatch(arg: "collection element: \($0)")
+                        throw BuiltinError.argumentTypeMismatch(
+                            arg: "collection element: \($0)", got: $0.typeName, want: "string")
                     }
                     return s
                 }.joined(separator: String(delimiter)))
@@ -24,12 +25,13 @@ extension BuiltinFuncs {
             return try .string(
                 s.sorted().map {
                     guard case .string(let s) = $0 else {
-                        throw BuiltinError.argumentTypeMismatch(arg: "collection element: \($0)")
+                        throw BuiltinError.argumentTypeMismatch(
+                            arg: "collection element: \($0)", got: $0.typeName, want: "string")
                     }
                     return s
                 }.joined(separator: String(delimiter)))
         default:
-            throw BuiltinError.argumentTypeMismatch(arg: "collection")
+            throw BuiltinError.argumentTypeMismatch(arg: "collection", got: args[1].typeName, want: "array|set")
         }
     }
 
@@ -39,11 +41,11 @@ extension BuiltinFuncs {
         }
 
         guard case .string(let haystack) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "haystack")
+            throw BuiltinError.argumentTypeMismatch(arg: "haystack", got: args[0].typeName, want: "string")
         }
 
         guard case .string(let needle) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "needle")
+            throw BuiltinError.argumentTypeMismatch(arg: "needle", got: args[1].typeName, want: "string")
         }
 
         // Special logic to mimic the Go strings.Contains() behavior for empty strings..
@@ -59,11 +61,11 @@ extension BuiltinFuncs {
         }
 
         guard case .string(let search) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "search")
+            throw BuiltinError.argumentTypeMismatch(arg: "search", got: args[0].typeName, want: "string")
         }
 
         guard case .string(let base) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "base")
+            throw BuiltinError.argumentTypeMismatch(arg: "base", got: args[1].typeName, want: "string")
         }
 
         return .boolean(search.hasSuffix(base))
@@ -75,11 +77,11 @@ extension BuiltinFuncs {
         }
 
         guard case .string(let haystack) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "haystack")
+            throw BuiltinError.argumentTypeMismatch(arg: "haystack", got: args[0].typeName, want: "string")
         }
 
         guard case .string(let needle) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "needle")
+            throw BuiltinError.argumentTypeMismatch(arg: "needle", got: args[1].typeName, want: "string")
         }
 
         // Special case to behave like the Go version does
@@ -100,7 +102,7 @@ extension BuiltinFuncs {
         }
 
         guard case .string(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
         }
 
         return .string(x.lowercased())
@@ -113,11 +115,11 @@ extension BuiltinFuncs {
         }
 
         guard case .string(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
         }
 
         guard case .string(let delimiter) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "delimiter")
+            throw BuiltinError.argumentTypeMismatch(arg: "delimiter", got: args[1].typeName, want: "string")
         }
 
         // If sep is empty, Split splits after each UTF-8 sequence
@@ -138,11 +140,11 @@ extension BuiltinFuncs {
         }
 
         guard case .string(let value) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "value")
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[0].typeName, want: "string")
         }
 
         guard case .string(let cutset) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "cutset")
+            throw BuiltinError.argumentTypeMismatch(arg: "cutset", got: args[1].typeName, want: "string")
         }
 
         let trimmedValue = value.trimmingCharacters(in: CharacterSet(charactersIn: cutset))
@@ -155,7 +157,7 @@ extension BuiltinFuncs {
         }
 
         guard case .string(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
         }
 
         return .string(x.uppercased())

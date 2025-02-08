@@ -14,11 +14,11 @@ extension BuiltinFuncs {
         }
 
         guard case .number(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "number")
         }
 
         guard case .number(let y) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "y")
+            throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "number")
         }
 
         return .number(NSDecimalNumber(decimal: x.decimalValue + y.decimalValue))
@@ -32,16 +32,16 @@ extension BuiltinFuncs {
         switch args[0] {
         case .number(let x):
             guard case .number(let y) = args[1] else {
-                throw BuiltinError.argumentTypeMismatch(arg: "y")
+                throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "number")
             }
             return .number(NSDecimalNumber(decimal: x.decimalValue - y.decimalValue))
         case .set(let x):
             guard case .set(let y) = args[1] else {
-                throw BuiltinError.argumentTypeMismatch(arg: "y")
+                throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "set")
             }
             return .set(x.subtracting(y))
         default:
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "number|set")
         }
     }
 
@@ -51,11 +51,11 @@ extension BuiltinFuncs {
         }
 
         guard case .number(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "number")
         }
 
         guard case .number(let y) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "y")
+            throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "number")
         }
 
         return .number(NSDecimalNumber(decimal: x.decimalValue * y.decimalValue))
@@ -68,11 +68,11 @@ extension BuiltinFuncs {
         }
 
         guard case .number(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "number")
         }
 
         guard case .number(let y) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "y")
+            throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "number")
         }
 
         // No divide-by-zero
@@ -89,7 +89,7 @@ extension BuiltinFuncs {
         }
 
         guard case .number(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "number")
         }
 
         if args[0].integerValue != nil {
@@ -105,7 +105,7 @@ extension BuiltinFuncs {
         }
 
         guard case .number(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "number")
         }
 
         if args[0].integerValue != nil {
@@ -121,7 +121,7 @@ extension BuiltinFuncs {
         }
 
         guard case .number(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "number")
         }
 
         if args[0].integerValue != nil {
@@ -137,7 +137,7 @@ extension BuiltinFuncs {
         }
 
         guard case .number(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "number")
         }
 
         return .number(NSDecimalNumber(decimal: x.decimalValue.magnitude))
@@ -150,11 +150,11 @@ extension BuiltinFuncs {
         }
 
         guard case .number = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "number")
         }
 
         guard case .number = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "y")
+            throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "number")
         }
 
         // Matching upstream behavior

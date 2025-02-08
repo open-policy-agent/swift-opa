@@ -8,6 +8,6 @@ import Foundation
 enum BuiltinFuncs {
     enum BuiltinError: Error {
         case argumentCountMismatch(got: Int, expected: Int)
-        case argumentTypeMismatch(arg: String)
+        case argumentTypeMismatch(arg: String, got: String = "", want: String = "")
     }
 }

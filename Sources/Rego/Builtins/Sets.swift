@@ -8,23 +8,27 @@ extension BuiltinFuncs {
         }
 
         guard case .set(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "set")
         }
 
         guard case .set(let y) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "y")
+            throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "set")
         }
 
         return .set(x.intersection(y))
     }
 
+    // intersection returns the intersection of the given input sets
+    // args
+    // xs: set of sets to intersect
+    // returns: the intersection of all `xs` sets
     static func intersection(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
         }
 
         guard case .set(let inputSet) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "xs")
+            throw BuiltinError.argumentTypeMismatch(arg: "xs", got: args[0].typeName, want: "set")
         }
 
         guard !inputSet.isEmpty else {
@@ -32,9 +36,9 @@ extension BuiltinFuncs {
         }
 
         var result: Set<AST.RegoValue>? = nil
-        for x in inputSet {
+        for (i, x) in inputSet.enumerated() {
             guard case .set(let s) = x else {
-                throw BuiltinError.argumentTypeMismatch(arg: "xs")
+                throw BuiltinError.argumentTypeMismatch(arg: "xs[\(i)]", got: x.typeName, want: "set")
             }
             result = result?.intersection(s) ?? s
         }
@@ -52,23 +56,27 @@ extension BuiltinFuncs {
         }
 
         guard case .set(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x")
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "set")
         }
 
         guard case .set(let y) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "y")
+            throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "set")
         }
 
         return .set(x.union(y))
     }
 
+    // union returns the union of the given input sets
+    // args
+    // xs: set of sets to merge
+    // returns: the union of all `xs` sets
     static func union(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
         }
 
         guard case .set(let inputSet) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "xs")
+            throw BuiltinError.argumentTypeMismatch(arg: "xs", got: args[0].typeName, want: "set")
         }
 
         guard !inputSet.isEmpty else {
@@ -76,9 +84,9 @@ extension BuiltinFuncs {
         }
 
         var result: Set<AST.RegoValue>? = nil
-        for x in inputSet {
+        for (i, x) in inputSet.enumerated() {
             guard case .set(let s) = x else {
-                throw BuiltinError.argumentTypeMismatch(arg: "xs")
+                throw BuiltinError.argumentTypeMismatch(arg: "xs[\(i)]", got: x.typeName, want: "set")
             }
             result = result?.union(s) ?? s
         }

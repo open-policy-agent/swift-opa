@@ -2,6 +2,7 @@ import AST
 import Foundation
 
 extension BuiltinFuncs {
+    // internal.member_2
     // memberOf is a membership check - memberOf(x: any, y: any) checks if y in x
     // For objects, we are checking the values, not the keys.
     static func isMemberOf(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {

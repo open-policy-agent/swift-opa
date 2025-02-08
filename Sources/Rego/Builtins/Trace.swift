@@ -10,7 +10,7 @@ extension BuiltinFuncs {
         }
 
         guard case .string(let msg) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "note")
+            throw BuiltinError.argumentTypeMismatch(arg: "note", got: args[0].typeName, want: "string")
         }
 
         if let tracer = ctx.tracer {

@@ -9,7 +9,7 @@ extension BuiltinFuncs {
         }
 
         guard case .object(let object) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "object")
+            throw BuiltinError.argumentTypeMismatch(arg: "object", got: args[0].typeName, want: "object")
         }
 
         let key = args[1]
@@ -44,7 +44,7 @@ extension BuiltinFuncs {
         }
 
         guard case .object(let x) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "object")
+            throw BuiltinError.argumentTypeMismatch(arg: "object", got: args[0].typeName, want: "object")
         }
 
         return .set(Set(x.keys))

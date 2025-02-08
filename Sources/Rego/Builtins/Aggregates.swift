@@ -17,7 +17,7 @@ extension BuiltinFuncs {
         case .set(let s):
             return .number(NSNumber(value: s.count))
         default:
-            throw BuiltinError.argumentTypeMismatch(arg: "a")
+            throw BuiltinError.argumentTypeMismatch(arg: "a", got: args[0].typeName, want: "string|array|object|set")
         }
     }
 }

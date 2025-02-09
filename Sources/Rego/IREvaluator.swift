@@ -405,6 +405,10 @@ internal func evalFrame(
 
             case let stmt as IR.AssignVarOnceStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
+                guard sourceValue != .undefined else {
+                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
+                    break stmtLoop
+                }
                 let targetValue = framePtr.v.resolveLocal(idx: stmt.target)
 
                 // if the target value is already defined, and not the same value as the source,
@@ -416,6 +420,10 @@ internal func evalFrame(
 
             case let stmt as IR.AssignVarStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
+                guard sourceValue != .undefined else {
+                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
+                    break stmtLoop
+                }
                 try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
 
             case let stmt as IR.BlockStatement:
@@ -497,6 +505,12 @@ internal func evalFrame(
             case let stmt as IR.DotStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
                 let keyValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
+                
+                // If any input parameter is undefined then the statement is undefined
+                guard sourceValue != .undefined, keyValue != .undefined else {
+                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
+                    break stmtLoop
+                }
 
                 var targetValue: AST.RegoValue?
                 switch sourceValue {

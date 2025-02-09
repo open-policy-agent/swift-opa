@@ -16,6 +16,27 @@ public enum RegoValue: Sendable, Hashable {
         case unsupportedObjectElement
         case unsupportedType(Any.Type)
     }
+}
+
+// Helpers for working with RegoValues
+extension RegoValue {
+    // count returns the element count for the value
+    // if it is a collection type (array|object|set|string),
+    // otherwise it returns zero.
+    public var count: Int? {
+        switch self {
+        case .array(let a):
+            return a.count
+        case .object(let o):
+            return o.count
+        case .set(let s):
+            return s.count
+        case .string(let s):
+            return s.count
+        default:
+            return nil
+        }
+    }
 
     public func isUndefined() -> Bool {
         guard case .undefined = self else {
@@ -82,6 +103,8 @@ public enum RegoValue: Sendable, Hashable {
     }
 }
 
+// Helper for differentiating between an NSNumber which a boolean vs. a number.
+// We're trying to avoid confusing NSNumber(0) from false and NSNumber(1) from true.
 private let boolLiteral = NSNumber(booleanLiteral: true)
 extension NSNumber {
     var isBool: Bool {

@@ -571,18 +571,18 @@ internal func evalFrame(
 
             case let stmt as IR.LenStatement:
                 let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
-                guard case .undefined = sourceValue else {
+                guard sourceValue != .undefined else {
                     currentScopePtr.v.markBlockUndefined(withCtx: ctx)
                     break stmtLoop
                 }
-                var len: Int = 0
-                switch sourceValue {
-                case let c as any Collection:
-                    len = c.count
-                default:
-                    throw EvaluationError.invalidOperand(
-                        reason: "len source must be a collection, got \(type(of: sourceValue))")
+
+                guard let len = sourceValue.count else {
+                    throw EvaluationError.invalidDataType(
+                        reason:
+                            "LenStmt invalid on provided operand type. got: \(sourceValue.typeName), want: (array|object|string|set)"
+                    )
                 }
+
                 try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: len)))
 
             case let stmt as IR.MakeArrayStatement:

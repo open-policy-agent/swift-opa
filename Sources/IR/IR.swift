@@ -11,9 +11,6 @@ public struct Policy: Codable, Equatable, Sendable {
         self.funcs = funcs
     }
 
-    package init() {
-    }
-
     enum CodingKeys: String, CodingKey {
         case staticData = "static"
         case plans
@@ -26,6 +23,12 @@ public struct Static: Codable, Equatable, Sendable {
     public var builtinFuncs: [BuiltinFunc]?
     public var files: [ConstString]?
 
+    public init(strings: [ConstString]? = nil, builtinFuncs: [BuiltinFunc]? = nil, files: [ConstString]? = nil) {
+        self.strings = strings
+        self.builtinFuncs = builtinFuncs
+        self.files = files
+    }
+
     enum CodingKeys: String, CodingKey {
         case strings
         case builtinFuncs = "builtin_funcs"
@@ -35,6 +38,10 @@ public struct Static: Codable, Equatable, Sendable {
 
 public struct ConstString: Codable, Equatable, Sendable {
     public var value: String
+
+    public init(value: String) {
+        self.value = value
+    }
 }
 
 public struct Plans: Codable, Equatable, Sendable {

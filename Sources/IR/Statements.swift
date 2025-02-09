@@ -83,6 +83,10 @@ public struct BlockStatement: Statement, Codable, Equatable {
 
     public var blocks: [Block]?
 
+    public init(blocks: [Block]) {
+        self.blocks = blocks
+    }
+
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
@@ -288,6 +292,11 @@ public struct LenStatement: Statement, Codable, Equatable {
     public var source: Operand
     public var target: Local
 
+    public init(source: Operand, target: Local) {
+        self.source = source
+        self.target = target
+    }
+
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
@@ -379,6 +388,13 @@ public struct MakeObjectStatement: Statement, Codable, Equatable {
     }
 
     public var target: Local
+
+    public init(location: Location? = nil, target: Local) {
+        if let location {
+            self.location = location
+        }
+        self.target = target
+    }
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -499,6 +515,15 @@ public struct ObjectInsertStatement: Statement, Codable, Equatable {
     public var key: Operand
     public var value: Operand
     public var object: Local
+
+    public init(location: Location? = nil, key: Operand, value: Operand, object: Local) {
+        if let location {
+            self.location = location
+        }
+        self.key = key
+        self.value = value
+        self.object = object
+    }
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {

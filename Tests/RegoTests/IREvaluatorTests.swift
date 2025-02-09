@@ -203,18 +203,38 @@ struct IRStatementTests {
     func prepareFrame(forStatement stmt: any Statement, withLocals locals: Locals, andReturn returnIdx: Local? = nil)
         -> (IREvaluationContext, Ptr<Frame>)
     {
-        var blocks: [Block] = [
-            Block(statements: [stmt])
-        ]
+        var block = Block(statements: [stmt])
+
+        // Synthesize building a resultset with the specified local
         if let returnIdx {
-            blocks[0].statements.append(
-                IR.ResultSetAddStatement(value: returnIdx)
+            let wrappedIdx = Local(7777)
+            let returnBlock = Block(statements: [
+                IR.MakeObjectStatement(target: wrappedIdx),
+                IR.ObjectInsertStatement(
+                    key: IR.Operand(type: .stringIndex, value: .stringIndex(0)),  // "results"
+                    value: IR.Operand(type: .local, value: .localIndex(Int(returnIdx))),
+                    object: wrappedIdx
+                ),
+                IR.ResultSetAddStatement(value: wrappedIdx),
+            ])
+            block.statements.append(
+                IR.BlockStatement(blocks: [returnBlock])
             )
         }
 
-        let policy = IndexedIRPolicy(policy: IR.Policy())
+        let policy = IndexedIRPolicy(
+            policy: IR.Policy(
+                staticData: IR.Static(
+                    strings: [
+                        IR.ConstString(value: "results")
+                    ]
+                ),
+                plans: nil,
+                funcs: nil
+            ))
         let ctx = EvaluationContext(query: "", input: [:])
         let irCtx = IREvaluationContext(ctx: ctx, policy: policy)
+        let blocks = [block]
 
         return (
             irCtx,
@@ -223,8 +243,157 @@ struct IRStatementTests {
     }
 
     static let allTests: [TestCase] = [
-        objectInsertOnceStmtTests
+        lenStmtTests,
+        objectInsertOnceStmtTests,
     ].flatMap { $0 }
+
+    static let lenStmtTests: [TestCase] = [
+        TestCase(
+            description: "len of empty array is 0",
+            stmt: IR.LenStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                target: Local(3)
+            ),
+            locals: [
+                2: []
+            ],
+            returnIdx: Local(3),
+            expectLocals: [
+                3: 0
+            ]
+        ),
+        TestCase(
+            description: "len of non-empty array",
+            stmt: IR.LenStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                target: Local(3)
+            ),
+            locals: [
+                2: [1, 2, 3, 4, 5]
+            ],
+            returnIdx: Local(3),
+            expectLocals: [
+                3: 5
+            ]
+        ),
+        TestCase(
+            description: "len of empty set",
+            stmt: IR.LenStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                target: Local(3)
+            ),
+            locals: [
+                2: .set([])
+            ],
+            returnIdx: Local(3),
+            expectLocals: [
+                3: 0
+            ]
+        ),
+        TestCase(
+            description: "len of non-empty set",
+            stmt: IR.LenStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                target: Local(3)
+            ),
+            locals: [
+                2: .set([1, 2])
+            ],
+            returnIdx: Local(3),
+            expectLocals: [
+                3: 2
+            ]
+        ),
+        TestCase(
+            description: "len of empty string",
+            stmt: IR.LenStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                target: Local(3)
+            ),
+            locals: [
+                2: ""
+            ],
+            returnIdx: Local(3),
+            expectLocals: [
+                3: 0
+            ]
+        ),
+        TestCase(
+            description: "len of non-empty string",
+            stmt: IR.LenStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                target: Local(3)
+            ),
+            locals: [
+                2: "hello, world"
+            ],
+            returnIdx: Local(3),
+            expectLocals: [
+                3: 12
+            ]
+        ),
+        TestCase(
+            description: "len of empty object",
+            stmt: IR.LenStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                target: Local(3)
+            ),
+            locals: [
+                2: [:]
+            ],
+            returnIdx: Local(3),
+            expectLocals: [
+                3: 0
+            ]
+        ),
+        TestCase(
+            description: "len of non-empty object",
+            stmt: IR.LenStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                target: Local(3)
+            ),
+            locals: [
+                2: ["foo": "bar", "baz": "qux"]
+            ],
+            returnIdx: Local(3),
+            expectLocals: [
+                3: 2
+            ]
+        ),
+        TestCase(
+            description: "len of unsupported type - integer",
+            stmt: IR.LenStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                target: Local(3)
+            ),
+            locals: [
+                2: 42
+            ],
+            expectError: true
+        ),
+        TestCase(
+            description: "len of unsupported type - null",
+            stmt: IR.LenStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                target: Local(3)
+            ),
+            locals: [
+                2: .null
+            ],
+            expectError: true
+        ),
+        TestCase(
+            description: "len of undefined is undefined",
+            stmt: IR.LenStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                target: Local(3)
+            ),
+            locals: [
+                2: .undefined
+            ],
+            expectResult: .empty
+        ),
+    ]
 
     static let objectInsertOnceStmtTests: [TestCase] = [
         TestCase(
@@ -322,7 +491,7 @@ struct IRStatementTests {
     ]
 
     @Test(arguments: allTests)
-    func testStatmentEvaluation(tc: TestCase) async throws {
+    func testStatementEvaluation(tc: TestCase) async throws {
         // TODO - maybe add a ResultSetAdd always? and check for that?
         let (ctx, frame) = prepareFrame(forStatement: tc.stmt, withLocals: tc.locals, andReturn: tc.returnIdx)
         let result = await Result {
@@ -336,15 +505,15 @@ struct IRStatementTests {
             return
         }
 
-        #expect(throws: Never.self) {
-            try result.get()
-        }
-        let results = try! result.get()
+        // Unwrap, ensuring no error was thrown
+        let results = try result.get()
 
         // Check local expectations
         let scope = try frame.v.currentScope()
         let expectLocals = mergeLocals(tc.locals, tc.expectLocals)
-        #expect(scope.v.locals == expectLocals, "comparing locals")
+        var gotLocals = scope.v.locals
+        gotLocals.removeValue(forKey: Local(7777))  // Remove temporary local used for building ResultSet (see prepareFrame)
+        #expect(gotLocals == expectLocals, "comparing locals")
 
         // Check result expectations
         // If the test case doesn't explicitly say which results to expect, and
@@ -352,7 +521,9 @@ struct IRStatementTests {
         var expectResult: ResultSet
         if tc.expectResult == nil && tc.returnIdx != nil {
             expectResult = ResultSet()
-            expectResult.insert(frame.v.resolveLocal(idx: tc.returnIdx!))
+            expectResult.insert(
+                ["results": frame.v.resolveLocal(idx: tc.returnIdx!)]
+            )
         } else {
             expectResult = tc.expectResult ?? .empty
         }

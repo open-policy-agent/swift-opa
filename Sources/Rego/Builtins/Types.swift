@@ -81,4 +81,13 @@ extension BuiltinFuncs {
 
         return .boolean(true)
     }
+
+    static func typeName(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+        }
+
+        return .string(args[0].typeName)
+    }
+    
 }

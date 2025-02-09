@@ -111,7 +111,6 @@ func decodeIRStatements() throws {
                                             object: Local(4)
                                         ),
                                         ResultSetAddStatement(
-                                            location: Location(row: 0, col: 0, file: 0),
                                             value: Local(4)
                                         ),
                                     ]

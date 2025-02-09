@@ -15,7 +15,7 @@ test:
 
 .PHONY: test-compliance
 test-compliance:
-	OPA_COMPLIANCE_TESTS=enabled swift test
+	OPA_COMPLIANCE_TESTS=enabled swift test --filter ComplianceTests.ComplianceTests
 
 .PHONY: build
 build:

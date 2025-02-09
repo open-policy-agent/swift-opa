@@ -62,7 +62,7 @@ func queryToEntryPoint(_ query: String) throws -> String {
 }
 
 // Policy wraps an IR.Policy with some more optimized accessors for use in evaluations.
-private struct IndexedIRPolicy {
+internal struct IndexedIRPolicy {
     // Original policy  TODO: we may not need this?
     var ir: IR.Policy
 
@@ -104,16 +104,16 @@ private struct IndexedIRPolicy {
     }
 }
 
-private struct IREvaluationContext {
+internal struct IREvaluationContext {
     var ctx: EvaluationContext
     var policy: IndexedIRPolicy
 }
 
-private typealias Locals = [IR.Local: AST.RegoValue]
+internal typealias Locals = [IR.Local: AST.RegoValue]
 
 // Frame represents a stack frame used during Rego IR evaluation. Each function call
 // will prompt creation of a new stack frame.
-private struct Frame {
+internal struct Frame {
     var scopeStack: [Ptr<Scope>] = []
     var results: ResultSet = ResultSet()
 
@@ -213,7 +213,7 @@ private struct Frame {
 // Scopes are children of a Frame, representing a logical Rego scope. Each time
 // a statement has nested blocks a new Scope is pushed. These are primarily used
 // for further protecting locals and tracking "with" value overrides.
-private struct Scope: Encodable {
+internal struct Scope: Encodable {
     var blockIdx: Int = 0
     var statementIdx: Int = 0
     let blocks: [IR.Block]
@@ -365,7 +365,7 @@ private func evalPlan(
 }
 
 // Evaluate a Frame from start to finish (respecting Task.isCancelled)
-private func evalFrame(
+internal func evalFrame(
     withContext ctx: IREvaluationContext,
     framePtr: Ptr<Frame>
 ) async throws -> ResultSet {
@@ -662,13 +662,16 @@ private func evalFrame(
                 }
                 guard case .object(var targetObjectValue) = target else {
                     throw EvaluationError.invalidDataType(
-                        reason:
-                            "unable to perform ObjectInsertStatement on target value of type \(type(of: target))"
+                        reason: "unable to perform ObjectInsertStatement on target value of type \(target.typeName))"
                     )
                 }
-                guard let currentValue = targetObjectValue[key], currentValue != targetValue else {
+
+                // The rules: Either this key has not been set (currentValue==nil),
+                // _or_ it has, but the old value must be equal to the new value
+                let currentValue = targetObjectValue[key]
+                guard currentValue == nil || currentValue! == targetValue else {
                     throw EvaluationError.objectInsertOnceError(
-                        reason: "key '\(key)' already exists in object")
+                        reason: "key '\(key)' already exists in object with different value")
                 }
                 targetObjectValue[key] = targetValue
                 try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))

@@ -1,9 +1,18 @@
 import Foundation
 
 public struct Policy: Codable, Equatable, Sendable {
-    public var staticData: Static?
+    public var staticData: Static? = nil
     public var plans: Plans? = nil
     public var funcs: Funcs? = nil
+
+    public init(staticData: Static? = nil, plans: Plans? = nil, funcs: Funcs? = nil) {
+        self.staticData = staticData
+        self.plans = plans
+        self.funcs = funcs
+    }
+
+    package init() {
+    }
 
     enum CodingKeys: String, CodingKey {
         case staticData = "static"
@@ -40,6 +49,10 @@ public struct Plan: Codable, Equatable, Sendable {
 public struct Block: Equatable, Sendable {
     public var statements: [any Statement]
 
+    public init(statements: [any Statement]) {
+        self.statements = statements
+    }
+
     // Equatable, we need a custom implementation for dynamic dispatch
     // to our heterogenous extistential type instances (statements)
     public static func == (lhs: Self, rhs: Self) -> Bool {
@@ -55,7 +68,6 @@ public struct Block: Equatable, Sendable {
 
         return true
     }
-
 }
 
 extension Block: Codable {

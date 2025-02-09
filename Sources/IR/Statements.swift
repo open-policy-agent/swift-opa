@@ -473,6 +473,12 @@ public struct ObjectInsertOnceStatement: Statement, Codable, Equatable {
     public var value: Operand
     public var object: Local
 
+    public init(key: Operand, value: Operand, object: Local) {
+        self.key = key
+        self.value = value
+        self.object = object
+    }
+
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false
@@ -548,6 +554,10 @@ public struct ResultSetAddStatement: Statement, Codable, Equatable {
     }
 
     public var value: Local
+
+    public init(value: Local) {
+        self.value = value
+    }
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {

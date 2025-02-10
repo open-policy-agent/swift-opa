@@ -24,7 +24,7 @@ public struct BuiltinRegistry {
             // Arithmetic
             "plus": BuiltinFuncs.plus,
             "minus": BuiltinFuncs.minus,
-            "mult": BuiltinFuncs.mult,
+            "mul": BuiltinFuncs.mul,
             "div": BuiltinFuncs.div,
             "round": BuiltinFuncs.round,
             "ceil": BuiltinFuncs.ceil,

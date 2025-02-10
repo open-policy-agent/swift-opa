@@ -89,5 +89,4 @@ extension BuiltinFuncs {
 
         return .string(args[0].typeName)
     }
-    
 }

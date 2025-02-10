@@ -45,7 +45,9 @@ extension BuiltinFuncs {
         }
     }
 
-    static func mult(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    // Multiplies two numbers.
+    // Returns: the product of `x` and `y`
+    static func mul(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
         }
@@ -62,6 +64,7 @@ extension BuiltinFuncs {
     }
 
     // Divides the first number by the second number.
+    // Returns: the result of `x` divided by `y`
     static func div(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)

@@ -144,28 +144,28 @@ struct ArithmeticTests {
         ),
     ]
 
-    static let multTests: [BuiltinTests.TestCase] = [
+    static let mulTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "2 * 2",
-            name: "mult",
+            name: "mul",
             args: [2, 2],
             expected: .success(4)
         ),
         BuiltinTests.TestCase(
             description: "2 * 1.5",
-            name: "mult",
+            name: "mul",
             args: [2, 1.5],
             expected: .success(3)
         ),
         BuiltinTests.TestCase(
             description: "3 * 0.33333",
-            name: "mult",
+            name: "mul",
             args: [3, 0.33333],
             expected: .success(0.99999)
         ),
         BuiltinTests.TestCase(
             description: "overflow",
-            name: "mult",
+            name: "mul",
             args: [999_999_999_999_999_999, 10000],
             // We're cheating on this a little bit, but it seems this is the only way
             // to construct the answer, main goal here is to make sure nothing blows
@@ -174,25 +174,25 @@ struct ArithmeticTests {
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
-            name: "mult",
+            name: "mul",
             args: [1],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
-            name: "mult",
+            name: "mul",
             args: [1, 1, 1],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong lhs arg type",
-            name: "mult",
+            name: "mul",
             args: ["1", 1],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
-            name: "mult",
+            name: "mul",
             args: [1, "1"],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "y"))
         ),
@@ -466,7 +466,7 @@ struct ArithmeticTests {
             plusTests,
             minusNumberTests,
             minusSetTests,
-            multTests,
+            mulTests,
             divTests,
             roundTests,
             ceilTests,

@@ -512,7 +512,7 @@ internal func evalFrame(
                     break stmtLoop
                 }
 
-                var targetValue: AST.RegoValue?
+                var targetValue: AST.RegoValue? = nil
                 switch sourceValue {
                 case .object(let sourceObj):
                     targetValue = sourceObj[keyValue]
@@ -520,8 +520,8 @@ internal func evalFrame(
                     if case .number(let numberValue) = keyValue {
                         let idx = numberValue.intValue
                         if idx < 0 || idx >= sourceArray.count {
-                            throw EvaluationError.internalError(
-                                reason: "DotStmt key array index out of bounds")
+                            targetValue = nil
+                            break
                         }
                         targetValue = sourceArray[idx]
                     }
@@ -531,11 +531,11 @@ internal func evalFrame(
                     }
                 default:
                     throw EvaluationError.invalidDataType(
-                        reason: "cannot perform DotStmt on \(type(of:sourceValue))")
+                        reason: "cannot perform DotStmt on \(sourceValue.typeName), want: object|array|set")
                 }
 
                 // This statement is undefined if the key does not exist in the source value.
-                guard let targetValue else {
+                guard let targetValue, targetValue != .undefined else {
                     // undefined
                     currentScopePtr.v.markBlockUndefined(withCtx: ctx)
                     break stmtLoop

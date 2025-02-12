@@ -63,9 +63,103 @@ struct ArrayTests {
         ),
     ]
 
+    static let arrayReverseTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "simple reverse",
+            name: "array.reverse",
+            args: [["a", "b"]],
+            expected: .success(["b", "a"])
+        ),
+        BuiltinTests.TestCase(
+            description: "empty reverse",
+            name: "array.reverse",
+            args: [[]],
+            expected: .success([])
+        ),
+    ]
+
+    static let arraySliceTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "slice in the middle",
+            name: "array.slice",
+            args: [["a", "b", "c", "d"], 1, 3],
+            expected: .success(["b", "c"])
+        ),
+        BuiltinTests.TestCase(
+            description: "start index out of bounds",
+            name: "array.slice",
+            args: [["a", "b", "c", "d"], -1, 3],
+            expected: .success(["a", "b", "c"])
+        ),
+        BuiltinTests.TestCase(
+            description: "stop index out of bounds",
+            name: "array.slice",
+            args: [["a", "b", "c", "d"], 0, 10],
+            expected: .success(["a", "b", "c", "d"])
+        ),
+        BuiltinTests.TestCase(
+            description: "start = stop and in bounds",
+            name: "array.slice",
+            args: [["a", "b", "c", "d"], 1, 1],
+            expected: .success([])
+        ),
+        BuiltinTests.TestCase(
+            description: "start = stop and out of bounds",
+            name: "array.slice",
+            args: [["a", "b", "c", "d"], -1, -1],
+            expected: .success([])
+        ),
+        BuiltinTests.TestCase(
+            description: "start > stop",
+            name: "array.slice",
+            args: [["a", "b", "c", "d"], 2, 1],
+            expected: .success([])
+        ),
+        BuiltinTests.TestCase(
+            description: "start is not an integer (undefined)",
+            name: "array.slice",
+            args: [["a", "b", "c", "d"], 1.1, 3],
+            expected: .success(.undefined)
+        ),
+        BuiltinTests.TestCase(
+            description: "stop is not an integer (undefined)",
+            name: "array.slice",
+            args: [["a", "b", "c", "d"], 1, 3.1],
+            expected: .success(.undefined)
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
-            arrayConcatTests
+            BuiltinTests.generateFailureTests(
+                builtinName: "array.concat", sampleArgs: [[1, 2], [3, 4]],
+                argIndex: 0, argName: "x", allowedArgTypes: ["array"],
+                generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "array.concat", sampleArgs: [[1, 2], [3, 4]],
+                argIndex: 1, argName: "y", allowedArgTypes: ["array"],
+                generateNumberOfArgsTest: false),
+            arrayConcatTests,
+            
+            BuiltinTests.generateFailureTests(
+                builtinName: "array.reverse", sampleArgs: [[1, 2]],
+                argIndex: 0, argName: "x", allowedArgTypes: ["array"],
+                generateNumberOfArgsTest: true),
+            arrayReverseTests,
+            
+            BuiltinTests.generateFailureTests(
+                builtinName: "array.slice", sampleArgs: [[1, 2], 0, 1],
+                argIndex: 0, argName: "x", allowedArgTypes: ["array"],
+                generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "array.slice", sampleArgs: [[1, 2], 0, 1],
+                argIndex: 1, argName: "start", allowedArgTypes: ["number"],
+                generateNumberOfArgsTest: false),
+            BuiltinTests.generateFailureTests(
+                builtinName: "array.slice", sampleArgs: [[1, 2], 0, 1],
+                argIndex: 2, argName: "stop", allowedArgTypes: ["number"],
+                generateNumberOfArgsTest: false),
+            arraySliceTests,
         ].flatMap { $0 }
     }
 

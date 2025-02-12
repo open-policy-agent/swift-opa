@@ -34,6 +34,8 @@ public struct BuiltinRegistry {
 
             // Array
             "array.concat": BuiltinFuncs.arrayConcat,
+            "array.reverse": BuiltinFuncs.arrayReverse,
+            "array.slice": BuiltinFuncs.arraySlice,
 
             // Bits
             "bits.lsh": BuiltinFuncs.bitsShiftLeft,

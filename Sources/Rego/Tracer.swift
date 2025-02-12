@@ -54,6 +54,9 @@ public class BufferedQueryTracer: QueryTracer {
     }
 
     public func traceEvent(_ event: any TraceableEvent) {
+        guard level != .none else {
+            return
+        }
         if level == .note && event.operation != .note {
             // in "note" mode, skip everything except those operations
             return

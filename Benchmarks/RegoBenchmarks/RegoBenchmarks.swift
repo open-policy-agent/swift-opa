@@ -30,6 +30,7 @@ private enum SetupError: Error {
 }
 
 nonisolated(unsafe) let benchmarks = {
+    // swift-format-ignore
     let fixtures = try! loadJsonFixtures()
     for f in fixtures.sorted() {
         Benchmark("Codable deserialize \(f.url.lastPathComponent)") { benchmark, setupState in

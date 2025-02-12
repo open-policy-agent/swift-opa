@@ -46,11 +46,20 @@ public struct ConstString: Codable, Equatable, Sendable {
 
 public struct Plans: Codable, Equatable, Sendable {
     public var plans: [Plan] = []
+
+    public init(plans: [Plan]) {
+        self.plans = plans
+    }
 }
 
 public struct Plan: Codable, Equatable, Sendable {
     public var name: String
     public var blocks: [Block]
+
+    public init(name: String, blocks: [Block]) {
+        self.name = name
+        self.blocks = blocks
+    }
 }
 
 public struct Block: Equatable, Sendable {

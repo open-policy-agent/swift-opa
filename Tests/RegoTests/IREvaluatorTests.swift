@@ -229,16 +229,19 @@ struct IRStatementTests {
                         IR.ConstString(value: "results")
                     ]
                 ),
-                plans: nil,
+                plans: Plans(
+                    plans: [
+                        Plan(name: "generated", blocks: [block])
+                    ]
+                ),
                 funcs: nil
             ))
         let ctx = EvaluationContext(query: "", input: [:])
         let irCtx = IREvaluationContext(ctx: ctx, policy: policy)
-        let blocks = [block]
 
         return (
             irCtx,
-            Ptr(toCopyOf: Frame(withCtx: irCtx, blocks: blocks, locals: locals))
+            Ptr(toCopyOf: Frame(locals: locals))
         )
     }
 
@@ -494,8 +497,10 @@ struct IRStatementTests {
     func testStatementEvaluation(tc: TestCase) async throws {
         // TODO - maybe add a ResultSetAdd always? and check for that?
         let (ctx, frame) = prepareFrame(forStatement: tc.stmt, withLocals: tc.locals, andReturn: tc.returnIdx)
+        let blocks = ctx.policy.plans["generated"]?.blocks ?? []
+        let stmt = IR.BlockStatement(blocks: blocks)
         let result = await Result {
-            try await evalFrame(withContext: ctx, framePtr: frame)
+            try await evalFrame(withContext: ctx, framePtr: frame, blocks: blocks, caller: stmt)
         }
 
         guard !tc.expectError else {
@@ -512,7 +517,8 @@ struct IRStatementTests {
         let scope = try frame.v.currentScope()
         let expectLocals = mergeLocals(tc.locals, tc.expectLocals)
         var gotLocals = scope.v.locals
-        gotLocals.removeValue(forKey: Local(7777))  // Remove temporary local used for building ResultSet (see prepareFrame)
+        // Remove temporary local used for building ResultSet (see prepareFrame)
+        gotLocals.removeValue(forKey: Local(7777))
         #expect(gotLocals == expectLocals, "comparing locals")
 
         // Check result expectations

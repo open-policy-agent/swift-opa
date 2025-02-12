@@ -117,16 +117,26 @@ internal struct Frame {
     var scopeStack: [Ptr<Scope>] = []
     var results: ResultSet = ResultSet()
 
-    init(withCtx ctx: IREvaluationContext, blocks: [IR.Block], locals: Locals = [:]) {
-        _ = self.pushScope(withCtx: ctx, blocks: blocks, locals: locals)
+    init(locals: Locals = [:]) {
+        _ = self.pushScope(locals: locals)
     }
 
-    var hasScope: Bool {
-        !self.scopeStack.isEmpty
+    // Create a new Scope, seed with some locals, push it to the stack, and return it.
+    mutating func pushScope(
+        locals: Locals = [:]
+    ) -> Ptr<Scope> {
+        let scopePtr = Ptr(toCopyOf: Scope(locals: locals))
+        self.scopeStack.append(scopePtr)
+        return scopePtr
     }
 
-    var hasParentScope: Bool {
-        self.scopeStack.count > 1
+    // popScope discards the current scope, and returns its parent scope if there is one.
+    mutating func popScope() -> Ptr<Scope>? {
+        guard self.scopeStack.last != nil else {
+            return nil
+        }
+        self.scopeStack.removeLast()
+        return self.scopeStack.last
     }
 
     func currentScope() throws -> Ptr<Scope> {
@@ -136,36 +146,12 @@ internal struct Frame {
         return self.scopeStack.last!
     }
 
-    func currentLocation(withCtx ctx: IREvaluationContext) throws -> TraceLocation {
-        let scope = try self.currentScope()
-        let stmt = scope.v.blocks[scope.v.blockIdx].statements[scope.v.statementIdx]
+    func currentLocation(withCtx ctx: IREvaluationContext, stmt: any IR.Statement) throws -> TraceLocation {
         return TraceLocation(
             row: stmt.location.row,
             col: stmt.location.col,
             file: ctx.policy.ir.staticData?.files?[stmt.location.file].value ?? "<unknown>"
         )
-    }
-
-    // Create a new Scope, seed with some locals, push it to the stack, and return it.
-    mutating func pushScope(
-        withCtx ctx: IREvaluationContext,
-        blocks: [IR.Block],
-        locals: Locals = [:]
-    ) -> Ptr<Scope> {
-        let scopePtr = Ptr(toCopyOf: Scope(blocks: blocks, locals: locals))
-        self.scopeStack.append(scopePtr)
-        scopePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.enter)
-        return scopePtr
-    }
-
-    // popScope discards the current scope, and returns its parent scope if there is one.
-    mutating func popScope(withCtx ctx: IREvaluationContext) -> Ptr<Scope>? {
-        guard let currentScope = self.scopeStack.last else {
-            return nil
-        }
-        currentScope.v.traceEvent(withCtx: ctx, op: TraceOperation.exit)
-        self.scopeStack.removeLast()
-        return self.scopeStack.last
     }
 
     func resolveLocal(idx: IR.Local) -> AST.RegoValue {
@@ -208,124 +194,85 @@ internal struct Frame {
         }
         return v
     }
-}
-
-// Scopes are children of a Frame, representing a logical Rego scope. Each time
-// a statement has nested blocks a new Scope is pushed. These are primarily used
-// for further protecting locals and tracking "with" value overrides.
-internal struct Scope: Encodable {
-    var blockIdx: Int = 0
-    var statementIdx: Int = 0
-    let blocks: [IR.Block]
-    var undefinedBlockIndexes: [Int] = []
-    var locals: Locals
-
-    // Initialize a fresh scope given a set of blocks to process
-    // within the context of the Scope
-    init(blocks: [IR.Block], locals: Locals = [:]) {
-        self.locals = locals
-        self.blocks = blocks
-    }
-
-    // markBlockUndefinedAndContinue will add the block index to the list of undefined blocks
-    // for this scope. The caller is then responsible for advancing to the next block.
-    // ref: https://www.openpolicyagent.org/docs/latest/ir/#block-execution
-    mutating func markBlockUndefined(withCtx ctx: IREvaluationContext) {
-        self.traceEvent(
-            withCtx: ctx,
-            op: TraceOperation.fail
-        )
-        self.undefinedBlockIndexes.append(self.blockIdx)
-    }
-
-    var currentBlock: IR.Block {
-        self.blocks[self.blockIdx]
-    }
-
-    // nextBlock advances to the next block
-    // (may advance out of bounds, after which isFinished == true)
-    mutating func nextBlock() {
-        self.blockIdx += 1
-        self.statementIdx = 0
-    }
-
-    // nextStatement advances to the next statement within the current block
-    // (may advance out of bounds, after which blockHasMoreStatements == false)
-    mutating func nextStatement() {
-        self.statementIdx += 1
-    }
-
-    // nextStatementOrBlock advances to the next executable statement
-    // (either in the current or next block)
-    mutating func nextStatementOrBlock() {
-        self.statementIdx += 1
-        if self.statementIdx >= self.currentBlock.statements.count {
-            self.blockIdx += 1
-            self.statementIdx = 0
-        }
-    }
-
-    // blockHasMoreStatments is true while the current block has additional statements to evaluate
-    var blockHasMoreStatements: Bool {
-        return self.statementIdx < self.currentBlock.statements.count
-    }
-
-    var currentStatement: any IR.Statement {
-        currentBlock.statements[self.statementIdx]
-    }
-
-    // isFinished is true when the current scope has exhausted blocks to evaluate
-    var isFinished: Bool {
-        return self.blockIdx >= self.blocks.count
-    }
-
-    // traceStatement returns either the current statement, or the previous statement if we've advanced out of bounds
-    // (this happens to the current scope as we're popping it to get to its parent scopes)
-    var traceStatement: IR.Statement {
-        var blockIdx = self.blockIdx
-        var statementIdx = self.statementIdx
-        if blockIdx >= self.blocks.count {
-            // If we advanced past the last block, rewind
-            blockIdx -= 1
-            statementIdx = self.blocks[blockIdx].statements.count - 1
-        } else if statementIdx >= self.blocks[blockIdx].statements.count {
-            statementIdx -= 1
-        }
-
-        return self.blocks[blockIdx].statements[statementIdx]
-    }
 
     func traceEvent(
         withCtx ctx: IREvaluationContext,
         op: TraceOperation,
+        stmt: any IR.Statement,
         _ message: String = ""
     ) {
         guard let tracer = ctx.ctx.tracer else {
             // tracing disabled
             return
         }
-        let stmt = self.traceStatement
         let formattedMessage = message.isEmpty ? "" : "message='\(message)'"
-        let eventMessage =
-            switch op {
-            case .enter:
-                "push scope"
-            case .exit:
-                "pop scope"
+
+        let msg: String
+        switch op {
+        case .enter:
+            switch stmt {
+            case let stmt as BlockStatement:
+                let count = stmt.blocks?.count ?? 0
+
+                msg = "block (stmt_count=\(count)): \(stmt.debugString)"
+            case let stmt as CallStatement:
+                msg = "function \(stmt.callFunc)"
+            case let stmt as CallDynamicStatement:
+                // Resolve dynamic call path
+                let pathStr = resolveDynamicFunctionCallPath(withCtx: ctx, path: stmt.path)
+                msg = "dynamic function \(pathStr)"
             default:
-                "\(type(of: stmt)) block=\(self.blockIdx) stmt=\(self.statementIdx)\(formattedMessage) -> \(stmt.debugString)"
+                msg = "\(type(of: stmt)) - \(stmt.debugString)"
             }
+        case .exit:
+            switch stmt {
+            case let stmt as BlockStatement:
+                msg = "block \(stmt.debugString)"
+            case let stmt as CallStatement:
+                msg = "function call \(stmt.callFunc)"
+            case let stmt as CallDynamicStatement:
+                let pathStr = resolveDynamicFunctionCallPath(withCtx: ctx, path: stmt.path)
+                msg = "dynamic function \(pathStr)"
+            default:
+                msg = "\(type(of: stmt)) - \(stmt.debugString)"
+            }
+        default:
+            msg = "\(type(of: stmt)) \(formattedMessage) -> \(stmt.debugString)"
+        }
         tracer.traceEvent(
             IRTraceEvent(
                 operation: op,
-                message: eventMessage,
+                message: msg,
                 location: TraceLocation(
                     row: stmt.location.row,
                     col: stmt.location.col,
                     file: ctx.policy.ir.staticData?.files?[stmt.location.file].value ?? "<unknown>"
-                ),
-                scope: self
+                )
             ))
+    }
+
+    // helper for rendering a dynamic call path into a string
+    private func resolveDynamicFunctionCallPath(withCtx ctx: IREvaluationContext, path: [IR.Operand]) -> String {
+        let path = path.map {
+            let v = (try? self.resolveOperand(ctx: ctx, $0)) ?? "<unknown>"
+            if case .string(let s) = v {
+                return s
+            }
+            return "<\(v.typeName)>"
+        }
+        return path.joined(separator: ".")
+    }
+}
+
+// Scopes are children of a Frame, representing a logical Rego scope. Each time
+// a statement has nested blocks a new Scope is pushed. These are primarily used
+// for further protecting locals and tracking "with" value overrides.
+internal struct Scope: Encodable {
+    var locals: Locals
+
+    // Initialize a fresh scope with its own copy of locals
+    init(locals: Locals = [:]) {
+        self.locals = locals
     }
 }
 
@@ -337,8 +284,7 @@ private struct IRTraceEvent: TraceableEvent {
     // IR Specific stuff
     // Note: this won't be seen in pretty prints but should be dumped in super verbose JSON output
     // TODO: Ideally we can just dump a copy of the scope in here, but it isn't Codable, so for now
-    // leave some choice bread crums
-    var scope: Scope
+    // leave some choice bread crumbs
 }
 
 // Evaluate an IR Plan from start to finish for the given IREvaluationContext
@@ -348,8 +294,6 @@ private func evalPlan(
 ) async throws -> ResultSet {
     // Initialize the starting Frame+Scope from the top level Plan blocks and kick off evaluation.
     let frame = Frame(
-        withCtx: ctx,
-        blocks: plan.blocks,
         locals: [
             // TODO: ?? are we going to hide stuff under special roots like OPA does?
             // TODO: We don't resolve refs with more complex paths very much... maybe we should
@@ -360,486 +304,529 @@ private func evalPlan(
             localIdxData: try await ctx.ctx.store.read(path: StoreKeyPath(["data"])),
         ]
     )
+    //
+    let caller = BlockStatement(blocks: plan.blocks)
+
     let pFrame = Ptr(toCopyOf: frame)
-    return try await evalFrame(withContext: ctx, framePtr: pFrame)
+    return try await evalFrame(withContext: ctx, framePtr: pFrame, blocks: plan.blocks, caller: caller)
 }
 
 // Evaluate a Frame from start to finish (respecting Task.isCancelled)
 internal func evalFrame(
     withContext ctx: IREvaluationContext,
-    framePtr: Ptr<Frame>
+    framePtr: Ptr<Frame>,
+    blocks: [IR.Block],
+    caller: any Statement
 ) async throws -> ResultSet {
-    var currentScopePtr = try framePtr.v.currentScope()
+    var results = ResultSet()
 
     // To evaluate a Frame we iterate through each block of the current scope, evaluating
     // statements in the block one at a time. We will jump between blocks being executed but
     // never go backwards, only early exit maneuvers jumping "forward" in the plan.
     // ref: https://www.openpolicyagent.org/docs/latest/ir/#execution
 
-    blockLoop: while !currentScopePtr.v.isFinished {
-
-        stmtLoop: while currentScopePtr.v.blockHasMoreStatements {
-
-            if Task.isCancelled {
-                throw EvaluationError.evaluationCancelled(reason: "parent task cancelled")
-            }
-
-            let statement = currentScopePtr.v.currentStatement
-
-            currentScopePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.eval)
-
-            switch statement {
-            case let stmt as IR.ArrayAppendStatement:
-                let array = framePtr.v.resolveLocal(idx: stmt.array)
-                let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
-                guard case .array(var arrayValue) = array, value != .undefined else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-                arrayValue.append(value)
-                try framePtr.v.assignLocal(idx: stmt.array, value: .array(arrayValue))
-
-            case let stmt as IR.AssignIntStatement:
-                try framePtr.v.assignLocal(
-                    idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
-
-            case let stmt as IR.AssignVarOnceStatement:
-                let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
-                guard sourceValue != .undefined else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-                let targetValue = framePtr.v.resolveLocal(idx: stmt.target)
-
-                // if the target value is already defined, and not the same value as the source,
-                // we should raise an exception
-                if targetValue != .undefined && targetValue != sourceValue {
-                    throw EvaluationError.assignOnceError(reason: "local already assigned")
-                }
-                try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
-
-            case let stmt as IR.AssignVarStatement:
-                let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
-                guard sourceValue != .undefined else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-                try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
-
-            case let stmt as IR.BlockStatement:
-                guard let blocks = stmt.blocks else {
-                    // Some plans emit null blocks for some reason
-                    // Just skip this statement
-                    break
-                }
-                currentScopePtr = framePtr.v.pushScope(
-                    withCtx: ctx,
-                    blocks: blocks,
-                    locals: currentScopePtr.v.locals
-                )
-                continue blockLoop
-
-            case let stmt as IR.BreakStatement:
-                // Pop N scopes for the "index" and resume processing from
-                // that saved scope. Drop all scopes that are popped.
-                for _ in 0..<stmt.index {
-                    let currentLocals = currentScopePtr.v.locals
-                    guard let parentScope = framePtr.v.popScope(withCtx: ctx) else {
-                        throw EvaluationError.internalError(reason: "scope stack exhausted")
-                    }
-
-                    // Propagate any modified locals from the scope we just popped off
-                    parentScope.v.locals = currentLocals
-
-                    currentScopePtr = parentScope
-                }
-            // flow down to the next statement in the new current scope/block
-
-            case let stmt as IR.CallDynamicStatement:
-                var path: [String] = []
-                for p in stmt.path {
-                    let segment = try framePtr.v.resolveOperand(ctx: ctx, p)
-                    guard case .string(let stringValue) = segment else {
-                        currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                        break stmtLoop
-
-                    }
-                    path.append(stringValue)
-                }
-
-                let funcName = path.joined(separator: ".")
-
-                let result = try await evalCall(
-                    ctx: ctx,
-                    frame: framePtr,
-                    funcName: funcName,
-                    args: stmt.args.map {  // (╯°□°)╯︵ ┻━┻
-                        // TODO: make the CallDynamicStatement "args" match the CallStatement ones upstream..
-                        IR.Operand(
-                            type: Operand.OpType.local, value: Operand.Value.localIndex(Int($0)))
-                    }
-                )
-
-                guard result != .undefined else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-
-                try framePtr.v.assignLocal(idx: stmt.result, value: result)
-
-            case let stmt as IR.CallStatement:
-                let result = try await evalCall(
-                    ctx: ctx,
-                    frame: framePtr,
-                    funcName: stmt.callFunc,
-                    args: stmt.args ?? []
-                )
-
-                guard result != .undefined else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-
-                try framePtr.v.assignLocal(idx: stmt.result, value: result)
-
-            case let stmt as IR.DotStatement:
-                let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
-                let keyValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
-                
-                // If any input parameter is undefined then the statement is undefined
-                guard sourceValue != .undefined, keyValue != .undefined else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-
-                var targetValue: AST.RegoValue? = nil
-                switch sourceValue {
-                case .object(let sourceObj):
-                    targetValue = sourceObj[keyValue]
-                case .array(let sourceArray):
-                    if case .number(let numberValue) = keyValue {
-                        let idx = numberValue.intValue
-                        if idx < 0 || idx >= sourceArray.count {
-                            targetValue = nil
-                            break
-                        }
-                        targetValue = sourceArray[idx]
-                    }
-                case .set(let sourceSet):
-                    if sourceSet.contains(keyValue) {
-                        targetValue = keyValue
-                    }
-                default:
-                    throw EvaluationError.invalidDataType(
-                        reason: "cannot perform DotStmt on \(sourceValue.typeName), want: object|array|set")
-                }
-
-                // This statement is undefined if the key does not exist in the source value.
-                guard let targetValue, targetValue != .undefined else {
-                    // undefined
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-                try framePtr.v.assignLocal(idx: stmt.target, value: targetValue)
-
-            case let stmt as IR.EqualStatement:
-                //This statement is undefined if a is not equal to b.
-                let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
-                let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
-                if a == .undefined || b == .undefined || a != b {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-
-            case let stmt as IR.IsArrayStatement:
-                guard case .array = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-
-            case let stmt as IR.IsDefinedStatement:
-                // This statement is undefined if source is undefined.
-                if case .undefined = framePtr.v.resolveLocal(idx: stmt.source) {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-
-            case let stmt as IR.IsObjectStatement:
-                guard case .object = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-
-            case let stmt as IR.IsSetStatement:
-                guard case .set = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-
-            case let stmt as IR.IsUndefinedStatement:
-                // This statement is undefined if source is not undefined.
-                guard case .undefined = framePtr.v.resolveLocal(idx: stmt.source) else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-
-            case let stmt as IR.LenStatement:
-                let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
-                guard sourceValue != .undefined else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-
-                guard let len = sourceValue.count else {
-                    throw EvaluationError.invalidDataType(
-                        reason:
-                            "LenStmt invalid on provided operand type. got: \(sourceValue.typeName), want: (array|object|string|set)"
-                    )
-                }
-
-                try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: len)))
-
-            case let stmt as IR.MakeArrayStatement:
-                var arr: [AST.RegoValue] = []
-                arr.reserveCapacity(Int(stmt.capacity))
-                try framePtr.v.assignLocal(idx: stmt.target, value: .array(arr))
-
-            case let stmt as IR.MakeNullStatement:
-                try framePtr.v.assignLocal(idx: stmt.target, value: .null)
-
-            case let stmt as IR.MakeNumberIntStatement:
-                try framePtr.v.assignLocal(
-                    idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
-
-            case let stmt as IR.MakeNumberRefStatement:
-                let sourceStringValue = try framePtr.v.resolveStaticString(
-                    ctx: ctx, Int(stmt.index))
-                let formatter = NumberFormatter()
-                formatter.numberStyle = .decimal
-                guard let n = formatter.number(from: sourceStringValue) else {
-                    throw EvaluationError.invalidDataType(
-                        reason: "invalid number literal with MakeNumberRefStatement")
-                }
-                try framePtr.v.assignLocal(idx: stmt.target, value: .number(n))
-
-            case let stmt as IR.MakeObjectStatement:
-                try framePtr.v.assignLocal(idx: stmt.target, value: .object([:]))
-
-            case let stmt as IR.MakeSetStatement:
-                try framePtr.v.assignLocal(idx: stmt.target, value: .set([]))
-
-            case _ as IR.NopStatement:
-                break
-
-            case let stmt as IR.NotEqualStatement:
-                // This statement is undefined if a is equal to b.
-                let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
-                let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
-                if a == .undefined || b == .undefined || a == b {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-
-            case let stmt as IR.NotStatement:
-                // We're going to evalaute the block in an isolated frame, propagating
-                // local state, so that we can more easily see whether it succeeded.
-                let subFrame = Frame(
-                    withCtx: ctx,
-                    blocks: [stmt.block],
-                    locals: currentScopePtr.v.locals
-                )
-                let subFramePtr = Ptr(toCopyOf: subFrame)
-                let resultSet = try await evalFrame(withContext: ctx, framePtr: subFramePtr)
-
-                // Look at the frame's current context, we derive whether it was undefined
-                // iff the number of blocks planned == the number of undefined blocks.
-                // This statement is undefined if the contained block is defined.
-                let lastScope = try subFramePtr.v.currentScope()
-                let allBlocksUndefined = lastScope.v.blocks.count == lastScope.v.undefinedBlockIndexes.count
-                if !allBlocksUndefined {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-
-                // Propagate any results from the block's sub frame into the parent frame
-                for result in resultSet {
-                    framePtr.v.results.insert(result)
-                }
-
-            case let stmt as IR.ObjectInsertOnceStatement:
-                let targetValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
-                let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
-                let target = framePtr.v.resolveLocal(idx: stmt.object)
-                guard targetValue != .undefined && key != .undefined && target != .undefined else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-                guard case .object(var targetObjectValue) = target else {
-                    throw EvaluationError.invalidDataType(
-                        reason: "unable to perform ObjectInsertStatement on target value of type \(target.typeName))"
-                    )
-                }
-
-                // The rules: Either this key has not been set (currentValue==nil),
-                // _or_ it has, but the old value must be equal to the new value
-                let currentValue = targetObjectValue[key]
-                guard currentValue == nil || currentValue! == targetValue else {
-                    throw EvaluationError.objectInsertOnceError(
-                        reason: "key '\(key)' already exists in object with different value")
-                }
-                targetObjectValue[key] = targetValue
-                try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
-
-            case let stmt as IR.ObjectInsertStatement:
-                let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
-                let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
-                let target = framePtr.v.resolveLocal(idx: stmt.object)
-                guard value != .undefined && key != .undefined && target != .undefined else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-                guard case .object(var targetObjectValue) = target else {
-                    throw EvaluationError.invalidDataType(
-                        reason:
-                            "unable to perform ObjectInsertStatement on target value of type \(type(of: target))"
-                    )
-                }
-                targetObjectValue[key] = value
-                try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
-
-            case let stmt as IR.ObjectMergeStatement:
-                let a = framePtr.v.resolveLocal(idx: stmt.a)
-                let b = framePtr.v.resolveLocal(idx: stmt.b)
-                if a == .undefined || b == .undefined {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-                guard case .object(let objectValueA) = a, case .object(let objectValueB) = b else {
-                    throw EvaluationError.invalidDataType(
-                        reason:
-                            "unable to perform ObjectMergeStatement with types \(type(of: a)) and \(type(of: b))"
-                    )
-                }
-                let merged = objectValueA.merge(with: objectValueB)
-                try framePtr.v.assignLocal(idx: stmt.target, value: .object(merged))
-
-            case let stmt as IR.ResetLocalStatement:
-                try framePtr.v.assignLocal(idx: stmt.target, value: .undefined)
-
-            case let stmt as IR.ResultSetAddStatement:
-                let value = framePtr.v.resolveLocal(idx: stmt.value)
-                guard value != .undefined else {
-                    // undefined
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-                guard case .object = value else {
-                    // undefined
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-                framePtr.v.results.insert(value)
-
-            case let stmt as IR.ReturnLocalStatement:
-                let result = framePtr.v.resolveLocal(idx: stmt.source)
-                currentScopePtr.v.traceEvent(withCtx: ctx, op: .exit)
-                return ResultSet([result])
-
-            case let stmt as IR.ScanStatement:
-                // This statement is undefined if source is a scalar value or empty collection.
-                let source = framePtr.v.resolveLocal(idx: stmt.source)
-
-                let results = try await evalScan(
-                    ctx: ctx,
-                    frame: framePtr,
-                    stmt: stmt,
-                    source: source
-                )
-
-                // Propagate any results from the block's sub frame into the parent frame
-                framePtr.v.results.formUnion(results)
-
-            case let stmt as IR.SetAddStatement:
-                let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
-                let target = framePtr.v.resolveLocal(idx: stmt.set)
-                guard value != .undefined && target != .undefined else {
-                    currentScopePtr.v.markBlockUndefined(withCtx: ctx)
-                    break stmtLoop
-                }
-                guard case .set(var targetSetValue) = target else {
-                    throw EvaluationError.invalidDataType(
-                        reason:
-                            "unable to perform SetAddStatement on target value of type \(type(of: target))"
-                    )
-                }
-                targetSetValue.insert(value)
-                try framePtr.v.assignLocal(idx: stmt.set, value: .set(targetSetValue))
-
-            case let stmt as IR.WithStatement:
-                // First we need to resolve the value that will be upserted
-                let overlayValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
-
-                // Next look up the object we'll be upserting into
-                let toPatch = framePtr.v.resolveLocal(idx: stmt.local)
-
-                // Resolve the patching path elements (composed of references to static strings
-                let pathOfInts = stmt.path ?? []
-                let path: [String] = pathOfInts.compactMap {
-                    ctx.policy.resolveStaticString(Int($0))
-                }
-                if path.count != pathOfInts.count {
-                    throw EvaluationError.internalError(
-                        reason: "invalid path - some segments could not resolve to strings")
-                }
-
-                let patched = toPatch.patch(with: overlayValue, at: path)
-
-                // Push a new scope that includes that patched local (likely shadowing a previous
-                // scopes values) and start evaluating the new block
-                var newLocals = currentScopePtr.v.locals
-                newLocals[stmt.local] = patched
-                currentScopePtr = framePtr.v.pushScope(
-                    withCtx: ctx,
-                    blocks: [stmt.block],
-                    locals: newLocals
-                )
-                // Start executing the block on the new scope we just pushed
-                continue blockLoop
-
-            default:
-                throw EvaluationError.internalError(
-                    reason: "unexpected statement type \(type(of: statement))")
-            }
-
-            // Next statement of current block
-            currentScopePtr.v.nextStatement()
+    blockLoop: for block in blocks {
+        // Evaluate the statements in the block
+        let rs = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: caller, block: block)
+        guard rs.breakCounter == 0 else {
+            throw EvaluationError.internalError(reason: "break statement jumped out of frame")
         }
-
-        // (break stmtLoop lands here)
-        // Next block
-        currentScopePtr.v.nextBlock()
-
-        // If we have reached the end of the current scope (no more blocks),
-        // then we need to pop the scope (preserving locals), and continue
-        // with its parent scope.
-        while currentScopePtr.v.isFinished && framePtr.v.hasParentScope {
-            guard let parent = framePtr.v.popScope(withCtx: ctx) else {
-                continue
-            }
-
-            let currentLocals = currentScopePtr.v.locals
-            parent.v.locals = currentLocals
-            currentScopePtr = parent
-            currentScopePtr.v.nextStatementOrBlock()
+        guard !rs.isUndefined else {
+            continue
         }
+        results.formUnion(rs.results)
     }
 
-    return framePtr.v.results
+    return results
+}
+
+// BlockResult is the result of evaluating a block.
+// In includes any results accumulated in descendent statements of the block,
+// as well as an indicator of whether the calling block evaluation should break.
+struct BlockResult {
+    var results: ResultSet
+    var breakCounter: UInt32
+
+    init(results: ResultSet, breakCounter: UInt32? = nil) {
+        self.results = results
+        self.breakCounter = breakCounter ?? 0
+    }
+
+    // Constructs a BlockResult with a single RegoValue in its ResultSet
+    init(withValue value: AST.RegoValue) {
+        self.results = ResultSet(value: value)
+        self.breakCounter = 0
+    }
+
+    // undefined initializes an undefined BlockResult
+    static var undefined: BlockResult {
+        return .init(results: .undefined, breakCounter: 0)
+    }
+
+    // empty initializes an empty BlockResult
+    static var empty: BlockResult {
+        return .init(results: .empty, breakCounter: 0)
+    }
+
+    // isUndefined indicates whether the block evaluated to undefined.
+    var isUndefined: Bool {
+        return self.results.isUndefined
+    }
+
+    // If shouldBreak is true, evaluation of the calling block should
+    // break (by calling breakByOne()).
+    var shouldBreak: Bool {
+        return self.breakCounter > 0
+    }
+
+    // breakByOne returns a new BlockResult whose breakCounter has been
+    // decremented by 1 - this simulates "breaking" one level.
+    func breakByOne() -> BlockResult {
+        return BlockResult(results: self.results, breakCounter: self.breakCounter - 1)
+    }
+}
+
+func evalBlock(
+    withContext ctx: IREvaluationContext,
+    framePtr: Ptr<Frame>,
+    caller: any IR.Statement,
+    block: Block
+) async throws -> BlockResult {
+    var currentScopePtr = try framePtr.v.currentScope()
+    var results = ResultSet.empty
+
+    framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.enter, stmt: caller)
+    defer { framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.exit, stmt: caller) }
+
+    stmtLoop: for (i, statement) in block.statements.enumerated() {
+
+        if Task.isCancelled {
+            throw EvaluationError.evaluationCancelled(reason: "parent task cancelled")
+        }
+
+        framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.eval, stmt: statement)
+
+        switch statement {
+        case let stmt as IR.ArrayAppendStatement:
+            let array = framePtr.v.resolveLocal(idx: stmt.array)
+            let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
+            guard case .array(var arrayValue) = array, value != .undefined else {
+                return .undefined
+            }
+            arrayValue.append(value)
+            try framePtr.v.assignLocal(idx: stmt.array, value: .array(arrayValue))
+
+        case let stmt as IR.AssignIntStatement:
+            try framePtr.v.assignLocal(
+                idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
+
+        case let stmt as IR.AssignVarOnceStatement:
+            let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
+            guard sourceValue != .undefined else {
+                return .undefined
+            }
+            let targetValue = framePtr.v.resolveLocal(idx: stmt.target)
+
+            // if the target value is already defined, and not the same value as the source,
+            // we should raise an exception
+            if targetValue != .undefined && targetValue != sourceValue {
+                throw EvaluationError.assignOnceError(reason: "local already assigned")
+            }
+            try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
+
+        case let stmt as IR.AssignVarStatement:
+            let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
+            guard sourceValue != .undefined else {
+                return .undefined
+            }
+            try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
+
+        case let stmt as IR.BlockStatement:
+            guard let blocks = stmt.blocks else {
+                // Some plans emit null blocks for some reason
+                // Just skip this statement
+                break
+            }
+
+            for block in blocks {
+                let rs = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: stmt, block: block)
+                if rs.shouldBreak {
+                    return rs.breakByOne()
+                }
+
+                if rs.isUndefined {
+                    continue
+                }
+                results.formUnion(rs.results)
+            }
+
+        case let stmt as IR.BreakStatement:
+            // Index is the index of the block to jump out of starting with zero representing
+            // the current block and incrementing by one for each outer block.
+            // (https://www.openpolicyagent.org/docs/latest/ir/#breakstmt)
+            //
+            // Callers of evalBlock should check BlockResult.shouldBreak and if true,
+            // return after calling BlockResult.breakByOne() to decrement the counter.
+            return BlockResult(results: results, breakCounter: stmt.index)
+
+        case let stmt as IR.CallDynamicStatement:
+            var path: [String] = []
+            for p in stmt.path {
+                let segment = try framePtr.v.resolveOperand(ctx: ctx, p)
+                guard case .string(let stringValue) = segment else {
+                    return .undefined
+                }
+                path.append(stringValue)
+            }
+
+            let funcName = path.joined(separator: ".")
+
+            let result = try await evalCall(
+                ctx: ctx,
+                frame: framePtr,
+                caller: stmt,
+                funcName: funcName,
+                args: stmt.args.map {  // (╯°□°)╯︵ ┻━┻
+                    // TODO: make the CallDynamicStatement "args" match the CallStatement ones upstream..
+                    IR.Operand(
+                        type: Operand.OpType.local, value: Operand.Value.localIndex(Int($0)))
+                }
+            )
+
+            guard result != .undefined else {
+                return .undefined
+            }
+
+            try framePtr.v.assignLocal(idx: stmt.result, value: result)
+
+        case let stmt as IR.CallStatement:
+            let result = try await evalCall(
+                ctx: ctx,
+                frame: framePtr,
+                caller: stmt,
+                funcName: stmt.callFunc,
+                args: stmt.args ?? []
+            )
+
+            guard result != .undefined else {
+                return .undefined
+            }
+
+            try framePtr.v.assignLocal(idx: stmt.result, value: result)
+
+        case let stmt as IR.DotStatement:
+            let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
+            let keyValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
+
+            // If any input parameter is undefined then the statement is undefined
+            guard sourceValue != .undefined, keyValue != .undefined else {
+                return .undefined
+            }
+
+            var targetValue: AST.RegoValue?
+            switch sourceValue {
+            case .object(let sourceObj):
+                targetValue = sourceObj[keyValue]
+            case .array(let sourceArray):
+                if case .number(let numberValue) = keyValue {
+                    let idx = numberValue.intValue
+                    if idx < 0 || idx >= sourceArray.count {
+                        throw EvaluationError.internalError(
+                            reason: "DotStmt key array index out of bounds")
+                    }
+                    targetValue = sourceArray[idx]
+                }
+            case .set(let sourceSet):
+                if sourceSet.contains(keyValue) {
+                    targetValue = keyValue
+                }
+            default:
+                throw EvaluationError.invalidDataType(
+                    reason: "cannot perform DotStmt on \(sourceValue.typeName)")
+            }
+
+            // This statement is undefined if the key does not exist in the source value.
+            guard let targetValue else {
+                // undefined
+                return .undefined
+            }
+            try framePtr.v.assignLocal(idx: stmt.target, value: targetValue)
+
+        case let stmt as IR.EqualStatement:
+            //This statement is undefined if a is not equal to b.
+            let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
+            let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
+            if a == .undefined || b == .undefined || a != b {
+                return .undefined
+            }
+
+        case let stmt as IR.IsArrayStatement:
+            guard case .array = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
+                return .undefined
+            }
+
+        case let stmt as IR.IsDefinedStatement:
+            // This statement is undefined if source is undefined.
+            if case .undefined = framePtr.v.resolveLocal(idx: stmt.source) {
+                return .undefined
+            }
+
+        case let stmt as IR.IsObjectStatement:
+            guard case .object = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
+                return .undefined
+            }
+
+        case let stmt as IR.IsSetStatement:
+            guard case .set = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
+                return .undefined
+            }
+
+        case let stmt as IR.IsUndefinedStatement:
+            // This statement is undefined if source is not undefined.
+            guard case .undefined = framePtr.v.resolveLocal(idx: stmt.source) else {
+                return .undefined
+            }
+
+        case let stmt as IR.LenStatement:
+            let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
+            guard sourceValue != .undefined else {
+                return .undefined
+            }
+
+            guard let len = sourceValue.count else {
+                throw EvaluationError.invalidDataType(
+                    reason:
+                        "LenStmt invalid on provided operand type. got: \(sourceValue.typeName), want: (array|object|string|set)"
+                )
+            }
+
+            try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: len)))
+
+        case let stmt as IR.MakeArrayStatement:
+            var arr: [AST.RegoValue] = []
+            arr.reserveCapacity(Int(stmt.capacity))
+            try framePtr.v.assignLocal(idx: stmt.target, value: .array(arr))
+
+        case let stmt as IR.MakeNullStatement:
+            try framePtr.v.assignLocal(idx: stmt.target, value: .null)
+
+        case let stmt as IR.MakeNumberIntStatement:
+            try framePtr.v.assignLocal(
+                idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
+
+        case let stmt as IR.MakeNumberRefStatement:
+            let sourceStringValue = try framePtr.v.resolveStaticString(
+                ctx: ctx, Int(stmt.index))
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            guard let n = formatter.number(from: sourceStringValue) else {
+                throw EvaluationError.invalidDataType(
+                    reason: "invalid number literal with MakeNumberRefStatement")
+            }
+            try framePtr.v.assignLocal(idx: stmt.target, value: .number(n))
+
+        case let stmt as IR.MakeObjectStatement:
+            try framePtr.v.assignLocal(idx: stmt.target, value: .object([:]))
+
+        case let stmt as IR.MakeSetStatement:
+            try framePtr.v.assignLocal(idx: stmt.target, value: .set([]))
+
+        case _ as IR.NopStatement:
+            break
+
+        case let stmt as IR.NotEqualStatement:
+            // This statement is undefined if a is equal to b.
+            let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
+            let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
+            if a == .undefined || b == .undefined || a == b {
+                return .undefined
+            }
+
+        case let stmt as IR.NotStatement:
+            // We're going to evalaute the block in an isolated frame, propagating
+            // local state, so that we can more easily see whether it succeeded.
+            let rs = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: stmt, block: stmt.block)
+            // TODO NotStmt over a breaking block deserves a unit test
+            if rs.shouldBreak {
+                return rs.breakByOne()
+            }
+
+            // This statement is undefined if the contained block is defined.
+            guard rs.isUndefined else {
+                return .undefined
+            }
+
+            // Propagate any results from the block's sub frame into the parent frame
+            // TODO is this correct?
+            results.formUnion(rs.results)
+
+        case let stmt as IR.ObjectInsertOnceStatement:
+            let targetValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
+            let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
+            let target = framePtr.v.resolveLocal(idx: stmt.object)
+            guard targetValue != .undefined && key != .undefined && target != .undefined else {
+                return .undefined
+            }
+            guard case .object(var targetObjectValue) = target else {
+                throw EvaluationError.invalidDataType(
+                    reason: "unable to perform ObjectInsertStatement on target value of type \(target.typeName))"
+                )
+            }
+
+            // The rules: Either this key has not been set (currentValue==nil),
+            // _or_ it has, but the old value must be equal to the new value
+            let currentValue = targetObjectValue[key]
+            guard currentValue == nil || currentValue! == targetValue else {
+                throw EvaluationError.objectInsertOnceError(
+                    reason: "key '\(key)' already exists in object with different value")
+            }
+            targetObjectValue[key] = targetValue
+            try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
+
+        case let stmt as IR.ObjectInsertStatement:
+            let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
+            let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
+            let target = framePtr.v.resolveLocal(idx: stmt.object)
+            guard value != .undefined && key != .undefined && target != .undefined else {
+                return .undefined
+            }
+            guard case .object(var targetObjectValue) = target else {
+                throw EvaluationError.invalidDataType(
+                    reason:
+                        "unable to perform ObjectInsertStatement on target value of type \(target.typeName))"
+                )
+            }
+            targetObjectValue[key] = value
+            try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
+
+        case let stmt as IR.ObjectMergeStatement:
+            let a = framePtr.v.resolveLocal(idx: stmt.a)
+            let b = framePtr.v.resolveLocal(idx: stmt.b)
+            if a == .undefined || b == .undefined {
+                return .undefined
+            }
+            guard case .object(let objectValueA) = a, case .object(let objectValueB) = b else {
+                throw EvaluationError.invalidDataType(
+                    reason:
+                        "unable to perform ObjectMergeStatement with types \(a.typeName)) and \(b.typeName))"
+                )
+            }
+            let merged = objectValueA.merge(with: objectValueB)
+            try framePtr.v.assignLocal(idx: stmt.target, value: .object(merged))
+
+        case let stmt as IR.ResetLocalStatement:
+            try framePtr.v.assignLocal(idx: stmt.target, value: .undefined)
+
+        case let stmt as IR.ResultSetAddStatement:
+            guard i == block.statements.count - 1 else {
+                // TODO can this be a warning?
+                throw EvaluationError.internalError(
+                    reason: "ResultSetAddStatement can only be used in the last statement of a block"
+                )
+            }
+            let value = framePtr.v.resolveLocal(idx: stmt.value)
+            guard value != .undefined else {
+                return .undefined
+            }
+            guard case .object = value else {
+                return .undefined
+            }
+            return BlockResult(withValue: value)
+
+        case let stmt as IR.ReturnLocalStatement:
+            let result = framePtr.v.resolveLocal(idx: stmt.source)
+            // TODO don't smuggle this on the resultset, put on BlockResult
+            return BlockResult(withValue: result)  // might be undefined
+
+        case let stmt as IR.ScanStatement:
+            // This statement is undefined if source is a scalar value or empty collection.
+            let source = framePtr.v.resolveLocal(idx: stmt.source)
+
+            let rs = try await evalScan(
+                ctx: ctx,
+                frame: framePtr,
+                stmt: stmt,
+                source: source
+            )
+
+            // Propagate any results from the block's sub frame into the parent frame
+            results.formUnion(rs)
+
+        case let stmt as IR.SetAddStatement:
+            let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
+            let target = framePtr.v.resolveLocal(idx: stmt.set)
+            guard value != .undefined && target != .undefined else {
+                return .undefined
+            }
+            guard case .set(var targetSetValue) = target else {
+                throw EvaluationError.invalidDataType(
+                    reason:
+                        "unable to perform SetAddStatement on target value of type \(target.typeName))"
+                )
+            }
+            targetSetValue.insert(value)
+            try framePtr.v.assignLocal(idx: stmt.set, value: .set(targetSetValue))
+
+        case let stmt as IR.WithStatement:
+            // First we need to resolve the value that will be upserted
+            let overlayValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
+
+            // Next look up the object we'll be upserting into
+            let toPatch = framePtr.v.resolveLocal(idx: stmt.local)
+
+            // Resolve the patching path elements (composed of references to static strings
+            let pathOfInts = stmt.path ?? []
+            let path: [String] = pathOfInts.compactMap {
+                ctx.policy.resolveStaticString(Int($0))
+            }
+            if path.count != pathOfInts.count {
+                throw EvaluationError.internalError(
+                    reason: "invalid path - some segments could not resolve to strings")
+            }
+
+            let patched = toPatch.patch(with: overlayValue, at: path)
+
+            // Push a new scope that includes that patched local (likely shadowing a previous
+            // scopes values) and start evaluating the new block
+            var newLocals = currentScopePtr.v.locals
+            newLocals[stmt.local] = patched
+            currentScopePtr = framePtr.v.pushScope(locals: newLocals)
+            // Start executing the block on the new scope we just pushed
+            let rs = try await evalBlock(
+                withContext: ctx,
+                framePtr: framePtr,
+                caller: stmt,
+                block: stmt.block
+            )
+
+            // Squash locals from the child frame back into the current frame.
+            // Overlay the original (non-patched) value, keep the other side-effects.
+            let _ = try popAndSquash(frame: framePtr)
+            try framePtr.v.assignLocal(idx: stmt.local, value: toPatch)
+
+            // TODO should we respect break here?
+            // Unit test!
+            if rs.shouldBreak {
+                return rs.breakByOne()
+            }
+            results.formUnion(rs.results)
+
+        default:
+            throw EvaluationError.internalError(
+                reason: "unexpected statement type \(type(of: statement))")
+        }
+
+        // Next statement of current block
+    }
+
+    // If no ResultSetAddStmt statements are executed, the implicit result set is empty.
+    return BlockResult(results: results)
 }
 
 private func evalCall(
     ctx: IREvaluationContext,
     frame: Ptr<Frame>,
+    caller: any Statement,
     funcName: String,
     args: [IR.Operand]
 ) async throws -> AST.RegoValue {
@@ -861,6 +848,7 @@ private func evalCall(
         return try await callPlanFunc(
             ctx: ctx,
             frame: frame,
+            caller: caller,
             funcName: funcName,
             args: argValues
         )
@@ -868,7 +856,7 @@ private func evalCall(
 
     // Handle built-in functions second
     let bctx = BuiltinContext(
-        location: try frame.v.currentLocation(withCtx: ctx),
+        location: try frame.v.currentLocation(withCtx: ctx, stmt: caller),
         tracer: ctx.ctx.tracer
     )
     return try await ctx.ctx.builtins.invoke(withCtx: bctx, name: funcName, args: argValues)
@@ -878,6 +866,7 @@ private func evalCall(
 private func callPlanFunc(
     ctx: IREvaluationContext,
     frame: Ptr<Frame>,
+    caller: any Statement,
     funcName: String,
     args: [AST.RegoValue]
 ) async throws -> AST.RegoValue {
@@ -902,16 +891,14 @@ private func callPlanFunc(
 
     // Add in implicit input + data locals
     callLocals[localIdxInput] = frame.v.resolveLocal(idx: localIdxInput)
-    callLocals[localIdxData] = frame.v.resolveLocal(idx: localIdxData)  // TODO deal with optional
+    callLocals[localIdxData] = frame.v.resolveLocal(idx: localIdxData)
 
     // Setup a new frame for the function call
     let callFrame = Frame(
-        withCtx: ctx,
-        blocks: fn.blocks,
         locals: callLocals
     )
     let callFramePtr = Ptr(toCopyOf: callFrame)
-    let resultSet = try await evalFrame(withContext: ctx, framePtr: callFramePtr)
+    let resultSet = try await evalFrame(withContext: ctx, framePtr: callFramePtr, blocks: fn.blocks, caller: caller)
 
     guard case 0...1 = resultSet.count else {
         throw EvaluationError.internalError(
@@ -960,17 +947,31 @@ private func evalScanBlock(
     // Note: This is assuming that the ".locals" on a scope is a full set we can propagate.
     let subFramePtr = Ptr(
         toCopyOf: Frame(
-            withCtx: ctx,
-            blocks: [stmt.block],
             locals: try frame.v.currentScope().v.locals
         ))
     try subFramePtr.v.assignLocal(idx: stmt.key, value: key)
     try subFramePtr.v.assignLocal(idx: stmt.value, value: value)
 
-    let results = try await evalFrame(withContext: ctx, framePtr: subFramePtr)
+    // TODO this probably can be evalBlock
+    let results = try await evalFrame(withContext: ctx, framePtr: subFramePtr, blocks: [stmt.block], caller: stmt)
 
     // Copy out any locals set on the nested block
     try frame.v.currentScope().v.locals = subFramePtr.v.currentScope().v.locals
 
     return results
+}
+
+// popAndSquash pops the current scope off the stack, and squashes its locals into its parent
+// Returns the new current scope.
+private func popAndSquash(frame: Ptr<Frame>) throws -> Ptr<Scope> {
+    let scope = try frame.v.currentScope()
+    let currentLocals = scope.v.locals
+
+    guard let parentScope = frame.v.popScope() else {
+        throw EvaluationError.internalError(reason: "scope stack exhausted")
+    }
+
+    // Propagate any modified locals from the scope we just popped off
+    parentScope.v.locals = currentLocals
+    return parentScope
 }

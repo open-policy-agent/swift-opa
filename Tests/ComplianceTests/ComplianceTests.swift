@@ -10,6 +10,7 @@ extension Tag {
 }
 
 private let complianceFilterFlag = "OPA_COMPLIANCE_TESTS"
+private let complianceTraceLevelFlag = "OPA_COMPLIANCE_TRACE"
 
 // Feature flag compliance tests, set OPA_COMPLIANCE_TESTS=... to run
 func complianceEnabled() -> Bool {
@@ -35,6 +36,20 @@ struct ComplianceTests {
             return nil
         }
         return v
+    }
+
+    // Feature flag controlling compliance test trace level [none|full]
+    static var complianceTraceLevel: TraceLevel {
+        let v = ProcessInfo.processInfo.environment[complianceTraceLevelFlag]
+        guard let v else {
+            return .none
+        }
+        return switch v.lowercased() {
+        case "full":
+            .full
+        default:
+            .none
+        }
     }
 
     static var testDescriptors: [TestURL] {
@@ -174,20 +189,24 @@ struct ComplianceTests {
 
             let input = tc.input ?? [:]
 
+            let level = ComplianceTests.complianceTraceLevel
+            let tracer = BufferedQueryTracer(level: level)
+
             do {
                 let wantError = (tc.wantError != nil) || (tc.wantErrorCode != nil)
 
                 var resultSet: ResultSet
+
                 if wantError {
                     let wantErrorMsg = "expected error \(tc.wantError ?? "") / \(tc.wantErrorCode ?? "")"
 
                     try await #require(throws: (any Swift.Error).self, "\(wantErrorMsg)") {
-                        let _ = try await engine.evaluate(query: query, input: input)
+                        _ = try await engine.evaluate(query: query, input: input, tracer: tracer)
                     }
                     // TODO does wantError apply to all entrypoints in the tests?
                     continue queryLoop
                 } else {
-                    resultSet = try await engine.evaluate(query: query, input: input)
+                    resultSet = try await engine.evaluate(query: query, input: input, tracer: tracer)
                 }
 
                 // Aggregate the result sets
@@ -213,6 +232,7 @@ struct ComplianceTests {
                 try #require(translated == expected, "comparing results for \(query)")
             } catch {
                 print("\t❌ \(tc.testDescription) (\(query))")
+                tracer.prettyPrint(out: .standardOutput)
                 throw error
             }
             print("\t✅ \(tc.testDescription) (\(query))")

@@ -49,6 +49,15 @@ public struct BuiltinRegistry {
             "neq": BuiltinFuncs.notEq,
             "equal": BuiltinFuncs.equal,
 
+            // Encoding
+            "base64.encode": BuiltinFuncs.base64Encode,
+            "base64.decode": BuiltinFuncs.base64Decode,
+            "base64.is_valid": BuiltinFuncs.base64IsValid,
+            "base64url.encode": BuiltinFuncs.base64UrlEncode,
+            "base64url.decode": BuiltinFuncs.base64UrlDecode,
+            "hex.encode": BuiltinFuncs.hexEncode,
+            "hex.decode": BuiltinFuncs.hexDecode,
+
             // Objects
             "object.get": BuiltinFuncs.objectGet,
             "object.keys": BuiltinFuncs.objectKeys,

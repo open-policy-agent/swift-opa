@@ -96,7 +96,7 @@ struct BuiltinTests {
                 )
             )
         }
-        var want = "{" + allowedArgTypes.joined(separator: ",") + "}"
+        var want = allowedArgTypes.joined(separator: "|")
         if allowedArgTypes.count == 1 {
             want = allowedArgTypes[0]
         }

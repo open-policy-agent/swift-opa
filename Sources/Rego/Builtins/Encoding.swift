@@ -51,7 +51,7 @@ extension BuiltinFuncs {
 
         return .boolean(true)
     }
-    
+
     static func base64UrlEncode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
@@ -62,12 +62,12 @@ extension BuiltinFuncs {
         }
 
         // See corresponding Golang implementation differences in encoding/base64/base64.go
-        var encoded = Data(x.utf8).base64EncodedString()
+        let encoded = Data(x.utf8).base64EncodedString()
             .replacingOccurrences(of: "+", with: "-")
             .replacingOccurrences(of: "/", with: "_")
         return .string(encoded)
     }
-    
+
     static func base64UrlDecode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
@@ -76,9 +76,9 @@ extension BuiltinFuncs {
         guard case .string(var x) = args[0] else {
             throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
         }
-        
+
         x = x.replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
-        
+
         guard
             let base64Decoded = Data(base64Encoded: x, options: Data.Base64DecodingOptions(rawValue: 0))
                 .flatMap({ String(data: $0, encoding: .utf8) })
@@ -122,8 +122,8 @@ extension BuiltinFuncs {
 }
 
 // Helper extension to the Data to decode hex strings
-private extension Data {
-    init?(hex: String) {
+extension Data {
+    fileprivate init?(hex: String) {
         // Ensure that input string has even length
         // Note that empty string of length 0 is okay - it produces an empty loop below and resylts
         guard hex.count % 2 == 0 else {

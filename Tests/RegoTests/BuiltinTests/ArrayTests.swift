@@ -140,13 +140,13 @@ struct ArrayTests {
                 argIndex: 1, argName: "y", allowedArgTypes: ["array"],
                 generateNumberOfArgsTest: false),
             arrayConcatTests,
-            
+
             BuiltinTests.generateFailureTests(
                 builtinName: "array.reverse", sampleArgs: [[1, 2]],
                 argIndex: 0, argName: "x", allowedArgTypes: ["array"],
                 generateNumberOfArgsTest: true),
             arrayReverseTests,
-            
+
             BuiltinTests.generateFailureTests(
                 builtinName: "array.slice", sampleArgs: [[1, 2], 0, 1],
                 argIndex: 0, argName: "x", allowedArgTypes: ["array"],

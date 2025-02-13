@@ -128,7 +128,8 @@ struct EncodingTests {
             description: "encodes a string which should produce diffrent base64 and base64url encodings",
             name: "base64url.encode",
             args: ["\u{FFFD}~"],
-            expected: .success(.string("77-9fg==")) // Note - character - it is NOT in base64 alphabet, base64 would produce a + there
+            // Note - character - it is NOT in base64 alphabet, base64 would produce a + there
+            expected: .success(.string("77-9fg=="))
         ),
     ]
 
@@ -159,22 +160,48 @@ struct EncodingTests {
         ),
     ]
 
-    
     static var allTests: [BuiltinTests.TestCase] {
         [
-            generateFailureTests(name: "base64.encode"),
+            BuiltinTests.generateFailureTests(
+                builtinName: "base64.encode", sampleArgs: [""],
+                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
             base64EncodeTests,
-            generateFailureTests(name: "base64.decode"),
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "base64.decode", sampleArgs: [""],
+                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
             base64DecodeTests,
-            generateFailureTests(name: "base64.is_valid"),
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "base64.is_valid", sampleArgs: [""],
+                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
             base64IsValidTests,
-            generateFailureTests(name: "base64url.encode"),
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "base64url.encode", sampleArgs: [""],
+                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
             base64UrlEncodeTests,
-            generateFailureTests(name: "base64url.decode"),
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "base64url.decode", sampleArgs: [""],
+                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
             base64UrlDecodeTests,
-            generateFailureTests(name: "hex.encode"),
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "hex.encode", sampleArgs: [""],
+                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
             hexEncodeTests,
-            generateFailureTests(name: "hex.decode"),
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "hex.decode", sampleArgs: [""],
+                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
             hexDecodeTests,
         ].flatMap { $0 }
     }
@@ -182,74 +209,5 @@ struct EncodingTests {
     @Test(arguments: allTests)
     func testBuiltins(tc: BuiltinTests.TestCase) async throws {
         try await BuiltinTests.testBuiltin(tc: tc)
-    }
-
-    // For Base64 tests, we will generate standard list of expected failures,
-    // covering arguments size checks and inputs of invalid type.
-    // Name argument is expected to match the builtin's name.
-    static func generateFailureTests(name: String) -> [BuiltinTests.TestCase] {
-        return [
-            BuiltinTests.TestCase(
-                description: "wrong number of arguments (too few)",
-                name: name,
-                args: [],
-                expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 1))
-            ),
-            BuiltinTests.TestCase(
-                description: "wrong number of arguments (too many)",
-                name: name,
-                args: [1, 2, 3],
-                expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 1))
-            ),
-            BuiltinTests.TestCase(
-                description: "incorrect argument type - array",
-                name: name,
-                args: [[1, 2, 3]],
-                expected: .failure(
-                    BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x", got: "array", want: "string"))
-            ),
-            BuiltinTests.TestCase(
-                description: "incorrect argument type - boolean",
-                name: name,
-                args: [true],
-                expected: .failure(
-                    BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x", got: "boolean", want: "string"))
-            ),
-            BuiltinTests.TestCase(
-                description: "incorrect argument type - null",
-                name: name,
-                args: [.null],
-                expected: .failure(
-                    BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x", got: "null", want: "string"))
-            ),
-            BuiltinTests.TestCase(
-                description: "incorrect argument type - number",
-                name: name,
-                args: [123],
-                expected: .failure(
-                    BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x", got: "number", want: "string"))
-            ),
-            BuiltinTests.TestCase(
-                description: "incorrect argument type - object",
-                name: name,
-                args: [["a": 1]],
-                expected: .failure(
-                    BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x", got: "object", want: "string"))
-            ),
-            BuiltinTests.TestCase(
-                description: "incorrect argument type - set",
-                name: name,
-                args: [.set([0])],
-                expected: .failure(
-                    BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x", got: "set", want: "string"))
-            ),
-            BuiltinTests.TestCase(
-                description: "incorrect argument type - undefined",
-                name: name,
-                args: [.undefined],
-                expected: .failure(
-                    BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x", got: "undefined", want: "string"))
-            ),
-        ]
     }
 }

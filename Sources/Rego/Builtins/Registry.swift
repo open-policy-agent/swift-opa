@@ -20,6 +20,8 @@ public struct BuiltinRegistry {
         return [
             // Aggregates
             "count": BuiltinFuncs.count,
+            "max": BuiltinFuncs.max,
+            "min": BuiltinFuncs.min,
 
             // Arithmetic
             "plus": BuiltinFuncs.plus,

@@ -598,6 +598,20 @@ struct IRStatementTests {
             expectLocals: [:],
             expectResult: .empty
         ),
+        TestCase(
+            description: "unsupported type lookup - undefined",
+            stmt: IR.DotStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                key: IR.Operand(type: .local, value: .localIndex(3)),
+                target: Local(4)
+            ),
+            locals: [
+                2: "double rainbow",
+                3: "what does it mean??",
+            ],
+            expectLocals: [:],
+            expectResult: .empty
+        ),
     ]
 
     @Test(arguments: allTests)

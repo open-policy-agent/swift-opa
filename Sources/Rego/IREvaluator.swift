@@ -540,8 +540,8 @@ func evalBlock(
                     targetValue = keyValue
                 }
             default:
-                throw EvaluationError.invalidDataType(
-                    reason: "cannot perform DotStmt on \(sourceValue.typeName)")
+                // Dot on non-collections is undefined
+                break
             }
 
             // This statement is undefined if the key does not exist in the source value.

@@ -58,6 +58,7 @@ public struct BuiltinRegistry {
             "base64.decode": BuiltinFuncs.base64Decode,
             "base64.is_valid": BuiltinFuncs.base64IsValid,
             "base64url.encode": BuiltinFuncs.base64UrlEncode,
+            "base64url.encode_no_pad": BuiltinFuncs.base64UrlEncodeNoPad,
             "base64url.decode": BuiltinFuncs.base64UrlDecode,
             "hex.encode": BuiltinFuncs.hexEncode,
             "hex.decode": BuiltinFuncs.hexDecode,

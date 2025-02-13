@@ -68,6 +68,23 @@ extension BuiltinFuncs {
         return .string(encoded)
     }
 
+    static func base64UrlEncodeNoPad(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+        }
+
+        guard case .string(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
+        }
+
+        // Same as base64URL encoding, without the padding at the end
+        let encoded = Data(x.utf8).base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .trimmingCharacters(in: CharacterSet(charactersIn: "="))
+        return .string(encoded)
+    }
+
     static func base64UrlDecode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
@@ -77,7 +94,12 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
         }
 
-        x = x.replacingOccurrences(of: "-", with: "+").replacingOccurrences(of: "_", with: "/")
+        // base64url.decode supports decoding both padded and unpadded strings
+        let paddingLength = x.count % 4 == 0 ? 0 : 4 - (x.count % 4)
+
+        x = x.replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+            .padding(toLength: x.count + paddingLength, withPad: "=", startingAt: 0)
 
         guard
             let base64Decoded = Data(base64Encoded: x, options: Data.Base64DecodingOptions(rawValue: 0))

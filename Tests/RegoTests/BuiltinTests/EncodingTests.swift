@@ -133,6 +133,28 @@ struct EncodingTests {
         ),
     ]
 
+    static let base64UrlEncodeNoPadTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "encodes empty string",
+            name: "base64url.encode_no_pad",
+            args: [""],
+            expected: .success(.string(""))
+        ),
+        BuiltinTests.TestCase(
+            description: "encodes a string",
+            name: "base64url.encode_no_pad",
+            args: ["Lorem ipsum dolor sit amet"],
+            expected: .success(.string("TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQ"))
+        ),
+        BuiltinTests.TestCase(
+            description: "encodes a string which should produce diffrent base64 and base64url encodings",
+            name: "base64url.encode_no_pad",
+            args: ["\u{FFFD}~"],
+            // Note - character - it is NOT in base64 alphabet, base64 would produce a + there
+            expected: .success(.string("77-9fg"))
+        ),
+    ]
+
     static let base64UrlDecodeTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "decodes empty string",
@@ -147,9 +169,21 @@ struct EncodingTests {
             expected: .success(.string("Lorem ipsum dolor sit amet"))
         ),
         BuiltinTests.TestCase(
+            description: "decodes an unpadded valid base64 string",
+            name: "base64url.decode",
+            args: ["TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQ"],
+            expected: .success(.string("Lorem ipsum dolor sit amet"))
+        ),
+        BuiltinTests.TestCase(
             description: "decodes a valid base64url string which is not a valid base64 string",
             name: "base64url.decode",
             args: ["77-9fg=="],
+            expected: .success(.string("\u{FFFD}~"))
+        ),
+        BuiltinTests.TestCase(
+            description: "decodes an unpadded valid base64url string which is not a valid base64 string",
+            name: "base64url.decode",
+            args: ["77-9fg"],
             expected: .success(.string("\u{FFFD}~"))
         ),
         BuiltinTests.TestCase(
@@ -185,6 +219,12 @@ struct EncodingTests {
                 argIndex: 0, argName: "x", allowedArgTypes: ["string"],
                 generateNumberOfArgsTest: true),
             base64UrlEncodeTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "base64url.encode_no_pad", sampleArgs: [""],
+                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
+            base64UrlEncodeNoPadTests,
 
             BuiltinTests.generateFailureTests(
                 builtinName: "base64url.decode", sampleArgs: [""],

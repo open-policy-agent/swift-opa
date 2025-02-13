@@ -167,6 +167,12 @@ public struct DotStatement: Statement, Codable, Equatable {
     public var key: Operand
     public var target: Local
 
+    public init(source: Operand, key: Operand, target: Local) {
+        self.source = source
+        self.key = key
+        self.target = target
+    }
+
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false

@@ -531,8 +531,7 @@ func evalBlock(
                 if case .number(let numberValue) = keyValue {
                     let idx = numberValue.intValue
                     if idx < 0 || idx >= sourceArray.count {
-                        throw EvaluationError.internalError(
-                            reason: "DotStmt key array index out of bounds")
+                        break
                     }
                     targetValue = sourceArray[idx]
                 }
@@ -553,7 +552,7 @@ func evalBlock(
             try framePtr.v.assignLocal(idx: stmt.target, value: targetValue)
 
         case let stmt as IR.EqualStatement:
-            //This statement is undefined if a is not equal to b.
+            // This statement is undefined if a is not equal to b.
             let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
             let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
             if a == .undefined || b == .undefined || a != b {

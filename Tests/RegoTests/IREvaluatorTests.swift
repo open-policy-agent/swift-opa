@@ -246,6 +246,7 @@ struct IRStatementTests {
     }
 
     static let allTests: [TestCase] = [
+        dotStmtTests,
         lenStmtTests,
         objectInsertOnceStmtTests,
     ].flatMap { $0 }
@@ -490,6 +491,112 @@ struct IRStatementTests {
             returnIdx: Local(4),
             expectError: false,
             expectResult: ResultSet.empty
+        ),
+    ]
+    static let dotStmtTests: [TestCase] = [
+        TestCase(
+            description: "in-bounds array lookup",
+            stmt: IR.DotStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                key: IR.Operand(type: .local, value: .localIndex(3)),
+                target: Local(4)
+            ),
+            locals: [
+                2: ["a", "b", "c"],
+                3: 1,
+            ],
+            expectLocals: [
+                4: "b"
+            ],
+            expectResult: .empty
+        ),
+        TestCase(
+            description: "out-of-bounds array lookup is undefined",
+            stmt: IR.DotStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                key: IR.Operand(type: .local, value: .localIndex(3)),
+                target: Local(4)
+            ),
+            locals: [
+                2: [0, 1, 2],
+                3: 3,
+            ],
+            expectLocals: [:],
+            expectResult: .empty
+        ),
+        TestCase(
+            description: "negative out-of-bounds array lookup is undefined",
+            stmt: IR.DotStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                key: IR.Operand(type: .local, value: .localIndex(3)),
+                target: Local(4)
+            ),
+            locals: [
+                2: [0, 1, 2],
+                3: -1,
+            ],
+            expectLocals: [:],
+            expectResult: .empty
+        ),
+        TestCase(
+            description: "object lookup",
+            stmt: IR.DotStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                key: IR.Operand(type: .local, value: .localIndex(3)),
+                target: Local(4)
+            ),
+            locals: [
+                2: ["a": "z"],
+                3: "a",
+            ],
+            expectLocals: [
+                4: "z"
+            ],
+            expectResult: .empty
+        ),
+        TestCase(
+            description: "object lookup - key not found",
+            stmt: IR.DotStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                key: IR.Operand(type: .local, value: .localIndex(3)),
+                target: Local(4)
+            ),
+            locals: [
+                2: ["a": "z"],
+                3: "b",
+            ],
+            expectLocals: [:],
+            expectResult: .empty
+        ),
+        TestCase(
+            description: "set lookup",
+            stmt: IR.DotStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                key: IR.Operand(type: .local, value: .localIndex(3)),
+                target: Local(4)
+            ),
+            locals: [
+                2: .set(["x", "y"]),
+                3: "x",
+            ],
+            expectLocals: [
+                4: "x"
+            ],
+            expectResult: .empty
+        ),
+        TestCase(
+            description: "set lookup - not found",
+            stmt: IR.DotStatement(
+                source: IR.Operand(type: .local, value: .localIndex(2)),
+                key: IR.Operand(type: .local, value: .localIndex(3)),
+                target: Local(4)
+            ),
+            locals: [
+                2: .set(["x", "y"]),
+                3: "z",
+            ],
+            expectLocals: [:],
+            expectResult: .empty
         ),
     ]
 

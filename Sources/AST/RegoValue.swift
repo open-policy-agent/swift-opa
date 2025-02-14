@@ -45,6 +45,14 @@ extension RegoValue {
         return true
     }
 
+    public var isFloat: Bool {
+        guard case .number = self else {
+            return false
+        }
+        // We know it is a number, so if it is not an int, it must be a float
+        return self.integerValue == nil
+    }
+
     public var integerValue: Int? {
         guard case .number(let number) = self else {
             return nil

@@ -426,6 +426,69 @@ struct StringsTests {
         ),
     ]
 
+    static let sprintfBasicTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "base",
+            name: "sprintf",
+            args: ["hello, %s", ["world!"]],
+            expected: .success("hello, world!")
+        ),
+        BuiltinTests.TestCase(
+            description: "no format args",
+            name: "sprintf",
+            args: ["hello, world!", []],
+            expected: .success("hello, world!")
+        ),
+        BuiltinTests.TestCase(
+            description: "multiple args",
+            name: "sprintf",
+            args: ["%v, %v%s", ["hello", "world", "!"]],
+            expected: .success("hello, world!")
+        ),
+        BuiltinTests.TestCase(
+            description: "multiple args with indexes",
+            name: "sprintf",
+            args: ["%[2]v %[1]v %v %[1]v %[2]v %v %[3]v %[9]v", [1, 2, 3]],
+            expected: .success("2 1 2 1 2 3 3 %!v(BADINDEX)")
+        ),
+        BuiltinTests.TestCase(
+            description: "json encoded for complex types",
+            name: "sprintf",
+            args: ["%v", [["hello": "world", "nested": ["obj": "val"]]]],
+            expected: .success("{\"hello\":\"world\",\"nested\":{\"obj\":\"val\"}}")
+        ),
+        BuiltinTests.TestCase(
+            description: "int",
+            name: "sprintf",
+            args: ["hello, int %d", [123]],
+            expected: .success("hello, int 123")
+        ),
+        BuiltinTests.TestCase(
+            description: "too many args",
+            name: "sprintf",
+            args: ["hello, world!", "world"],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
+        ),
+        BuiltinTests.TestCase(
+            description: "not enough args",
+            name: "sprintf",
+            args: ["%s"],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong type arg 1",
+            name: "sprintf",
+            args: [["%s"], ["world!"]],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "format"))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong type arg 2",
+            name: "sprintf",
+            args: ["hello, %s", "world!"],
+            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "values"))
+        ),
+    ]
+
     static let trimTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "base",
@@ -506,6 +569,7 @@ struct StringsTests {
             indexOfTests,
             lowerTests,
             splitTests,
+            sprintfBasicTests,
             trimTests,
             upperTests,
         ].flatMap { $0 }

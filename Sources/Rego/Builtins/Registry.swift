@@ -81,6 +81,7 @@ public struct BuiltinRegistry {
             "split": BuiltinFuncs.split,
             "trim": BuiltinFuncs.trim,
             "lower": BuiltinFuncs.lower,
+            "sprintf": BuiltinFuncs.sprintf,
             "upper": BuiltinFuncs.upper,
 
             // Trace

@@ -115,13 +115,15 @@ extension RegoValue: Codable {
             // values, we'll do it ourselves.. Assume that at some point in the recursive
             // encoding we hit non-object (or empty object) values with concrete types for
             // the keys... then let the standard dictionary encoder handle the values.
+            let keyEncoder = JSONEncoder()
+            keyEncoder.outputFormatting = [.sortedKeys]
             let partiallyEncoded = try o.reduce(into: [String: RegoValue]()) { (result, elem) in
                 let strKey =
                     switch elem.key {
                     case .string(let s):
                         s
                     default:
-                        String(data: try JSONEncoder().encode(elem.key), encoding: .utf8)!
+                        String(data: try keyEncoder.encode([elem.key]), encoding: .utf8)!
                     }
                 result[strKey] = elem.value
             }
@@ -129,11 +131,17 @@ extension RegoValue: Codable {
         case .boolean(let b):
             try container.encode(b)
         case .number(let n):
-            try container.encode(n.stringValue)
+            if self.isFloat {
+                try container.encode(n.doubleValue)
+            } else {
+                try container.encode(n.intValue)
+            }
         case .null:
             try container.encodeNil()
         case .set(let s):
-            try container.encode(s)
+            // The sets don't seem to follow the usual rules for ordering, this is expensive but
+            // we need to give idempotent results on encoding outputs of a policy decision.
+            try container.encode(s.sorted())
         case .undefined:
             try container.encode("<undefined>")
         }

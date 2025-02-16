@@ -5,6 +5,6 @@ struct CLIRootCommand: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "swift-rego-cli",
         abstract: "An example command line showing swift-rego in action.",
-        subcommands: [EvalCommand.self]
+        subcommands: [EvalCommand.self, BenchCommand.self]
     )
 }

@@ -4,8 +4,12 @@ import Testing
 
 @testable import Rego
 
-@Suite("BuiltinTests - Array")
-struct ArrayTests {
+extension BuiltinTests {
+    @Suite("BuiltinTests - Array", .tags(.builtins))
+    struct ArrayTests {}
+}
+
+extension BuiltinTests.ArrayTests {
     static let arrayConcatTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "simple concat",

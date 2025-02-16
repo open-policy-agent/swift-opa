@@ -4,8 +4,12 @@ import Testing
 
 @testable import Rego
 
-@Suite("BuiltinTests - Aggregates")
-struct AggregatesTests {
+extension BuiltinTests {
+    @Suite("BuiltinTests - Aggregates", .tags(.builtins))
+    struct AggregatesTests {}
+}
+
+extension BuiltinTests.AggregatesTests {
     static let countTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "string count",

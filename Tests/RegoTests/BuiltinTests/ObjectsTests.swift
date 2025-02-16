@@ -4,8 +4,12 @@ import Testing
 
 @testable import Rego
 
-@Suite("BuiltinTests - Objects")
-struct ObjectTests {
+extension BuiltinTests {
+    @Suite("BuiltinTests - Objects", .tags(.builtins))
+    struct ObjectTests {}
+}
+
+extension BuiltinTests.ObjectTests {
     static let objectGetTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "simple key exists",

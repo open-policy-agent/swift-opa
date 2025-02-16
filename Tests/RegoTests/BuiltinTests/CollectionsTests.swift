@@ -4,8 +4,12 @@ import Testing
 
 @testable import Rego
 
-@Suite("BuiltinTests - Collections")
-struct CollectionsTests {
+extension BuiltinTests {
+    @Suite("BuiltinTests - Collections", .tags(.builtins))
+    struct CollectionsTests {}
+}
+
+extension BuiltinTests.CollectionsTests {
     // Tests isMemberOf
     static let isMemberOfTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(

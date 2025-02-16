@@ -4,8 +4,12 @@ import Testing
 
 @testable import Rego
 
-@Suite("BuiltinTests - Bits")
-struct BitsTests {
+extension BuiltinTests {
+    @Suite("BuiltinTests - Bits", .tags(.builtins))
+    struct BitsTests {}
+}
+
+extension BuiltinTests.BitsTests {
     static let bitsShiftLeftTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "0 << 0",

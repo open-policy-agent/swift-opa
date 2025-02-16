@@ -4,8 +4,12 @@ import Testing
 
 @testable import Rego
 
-@Suite("BuiltinTests - Types")
-struct TypesTests {
+extension BuiltinTests {
+    @Suite("BuiltinTests - Types", .tags(.builtins))
+    struct TypesTests {}
+}
+
+extension BuiltinTests.TypesTests {
     static var allTests: [BuiltinTests.TestCase] {
         [
             generate(

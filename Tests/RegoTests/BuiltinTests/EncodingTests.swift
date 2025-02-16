@@ -4,8 +4,12 @@ import Testing
 
 @testable import Rego
 
-@Suite("BuiltinTests - Encoding")
-struct EncodingTests {
+extension BuiltinTests {
+    @Suite("BuiltinTests - Encoding", .tags(.builtins))
+    struct EncodingTests {}
+}
+
+extension BuiltinTests.EncodingTests {
     static let base64EncodeTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "encodes empty string",

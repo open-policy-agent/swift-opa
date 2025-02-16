@@ -4,8 +4,12 @@ import Testing
 
 @testable import Rego
 
-@Suite("BuiltinTests - Comparison")
-struct ComparisonTests {
+extension BuiltinTests {
+    @Suite("BuiltinTests - Comparison", .tags(.builtins))
+    struct ComparisonTests {}
+}
+
+extension BuiltinTests.ComparisonTests {
 
     static let greaterThanTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(

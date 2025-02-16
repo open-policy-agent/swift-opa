@@ -4,6 +4,10 @@ import Testing
 
 @testable import Rego
 
+extension Tag {
+    @Tag public static var builtins: Self
+}
+
 @Suite("BuiltinTests")
 struct BuiltinTests {
     struct TestCase {
@@ -117,7 +121,6 @@ struct BuiltinTests {
 
         return tests
     }
-
 }
 
 extension BuiltinTests.TestCase: CustomTestStringConvertible {

@@ -4,8 +4,12 @@ import Testing
 
 @testable import Rego
 
-@Suite("BuiltinTests - Arithmetic")
-struct ArithmeticTests {
+extension BuiltinTests {
+    @Suite("BuiltinTests - Arithmetic", .tags(.builtins))
+    struct ArithmeticTests {}
+}
+
+extension BuiltinTests.ArithmeticTests {
     static let plusTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "1 + 1",

@@ -404,10 +404,11 @@ func evalBlock(
             throw EvaluationError.evaluationCancelled(reason: "parent task cancelled")
         }
 
-        framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.eval, stmt: statement)
+        // TODO
+        // framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.eval, stmt: statement)
 
         switch statement {
-        case let stmt as IR.ArrayAppendStatement:
+        case .arrayAppendStmt(let stmt):
             let array = framePtr.v.resolveLocal(idx: stmt.array)
             let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
             guard case .array(var arrayValue) = array, value != .undefined else {
@@ -416,11 +417,11 @@ func evalBlock(
             arrayValue.append(value)
             try framePtr.v.assignLocal(idx: stmt.array, value: .array(arrayValue))
 
-        case let stmt as IR.AssignIntStatement:
+        case .assignIntStmt(let stmt):
             try framePtr.v.assignLocal(
                 idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
 
-        case let stmt as IR.AssignVarOnceStatement:
+        case .assignVarOnceStmt(let stmt):
             let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
             guard sourceValue != .undefined else {
                 return .undefined
@@ -434,14 +435,14 @@ func evalBlock(
             }
             try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
 
-        case let stmt as IR.AssignVarStatement:
+        case .assignVarStmt(let stmt):
             let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
             guard sourceValue != .undefined else {
                 return .undefined
             }
             try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
 
-        case let stmt as IR.BlockStatement:
+        case .blockStmt(let stmt):
             guard let blocks = stmt.blocks else {
                 // Some plans emit null blocks for some reason
                 // Just skip this statement
@@ -460,7 +461,7 @@ func evalBlock(
                 results.formUnion(rs.results)
             }
 
-        case let stmt as IR.BreakStatement:
+        case .breakStmt(let stmt):
             // Index is the index of the block to jump out of starting with zero representing
             // the current block and incrementing by one for each outer block.
             // (https://www.openpolicyagent.org/docs/latest/ir/#breakstmt)
@@ -469,7 +470,7 @@ func evalBlock(
             // return after calling BlockResult.breakByOne() to decrement the counter.
             return BlockResult(results: results, breakCounter: stmt.index)
 
-        case let stmt as IR.CallDynamicStatement:
+        case .callDynamicStmt(let stmt):
             var path: [String] = []
             for p in stmt.path {
                 let segment = try framePtr.v.resolveOperand(ctx: ctx, p)
@@ -499,7 +500,7 @@ func evalBlock(
 
             try framePtr.v.assignLocal(idx: stmt.result, value: result)
 
-        case let stmt as IR.CallStatement:
+        case .callStmt(let stmt):
             let result = try await evalCall(
                 ctx: ctx,
                 frame: framePtr,
@@ -514,7 +515,7 @@ func evalBlock(
 
             try framePtr.v.assignLocal(idx: stmt.result, value: result)
 
-        case let stmt as IR.DotStatement:
+        case .dotStmt(let stmt):
             let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
             let keyValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
 
@@ -551,7 +552,7 @@ func evalBlock(
             }
             try framePtr.v.assignLocal(idx: stmt.target, value: targetValue)
 
-        case let stmt as IR.EqualStatement:
+        case .equalStmt(let stmt):
             // This statement is undefined if a is not equal to b.
             let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
             let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
@@ -559,34 +560,34 @@ func evalBlock(
                 return .undefined
             }
 
-        case let stmt as IR.IsArrayStatement:
+        case .isArrayStmt(let stmt):
             guard case .array = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
                 return .undefined
             }
 
-        case let stmt as IR.IsDefinedStatement:
+        case .isDefinedStmt(let stmt):
             // This statement is undefined if source is undefined.
             if case .undefined = framePtr.v.resolveLocal(idx: stmt.source) {
                 return .undefined
             }
 
-        case let stmt as IR.IsObjectStatement:
+        case .isObjectStmt(let stmt):
             guard case .object = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
                 return .undefined
             }
 
-        case let stmt as IR.IsSetStatement:
+        case .isSetStmt(let stmt):
             guard case .set = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
                 return .undefined
             }
 
-        case let stmt as IR.IsUndefinedStatement:
+        case .isUndefinedStmt(let stmt):
             // This statement is undefined if source is not undefined.
             guard case .undefined = framePtr.v.resolveLocal(idx: stmt.source) else {
                 return .undefined
             }
 
-        case let stmt as IR.LenStatement:
+        case .lenStmt(let stmt):
             let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
             guard sourceValue != .undefined else {
                 return .undefined
@@ -601,19 +602,19 @@ func evalBlock(
 
             try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: len)))
 
-        case let stmt as IR.MakeArrayStatement:
+        case .makeArrayStmt(let stmt):
             var arr: [AST.RegoValue] = []
             arr.reserveCapacity(Int(stmt.capacity))
             try framePtr.v.assignLocal(idx: stmt.target, value: .array(arr))
 
-        case let stmt as IR.MakeNullStatement:
+        case .makeNullStmt(let stmt):
             try framePtr.v.assignLocal(idx: stmt.target, value: .null)
 
-        case let stmt as IR.MakeNumberIntStatement:
+        case .makeNumberIntStmt(let stmt):
             try framePtr.v.assignLocal(
                 idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
 
-        case let stmt as IR.MakeNumberRefStatement:
+        case .makeNumberRefStmt(let stmt):
             let sourceStringValue = try framePtr.v.resolveStaticString(
                 ctx: ctx, Int(stmt.index))
             let formatter = NumberFormatter()
@@ -624,16 +625,16 @@ func evalBlock(
             }
             try framePtr.v.assignLocal(idx: stmt.target, value: .number(n))
 
-        case let stmt as IR.MakeObjectStatement:
+        case .makeObjectStmt(let stmt):
             try framePtr.v.assignLocal(idx: stmt.target, value: .object([:]))
 
-        case let stmt as IR.MakeSetStatement:
+        case .makeSetStmt(let stmt):
             try framePtr.v.assignLocal(idx: stmt.target, value: .set([]))
 
-        case _ as IR.NopStatement:
+        case .nopStmt:
             break
 
-        case let stmt as IR.NotEqualStatement:
+        case .notEqualStmt(let stmt):
             // This statement is undefined if a is equal to b.
             let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
             let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
@@ -641,7 +642,7 @@ func evalBlock(
                 return .undefined
             }
 
-        case let stmt as IR.NotStatement:
+        case .notStmt(let stmt):
             // We're going to evalaute the block in an isolated frame, propagating
             // local state, so that we can more easily see whether it succeeded.
             let rs = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: stmt, block: stmt.block)
@@ -659,7 +660,7 @@ func evalBlock(
             // TODO is this correct?
             results.formUnion(rs.results)
 
-        case let stmt as IR.ObjectInsertOnceStatement:
+        case .objectInsertOnceStmt(let stmt):
             let targetValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
             let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
             let target = framePtr.v.resolveLocal(idx: stmt.object)
@@ -682,7 +683,7 @@ func evalBlock(
             targetObjectValue[key] = targetValue
             try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
 
-        case let stmt as IR.ObjectInsertStatement:
+        case .objectInsertStmt(let stmt):
             let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
             let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
             let target = framePtr.v.resolveLocal(idx: stmt.object)
@@ -698,7 +699,7 @@ func evalBlock(
             targetObjectValue[key] = value
             try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
 
-        case let stmt as IR.ObjectMergeStatement:
+        case .objectMergeStmt(let stmt):
             let a = framePtr.v.resolveLocal(idx: stmt.a)
             let b = framePtr.v.resolveLocal(idx: stmt.b)
             if a == .undefined || b == .undefined {
@@ -713,10 +714,10 @@ func evalBlock(
             let merged = objectValueA.merge(with: objectValueB)
             try framePtr.v.assignLocal(idx: stmt.target, value: .object(merged))
 
-        case let stmt as IR.ResetLocalStatement:
+        case .resetLocalStmt(let stmt):
             try framePtr.v.assignLocal(idx: stmt.target, value: .undefined)
 
-        case let stmt as IR.ResultSetAddStatement:
+        case .resultSetAddStmt(let stmt):
             guard i == block.statements.count - 1 else {
                 // TODO can this be a warning?
                 throw EvaluationError.internalError(
@@ -732,12 +733,12 @@ func evalBlock(
             }
             return BlockResult(withValue: value)
 
-        case let stmt as IR.ReturnLocalStatement:
+        case .returnLocalStmt(let stmt):
             let result = framePtr.v.resolveLocal(idx: stmt.source)
             // TODO don't smuggle this on the resultset, put on BlockResult
             return BlockResult(withValue: result)  // might be undefined
 
-        case let stmt as IR.ScanStatement:
+        case .scanStmt(let stmt):
             // This statement is undefined if source is a scalar value or empty collection.
             let source = framePtr.v.resolveLocal(idx: stmt.source)
 
@@ -751,7 +752,7 @@ func evalBlock(
             // Propagate any results from the block's sub frame into the parent frame
             results.formUnion(rs)
 
-        case let stmt as IR.SetAddStatement:
+        case .setAddStmt(let stmt):
             let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
             let target = framePtr.v.resolveLocal(idx: stmt.set)
             guard value != .undefined && target != .undefined else {
@@ -766,7 +767,7 @@ func evalBlock(
             targetSetValue.insert(value)
             try framePtr.v.assignLocal(idx: stmt.set, value: .set(targetSetValue))
 
-        case let stmt as IR.WithStatement:
+        case .withStmt(let stmt):
             // First we need to resolve the value that will be upserted
             let overlayValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
 
@@ -810,9 +811,10 @@ func evalBlock(
             }
             results.formUnion(rs.results)
 
-        default:
-            throw EvaluationError.internalError(
-                reason: "unexpected statement type \(type(of: statement))")
+        case .unknown(let location):
+            // Included for completeness, but this won't happen in practice as IR.Block's
+            // decoder will have already failed to parse any unknown statements.
+            throw EvaluationError.internalError(reason: "unexpected statement at location: \(location)")
         }
 
         // Next statement of current block

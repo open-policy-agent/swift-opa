@@ -63,10 +63,14 @@ public struct Plan: Codable, Equatable, Sendable {
 }
 
 public struct Block: Equatable, Sendable {
-    public var statements: [any Statement]
+    public var statements: [AnyStatement]
 
     public init(statements: [any Statement]) {
-        self.statements = statements
+        self.statements = statements.map { AnyStatement($0) }
+    }
+
+    public mutating func appendStatement(_ stmt: any Statement) {
+        self.statements.append(AnyStatement(stmt))
     }
 
     // Equatable, we need a custom implementation for dynamic dispatch
@@ -76,37 +80,33 @@ public struct Block: Equatable, Sendable {
             return false
         }
 
-        for i in 0..<lhs.statements.count {
-            guard lhs.statements[i].isEqual(to: rhs.statements[i]) else {
-                return false
-            }
-        }
-
-        return true
+        return zip(lhs.statements, rhs.statements).allSatisfy { $0 == $1 }
     }
 }
 
 extension Block: Codable {
     enum CodingKeys: String, CodingKey {
         case statements = "stmts"
+
     }
     // Each abstract statement has a stmt with the polymorphic contents
     enum InnerCodingKeys: String, CodingKey {
         case innerStatement = "stmt"
     }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         var iter = try container.nestedUnkeyedContainer(forKey: .statements)
         var peek = iter
 
-        var out = [any Statement]()
+        var out: [AnyStatement] = []
         while !peek.isAtEnd {
-            let anyStmt = try peek.decode(AnyStatement.self)
+            let partial = try peek.decode(PartialStatement.self)
             let inner = try iter.nestedContainer(keyedBy: InnerCodingKeys.self)
 
             var outStmt: any Statement
 
-            switch anyStmt.type {
+            switch partial.type {
             case .arrayAppendStmt:
                 outStmt = try inner.decode(ArrayAppendStatement.self, forKey: .innerStatement)
             case .assignIntStmt:
@@ -175,15 +175,12 @@ extension Block: Codable {
                 outStmt = try inner.decode(SetAddStatement.self, forKey: .innerStatement)
             case .withStmt:
                 outStmt = try inner.decode(WithStatement.self, forKey: .innerStatement)
-            //            default:
-            //                // TODO This wouldn't get here if the type was unknown :/
-            //                throw StatementError.unknown(anyStmt.type.rawValue)
             }
 
             // Set location properties shared by any statement type
-            outStmt.location = anyStmt.inner.location
+            outStmt.location = partial.inner.location
 
-            out.append(outStmt)
+            out.append(AnyStatement(outStmt))
         }
 
         self.statements = out
@@ -195,10 +192,13 @@ extension Block: Codable {
     }
 }
 
-// AnyStatement represents the generic parts of a statement - its type and location.
+// PartialStatement represents the generic parts of a statement - its type and location.
 // This is used for partial decoding of polymorphic statements preceding the concrete
 // statement decoding.
-struct AnyStatement: Codable, Equatable {
+struct PartialStatement: Codable, Equatable {
+    // KnownStatements are all allowed values for the "type" field of
+    // serialized IR Statements (https://www.openpolicyagent.org/docs/latest/ir/#statements)
+    // NOTE: This must be kept in sync with the corresponding cases in AnyStatement.
     enum KnownStatements: String, Codable {
         case arrayAppendStmt = "ArrayAppendStmt"
         case assignIntStmt = "AssignIntStmt"
@@ -241,6 +241,121 @@ struct AnyStatement: Codable, Equatable {
     }
     var type: KnownStatements
     var inner: AnyInnerStatement
+}
+
+// AnyStatement is an enum over all supported statements
+public enum AnyStatement: Sendable, Equatable {
+    case arrayAppendStmt(ArrayAppendStatement)
+    case assignIntStmt(AssignIntStatement)
+    case assignVarOnceStmt(AssignVarOnceStatement)
+    case assignVarStmt(AssignVarStatement)
+    case blockStmt(BlockStatement)
+    case breakStmt(BreakStatement)
+    case callDynamicStmt(CallDynamicStatement)
+    case callStmt(CallStatement)
+    case dotStmt(DotStatement)
+    case equalStmt(EqualStatement)
+    case isArrayStmt(IsArrayStatement)
+    case isDefinedStmt(IsDefinedStatement)
+    case isObjectStmt(IsObjectStatement)
+    case isSetStmt(IsSetStatement)
+    case isUndefinedStmt(IsUndefinedStatement)
+    case lenStmt(LenStatement)
+    case makeArrayStmt(MakeArrayStatement)
+    case makeNullStmt(MakeNullStatement)
+    case makeNumberIntStmt(MakeNumberIntStatement)
+    case makeNumberRefStmt(MakeNumberRefStatement)
+    case makeObjectStmt(MakeObjectStatement)
+    case makeSetStmt(MakeSetStatement)
+    case nopStmt(NopStatement)
+    case notEqualStmt(NotEqualStatement)
+    case notStmt(NotStatement)
+    case objectInsertOnceStmt(ObjectInsertOnceStatement)
+    case objectInsertStmt(ObjectInsertStatement)
+    case objectMergeStmt(ObjectMergeStatement)
+    case resetLocalStmt(ResetLocalStatement)
+    case resultSetAddStmt(ResultSetAddStatement)
+    case returnLocalStmt(ReturnLocalStatement)
+    case scanStmt(ScanStatement)
+    case setAddStmt(SetAddStatement)
+    case withStmt(WithStatement)
+
+    case unknown(Location)
+
+    // Constructor to wrap any concrete statement in an AnyStatment
+    // NOTE: This is O(N) where N is the number of possible statements
+    public init(_ v: any Statement) {
+        switch v {
+        case let stmt as IR.ArrayAppendStatement:
+            self = .arrayAppendStmt(stmt)
+        case let stmt as IR.AssignIntStatement:
+            self = .assignIntStmt(stmt)
+        case let stmt as IR.AssignVarOnceStatement:
+            self = .assignVarOnceStmt(stmt)
+        case let stmt as IR.AssignVarStatement:
+            self = .assignVarStmt(stmt)
+        case let stmt as IR.BlockStatement:
+            self = .blockStmt(stmt)
+        case let stmt as IR.BreakStatement:
+            self = .breakStmt(stmt)
+        case let stmt as IR.CallDynamicStatement:
+            self = .callDynamicStmt(stmt)
+        case let stmt as IR.CallStatement:
+            self = .callStmt(stmt)
+        case let stmt as IR.DotStatement:
+            self = .dotStmt(stmt)
+        case let stmt as IR.EqualStatement:
+            self = .equalStmt(stmt)
+        case let stmt as IR.IsArrayStatement:
+            self = .isArrayStmt(stmt)
+        case let stmt as IR.IsDefinedStatement:
+            self = .isDefinedStmt(stmt)
+        case let stmt as IR.IsObjectStatement:
+            self = .isObjectStmt(stmt)
+        case let stmt as IR.IsSetStatement:
+            self = .isSetStmt(stmt)
+        case let stmt as IR.IsUndefinedStatement:
+            self = .isUndefinedStmt(stmt)
+        case let stmt as IR.LenStatement:
+            self = .lenStmt(stmt)
+        case let stmt as IR.MakeArrayStatement:
+            self = .makeArrayStmt(stmt)
+        case let stmt as IR.MakeNullStatement:
+            self = .makeNullStmt(stmt)
+        case let stmt as IR.MakeNumberIntStatement:
+            self = .makeNumberIntStmt(stmt)
+        case let stmt as IR.MakeNumberRefStatement:
+            self = .makeNumberRefStmt(stmt)
+        case let stmt as IR.MakeObjectStatement:
+            self = .makeObjectStmt(stmt)
+        case let stmt as IR.MakeSetStatement:
+            self = .makeSetStmt(stmt)
+        case let stmt as IR.NotEqualStatement:
+            self = .notEqualStmt(stmt)
+        case let stmt as IR.NotStatement:
+            self = .notStmt(stmt)
+        case let stmt as IR.ObjectInsertOnceStatement:
+            self = .objectInsertOnceStmt(stmt)
+        case let stmt as IR.ObjectInsertStatement:
+            self = .objectInsertStmt(stmt)
+        case let stmt as IR.ObjectMergeStatement:
+            self = .objectMergeStmt(stmt)
+        case let stmt as IR.ResetLocalStatement:
+            self = .resetLocalStmt(stmt)
+        case let stmt as IR.ResultSetAddStatement:
+            self = .resultSetAddStmt(stmt)
+        case let stmt as IR.ReturnLocalStatement:
+            self = .returnLocalStmt(stmt)
+        case let stmt as IR.ScanStatement:
+            self = .scanStmt(stmt)
+        case let stmt as IR.SetAddStatement:
+            self = .setAddStmt(stmt)
+        case let stmt as IR.WithStatement:
+            self = .withStmt(stmt)
+        default:
+            self = .unknown(v.location)
+        }
+    }
 }
 
 // AnyInnerStatement represents the generic stmt field, which should always contain location fields.

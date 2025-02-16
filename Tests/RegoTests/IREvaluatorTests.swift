@@ -217,7 +217,7 @@ struct IRStatementTests {
                 ),
                 IR.ResultSetAddStatement(value: wrappedIdx),
             ])
-            block.statements.append(
+            block.appendStatement(
                 IR.BlockStatement(blocks: [returnBlock])
             )
         }

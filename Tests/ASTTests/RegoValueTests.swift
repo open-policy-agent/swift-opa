@@ -93,6 +93,9 @@ func testNumberIsInteger() throws {
     #expect(AST.RegoValue.number(NSNumber(value: Float(0))).integerValue == 0)
     #expect(AST.RegoValue.number(NSNumber(value: Bool(false))).integerValue == 0)
     #expect(AST.RegoValue.number(NSNumber(value: Bool(true))).integerValue == 1)
+    #expect(
+        AST.RegoValue.number(NSNumber(value: UInt64(9_223_372_036_854_775_807))).integerValue
+            == 9_223_372_036_854_775_807)
 
     // Not integers
     #expect(AST.RegoValue.number(NSNumber(value: Double(1.234567890))).integerValue == nil)

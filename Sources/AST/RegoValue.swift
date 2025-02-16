@@ -53,40 +53,44 @@ extension RegoValue {
         return self.integerValue == nil
     }
 
-    public var integerValue: Int? {
+    /// The (long) integer value of a RegoValue, if it is a .number and contained value is in fact a whole number.
+    /// Note that Decimals and Floats are treated as integers when they don't have fractional reminders.
+    /// This does not do rounding or truncation and instead (for float types) relies on Decimal implementaion
+    /// to detect whether or not a decimal is a whole number or not.
+    /// In all other cases, including different types of RegoValue, nil is returned.
+    public var integerValue: Int64? {
         guard case .number(let number) = self else {
             return nil
         }
 
-        // TODO: Whats more sketchy? This switch that might not be exhaustive or the math check that might be lossy and more slow?
-        //switch numberType {
-        //    case
-        //        .sInt8Type,
-        //        .sInt16Type,
-        //        .sInt32Type,
-        //        .sInt64Type,
-        //        .shortType,
-        //        .intType,
-        //        .longType,
-        //        .longLongType,
-        //        .charType,
-        //        .cfIndexType,
-        //        .nsIntegerType:
-        //    return true
-        //default:
-        //    return false
-
-        let decimalValue = Decimal(number.doubleValue)
-        let integerValue = number.intValue
-
-        // Check if there is a fractional part comparing between coerced types
-        // to detect truncation of the number when its an Integer
-        let fractionalRemainder = decimalValue - Decimal(integerValue)
-        guard fractionalRemainder == Decimal(0) else {
-            // It's probably a float
+        // For very large Int64's, the doubleValue is going to start losing precision
+        // so we use an explicit switch.
+        // We check for fractional remainders only for float types
+        switch number.numberType {
+        case .sInt8Type,
+            .sInt16Type,
+            .sInt32Type,
+            .sInt64Type,
+            .shortType,
+            .intType,
+            .longType,
+            .longLongType,
+            .charType,
+            .cfIndexType,
+            .nsIntegerType:
+            return number.int64Value
+        // for Double and Float values, only return non-nil if they are ints
+        case .doubleType, .floatType, .float32Type, .float64Type, .cgFloatType:
+            let decimalValue = Decimal(number.doubleValue)
+            let fractionalRemainder = decimalValue - Decimal(number.int64Value)
+            guard fractionalRemainder == Decimal(0) else {
+                // It's probably a float
+                return nil
+            }
+            return number.int64Value
+        default:
             return nil
         }
-        return integerValue
     }
 
     public var typeName: String {

@@ -40,7 +40,12 @@ public struct BuiltinRegistry {
             "array.slice": BuiltinFuncs.arraySlice,
 
             // Bits
+            "bits.and": BuiltinFuncs.bitsAnd,
             "bits.lsh": BuiltinFuncs.bitsShiftLeft,
+            "bits.negate": BuiltinFuncs.bitsNegate,
+            "bits.or": BuiltinFuncs.bitsOr,
+            "bits.rsh": BuiltinFuncs.bitsShiftRight,
+            "bits.xor": BuiltinFuncs.bitsXor,
 
             // Collections
             "internal.member_2": BuiltinFuncs.isMemberOf,

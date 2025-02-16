@@ -339,7 +339,7 @@ private struct SimilarToGoFmtPrinter {
             // Check for a width field next, either "*" for an arg or explicit number
             if c == "*" {
                 if let width = self.currentArg?.integerValue ?? nil {
-                    self.flags.width = width
+                    self.flags.width = Int(width)
 
                     if self.flags.width! < 0 {
                         self.flags.width = abs(self.flags.width!)
@@ -398,7 +398,7 @@ private struct SimilarToGoFmtPrinter {
                 // See if there is an explict number or another * for an arg value
                 if c == "*" {
                     if let prec = self.currentArg?.integerValue ?? nil {
-                        self.flags.precision = prec
+                        self.flags.precision = Int(prec)
 
                         if self.flags.precision! < 0 {
                             // not valid
@@ -606,7 +606,7 @@ private struct SimilarToGoFmtPrinter {
         switch arg {
         case .number(let n):
             if let intVal = arg.integerValue {
-                self.fmtInt(intVal, verb)
+                self.fmtInt(Int(intVal), verb)
             } else {
                 self.fmtFloat(n, verb)
             }

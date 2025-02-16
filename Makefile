@@ -13,7 +13,8 @@ lint:
 
 .PHONY: test
 test:
-	swift test
+	mkdir -p .build/test-results
+	swift test --xunit-output .build/test-results/junit.xml
 
 .PHONY: build
 build:

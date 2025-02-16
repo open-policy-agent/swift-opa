@@ -5,11 +5,11 @@ all: fmt lint test build
 
 .PHONY: fmt
 fmt:
-	swift format format --configuration swift-format.config.json --parallel --recursive -i .
+	swift format format --parallel --recursive -i .
 
 .PHONY: lint
 lint:
-	swift format lint --configuration swift-format.config.json --parallel --recursive .
+	swift format lint --parallel --recursive .
 
 .PHONY: test
 test:

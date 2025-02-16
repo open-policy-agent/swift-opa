@@ -120,7 +120,7 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
         }
 
-        return .string(Data(x.utf8).map { String(format: "%02x", $0) }.joined())
+        return .string(Data(x.utf8).hexEncoded)
     }
 
     static func hexDecode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -133,7 +133,7 @@ extension BuiltinFuncs {
         }
 
         guard
-            let hexDecoded = Data(hex: x)
+            let hexDecoded = Data.fromHexEncoded(hex: x)
                 .flatMap({ String(data: $0, encoding: .utf8) })
         else {
             return .undefined
@@ -143,16 +143,17 @@ extension BuiltinFuncs {
     }
 }
 
-// Helper extension to the Data to decode hex strings
+/// Helper extension to the Data to encode and decode hex strings
 extension Data {
-    fileprivate init?(hex: String) {
+    /// Initialize Data with a Hex-Encoded String
+    static func fromHexEncoded(hex: String) -> Data? {
         // Ensure that input string has even length
         // Note that empty string of length 0 is okay - it produces an empty loop below and resylts
         guard hex.count % 2 == 0 else {
             return nil
         }
         // Each character is represented by TWO characters in the input hex string
-        self.init(capacity: hex.count / 2)
+        var d = Data.init(capacity: hex.count / 2)
 
         for i in stride(from: 0, to: hex.count, by: 2) {
             // Extract a two-character element starting at index I
@@ -164,7 +165,15 @@ extension Data {
             guard let byte = UInt8(element, radix: 16) else {
                 return nil
             }
-            self.append(byte)
+            d.append(byte)
         }
+
+        return d
+    }
+
+    /// Hex Encoding the Data.
+    /// Note that this may need to be optimized based on the perf testing.
+    var hexEncoded: String {
+        self.map { String(format: "%02x", $0) }.joined()
     }
 }

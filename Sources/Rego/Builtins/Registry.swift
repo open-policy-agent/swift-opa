@@ -53,6 +53,16 @@ public struct BuiltinRegistry {
             "neq": BuiltinFuncs.notEq,
             "equal": BuiltinFuncs.equal,
 
+            // Cryptography
+            "crypto.hmac.equal": BuiltinFuncs.hmacsEqual,
+            "crypto.hmac.md5": BuiltinFuncs.insecureMD5HMAC,
+            "crypto.hmac.sha1": BuiltinFuncs.insecureSha1HMAC,
+            "crypto.hmac.sha256": BuiltinFuncs.sha256HMAC,
+            "crypto.hmac.sha512": BuiltinFuncs.sha512HMAC,
+            "crypto.md5": BuiltinFuncs.insecureMD5Hash,
+            "crypto.sha1": BuiltinFuncs.insecureSHA1Hash,
+            "crypto.sha256": BuiltinFuncs.sha256Hash,
+
             // Encoding
             "base64.encode": BuiltinFuncs.base64Encode,
             "base64.decode": BuiltinFuncs.base64Decode,

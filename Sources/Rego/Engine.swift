@@ -19,11 +19,11 @@ public struct Engine {
         self.bundlePaths = withBundlePaths
     }
 
-    init(withBundles: [String: Bundle]) {
+    public init(withBundles: [String: Bundle]) {
         self.bundles = withBundles
     }
 
-    init(withPolicies policies: [IR.Policy], andStore store: any Store) {
+    public init(withPolicies policies: [IR.Policy], andStore store: any Store) {
         self.evaluator = IREvaluator(withPolicies: policies)
         self.store = store
     }

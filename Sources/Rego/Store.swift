@@ -29,7 +29,7 @@ struct NullStore: Store {
     }
 }
 
-struct InMemoryStore: Store {
+public struct InMemoryStore: Store {
     private var data: AST.RegoValue = AST.RegoValue.object([:])
 
     public init(initialData data: AST.RegoValue) {
@@ -51,7 +51,7 @@ struct InMemoryStore: Store {
         return current
     }
 
-    mutating func write(path: StoreKeyPath, value: AST.RegoValue) async throws {
+    public mutating func write(path: StoreKeyPath, value: AST.RegoValue) async throws {
         // TODO this is not achieving our goal of thread safety
         data = data.patch(with: value, at: path.segments)
     }

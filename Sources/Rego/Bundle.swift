@@ -1,11 +1,11 @@
 import AST
 import Foundation
 
-struct Bundle: Equatable, Sendable {
-    var manifest: Manifest = Manifest()
-    var planFiles: [BundleFile] = []
-    var regoFiles: [BundleFile] = []
-    var data: AST.RegoValue = .object([:])
+public struct Bundle: Equatable, Sendable {
+    public var manifest: Manifest = Manifest()
+    public var planFiles: [BundleFile] = []
+    public var regoFiles: [BundleFile] = []
+    public var data: AST.RegoValue = .object([:])
 
     // Internal - trie built from the manifest roots
     var rootsTrie: TrieNode
@@ -37,19 +37,21 @@ struct Bundle: Equatable, Sendable {
     }
 }
 
-struct Manifest: Equatable, Sendable {
-    var revision: String = ""
-    var roots: [String] = [""]
-    var regoVersion: Version = .regoV1
-    var metadata: AST.RegoValue = .null
-
-    enum Version: Int {
+public struct Manifest: Equatable, Sendable {
+    public var revision: String = ""
+    public var roots: [String] = [""]
+    public var regoVersion: Version = .regoV1
+    public var metadata: AST.RegoValue = .null
+    
+    
+    public enum Version: Int, Sendable {
         case regoV0 = 0
         case regoV1 = 1
     }
 }
 
-extension Manifest {
+
+public extension Manifest {
     init(from jsonData: Data) throws {
         let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
         guard let jsonDict = jsonObject as? [String: Any] else {
@@ -99,7 +101,7 @@ extension Manifest {
     }
 }
 
-struct BundleFile: Sendable, Hashable {
-    let url: URL  // relative to bundle root
-    let data: Data
+public struct BundleFile: Sendable, Hashable {
+    public let url: URL  // relative to bundle root
+    public let data: Data
 }

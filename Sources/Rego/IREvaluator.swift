@@ -71,7 +71,7 @@ internal struct IndexedIRPolicy {
 
     // Policy functions indexed by function name
     var funcs: [String: IR.Func] = [:]
-    
+
     // Policy functions indexed by path name
     var funcsPathToName: [String: String] = [:]
 
@@ -752,7 +752,7 @@ func evalBlock(
             // After clarification, the correct behavior should be: "This statement is undefined if the source is a scalar or undefined.",
             // i.e. we need to ensure it is a collection type, but empty is allowed.
             let source = framePtr.v.resolveLocal(idx: stmt.source)
-            
+
             // Ensure the source is defined and not a scalar type
             guard source != .undefined, source.isCollection else {
                 return .undefined
@@ -860,7 +860,7 @@ private func evalCall(
 
         argValues.append(arg)
     }
-    
+
     if isDynamic {
         // DynamicCallStmt doesn't reference functions by name (as labeled in the IR), it will be by path,
         // eg, ["g0", "a", "b"] versus the "name" like "g0.data.a.b"
@@ -893,7 +893,7 @@ private func evalCall(
         location: try frame.v.currentLocation(withCtx: ctx, stmt: caller),
         tracer: ctx.ctx.tracer
     )
-    
+
     return try await ctx.ctx.builtins.invoke(withCtx: bctx, name: funcName, args: argValues)
 }
 

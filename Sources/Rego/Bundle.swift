@@ -42,17 +42,15 @@ public struct Manifest: Equatable, Sendable {
     public var roots: [String] = [""]
     public var regoVersion: Version = .regoV1
     public var metadata: AST.RegoValue = .null
-    
-    
+
     public enum Version: Int, Sendable {
         case regoV0 = 0
         case regoV1 = 1
     }
 }
 
-
-public extension Manifest {
-    init(from jsonData: Data) throws {
+extension Manifest {
+    public init(from jsonData: Data) throws {
         let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
         guard let jsonDict = jsonObject as? [String: Any] else {
             throw DecodingError.typeMismatch(
@@ -93,7 +91,7 @@ public extension Manifest {
         self.metadata = metadataValue
     }
 
-    enum CodingKeys: String, CodingKey {
+    public enum CodingKeys: String, CodingKey {
         case revision = "revision"
         case roots = "roots"
         case regoVersion = "rego_version"

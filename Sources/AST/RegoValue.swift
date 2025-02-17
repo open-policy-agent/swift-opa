@@ -1,3 +1,4 @@
+import CoreFoundation
 import Foundation
 
 // RegoValue represents any concrete JSON-representable value consumable by Rego
@@ -44,7 +45,7 @@ extension RegoValue {
         }
         return true
     }
-    
+
     public var isCollection: Bool {
         switch self {
         case .array, .object, .set:
@@ -75,21 +76,7 @@ extension RegoValue {
         // For very large Int64's, the doubleValue is going to start losing precision
         // so we use an explicit switch.
         // We check for fractional remainders only for float types
-        switch number.numberType {
-        case .sInt8Type,
-            .sInt16Type,
-            .sInt32Type,
-            .sInt64Type,
-            .shortType,
-            .intType,
-            .longType,
-            .longLongType,
-            .charType,
-            .cfIndexType,
-            .nsIntegerType:
-            return number.int64Value
-        // for Double and Float values, only return non-nil if they are ints
-        case .doubleType, .floatType, .float32Type, .float64Type, .cgFloatType:
+        if number.isFloatType {
             let decimalValue = Decimal(number.doubleValue)
             let fractionalRemainder = decimalValue - Decimal(number.int64Value)
             guard fractionalRemainder == Decimal(0) else {
@@ -97,9 +84,8 @@ extension RegoValue {
                 return nil
             }
             return number.int64Value
-        default:
-            return nil
         }
+        return number.int64Value
     }
 
     public var typeName: String {
@@ -128,11 +114,28 @@ extension RegoValue {
 // We're trying to avoid confusing NSNumber(0) from false and NSNumber(1) from true.
 private let boolLiteral = NSNumber(booleanLiteral: true)
 extension NSNumber {
+    var asCFNumber: CFNumber? {
+        let cfNumberTypeID = CFNumberGetTypeID()
+        let myCFTypeID = CFGetTypeID(self)
+        guard myCFTypeID == cfNumberTypeID else {
+            return nil
+        }
+        #if os(Linux)
+            // This should be safe after the check above.
+            return unsafeBitCast(self, to: CFNumber.self)
+        #else
+            return self
+        #endif
+    }
+
     var isBool: Bool {
         return type(of: self) == type(of: boolLiteral)
     }
 
-    var numberType: CFNumberType {
-        return CFNumberGetType(self as CFNumber)
+    var isFloatType: Bool {
+        guard let cf = self.asCFNumber else {
+            return false
+        }
+        return CFNumberIsFloatType(cf)
     }
 }

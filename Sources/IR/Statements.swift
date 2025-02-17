@@ -65,11 +65,11 @@ public struct AssignVarStatement: Statement, Codable, Equatable {
 
     public var source: Operand
     public var target: Local
-    
+
     public init(location: Location? = nil, source: Operand, target: Local) {
         self.source = source
         self.target = target
-        
+
         guard let location else {
             return
         }
@@ -201,7 +201,7 @@ public struct EqualStatement: Statement, Codable, Equatable {
 
     public var a: Operand
     public var b: Operand
-    
+
     public init(a: Operand, b: Operand) {
         self.a = a
         self.b = b
@@ -293,7 +293,7 @@ public struct IsUndefinedStatement: Statement, Codable, Equatable {
 
     // NOTE: There is a mistake upstream in the spec, which specifies this as an operand (https://www.openpolicyagent.org/docs/latest/ir/#isundefinedstmt)
     public var source: Local
-    
+
     public init(source: Local) {
         self.source = source
     }
@@ -492,7 +492,7 @@ public struct NotEqualStatement: Statement, Codable, Equatable {
 
     public var a: Operand
     public var b: Operand
-    
+
     public init(a: Operand, b: Operand) {
         self.a = a
         self.b = b
@@ -653,7 +653,7 @@ public struct ScanStatement: Statement, Codable, Equatable {
     public var key: Local
     public var value: Local
     public var block: Block
-    
+
     public init(source: Local, key: Local, value: Local, block: Block) {
         self.source = source
         self.key = key

@@ -1,6 +1,11 @@
 import AST
-import CryptoKit
 import Foundation
+
+#if canImport(CryptoKit)
+    import CryptoKit
+#else
+    import Crypto
+#endif
 
 extension BuiltinFuncs {
     static func sha256Hash(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {

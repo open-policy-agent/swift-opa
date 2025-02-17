@@ -40,11 +40,11 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "array")
         }
 
-        guard case .number(var start) = args[1] else {
+        guard case .number(let start) = args[1] else {
             throw BuiltinError.argumentTypeMismatch(arg: "start", got: args[1].typeName, want: "number")
         }
 
-        guard case .number(var stop) = args[2] else {
+        guard case .number(let stop) = args[2] else {
             throw BuiltinError.argumentTypeMismatch(arg: "stop", got: args[2].typeName, want: "number")
         }
 
@@ -53,21 +53,24 @@ extension BuiltinFuncs {
             return .undefined
         }
 
+        var startInt = start.intValue
+        var stopInt = stop.intValue
+
         // Bring start within array bounds
-        if start.isLessThan(0) {
-            start = 0 as NSNumber
+        if startInt < 0 {
+            startInt = 0
         }
 
         // Bring stop within array bounds
-        if stop.isGreaterThan(x.count) {
-            stop = x.count as NSNumber
+        if stopInt > x.count {
+            stopInt = x.count
         }
 
         // When start > stop, immediately return an empty array
-        guard stop.isGreaterThanOrEqual(to: start) else {
+        guard stopInt >= startInt else {
             return .array([])
         }
 
-        return .array(Array(x[start.intValue..<stop.intValue]))
+        return .array(Array(x[startInt..<stopInt]))
     }
 }

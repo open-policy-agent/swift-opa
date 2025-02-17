@@ -16,7 +16,7 @@ func goldenFiles() -> [TestURL] {
         forResourcesWithExtension: "json",
         subdirectory: "Fixtures"
     )!
-    return files.map { TestURL(url: $0) }
+    return files.map { TestURL(url: $0 as URL) }
 }
 
 @Test("testParsingGolden", arguments: goldenFiles())

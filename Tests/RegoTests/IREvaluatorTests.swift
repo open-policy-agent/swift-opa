@@ -609,7 +609,7 @@ struct IRStatementTests {
             ),
             locals: [
                 // Can only scan collections
-                2: "not a collection",
+                2: "not a collection"
             ],
             expectLocals: [:],
             expectResult: .undefined
@@ -766,7 +766,7 @@ struct IRStatementTests {
                 2: .set(["a", "b", "c"])
             ],
             expectLocals: [:],
-            ignoreLocals: [3,4],
+            ignoreLocals: [3, 4],
             expectResult: ["a", "b", "c"]
         ),
         TestCase(
@@ -785,7 +785,7 @@ struct IRStatementTests {
                 2: .set([])
             ],
             expectLocals: [:],
-            ignoreLocals: [3,4],
+            ignoreLocals: [3, 4],
             expectResult: .empty
         ),
     ]

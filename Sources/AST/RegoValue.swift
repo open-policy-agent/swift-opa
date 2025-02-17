@@ -44,6 +44,15 @@ extension RegoValue {
         }
         return true
     }
+    
+    public var isCollection: Bool {
+        switch self {
+        case .array, .object, .set:
+            return true
+        default:
+            return false
+        }
+    }
 
     public var isFloat: Bool {
         guard case .number = self else {

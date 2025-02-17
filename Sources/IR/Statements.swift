@@ -65,6 +65,16 @@ public struct AssignVarStatement: Statement, Codable, Equatable {
 
     public var source: Operand
     public var target: Local
+    
+    public init(location: Location? = nil, source: Operand, target: Local) {
+        self.source = source
+        self.target = target
+        
+        guard let location else {
+            return
+        }
+        self.location = location
+    }
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -191,6 +201,11 @@ public struct EqualStatement: Statement, Codable, Equatable {
 
     public var a: Operand
     public var b: Operand
+    
+    public init(a: Operand, b: Operand) {
+        self.a = a
+        self.b = b
+    }
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -278,6 +293,10 @@ public struct IsUndefinedStatement: Statement, Codable, Equatable {
 
     // NOTE: There is a mistake upstream in the spec, which specifies this as an operand (https://www.openpolicyagent.org/docs/latest/ir/#isundefinedstmt)
     public var source: Local
+    
+    public init(source: Local) {
+        self.source = source
+    }
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -473,6 +492,11 @@ public struct NotEqualStatement: Statement, Codable, Equatable {
 
     public var a: Operand
     public var b: Operand
+    
+    public init(a: Operand, b: Operand) {
+        self.a = a
+        self.b = b
+    }
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
@@ -629,6 +653,13 @@ public struct ScanStatement: Statement, Codable, Equatable {
     public var key: Local
     public var value: Local
     public var block: Block
+    
+    public init(source: Local, key: Local, value: Local, block: Block) {
+        self.source = source
+        self.key = key
+        self.value = value
+        self.block = block
+    }
 
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {

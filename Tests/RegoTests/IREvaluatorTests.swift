@@ -180,16 +180,14 @@ struct IRStatementTests {
         var stmt: any Statement
         // locals are the input locals state
         var locals: Locals
-        // If provided, inject a ReturnSetStatment to return this local
-        var returnIdx: Local?
         // If provided, expectLocals will be overlaid over locals and compared to the
         // state of the frame after evaluation.
         var expectLocals: Locals?
+        // If provided, locals to ignore during comparison
+        var ignoreLocals: [Local] = []
         // expectError, if true, means we expect the statement to throw and exception
         var expectError: Bool = false
         // expectResult - if an explicit value is set, we will compare that to the resultSet.
-        // If this is left nil, and returnIdx was set, we will automatically compare to the
-        // same local as returnIdx (which we expected to be returned)
         var expectResult: ResultSet? = nil
     }
 
@@ -200,27 +198,10 @@ struct IRStatementTests {
         return lhs.merging(rhs) { (_, new) in new }
     }
 
-    func prepareFrame(forStatement stmt: any Statement, withLocals locals: Locals, andReturn returnIdx: Local? = nil)
+    func prepareFrame(forStatement stmt: any Statement, withLocals locals: Locals)
         -> (IREvaluationContext, Ptr<Frame>)
     {
-        var block = Block(statements: [stmt])
-
-        // Synthesize building a resultset with the specified local
-        if let returnIdx {
-            let wrappedIdx = Local(7777)
-            let returnBlock = Block(statements: [
-                IR.MakeObjectStatement(target: wrappedIdx),
-                IR.ObjectInsertStatement(
-                    key: IR.Operand(type: .stringIndex, value: .stringIndex(0)),  // "results"
-                    value: IR.Operand(type: .local, value: .localIndex(Int(returnIdx))),
-                    object: wrappedIdx
-                ),
-                IR.ResultSetAddStatement(value: wrappedIdx),
-            ])
-            block.appendStatement(
-                IR.BlockStatement(blocks: [returnBlock])
-            )
-        }
+        let block = Block(statements: [stmt])
 
         let policy = IndexedIRPolicy(
             policy: IR.Policy(
@@ -249,6 +230,7 @@ struct IRStatementTests {
         dotStmtTests,
         lenStmtTests,
         objectInsertOnceStmtTests,
+        scanStmtTests,
     ].flatMap { $0 }
 
     static let lenStmtTests: [TestCase] = [
@@ -261,7 +243,6 @@ struct IRStatementTests {
             locals: [
                 2: []
             ],
-            returnIdx: Local(3),
             expectLocals: [
                 3: 0
             ]
@@ -275,7 +256,6 @@ struct IRStatementTests {
             locals: [
                 2: [1, 2, 3, 4, 5]
             ],
-            returnIdx: Local(3),
             expectLocals: [
                 3: 5
             ]
@@ -289,7 +269,6 @@ struct IRStatementTests {
             locals: [
                 2: .set([])
             ],
-            returnIdx: Local(3),
             expectLocals: [
                 3: 0
             ]
@@ -303,7 +282,6 @@ struct IRStatementTests {
             locals: [
                 2: .set([1, 2])
             ],
-            returnIdx: Local(3),
             expectLocals: [
                 3: 2
             ]
@@ -317,7 +295,6 @@ struct IRStatementTests {
             locals: [
                 2: ""
             ],
-            returnIdx: Local(3),
             expectLocals: [
                 3: 0
             ]
@@ -331,7 +308,6 @@ struct IRStatementTests {
             locals: [
                 2: "hello, world"
             ],
-            returnIdx: Local(3),
             expectLocals: [
                 3: 12
             ]
@@ -345,7 +321,6 @@ struct IRStatementTests {
             locals: [
                 2: [:]
             ],
-            returnIdx: Local(3),
             expectLocals: [
                 3: 0
             ]
@@ -359,7 +334,6 @@ struct IRStatementTests {
             locals: [
                 2: ["foo": "bar", "baz": "qux"]
             ],
-            returnIdx: Local(3),
             expectLocals: [
                 3: 2
             ]
@@ -395,7 +369,7 @@ struct IRStatementTests {
             locals: [
                 2: .undefined
             ],
-            expectResult: .empty
+            expectResult: .undefined
         ),
     ]
 
@@ -412,7 +386,6 @@ struct IRStatementTests {
                 3: "value",
                 4: [:],
             ],
-            returnIdx: Local(4),
             expectLocals: [
                 4: ["key": "value"]
             ]
@@ -429,7 +402,6 @@ struct IRStatementTests {
                 3: "prev_value",
                 4: ["foo": "bar", "key": "prev_value"],
             ],
-            returnIdx: Local(4),
             expectLocals: [
                 4: ["foo": "bar", "key": "prev_value"]
             ]
@@ -473,9 +445,8 @@ struct IRStatementTests {
                 3: "new_value",
                 4: [:],
             ],
-            returnIdx: Local(4),
             expectError: false,
-            expectResult: ResultSet.empty
+            expectResult: .undefined
         ),
         TestCase(
             description: "value is undefined",
@@ -488,9 +459,8 @@ struct IRStatementTests {
                 2: "key",
                 4: [:],
             ],
-            returnIdx: Local(4),
             expectError: false,
-            expectResult: ResultSet.empty
+            expectResult: .undefined
         ),
     ]
     static let dotStmtTests: [TestCase] = [
@@ -507,8 +477,7 @@ struct IRStatementTests {
             ],
             expectLocals: [
                 4: "b"
-            ],
-            expectResult: .empty
+            ]
         ),
         TestCase(
             description: "out-of-bounds array lookup is undefined",
@@ -522,7 +491,7 @@ struct IRStatementTests {
                 3: 3,
             ],
             expectLocals: [:],
-            expectResult: .empty
+            expectResult: .undefined
         ),
         TestCase(
             description: "negative out-of-bounds array lookup is undefined",
@@ -536,7 +505,7 @@ struct IRStatementTests {
                 3: -1,
             ],
             expectLocals: [:],
-            expectResult: .empty
+            expectResult: .undefined
         ),
         TestCase(
             description: "object lookup",
@@ -551,8 +520,7 @@ struct IRStatementTests {
             ],
             expectLocals: [
                 4: "z"
-            ],
-            expectResult: .empty
+            ]
         ),
         TestCase(
             description: "object lookup - key not found",
@@ -566,7 +534,7 @@ struct IRStatementTests {
                 3: "b",
             ],
             expectLocals: [:],
-            expectResult: .empty
+            expectResult: .undefined
         ),
         TestCase(
             description: "set lookup",
@@ -581,8 +549,7 @@ struct IRStatementTests {
             ],
             expectLocals: [
                 4: "x"
-            ],
-            expectResult: .empty
+            ]
         ),
         TestCase(
             description: "set lookup - not found",
@@ -596,7 +563,7 @@ struct IRStatementTests {
                 3: "z",
             ],
             expectLocals: [:],
-            expectResult: .empty
+            expectResult: .undefined
         ),
         TestCase(
             description: "unsupported type lookup - undefined",
@@ -610,18 +577,227 @@ struct IRStatementTests {
                 3: "what does it mean??",
             ],
             expectLocals: [:],
+            expectResult: .undefined
+        ),
+    ]
+
+    static let scanStmtTests: [TestCase] = [
+        TestCase(
+            description: "source undefined",
+            stmt: IR.ScanStatement(
+                source: Local(2),
+                key: Local(3),
+                value: Local(4),
+                block: Block(statements: [])
+            ),
+            locals: [
+                2: .undefined
+            ],
+            expectLocals: [:],
+            expectResult: .undefined
+        ),
+        TestCase(
+            description: "scalar - undefined",
+            stmt: IR.ScanStatement(
+                source: Local(2),
+                key: Local(3),
+                value: Local(4),
+                block: Block(statements: [
+                    // Copy value into resultset
+                    ResultSetAddStatement(value: Local(4))
+                ])
+            ),
+            locals: [
+                // Can only scan collections
+                2: "not a collection",
+            ],
+            expectLocals: [:],
+            expectResult: .undefined
+        ),
+        TestCase(
+            description: "empty array",
+            stmt: IR.ScanStatement(
+                source: Local(2),
+                key: Local(3),
+                value: Local(4),
+                block: Block(statements: [
+                    // if any (key == value)
+                    EqualStatement(
+                        a: IR.Operand(type: .local, value: .localIndex(3)),
+                        b: IR.Operand(type: .local, value: .localIndex(4))
+                    ),
+                    AssignVarStatement(
+                        source: IR.Operand(type: .bool, value: .bool(true)),
+                        target: Local(5)
+                    ),
+                ])
+            ),
+            locals: [
+                2: []
+            ],
+            expectLocals: [:]
+        ),
+        TestCase(
+            description: "array - some iterations were truthy",
+            stmt: IR.ScanStatement(
+                source: Local(2),
+                key: Local(3),
+                value: Local(4),
+                block: Block(statements: [
+                    // if any (key == value)
+                    EqualStatement(
+                        a: IR.Operand(type: .local, value: .localIndex(3)),
+                        b: IR.Operand(type: .local, value: .localIndex(4))
+                    ),
+                    AssignVarStatement(
+                        source: IR.Operand(type: .bool, value: .bool(true)),
+                        target: Local(5)
+                    ),
+                ])
+            ),
+            locals: [
+                2: [9, 1, 8]
+            ],
+            expectLocals: [
+                // key/value from the last iteration
+                3: 2,
+                4: 8,
+                // The middle key/value pair were equal, so we set 5
+                5: true,
+            ]
+        ),
+        TestCase(
+            description: "array - none were truthy",
+            stmt: IR.ScanStatement(
+                source: Local(2),
+                key: Local(3),
+                value: Local(4),
+                block: Block(statements: [
+                    // if any (key == value)
+                    EqualStatement(
+                        a: IR.Operand(type: .local, value: .localIndex(3)),
+                        b: IR.Operand(type: .local, value: .localIndex(4))
+                    ),
+                    AssignVarStatement(
+                        source: IR.Operand(type: .bool, value: .bool(true)),
+                        target: Local(5)
+                    ),
+                ])
+            ),
+            locals: [
+                2: [9, 9, 9]
+            ],
+            expectLocals: [
+                // key/value from the last iteration
+                3: 2,
+                4: 9,
+                    // none of the iterations were equal, so we never set 5
+            ]
+        ),
+        TestCase(
+            description: "object - copy key/values into results",
+            stmt: IR.ScanStatement(
+                source: Local(2),
+                key: Local(3),
+                value: Local(4),
+                block: Block(statements: [
+                    BlockStatement(blocks: [
+                        Block(statements: [
+                            // Copy key into resultset
+                            ResultSetAddStatement(value: Local(3))
+                        ]),
+                        Block(statements: [
+                            // Copy value into resultset
+                            ResultSetAddStatement(value: Local(4))
+                        ]),
+                    ])
+                ])
+            ),
+            locals: [
+                2: [
+                    "a": 1,
+                    "b": 2,
+                    "c": 3,
+                ]
+            ],
+            expectLocals: [:],
+            ignoreLocals: [3, 4],
+            expectResult: ["a", "b", "c", 1, 2, 3]
+        ),
+        TestCase(
+            description: "object - empty",
+            stmt: IR.ScanStatement(
+                source: Local(2),
+                key: Local(3),
+                value: Local(4),
+                block: Block(statements: [
+                    BlockStatement(blocks: [
+                        Block(statements: [
+                            // Copy key into resultset
+                            ResultSetAddStatement(value: Local(3))
+                        ]),
+                        Block(statements: [
+                            // Copy value into resultset
+                            ResultSetAddStatement(value: Local(4))
+                        ]),
+                    ])
+                ])
+            ),
+            locals: [
+                // Empty object, so no iterations
+                2: [:]
+            ],
+            expectLocals: [:],
+            expectResult: .empty
+        ),
+        TestCase(
+            description: "set - copy values into result",
+            stmt: IR.ScanStatement(
+                source: Local(2),
+                key: Local(3),
+                value: Local(4),
+                block: Block(statements: [
+                    // Copy value into resultset
+                    ResultSetAddStatement(value: Local(4))
+                ])
+            ),
+            locals: [
+                // Empty set, so no iterations
+                2: .set(["a", "b", "c"])
+            ],
+            expectLocals: [:],
+            ignoreLocals: [3,4],
+            expectResult: ["a", "b", "c"]
+        ),
+        TestCase(
+            description: "set - empty",
+            stmt: IR.ScanStatement(
+                source: Local(2),
+                key: Local(3),
+                value: Local(4),
+                block: Block(statements: [
+                    // Copy value into resultset
+                    ResultSetAddStatement(value: Local(4))
+                ])
+            ),
+            locals: [
+                // Empty set, so no iterations
+                2: .set([])
+            ],
+            expectLocals: [:],
+            ignoreLocals: [3,4],
             expectResult: .empty
         ),
     ]
 
     @Test(arguments: allTests)
     func testStatementEvaluation(tc: TestCase) async throws {
-        // TODO - maybe add a ResultSetAdd always? and check for that?
-        let (ctx, frame) = prepareFrame(forStatement: tc.stmt, withLocals: tc.locals, andReturn: tc.returnIdx)
-        let blocks = ctx.policy.plans["generated"]?.blocks ?? []
-        let stmt = IR.BlockStatement(blocks: blocks)
+        let (ctx, frame) = prepareFrame(forStatement: tc.stmt, withLocals: tc.locals)
+        let block = IR.Block(statements: [tc.stmt])
+
+        let caller = IR.BlockStatement(blocks: [block])
         let result = await Result {
-            try await evalFrame(withContext: ctx, framePtr: frame, blocks: blocks, caller: stmt)
+            try await evalBlock(withContext: ctx, framePtr: frame, caller: caller, block: block)
         }
 
         guard !tc.expectError else {
@@ -635,27 +811,18 @@ struct IRStatementTests {
         let results = try result.get()
 
         // Check local expectations
-        let scope = try frame.v.currentScope()
         let expectLocals = mergeLocals(tc.locals, tc.expectLocals)
+
+        let scope = try frame.v.currentScope()
         var gotLocals = scope.v.locals
-        // Remove temporary local used for building ResultSet (see prepareFrame)
-        gotLocals.removeValue(forKey: Local(7777))
+        for idx in tc.ignoreLocals {
+            gotLocals[idx] = nil
+        }
         #expect(gotLocals == expectLocals, "comparing locals")
 
-        // Check result expectations
-        // If the test case doesn't explicitly say which results to expect, and
-        // it does specity a return idx, expect that local.
-        var expectResult: ResultSet
-        if tc.expectResult == nil && tc.returnIdx != nil {
-            expectResult = ResultSet()
-            expectResult.insert(
-                ["results": frame.v.resolveLocal(idx: tc.returnIdx!)]
-            )
-        } else {
-            expectResult = tc.expectResult ?? .empty
-        }
+        let expectResult = tc.expectResult ?? .empty
 
-        #expect(results == expectResult, "comparing results")
+        #expect(results.results == expectResult, "comparing results")
     }
 }
 

@@ -735,9 +735,6 @@ func evalBlock(
             guard value != .undefined else {
                 return .undefined
             }
-            guard case .object = value else {
-                return .undefined
-            }
             return BlockResult(withValue: value)
 
         case .returnLocalStmt(let stmt):
@@ -746,8 +743,20 @@ func evalBlock(
             return BlockResult(withValue: result)  // might be undefined
 
         case .scanStmt(let stmt):
-            // This statement is undefined if source is a scalar value or empty collection.
+            // From the spec: "This statement is undefined if source is a scalar value or empty collection."
+            // ...but from jarl (https://github.com/borgeby/jarl/blob/02262bde6553c6b3cd9325e6c1593dded13fa753/core/src/main/cljc/jarl/eval.cljc#L322C61-L323C10)
+            //   "OPA IR docs states 'source' may not be an empty collection;
+            //   but if we 'break' for such, statements like 'every x in [] { x != x }' will be 'undefined'."
+            // Also - "If the domain is empty, the overall statement is true."
+            //  ref: https://www.openpolicyagent.org/docs/latest/policy-language/#every-keyword
+            // After clarification, the correct behavior should be: "This statement is undefined if the source is a scalar or undefined.",
+            // i.e. we need to ensure it is a collection type, but empty is allowed.
             let source = framePtr.v.resolveLocal(idx: stmt.source)
+            
+            // Ensure the source is defined and not a scalar type
+            guard source != .undefined, source.isCollection else {
+                return .undefined
+            }
 
             let rs = try await evalScan(
                 ctx: ctx,
@@ -943,12 +952,11 @@ private func evalScan(
     switch source {
     case .array(let arr):
         for i in 0..<arr.count {
-            let k = try RegoValue(from: i)
+            let k: AST.RegoValue = .number(NSNumber(value: i))
             let v = arr[i] as AST.RegoValue
             let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
             results.formUnion(rs)
         }
-
     case .object(let o):
         for (k, v) in o {
             let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)

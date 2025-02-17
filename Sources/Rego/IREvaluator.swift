@@ -71,6 +71,9 @@ internal struct IndexedIRPolicy {
 
     // Policy functions indexed by function name
     var funcs: [String: IR.Func] = [:]
+    
+    // Policy functions indexed by path name
+    var funcsPathToName: [String: String] = [:]
 
     // Policy static values, indexes match original plan array
     var staticStrings: [String] = []
@@ -88,6 +91,9 @@ internal struct IndexedIRPolicy {
         for funcDecl in policy.funcs?.funcs ?? [] {
             // TODO: validator should ensure these names were unique
             self.funcs[funcDecl.name] = funcDecl
+            if !funcDecl.path.isEmpty {
+                self.funcsPathToName[funcDecl.path.joined(separator: ".")] = funcDecl.name
+            }
         }
         for string in policy.staticData?.strings ?? [] {
             self.staticStrings.append(string.value)
@@ -491,7 +497,8 @@ func evalBlock(
                     // TODO: make the CallDynamicStatement "args" match the CallStatement ones upstream..
                     IR.Operand(
                         type: Operand.OpType.local, value: Operand.Value.localIndex(Int($0)))
-                }
+                },
+                isDynamic: true
             )
 
             guard result != .undefined else {
@@ -829,7 +836,8 @@ private func evalCall(
     frame: Ptr<Frame>,
     caller: any Statement,
     funcName: String,
-    args: [IR.Operand]
+    args: [IR.Operand],
+    isDynamic: Bool = false
 ) async throws -> AST.RegoValue {
     var argValues: [AST.RegoValue] = []
     for arg in args {
@@ -842,6 +850,22 @@ private func evalCall(
         }
 
         argValues.append(arg)
+    }
+    
+    if isDynamic {
+        // DynamicCallStmt doesn't reference functions by name (as labeled in the IR), it will be by path,
+        // eg, ["g0", "a", "b"] versus the "name" like "g0.data.a.b"
+        // We strigify the path first so they come in here looking like "g0.a.b".
+        if let funcName = ctx.policy.funcsPathToName[funcName] {
+            return try await callPlanFunc(
+                ctx: ctx,
+                frame: frame,
+                caller: caller,
+                funcName: funcName,
+                args: argValues
+            )
+        }
+        throw EvaluationError.unknownDynamicFunction(name: "\(funcName)")
     }
 
     // Handle plan-defined functions first
@@ -860,6 +884,7 @@ private func evalCall(
         location: try frame.v.currentLocation(withCtx: ctx, stmt: caller),
         tracer: ctx.ctx.tracer
     )
+    
     return try await ctx.ctx.builtins.invoke(withCtx: bctx, name: funcName, args: argValues)
 }
 

@@ -1,0 +1,13 @@
+{
+  "name": "Swift 6",
+  "image": "swift:6.0",
+  "extensions": [
+    "swiftlang.swift-vscode"
+  ],
+  "settings": {
+    "lldb.library": "/usr/lib/liblldb.so"
+  },
+  "forwardPorts": [
+    8080
+  ]
+}

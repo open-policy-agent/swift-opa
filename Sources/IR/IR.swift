@@ -356,6 +356,93 @@ public enum AnyStatement: Sendable, Equatable {
             self = .unknown(v.location)
         }
     }
+
+    public var statement: Statement? {
+        switch self {
+        case .arrayAppendStmt(let s):
+            return s
+        case .assignIntStmt(let s):
+            return s
+        case .assignVarOnceStmt(let s):
+            return s
+        case .assignVarStmt(let s):
+            return s
+        case .blockStmt(let s):
+            return s
+        case .breakStmt(let s):
+            return s
+        case .callDynamicStmt(let s):
+            return s
+        case .callStmt(let s):
+            return s
+        case .dotStmt(let s):
+            return s
+        case .equalStmt(let s):
+            return s
+        case .isArrayStmt(let s):
+            return s
+        case .isDefinedStmt(let s):
+            return s
+        case .isObjectStmt(let s):
+            return s
+        case .isSetStmt(let s):
+            return s
+        case .isUndefinedStmt(let s):
+            return s
+        case .lenStmt(let s):
+            return s
+        case .makeArrayStmt(let s):
+            return s
+        case .makeNullStmt(let s):
+            return s
+        case .makeNumberIntStmt(let s):
+            return s
+        case .makeNumberRefStmt(let s):
+            return s
+        case .makeObjectStmt(let s):
+            return s
+        case .makeSetStmt(let s):
+            return s
+        case .nopStmt(let s):
+            return s
+        case .notEqualStmt(let s):
+            return s
+        case .notStmt(let s):
+            return s
+        case .objectInsertOnceStmt(let s):
+            return s
+        case .objectInsertStmt(let s):
+            return s
+        case .objectMergeStmt(let s):
+            return s
+        case .resetLocalStmt(let s):
+            return s
+        case .resultSetAddStmt(let s):
+            return s
+        case .returnLocalStmt(let s):
+            return s
+        case .scanStmt(let s):
+            return s
+        case .setAddStmt(let s):
+            return s
+        case .withStmt(let s):
+            return s
+        case .unknown:
+            return nil
+        }
+    }
+
+    public var location: Location {
+        switch self {
+        case .unknown(let loc):
+            return loc
+        default:
+            if let stmt = self as? Statement {
+                return stmt.location
+            }
+            return Location()
+        }
+    }
 }
 
 // AnyInnerStatement represents the generic stmt field, which should always contain location fields.

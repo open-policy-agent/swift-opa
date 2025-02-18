@@ -152,7 +152,7 @@ internal struct Frame {
         return self.scopeStack.last!
     }
 
-    func currentLocation(withCtx ctx: IREvaluationContext, stmt: any IR.Statement) throws -> TraceLocation {
+    func currentLocation(withCtx ctx: IREvaluationContext, stmt: IR.AnyStatement) throws -> TraceLocation {
         return TraceLocation(
             row: stmt.location.row,
             col: stmt.location.col,
@@ -204,7 +204,7 @@ internal struct Frame {
     func traceEvent(
         withCtx ctx: IREvaluationContext,
         op: TraceOperation,
-        stmt: any IR.Statement,
+        anyStmt: IR.AnyStatement,
         _ message: String = ""
     ) {
         guard let tracer = ctx.ctx.tracer else {
@@ -216,45 +216,59 @@ internal struct Frame {
         let msg: String
         switch op {
         case .enter:
-            switch stmt {
-            case let stmt as BlockStatement:
+            switch anyStmt {
+            case .blockStmt(let stmt):
                 let count = stmt.blocks?.count ?? 0
 
                 msg = "block (stmt_count=\(count)): \(stmt.debugString)"
-            case let stmt as CallStatement:
+            case .callStmt(let stmt):
                 msg = "function \(stmt.callFunc)"
-            case let stmt as CallDynamicStatement:
+            case .callDynamicStmt(let stmt):
                 // Resolve dynamic call path
                 let pathStr = resolveDynamicFunctionCallPath(withCtx: ctx, path: stmt.path)
                 msg = "dynamic function \(pathStr)"
             default:
-                msg = "\(type(of: stmt)) - \(stmt.debugString)"
+                if let stmt = anyStmt.statement {
+                    msg = "\(type(of: stmt)) - \(stmt.debugString)"
+                } else {
+                    msg = "<unknown>"
+                }
             }
         case .exit:
-            switch stmt {
-            case let stmt as BlockStatement:
+            switch anyStmt {
+            case .blockStmt(let stmt):
                 msg = "block \(stmt.debugString)"
-            case let stmt as CallStatement:
+            case .callStmt(let stmt):
                 msg = "function call \(stmt.callFunc)"
-            case let stmt as CallDynamicStatement:
+            case .callDynamicStmt(let stmt):
                 let pathStr = resolveDynamicFunctionCallPath(withCtx: ctx, path: stmt.path)
                 msg = "dynamic function \(pathStr)"
             default:
-                msg = "\(type(of: stmt)) - \(stmt.debugString)"
+                if let stmt = anyStmt.statement {
+                    msg = "\(type(of: stmt)) - \(stmt.debugString)"
+                } else {
+                    msg = "<unknown>"
+                }
             }
         default:
-            msg = "\(type(of: stmt)) \(formattedMessage) -> \(stmt.debugString)"
+            if let stmt = anyStmt.statement {
+                msg = "\(type(of: stmt)) \(formattedMessage) -> \(stmt.debugString)"
+            } else {
+                msg = "<unknown>"
+            }
         }
+        let traceLocation = anyStmt.location
         tracer.traceEvent(
             IRTraceEvent(
                 operation: op,
                 message: msg,
                 location: TraceLocation(
-                    row: stmt.location.row,
-                    col: stmt.location.col,
-                    file: ctx.policy.ir.staticData?.files?[stmt.location.file].value ?? "<unknown>"
+                    row: traceLocation.row,
+                    col: traceLocation.col,
+                    file: ctx.policy.ir.staticData?.files?[traceLocation.file].value ?? "<unknown>"
                 )
-            ))
+            )
+        )
     }
 
     // helper for rendering a dynamic call path into a string
@@ -311,7 +325,7 @@ private func evalPlan(
         ]
     )
     //
-    let caller = BlockStatement(blocks: plan.blocks)
+    let caller = IR.AnyStatement(BlockStatement(blocks: plan.blocks))
 
     let pFrame = Ptr(toCopyOf: frame)
     return try await evalFrame(withContext: ctx, framePtr: pFrame, blocks: plan.blocks, caller: caller)
@@ -322,7 +336,7 @@ internal func evalFrame(
     withContext ctx: IREvaluationContext,
     framePtr: Ptr<Frame>,
     blocks: [IR.Block],
-    caller: any Statement
+    caller: IR.AnyStatement
 ) async throws -> ResultSet {
     var results = ResultSet()
 
@@ -395,14 +409,14 @@ struct BlockResult {
 func evalBlock(
     withContext ctx: IREvaluationContext,
     framePtr: Ptr<Frame>,
-    caller: any IR.Statement,
+    caller: IR.AnyStatement,
     block: Block
 ) async throws -> BlockResult {
     var currentScopePtr = try framePtr.v.currentScope()
     var results = ResultSet.empty
 
-    framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.enter, stmt: caller)
-    defer { framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.exit, stmt: caller) }
+    framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.enter, anyStmt: caller)
+    defer { framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.exit, anyStmt: caller) }
 
     stmtLoop: for (i, statement) in block.statements.enumerated() {
 
@@ -410,8 +424,7 @@ func evalBlock(
             throw EvaluationError.evaluationCancelled(reason: "parent task cancelled")
         }
 
-        // TODO
-        // framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.eval, stmt: statement)
+        framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.eval, anyStmt: statement)
 
         switch statement {
         case .arrayAppendStmt(let stmt):
@@ -456,7 +469,7 @@ func evalBlock(
             }
 
             for block in blocks {
-                let rs = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: stmt, block: block)
+                let rs = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: statement, block: block)
                 if rs.shouldBreak {
                     return rs.breakByOne()
                 }
@@ -491,7 +504,7 @@ func evalBlock(
             let result = try await evalCall(
                 ctx: ctx,
                 frame: framePtr,
-                caller: stmt,
+                caller: statement,
                 funcName: funcName,
                 args: stmt.args.map {  // (╯°□°)╯︵ ┻━┻
                     // TODO: make the CallDynamicStatement "args" match the CallStatement ones upstream..
@@ -511,7 +524,7 @@ func evalBlock(
             let result = try await evalCall(
                 ctx: ctx,
                 frame: framePtr,
-                caller: stmt,
+                caller: statement,
                 funcName: stmt.callFunc,
                 args: stmt.args ?? []
             )
@@ -652,7 +665,7 @@ func evalBlock(
         case .notStmt(let stmt):
             // We're going to evalaute the block in an isolated frame, propagating
             // local state, so that we can more easily see whether it succeeded.
-            let rs = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: stmt, block: stmt.block)
+            let rs = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: statement, block: stmt.block)
             // TODO NotStmt over a breaking block deserves a unit test
             if rs.shouldBreak {
                 return rs.breakByOne()
@@ -811,7 +824,7 @@ func evalBlock(
             let rs = try await evalBlock(
                 withContext: ctx,
                 framePtr: framePtr,
-                caller: stmt,
+                caller: statement,
                 block: stmt.block
             )
 
@@ -843,7 +856,7 @@ func evalBlock(
 private func evalCall(
     ctx: IREvaluationContext,
     frame: Ptr<Frame>,
-    caller: any Statement,
+    caller: IR.AnyStatement,
     funcName: String,
     args: [IR.Operand],
     isDynamic: Bool = false
@@ -901,7 +914,7 @@ private func evalCall(
 private func callPlanFunc(
     ctx: IREvaluationContext,
     frame: Ptr<Frame>,
-    caller: any Statement,
+    caller: IR.AnyStatement,
     funcName: String,
     args: [AST.RegoValue]
 ) async throws -> AST.RegoValue {
@@ -974,7 +987,11 @@ private func evalScan(
 }
 
 private func evalScanBlock(
-    ctx: IREvaluationContext, frame: Ptr<Frame>, stmt: ScanStatement, key: AST.RegoValue, value: AST.RegoValue
+    ctx: IREvaluationContext,
+    frame: Ptr<Frame>,
+    stmt: ScanStatement,
+    key: AST.RegoValue,
+    value: AST.RegoValue
 ) async throws -> ResultSet {
     // Treat each block we iterate over as a frame and let it evaluate to completion. This
     // lets us drop any state on it and work around trying to jump around in this loop.
@@ -987,7 +1004,8 @@ private func evalScanBlock(
     try subFramePtr.v.assignLocal(idx: stmt.value, value: value)
 
     // TODO this probably can be evalBlock
-    let results = try await evalFrame(withContext: ctx, framePtr: subFramePtr, blocks: [stmt.block], caller: stmt)
+    let results = try await evalFrame(
+        withContext: ctx, framePtr: subFramePtr, blocks: [stmt.block], caller: IR.AnyStatement(stmt))
 
     // Copy out any locals set on the nested block
     try frame.v.currentScope().v.locals = subFramePtr.v.currentScope().v.locals

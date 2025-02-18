@@ -740,7 +740,13 @@ func evalBlock(
                         "unable to perform ObjectMergeStatement with types \(a.typeName)) and \(b.typeName))"
                 )
             }
-            let merged = objectValueA.merge(with: objectValueB)
+
+            // The IR spec says object B is merged in to object A.. however, it seems that
+            // the values in A need to take precedence, so we'll merge it in to B.
+            // Some context:
+            // - https://github.com/open-policy-agent/opa/issues/2926
+            // - https://github.com/open-policy-agent/opa/pull/3017
+            let merged = objectValueB.merge(with: objectValueA)
             try framePtr.v.assignLocal(idx: stmt.target, value: .object(merged))
 
         case .resetLocalStmt(let stmt):

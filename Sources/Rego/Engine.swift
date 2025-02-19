@@ -55,7 +55,7 @@ public struct Engine {
 
     public func evaluate(
         query: String,
-        input: AST.RegoValue = .object([:]),
+        input: AST.RegoValue = .undefined,
         tracer: QueryTracer? = nil
     ) async throws -> ResultSet {
         let ctx = EvaluationContext(

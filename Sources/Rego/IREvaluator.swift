@@ -332,7 +332,7 @@ private func evalPlan(
             localIdxData: try await ctx.ctx.store.read(path: StoreKeyPath(["data"])),
         ]
     )
-    //
+
     let caller = IR.AnyStatement(BlockStatement(blocks: plan.blocks))
 
     let pFrame = Ptr(toCopyOf: frame)
@@ -886,15 +886,10 @@ private func evalCall(
 ) async throws -> AST.RegoValue {
     var argValues: [AST.RegoValue] = []
     for arg in args {
-        let arg = try frame.v.resolveOperand(ctx: ctx, arg)
-
-        // If any argument (ie, statement "input") is undefined, bail out early
-        // and let the call statement become undefined too
-        guard arg != .undefined else {
-            return AST.RegoValue.undefined
-        }
-
-        argValues.append(arg)
+        // Note: we do not enforce that args are defined here, it appears
+        // that the expectation is that statements within the function blocks
+        // (for non-builtins) handle it.
+        argValues.append(try frame.v.resolveOperand(ctx: ctx, arg))
     }
 
     if isDynamic {
@@ -924,7 +919,15 @@ private func evalCall(
         )
     }
 
-    // Handle built-in functions second
+    // Handle built-in functions last
+
+    // We won't bother invoking the builtin function if one of the arguments is undefined
+    for argValue in argValues {
+        guard argValue != .undefined else {
+            return .undefined
+        }
+    }
+
     let bctx = BuiltinContext(
         location: try frame.v.currentLocation(withCtx: ctx, stmt: caller),
         tracer: ctx.ctx.tracer

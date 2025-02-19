@@ -218,7 +218,7 @@ struct IRStatementTests {
                 ),
                 funcs: IR.Funcs(funcs: funcs)
             ))
-        let ctx = EvaluationContext(query: "", input: [:])
+        let ctx = EvaluationContext(query: "", input: .undefined)
         let irCtx = IREvaluationContext(ctx: ctx, policy: policy)
 
         return (

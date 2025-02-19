@@ -147,10 +147,18 @@ struct IREvaluatorTests {
         if tc.expectedResult != actual {
             let tempDirectoryURL = FileManager.default.temporaryDirectory
             let tempFileURL = tempDirectoryURL.appendingPathComponent(UUID().uuidString)
-            FileManager.default.createFile(atPath: tempFileURL.path, contents: Data(), attributes: nil)
-            let tempFileHandle = try FileHandle(forWritingTo: tempFileURL)
-            bufferTracer.prettyPrint(out: tempFileHandle)
-            print("Debug Trace: \(tempFileURL.path)")
+            if !FileManager.default.createFile(atPath: tempFileURL.path, contents: Data(), attributes: nil) {
+                print(
+                    """
+                    WARNING! Failed to create a temporary file in \(tempDirectoryURL).
+                    Debug Trace will not be created.
+                    """
+                )
+            } else {
+                let tempFileHandle = try FileHandle(forWritingTo: tempFileURL)
+                bufferTracer.prettyPrint(out: tempFileHandle)
+                print("Debug Trace: \(tempFileURL.path)")
+            }
         }
         #expect(tc.expectedResult == actual)
     }

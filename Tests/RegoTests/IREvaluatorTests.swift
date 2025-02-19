@@ -182,6 +182,7 @@ struct IRStatementTests {
         var locals: Locals
         // If provided, expectLocals will be overlaid over locals and compared to the
         // state of the frame after evaluation.
+        var funcs: [IR.Func] = []
         var expectLocals: Locals?
         // If provided, locals to ignore during comparison
         var ignoreLocals: [Local] = []
@@ -198,7 +199,7 @@ struct IRStatementTests {
         return lhs.merging(rhs) { (_, new) in new }
     }
 
-    func prepareFrame(forStatement stmt: any Statement, withLocals locals: Locals)
+    func prepareFrame(forStatement stmt: any Statement, withLocals locals: Locals, withFuncs funcs: [IR.Func] = [])
         -> (IREvaluationContext, Ptr<Frame>)
     {
         let block = Block(statements: [stmt])
@@ -215,7 +216,7 @@ struct IRStatementTests {
                         Plan(name: "generated", blocks: [block])
                     ]
                 ),
-                funcs: nil
+                funcs: IR.Funcs(funcs: funcs)
             ))
         let ctx = EvaluationContext(query: "", input: [:])
         let irCtx = IREvaluationContext(ctx: ctx, policy: policy)
@@ -227,11 +228,54 @@ struct IRStatementTests {
     }
 
     static let allTests: [TestCase] = [
+        callStmtTests,
         dotStmtTests,
         lenStmtTests,
         objectInsertOnceStmtTests,
         scanStmtTests,
     ].flatMap { $0 }
+
+    static let callStmtTests: [TestCase] = [
+        TestCase(
+            description: "infinite recursion",
+            stmt: IR.CallStatement(
+                callFunc: "g0.f",
+                args: [
+                    Operand(type: .local, value: .localIndex(0)),
+                    Operand(type: .local, value: .localIndex(1)),
+                ],
+                result: Local(2)
+            ),
+            locals: [
+                0: [:],
+                1: [:],
+            ],
+            funcs: [
+                IR.Func(
+                    name: "g0.f",
+                    path: ["g0", "f"],
+                    params: [
+                        Local(0),
+                        Local(1),
+                    ],
+                    returnVar: Local(2),
+                    blocks: [
+                        IR.Block(statements: [
+                            IR.CallStatement(
+                                callFunc: "g0.f",
+                                args: [
+                                    Operand(type: .local, value: .localIndex(0)),
+                                    Operand(type: .local, value: .localIndex(1)),
+                                ],
+                                result: Local(2)
+                            )
+                        ])
+                    ]
+                )
+            ],
+            expectError: true  // EvaluationError.maxCallDepthExceeded
+        )
+    ]
 
     static let lenStmtTests: [TestCase] = [
         TestCase(
@@ -792,7 +836,7 @@ struct IRStatementTests {
 
     @Test(arguments: allTests)
     func testStatementEvaluation(tc: TestCase) async throws {
-        let (ctx, frame) = prepareFrame(forStatement: tc.stmt, withLocals: tc.locals)
+        let (ctx, frame) = prepareFrame(forStatement: tc.stmt, withLocals: tc.locals, withFuncs: tc.funcs)
         let block = IR.Block(statements: [tc.stmt])
 
         let caller = IR.AnyStatement(IR.BlockStatement(blocks: [block]))

@@ -20,6 +20,7 @@ public enum EvaluationError: Error, Equatable {
     case assignOnceError(reason: String)
     case objectInsertOnceError(reason: String)
     case unknownDynamicFunction(name: String)
+    case maxCallDepthExceeded(depth: Int)
 }
 
 // EvaluationContext is the common evaluation context that is passed to the common Engine.

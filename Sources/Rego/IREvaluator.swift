@@ -113,6 +113,14 @@ internal struct IndexedIRPolicy {
 internal struct IREvaluationContext {
     var ctx: EvaluationContext
     var policy: IndexedIRPolicy
+    var maxCallDepth: Int = 16_384
+    var callDepth: Int = 0
+
+    func withIncrementedCallDepth() -> IREvaluationContext {
+        var ctx = self
+        ctx.callDepth += 1
+        return ctx
+    }
 }
 
 internal typealias Locals = [IR.Local: AST.RegoValue]
@@ -941,6 +949,9 @@ private func callPlanFunc(
         throw EvaluationError.internalError(
             reason: "mismatched argument count for function \(funcName)")
     }
+    guard ctx.callDepth < ctx.maxCallDepth else {
+        throw EvaluationError.maxCallDepthExceeded(depth: ctx.callDepth)
+    }
 
     // Match source arguments to target params
     // to construct the locals map for the callee.
@@ -961,7 +972,12 @@ private func callPlanFunc(
         locals: callLocals
     )
     let callFramePtr = Ptr(toCopyOf: callFrame)
-    let resultSet = try await evalFrame(withContext: ctx, framePtr: callFramePtr, blocks: fn.blocks, caller: caller)
+    let resultSet = try await evalFrame(
+        withContext: ctx.withIncrementedCallDepth(),
+        framePtr: callFramePtr,
+        blocks: fn.blocks,
+        caller: caller
+    )
 
     guard case 0...1 = resultSet.count else {
         throw EvaluationError.internalError(

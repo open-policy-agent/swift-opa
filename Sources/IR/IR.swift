@@ -457,9 +457,15 @@ public struct AnyInnerStatement: Codable, Equatable {
 }
 
 public struct Location: Codable, Equatable, Sendable {
-    public var row: Int = 0
-    public var col: Int = 0
-    public var file: Int = 0
+    public var row: Int
+    public var col: Int
+    public var file: Int
+
+    public init(row: Int = 0, col: Int = 0, file: Int = 0) {
+        self.row = row
+        self.col = col
+        self.file = file
+    }
 }
 
 public enum StatementError: Error {
@@ -495,6 +501,10 @@ extension Statement {
 
 public struct Funcs: Codable, Equatable, Sendable {
     public var funcs: [Func]? = []
+
+    public init(funcs: [Func]) {
+        self.funcs = funcs
+    }
 }
 
 public struct Func: Codable, Equatable, Sendable {
@@ -503,6 +513,14 @@ public struct Func: Codable, Equatable, Sendable {
     public var params: [Local]
     public var returnVar: Local
     public var blocks: [Block]
+
+    public init(name: String, path: [String], params: [Local], returnVar: Local, blocks: [Block]) {
+        self.name = name
+        self.path = path
+        self.params = params
+        self.returnVar = returnVar
+        self.blocks = blocks
+    }
 
     enum CodingKeys: String, CodingKey {
         case name

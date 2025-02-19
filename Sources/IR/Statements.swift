@@ -156,6 +156,13 @@ public struct CallStatement: Statement, Codable, Equatable {
         case result
     }
 
+    public init(location: Location = Location(), callFunc: String, args: [Operand] = [], result: Local) {
+        self.location = location
+        self.callFunc = callFunc
+        self.args = args
+        self.result = result
+    }
+
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false

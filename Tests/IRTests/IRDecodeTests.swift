@@ -250,7 +250,8 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                             type: .local,
                             value: .localIndex(789)
                         )
-                    ]
+                    ],
+                    result: Local(7)
                 ),
                 AssignVarStatement(
                     source: Operand(
@@ -271,7 +272,8 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                             type: .local,
                             value: .localIndex(789)
                         )
-                    ]
+                    ],
+                    result: Local(7)
                 ),
                 AssignVarStatement(
                     source: Operand(
@@ -303,7 +305,8 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                             type: .local,
                             value: .localIndex(789)
                         )
-                    ]
+                    ],
+                    result: Local(7)
                 ),
             ]
         ),
@@ -317,7 +320,8 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                             type: .local,
                             value: .localIndex(789)
                         )
-                    ]
+                    ],
+                    result: Local(7)
                 ),
                 AssignVarStatement(
                     source: Operand(
@@ -342,7 +346,8 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                             type: .local,
                             value: .localIndex(789)
                         )
-                    ]
+                    ],
+                    result: Local(7)
                 ),
                 AssignVarStatement(
                     source: Operand(
@@ -363,7 +368,8 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
                             type: .local,
                             value: .localIndex(790)
                         )
-                    ]
+                    ],
+                    result: Local(7)
                 ),
                 AssignVarStatement(
                     source: Operand(

@@ -120,16 +120,16 @@ extension BuiltinTests.ArrayTests {
             expected: .success([])
         ),
         BuiltinTests.TestCase(
-            description: "start is not an integer (undefined)",
+            description: "start is not an integer",
             name: "array.slice",
             args: [["a", "b", "c", "d"], 1.1, 3],
-            expected: .success(.undefined)
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "start and stop must be integers"))
         ),
         BuiltinTests.TestCase(
-            description: "stop is not an integer (undefined)",
+            description: "stop is not an integer",
             name: "array.slice",
             args: [["a", "b", "c", "d"], 1, 3.1],
-            expected: .success(.undefined)
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "start and stop must be integers"))
         ),
     ]
 

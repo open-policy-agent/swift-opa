@@ -44,7 +44,10 @@ extension BuiltinFuncs {
         }
 
         guard let result = result else {
-            return .undefined
+            // This shouldn't happen, we checked earlier to ensure inputSet wasn't empty,
+            // but just in case we somehow make it down here we'll bail out with an empty
+            // set (again).
+            return .set([])
         }
 
         return .set(result)
@@ -83,16 +86,12 @@ extension BuiltinFuncs {
             return .set([])
         }
 
-        var result: Set<AST.RegoValue>? = nil
+        var result: Set<AST.RegoValue> = []
         for (i, x) in inputSet.enumerated() {
             guard case .set(let s) = x else {
                 throw BuiltinError.argumentTypeMismatch(arg: "xs[\(i)]", got: x.typeName, want: "set")
             }
-            result = result?.union(s) ?? s
-        }
-
-        guard let result = result else {
-            return .undefined
+            result = result.union(s)
         }
 
         return .set(result)

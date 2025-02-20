@@ -50,7 +50,7 @@ extension BuiltinFuncs {
 
         // We expect start and stop to be integers, otherwise undefined should be returned
         guard start is Int, stop is Int else {
-            return .undefined
+            throw BuiltinError.evalError(msg: "start and stop must be integers")
         }
 
         var startInt = start.intValue

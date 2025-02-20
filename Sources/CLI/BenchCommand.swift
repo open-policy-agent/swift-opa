@@ -25,7 +25,8 @@ struct BenchCommand: AsyncParsableCommand {
         let report = try await measureAsync(iterations: Int(count)) {
             let _ = try await regoEngine.evaluate(
                 query: self.evalOptions.query,
-                input: self.evalOptions.inputValue
+                input: self.evalOptions.inputValue,
+                strictBuiltins: self.evalOptions.strictBuiltinErrors
             )
         }
 

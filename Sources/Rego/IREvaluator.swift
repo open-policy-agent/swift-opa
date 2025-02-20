@@ -935,7 +935,12 @@ private func evalCall(
         tracer: ctx.ctx.tracer
     )
 
-    return try await ctx.ctx.builtins.invoke(withCtx: bctx, name: funcName, args: argValues)
+    return try await ctx.ctx.builtins.invoke(
+        withCtx: bctx,
+        name: funcName,
+        args: argValues,
+        strict: ctx.ctx.strictBuiltins
+    )
 }
 
 // callPlanFunc will evaluate calling a function defined on the plan

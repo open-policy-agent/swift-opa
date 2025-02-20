@@ -17,6 +17,8 @@ struct EvalOptions: ParsableArguments {
     @Option(
         name: [.customShort("j"), .customLong("just-use-this-json-string-as-input-plz")], help: "Input JSON string")
     var rawInput: String?
+    @Flag(name: [.long], help: "treat the first built-in function error encountered as fatal")
+    var strictBuiltinErrors: Bool = false
 
     // Parsed inputs during validation
     var inputValue: AST.RegoValue = .object([:])
@@ -29,6 +31,7 @@ struct EvalOptions: ParsableArguments {
         case inputFile
         case query
         case rawInput
+        case strictBuiltinErrors
     }
 
     mutating func validate() throws {

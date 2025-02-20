@@ -276,7 +276,7 @@ extension BuiltinTests.StringsTests {
             description: "empty needle",
             name: "indexof",
             args: ["hello, world!", ""],
-            expected: .success(.undefined)
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "empty search character"))
         ),
         BuiltinTests.TestCase(
             description: "full match",
@@ -300,7 +300,7 @@ extension BuiltinTests.StringsTests {
             description: "both empty",
             name: "indexof",
             args: ["", ""],
-            expected: .success(.undefined)
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "empty search character"))
         ),
         BuiltinTests.TestCase(
             description: "too many args",

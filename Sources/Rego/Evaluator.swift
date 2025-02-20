@@ -30,19 +30,22 @@ public struct EvaluationContext {
     public var store: Store
     public var builtins: BuiltinRegistry
     public var tracer: QueryTracer?
+    public var strictBuiltins: Bool = false
 
     init(
         query: String,
         input: AST.RegoValue,
         store: Store = NullStore(),
         builtins: BuiltinRegistry = defaultBuiltinRegistry,
-        tracer: QueryTracer? = nil
+        tracer: QueryTracer? = nil,
+        strictBuiltins: Bool = false
     ) {
         self.query = query
         self.input = input
         self.store = store
         self.builtins = builtins
         self.tracer = tracer
+        self.strictBuiltins = strictBuiltins
     }
 }
 

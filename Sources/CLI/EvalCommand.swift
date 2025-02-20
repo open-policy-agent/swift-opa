@@ -25,7 +25,8 @@ struct EvalCommand: AsyncParsableCommand {
         let resultSet = try await regoEngine.evaluate(
             query: self.evalOptions.query,
             input: self.evalOptions.inputValue,
-            tracer: tracer
+            tracer: tracer,
+            strictBuiltins: self.evalOptions.strictBuiltinErrors
         )
 
         let encoder = JSONEncoder()

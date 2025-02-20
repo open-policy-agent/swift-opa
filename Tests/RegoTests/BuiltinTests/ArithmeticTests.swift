@@ -227,7 +227,7 @@ extension BuiltinTests.ArithmeticTests {
             description: "divide by 0",
             name: "div",
             args: [3, 0],
-            expected: .success(.undefined)
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "divide by zero"))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
@@ -425,7 +425,7 @@ extension BuiltinTests.ArithmeticTests {
             description: "divide by 0",
             name: "rem",
             args: [3, 0],
-            expected: .success(.undefined)
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "rem by zero"))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
@@ -443,13 +443,13 @@ extension BuiltinTests.ArithmeticTests {
             description: "float arg lhs",
             name: "rem",
             args: [1.2345, 1],
-            expected: .success(.undefined)
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "modulo on floating-point number"))
         ),
         BuiltinTests.TestCase(
             description: "float arg rhs",
             name: "rem",
             args: [10, 1.2345],
-            expected: .success(.undefined)
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "modulo on floating-point number"))
         ),
         BuiltinTests.TestCase(
             description: "wrong lhs arg type",

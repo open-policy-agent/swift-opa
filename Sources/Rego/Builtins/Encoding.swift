@@ -27,7 +27,7 @@ extension BuiltinFuncs {
             let base64Decoded = Data(base64Encoded: x, options: Data.Base64DecodingOptions(rawValue: 0))
                 .flatMap({ String(data: $0, encoding: .utf8) })
         else {
-            return .undefined
+            throw BuiltinError.evalError(msg: "invalid base64 string")
         }
 
         return .string(base64Decoded)
@@ -105,7 +105,7 @@ extension BuiltinFuncs {
             let base64Decoded = Data(base64Encoded: x, options: Data.Base64DecodingOptions(rawValue: 0))
                 .flatMap({ String(data: $0, encoding: .utf8) })
         else {
-            return .undefined
+            throw BuiltinError.evalError(msg: "invalid base64 string")
         }
 
         return .string(base64Decoded)
@@ -136,7 +136,7 @@ extension BuiltinFuncs {
             let hexDecoded = Data.fromHexEncoded(hex: x)
                 .flatMap({ String(data: $0, encoding: .utf8) })
         else {
-            return .undefined
+            throw BuiltinError.evalError(msg: "invalid hex string")
         }
 
         return .string(hexDecoded)

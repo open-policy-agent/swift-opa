@@ -86,7 +86,7 @@ extension BuiltinFuncs {
 
         // Special case to behave like the Go version does
         guard !needle.isEmpty else {
-            return .undefined
+            throw BuiltinError.evalError(msg: "empty search character")  // matching go error
         }
 
         let range = haystack.range(of: needle)

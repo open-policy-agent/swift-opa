@@ -80,7 +80,7 @@ extension BuiltinFuncs {
 
         // No divide-by-zero
         guard y.decimalValue != 0 else {
-            return .undefined
+            throw BuiltinError.evalError(msg: "division by zero")
         }
 
         return .number(NSDecimalNumber(decimal: x.decimalValue / y.decimalValue))
@@ -162,12 +162,12 @@ extension BuiltinFuncs {
 
         // Matching upstream behavior
         guard let x = args[0].integerValue, let y = args[1].integerValue else {
-            return .undefined
+            throw BuiltinError.evalError(msg: "modulo on floating-point number")
         }
 
         // No divide-by-zero
         guard y != 0 else {
-            return .undefined
+            throw BuiltinError.evalError(msg: "modulo by zero")
         }
 
         return .number(NSNumber(value: x % y))

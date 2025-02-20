@@ -114,11 +114,30 @@ public struct BuiltinRegistry {
         ]
     }
 
-    func invoke(withCtx ctx: BuiltinContext, name: String, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    func invoke(
+        withCtx ctx: BuiltinContext,
+        name: String,
+        args: [AST.RegoValue],
+        strict: Bool = false
+    ) async throws -> AST.RegoValue {
         guard let builtin = builtins[name] else {
             throw RegistryError.builtinNotFound(name: name)
         }
-        return try await builtin(ctx, args)
+        do {
+            return try await builtin(ctx, args)
+        } catch {
+            if case .halt = error as? BuiltinFuncs.BuiltinError {
+                // halt errors mean we propagate, always.
+                throw error
+            }
+
+            // In "strict" mode we are going to propagate the error, if disabled
+            // they are treated as undefined.
+            if strict {
+                throw error
+            }
+            return .undefined
+        }
     }
 
     func hasBuiltin(_ name: String) -> Bool {

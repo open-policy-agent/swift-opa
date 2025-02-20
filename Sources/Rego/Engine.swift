@@ -56,14 +56,16 @@ public struct Engine {
     public func evaluate(
         query: String,
         input: AST.RegoValue = .undefined,
-        tracer: QueryTracer? = nil
+        tracer: QueryTracer? = nil,
+        strictBuiltins: Bool = false
     ) async throws -> ResultSet {
         let ctx = EvaluationContext(
             query: query,
             input: input,
             store: self.store,
             builtins: defaultBuiltinRegistry,
-            tracer: tracer
+            tracer: tracer,
+            strictBuiltins: strictBuiltins
         )
 
         guard let evaluator = self.evaluator else {

@@ -893,19 +893,21 @@ private func evalCall(
     }
 
     if isDynamic {
-        // DynamicCallStmt doesn't reference functions by name (as labeled in the IR), it will be by path,
+        // CallDynamicStmt doesn't reference functions by name (as labeled in the IR), it will be by path,
         // eg, ["g0", "a", "b"] versus the "name" like "g0.data.a.b"
         // We strigify the path first so they come in here looking like "g0.a.b".
-        if let funcName = ctx.policy.funcsPathToName[funcName] {
-            return try await callPlanFunc(
-                ctx: ctx,
-                frame: frame,
-                caller: caller,
-                funcName: funcName,
-                args: argValues
-            )
+        // If the function is not found in the policy, it is valid but undefined.
+        guard let funcName = ctx.policy.funcsPathToName[funcName] else {
+            return .undefined
         }
-        throw EvaluationError.unknownDynamicFunction(name: "\(funcName)")
+        
+        return try await callPlanFunc(
+            ctx: ctx,
+            frame: frame,
+            caller: caller,
+            funcName: funcName,
+            args: argValues
+        )
     }
 
     // Handle plan-defined functions first

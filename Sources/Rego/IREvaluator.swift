@@ -900,7 +900,7 @@ private func evalCall(
         guard let funcName = ctx.policy.funcsPathToName[funcName] else {
             return .undefined
         }
-        
+
         return try await callPlanFunc(
             ctx: ctx,
             frame: frame,

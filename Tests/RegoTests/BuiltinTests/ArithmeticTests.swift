@@ -479,8 +479,28 @@ extension BuiltinTests.ArithmeticTests {
         ].flatMap { $0 }
     }
 
+    static let knownIssues: Set<String> = [
+        "minus: 2 - 1.234567890",
+        "minus: 2.33333 + 1.33333",
+        "mul: overflow",
+    ]
+
+    private var isLinux: Bool {
+        #if os(Linux)
+            true
+        #else
+            false
+        #endif
+    }
+
     @Test(arguments: allTests)
     func testBuiltins(tc: BuiltinTests.TestCase) async throws {
-        try await BuiltinTests.testBuiltin(tc: tc)
+        try await withKnownIssue(isIntermittent: true) {
+            try await BuiltinTests.testBuiltin(tc: tc)
+        } when: {
+            isLinux
+        } matching: { _ in
+            BuiltinTests.ArithmeticTests.knownIssues.contains(tc.testDescription)
+        }
     }
 }

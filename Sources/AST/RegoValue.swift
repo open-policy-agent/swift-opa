@@ -56,11 +56,10 @@ extension RegoValue {
     }
 
     public var isFloat: Bool {
-        guard case .number = self else {
+        guard case .number(let n) = self else {
             return false
         }
-        // We know it is a number, so if it is not an int, it must be a float
-        return self.integerValue == nil
+        return n.isFloatType
     }
 
     /// The (long) integer value of a RegoValue, if it is a .number and contained value is in fact a whole number.

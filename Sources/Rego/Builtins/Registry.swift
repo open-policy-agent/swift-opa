@@ -111,6 +111,10 @@ public struct BuiltinRegistry {
             "is_set": BuiltinFuncs.isSet,
             "is_string": BuiltinFuncs.isString,
             "type_name": BuiltinFuncs.typeName,
+
+            // Units
+            "units.parse": BuiltinFuncs.parseUnits,
+            "units.parse_bytes": BuiltinFuncs.parseByteUnits,
         ]
     }
 

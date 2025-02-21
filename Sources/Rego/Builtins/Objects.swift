@@ -21,16 +21,38 @@ extension BuiltinFuncs {
             // Copying behavior from upstream OPA, an empty array should return the whole object
             var current: AST.RegoValue = .object(object)
             for key in keyPath {
-                guard case .object(let currentObj) = current else {
+                switch current {
+                case .array(let arr):
+                    guard case .number(let idx) = key else {
+                        return defaultValue
+                    }
+                    guard !key.isFloat else {
+                        return defaultValue
+                    }
+                    let i = idx.intValue
+                    // Bounds check
+                    guard i >= 0 && i < arr.count else {
+                        return defaultValue
+                    }
+                    current = arr[i]
+                case .object(let currentObj):
+                    guard let next = currentObj[key] else {
+                        return defaultValue
+                    }
+                    current = next
+                case .set(let set):
+                    guard set.contains(key) else {
+                        return defaultValue
+                    }
+                    current = key
+                default:
                     return defaultValue
                 }
-                guard let next = currentObj[key] else {
-                    return defaultValue
-                }
-                current = next
             }
             return current
+
         default:
+            // Scalar keys - simple lookup
             guard let value = object[key] else {
                 return defaultValue
             }

@@ -208,6 +208,164 @@ extension BuiltinTests.ObjectTests {
             ],
             expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 4, expected: 3))
         ),
+        BuiltinTests.TestCase(
+            description: "string->array found",
+            name: "object.get",
+            args: [
+                [
+                    "a": [
+                        "first",
+                        "second",
+                    ]
+                ],
+                ["a", 1],
+                "default_value",
+            ],
+            expected: .success("second")
+        ),
+        BuiltinTests.TestCase(
+            description: "string->array (out of bounds)",
+            name: "object.get",
+            args: [
+                [
+                    "a": [
+                        "first",
+                        "second",
+                    ]
+                ],
+                ["a", 2],
+                "default_value",
+            ],
+            expected: .success("default_value")
+        ),
+        BuiltinTests.TestCase(
+            description: "string->array (negative out of bounds)",
+            name: "object.get",
+            args: [
+                [
+                    "a": [
+                        "first",
+                        "second",
+                    ]
+                ],
+                ["a", -1],
+                "default_value",
+            ],
+            expected: .success("default_value")
+        ),
+        BuiltinTests.TestCase(
+            description: "string->array->array-string",
+            name: "object.get",
+            args: [
+                [
+                    "a": [
+                        "first",
+                        [
+                            "needle"
+                        ],
+                        "third",
+                    ]
+                ],
+                ["a", 1, 0],
+                "default_value",
+            ],
+            expected: .success("needle")
+        ),
+        BuiltinTests.TestCase(
+            description: "string->set",
+            name: "object.get",
+            args: [
+                [
+                    "a": .set([
+                        "X",
+                        "Y",
+                        "Z",
+                    ]),
+                    "b": "bee",
+                ],
+                ["a", "Y"],
+                "default_value",
+            ],
+            expected: .success("Y")
+        ),
+        BuiltinTests.TestCase(
+            description: "string->set (not found)",
+            name: "object.get",
+            args: [
+                [
+                    "a": .set([
+                        "X",
+                        "Y",
+                        "Z",
+                    ]),
+                    "b": "bee",
+                ],
+                ["a", "C"],
+                "default_value",
+            ],
+            expected: .success("default_value")
+        ),
+        BuiltinTests.TestCase(
+            description: "string->set->set->string",
+            name: "object.get",
+            args: [
+                [
+                    "a": .set([
+                        "X",
+                        .set([
+                            ["not": "this one"],
+                            ["this": "one"],
+                        ]),
+                        "Z",
+                    ]),
+                    "b": "bee",
+                ],
+                // Path:
+                [
+                    "a",
+                    // Select the full set
+                    .set([
+                        ["not": "this one"],
+                        ["this": "one"],
+                    ]),
+                    // Select the object within that set
+                    ["this": "one"],
+                    // Select the key within that object
+                    "this",
+                ],
+                "default_value",
+            ],
+            expected: .success("one")
+        ),
+        BuiltinTests.TestCase(
+            description: "array as key in path",
+            name: "object.get",
+            args: [
+                .object([
+                    .array([0, 1]): "found it",
+                    "b": "bee",
+                ]),
+                [[0, 1]],
+                "default value",
+            ],
+            expected: .success("found it")
+        ),
+        // object.get({"a": ["b", "found it"]}, ["a", 1.0], "nope") == "nope" :-/
+        BuiltinTests.TestCase(
+            description: "numeric key equivalency as array index",
+            name: "object.get",
+            args: [
+                [
+                    "a": [
+                        "b",
+                        "found it",
+                    ]
+                ],
+                ["a", 1.0],
+                "default value",
+            ],
+            expected: .success("default value")
+        ),
     ]
 
     static let objectKeysTests: [BuiltinTests.TestCase] = [

@@ -459,9 +459,6 @@ func evalBlock(
 
         case .assignVarOnceStmt(let stmt):
             let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
-            guard sourceValue != .undefined else {
-                return markUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
-            }
             let targetValue = framePtr.v.resolveLocal(idx: stmt.target)
 
             // if the target value is already defined, and not the same value as the source,
@@ -469,12 +466,19 @@ func evalBlock(
             if targetValue != .undefined && targetValue != sourceValue {
                 throw EvaluationError.assignOnceError(reason: "local already assigned")
             }
+
+            guard sourceValue != .undefined else {
+                // 'undefined' source value doesn't propagate, just don't set the var
+                continue
+            }
+
             try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
 
         case .assignVarStmt(let stmt):
             let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
             guard sourceValue != .undefined else {
-                return markUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                // 'undefined' source value doesn't propagate, just don't set the var
+                continue
             }
             try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
 

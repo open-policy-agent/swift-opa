@@ -199,6 +199,7 @@ struct IRStatementTests {
         var expectError: Bool = false
         // expectResult - if an explicit value is set, we will compare that to the resultSet.
         var expectResult: ResultSet? = nil
+        var expectUndefined: Bool = false
     }
 
     func mergeLocals(_ lhs: Locals, _ rhs: Locals?) -> Locals {
@@ -549,7 +550,8 @@ struct IRStatementTests {
             locals: [
                 2: .undefined
             ],
-            expectResult: .undefined
+            expectResult: [],
+            expectUndefined: true
         ),
     ]
 
@@ -626,7 +628,8 @@ struct IRStatementTests {
                 4: [:],
             ],
             expectError: false,
-            expectResult: .undefined
+            expectResult: [],
+            expectUndefined: true
         ),
         TestCase(
             description: "value is undefined",
@@ -640,7 +643,8 @@ struct IRStatementTests {
                 4: [:],
             ],
             expectError: false,
-            expectResult: .undefined
+            expectResult: [],
+            expectUndefined: true
         ),
     ]
     static let dotStmtTests: [TestCase] = [
@@ -671,7 +675,8 @@ struct IRStatementTests {
                 3: 3,
             ],
             expectLocals: [:],
-            expectResult: .undefined
+            expectResult: [],
+            expectUndefined: true
         ),
         TestCase(
             description: "negative out-of-bounds array lookup is undefined",
@@ -685,7 +690,8 @@ struct IRStatementTests {
                 3: -1,
             ],
             expectLocals: [:],
-            expectResult: .undefined
+            expectResult: [],
+            expectUndefined: true
         ),
         TestCase(
             description: "object lookup",
@@ -714,7 +720,8 @@ struct IRStatementTests {
                 3: "b",
             ],
             expectLocals: [:],
-            expectResult: .undefined
+            expectResult: [],
+            expectUndefined: true
         ),
         TestCase(
             description: "set lookup",
@@ -743,7 +750,8 @@ struct IRStatementTests {
                 3: "z",
             ],
             expectLocals: [:],
-            expectResult: .undefined
+            expectResult: [],
+            expectUndefined: true
         ),
         TestCase(
             description: "unsupported type lookup - undefined",
@@ -757,7 +765,8 @@ struct IRStatementTests {
                 3: "what does it mean??",
             ],
             expectLocals: [:],
-            expectResult: .undefined
+            expectResult: [],
+            expectUndefined: true
         ),
     ]
 
@@ -774,7 +783,8 @@ struct IRStatementTests {
                 2: .undefined
             ],
             expectLocals: [:],
-            expectResult: .undefined
+            expectResult: [],
+            expectUndefined: true
         ),
         TestCase(
             description: "scalar - undefined",
@@ -792,7 +802,8 @@ struct IRStatementTests {
                 2: "not a collection"
             ],
             expectLocals: [:],
-            expectResult: .undefined
+            expectResult: [],
+            expectUndefined: true
         ),
         TestCase(
             description: "empty array",
@@ -1008,6 +1019,8 @@ struct IRStatementTests {
         let expectResult = tc.expectResult ?? .empty
 
         #expect(results.results == expectResult, "comparing results")
+
+        #expect(results.isUndefined == tc.expectUndefined, "comparing undefined")
     }
 }
 

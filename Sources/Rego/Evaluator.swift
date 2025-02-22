@@ -58,17 +58,7 @@ extension ResultSet {
         return []
     }
 
-    public static var undefined: ResultSet {
-        return [.undefined]
-    }
-
     public init(value: AST.RegoValue) {
         self = [value]
-    }
-
-    public var isUndefined: Bool {
-        // We assert that a ResultSet either contains a single .undefined,
-        // _or_ 0..N other values, but not both.
-        return self.contains(.undefined)
     }
 }

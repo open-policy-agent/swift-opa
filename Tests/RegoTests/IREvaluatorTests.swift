@@ -243,6 +243,7 @@ struct IRStatementTests {
     static let allTests: [TestCase] = [
         assignVarStmtTests,
         assignVarOnceStmtTests,
+        breakStmtTests,
         callStmtTests,
         dotStmtTests,
         lenStmtTests,
@@ -368,6 +369,44 @@ struct IRStatementTests {
                 1: "initial value"
             ],
             staticStrings: ["will trigger an error"],
+            expectError: true
+        ),
+    ]
+
+    static let breakStmtTests: [TestCase] = [
+        TestCase(
+            description: "break makes the block undefined",
+            stmt: IR.BreakStatement(index: 0),
+            locals: [:],
+            expectUndefined: true
+        ),
+        TestCase(
+            description: "breaking out of call frame is an error",
+            stmt: IR.CallStatement(
+                callFunc: "g0.f",
+                args: [
+                    Operand(type: .local, value: .localIndex(0)),
+                    Operand(type: .local, value: .localIndex(1)),
+                ],
+                result: Local(2)
+            ),
+            locals: [:],
+            funcs: [
+                IR.Func(
+                    name: "g0.f",
+                    path: ["g0", "f"],
+                    params: [
+                        Local(0),
+                        Local(1),
+                    ],
+                    returnVar: Local(2),
+                    blocks: [
+                        IR.Block(statements: [
+                            IR.BreakStatement(index: 2)
+                        ])
+                    ]
+                )
+            ],
             expectError: true
         ),
     ]

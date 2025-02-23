@@ -537,6 +537,9 @@ func evalBlock(
                     return rs.breakByOne()
                 }
 
+                // Individual undefined blocks within the BlockStmt do not
+                // make the whole BlockStmt undefined - we simply continue
+                // to the next internal block.
                 if rs.isUndefined {
                     continue
                 }

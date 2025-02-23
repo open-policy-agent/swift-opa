@@ -124,6 +124,10 @@ public struct BreakStatement: Statement, Codable, Equatable {
 
     public var index: UInt32
 
+    public init(index: UInt32) {
+        self.index = index
+    }
+
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false

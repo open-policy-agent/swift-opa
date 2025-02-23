@@ -458,28 +458,25 @@ func evalBlock(
                 idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
 
         case .assignVarOnceStmt(let stmt):
+            // 'undefined' source value doesn't propagate aka don't break out of the block
             let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
             let targetValue = framePtr.v.resolveLocal(idx: stmt.target)
 
-            // if the target value is already defined, and not the same value as the source,
-            // we should raise an exception
-            if targetValue != .undefined && targetValue != sourceValue {
-                throw EvaluationError.assignOnceError(reason: "local already assigned")
+            // If it's the first time setting target, assign unconditionally
+            if targetValue == .undefined {
+                try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
+                break
             }
 
-            guard sourceValue != .undefined else {
-                // 'undefined' source value doesn't propagate, just don't set the var
-                continue
+            // Repeated assignments can only be of the same value, otherwise throw an exception
+            if targetValue != sourceValue {
+                throw EvaluationError.assignOnceError(reason: "local already assigned with different value")
             }
-
-            try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
 
         case .assignVarStmt(let stmt):
+            // 'undefined' source value doesn't propagate: allow
+            // assiging undefined to target, and don't affect control flow.
             let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
-            guard sourceValue != .undefined else {
-                // 'undefined' source value doesn't propagate, just don't set the var
-                continue
-            }
             try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
 
         case .blockStmt(let stmt):

@@ -47,6 +47,16 @@ public struct AssignVarOnceStatement: Statement, Codable, Equatable {
     public var source: Operand
     public var target: Local
 
+    public init(location: Location? = nil, source: Operand, target: Local) {
+        self.source = source
+        self.target = target
+
+        guard let location else {
+            return
+        }
+        self.location = location
+    }
+
     public func isEqual(to other: any Statement) -> Bool {
         guard let rhs = other as? Self else {
             return false

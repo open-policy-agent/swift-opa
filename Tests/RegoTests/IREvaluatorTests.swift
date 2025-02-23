@@ -191,6 +191,7 @@ struct IRStatementTests {
         // If provided, expectLocals will be overlaid over locals and compared to the
         // state of the frame after evaluation.
         var funcs: [IR.Func] = []
+        var staticStrings: [String] = []
         var expectLocals: Locals?
         // If provided, locals to ignore during comparison
         var ignoreLocals: [Local] = []
@@ -207,7 +208,12 @@ struct IRStatementTests {
         return lhs.merging(rhs) { (_, new) in new }
     }
 
-    func prepareFrame(forStatement stmt: any Statement, withLocals locals: Locals, withFuncs funcs: [IR.Func] = [])
+    func prepareFrame(
+        forStatement stmt: any Statement,
+        withLocals locals: Locals,
+        withFuncs funcs: [IR.Func] = [],
+        withStaticStrings staticStrings: [String] = []
+    )
         -> (IREvaluationContext, Ptr<Frame>)
     {
         let block = Block(statements: [stmt])
@@ -215,9 +221,7 @@ struct IRStatementTests {
         let policy = IndexedIRPolicy(
             policy: IR.Policy(
                 staticData: IR.Static(
-                    strings: [
-                        IR.ConstString(value: "results")
-                    ]
+                    strings: staticStrings.map { IR.ConstString(value: $0) }
                 ),
                 plans: Plans(
                     plans: [
@@ -236,12 +240,136 @@ struct IRStatementTests {
     }
 
     static let allTests: [TestCase] = [
+        assignVarStmtTests,
+        assignVarOnceStmtTests,
         callStmtTests,
         dotStmtTests,
         lenStmtTests,
         objectInsertOnceStmtTests,
         scanStmtTests,
     ].flatMap { $0 }
+
+    static let assignVarStmtTests: [TestCase] = [
+        TestCase(
+            description: "assign local",
+            stmt: IR.AssignVarStatement(
+                source: Operand(type: .local, value: .localIndex(0)),
+                target: Local(1)
+            ),
+            locals: [
+                0: ["some": "local"]
+            ],
+            expectLocals: [
+                1: ["some": "local"]
+            ]
+        ),
+        TestCase(
+            description: "assign local - source undefined",
+            stmt: IR.AssignVarStatement(
+                source: Operand(type: .local, value: .localIndex(42)),
+                target: Local(1)
+            ),
+            locals: [
+                0: "unrelated",
+                1: "will be overwritten",
+            ],
+            expectLocals: [
+                1: .undefined
+            ]
+        ),
+        TestCase(
+            description: "assign local - overwrite",
+            stmt: IR.AssignVarStatement(
+                source: Operand(type: .local, value: .localIndex(0)),
+                target: Local(1)
+            ),
+            locals: [
+                0: ["a", "b", "c"],
+                1: "will be overwritten",
+            ],
+            expectLocals: [
+                1: ["a", "b", "c"]
+            ]
+        ),
+        TestCase(
+            description: "assign local - constant",
+            stmt: IR.AssignVarStatement(
+                source: Operand(type: .bool, value: .bool(true)),
+                target: Local(0)
+            ),
+            locals: [:],
+            expectLocals: [
+                0: true
+            ]
+        ),
+        TestCase(
+            description: "assign local - string ref",
+            stmt: IR.AssignVarStatement(
+                source: Operand(type: .stringIndex, value: .stringIndex(0)),
+                target: Local(0)
+            ),
+            locals: [:],
+            staticStrings: ["hello, world"],
+            expectLocals: [
+                0: "hello, world"
+            ]
+        ),
+    ]
+
+    static let assignVarOnceStmtTests: [TestCase] = [
+        TestCase(
+            description: "initial assign local",
+            stmt: IR.AssignVarOnceStatement(
+                source: Operand(type: .local, value: .localIndex(0)),
+                target: Local(1)
+            ),
+            locals: [
+                0: "target value"
+            ],
+            expectLocals: [
+                1: "target value"
+            ]
+        ),
+        TestCase(
+            description: "assign local - source undefined",
+            stmt: IR.AssignVarOnceStatement(
+                source: Operand(type: .local, value: .localIndex(42)),
+                target: Local(1)
+            ),
+            locals: [
+                0: "unrelated"
+            ],
+            expectLocals: [
+                1: .undefined
+            ]
+        ),
+        TestCase(
+            description: "reassign string ref - same value allowed",
+            stmt: IR.AssignVarOnceStatement(
+                source: Operand(type: .stringIndex, value: .stringIndex(0)),
+                target: Local(1)
+            ),
+            locals: [
+                1: "will be overwritten"
+            ],
+            staticStrings: ["will be overwritten"],
+            expectLocals: [
+                1: "will be overwritten"
+            ]
+        ),
+        TestCase(
+            description: "reassign string ref - different value is an error",
+            stmt: IR.AssignVarOnceStatement(
+                source: Operand(type: .stringIndex, value: .stringIndex(0)),
+                target: Local(1)
+            ),
+            locals: [
+                1: "initial value"
+            ],
+            staticStrings: ["will trigger an error"],
+            expectError: true
+        ),
+    ]
 
     static let callStmtTests: [TestCase] = [
         TestCase(
@@ -844,7 +972,12 @@ struct IRStatementTests {
 
     @Test(arguments: allTests)
     func testStatementEvaluation(tc: TestCase) async throws {
-        let (ctx, frame) = prepareFrame(forStatement: tc.stmt, withLocals: tc.locals, withFuncs: tc.funcs)
+        let (ctx, frame) = prepareFrame(
+            forStatement: tc.stmt,
+            withLocals: tc.locals,
+            withFuncs: tc.funcs,
+            withStaticStrings: tc.staticStrings
+        )
         let block = IR.Block(statements: [tc.stmt])
 
         let caller = IR.AnyStatement(IR.BlockStatement(blocks: [block]))

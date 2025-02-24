@@ -614,10 +614,7 @@ private struct SimilarToGoFmtPrinter {
             self.fmtString(s, verb)
         default:
             do {
-                let encoder = JSONEncoder()
-                encoder.outputFormatting = [.sortedKeys]
-                let data = try encoder.encode(arg)
-                let str = String(data: data, encoding: .utf8)!
+                let str = try String(arg)  // Stringify the RegoValue
                 self.fmtString(str, verb)
             } catch {
                 // Making this up.. it shouldn't happen but we need to put something in here on an error

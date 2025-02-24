@@ -119,13 +119,19 @@ extension RegoValue: Codable {
             let keyEncoder = JSONEncoder()
             keyEncoder.outputFormatting = [.sortedKeys]
             let partiallyEncoded = try o.reduce(into: [String: RegoValue]()) { (result, elem) in
-                let strKey =
-                    switch elem.key {
-                    case .string(let s):
-                        s
-                    default:
-                        String(data: try keyEncoder.encode([elem.key]), encoding: .utf8)!
-                    }
+                let strKey: String
+                do {
+                    try strKey = String(elem.key)
+                } catch {
+                    throw EncodingError.invalidValue(
+                        elem.key,
+                        EncodingError.Context(
+                            codingPath: encoder.codingPath,
+                            debugDescription: "failed to stringify key",
+                            underlyingError: error
+                        )
+                    )
+                }
                 result[strKey] = elem.value
             }
             try container.encode(partiallyEncoded)
@@ -148,6 +154,27 @@ extension RegoValue: Codable {
         }
     }
 
+}
+
+// RegoValue -> String initializer (Stringify)
+extension String {
+    public init(_ v: RegoValue) throws {
+        self = try stringify(v)
+    }
+}
+
+// stringify returns a string representation of a RegoValue
+func stringify(_ v: RegoValue) throws -> String {
+    if case .string(let s) = v {
+        return s
+    }
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+    encoder.nonConformingFloatEncodingStrategy = .throw
+    guard let output = String(data: try encoder.encode(v), encoding: .utf8) else {
+        throw RegoValue.RegoEncodingError.invalidUTF8
+    }
+    return output
 }
 
 // AnyKey allows dynamic decoding when keys are not known ahead of time

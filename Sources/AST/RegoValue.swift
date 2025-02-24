@@ -11,11 +11,17 @@ public enum RegoValue: Sendable, Hashable {
     case set(Set<RegoValue>)
     case string(String)
     case undefined
+}
 
+// Related erorrs
+extension RegoValue {
     public enum ValueError: Error {
         case unsupportedArrayElement
         case unsupportedObjectElement
         case unsupportedType(Any.Type)
+    }
+    public enum RegoEncodingError: Error {
+        case invalidUTF8
     }
 }
 

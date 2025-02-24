@@ -492,7 +492,7 @@ extension Statement {
             let encoder = JSONEncoder()
             encoder.outputFormatting = [.sortedKeys]
             let data = try encoder.encode(self)
-            return String(data: data, encoding: .utf8)!
+            return String(data: data, encoding: .utf8) ?? "<invalid>"
         } catch {
             return "\(type(of: self)) statement encoding failed: \(error)"
         }

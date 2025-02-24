@@ -49,11 +49,11 @@ struct EvalOptions: ParsableArguments {
             }
         }
 
-        if rawInput != nil {
+        if let rawInput {
             guard inputFile == nil else {
                 throw ValidationError("Cannot specify both input file and raw input JSON string")
             }
-            inputData = rawInput!.data(using: .utf8)!
+            inputData = rawInput.data(using: .utf8)!
         }
 
         if let inputData = inputData {

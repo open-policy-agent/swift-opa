@@ -8,13 +8,6 @@ public struct ArrayAppendStatement: Statement, Codable, Equatable {
 
     public var array: Local
     public var value: Operand
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct AssignIntStatement: Statement, Codable, Equatable {
@@ -27,13 +20,6 @@ public struct AssignIntStatement: Statement, Codable, Equatable {
 
     public var value: Int64
     public var target: Local
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct AssignVarOnceStatement: Statement, Codable, Equatable {
@@ -55,13 +41,6 @@ public struct AssignVarOnceStatement: Statement, Codable, Equatable {
             return
         }
         self.location = location
-    }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
     }
 }
 
@@ -85,13 +64,6 @@ public struct AssignVarStatement: Statement, Codable, Equatable {
         }
         self.location = location
     }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct BlockStatement: Statement, Codable, Equatable {
@@ -105,13 +77,6 @@ public struct BlockStatement: Statement, Codable, Equatable {
 
     public init(blocks: [Block]) {
         self.blocks = blocks
-    }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
     }
 }
 
@@ -127,13 +92,6 @@ public struct BreakStatement: Statement, Codable, Equatable {
     public init(index: UInt32) {
         self.index = index
     }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct CallDynamicStatement: Statement, Codable, Equatable {
@@ -148,13 +106,6 @@ public struct CallDynamicStatement: Statement, Codable, Equatable {
     public var path: [Operand]
     public var args: [Local]
     public var result: Local
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct CallStatement: Statement, Codable, Equatable {
@@ -176,13 +127,6 @@ public struct CallStatement: Statement, Codable, Equatable {
         self.args = args
         self.result = result
     }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct DotStatement: Statement, Codable, Equatable {
@@ -203,13 +147,6 @@ public struct DotStatement: Statement, Codable, Equatable {
         self.key = key
         self.target = target
     }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct EqualStatement: Statement, Codable, Equatable {
@@ -227,13 +164,6 @@ public struct EqualStatement: Statement, Codable, Equatable {
         self.a = a
         self.b = b
     }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct IsArrayStatement: Statement, Codable, Equatable {
@@ -244,13 +174,6 @@ public struct IsArrayStatement: Statement, Codable, Equatable {
     }
 
     public var source: Operand
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct IsDefinedStatement: Statement, Codable, Equatable {
@@ -262,13 +185,6 @@ public struct IsDefinedStatement: Statement, Codable, Equatable {
 
     // NOTE: There is a mistake upstream in the spec, which specifies this as an operand (https://www.openpolicyagent.org/docs/latest/ir/#isdefinedstmt)
     public var source: Local
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct IsObjectStatement: Statement, Codable, Equatable {
@@ -279,13 +195,6 @@ public struct IsObjectStatement: Statement, Codable, Equatable {
     }
 
     public var source: Operand
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct IsSetStatement: Statement, Codable, Equatable {
@@ -296,13 +205,6 @@ public struct IsSetStatement: Statement, Codable, Equatable {
     }
 
     public var source: Operand
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct IsUndefinedStatement: Statement, Codable, Equatable {
@@ -317,13 +219,6 @@ public struct IsUndefinedStatement: Statement, Codable, Equatable {
 
     public init(source: Local) {
         self.source = source
-    }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
     }
 }
 
@@ -342,13 +237,6 @@ public struct LenStatement: Statement, Codable, Equatable {
         self.source = source
         self.target = target
     }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct MakeArrayStatement: Statement, Codable, Equatable {
@@ -361,13 +249,6 @@ public struct MakeArrayStatement: Statement, Codable, Equatable {
 
     public var capacity: Int32
     public var target: Local
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct MakeNullStatement: Statement, Codable, Equatable {
@@ -378,13 +259,6 @@ public struct MakeNullStatement: Statement, Codable, Equatable {
     }
 
     public var target: Local
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct MakeNumberIntStatement: Statement, Codable, Equatable {
@@ -397,13 +271,6 @@ public struct MakeNumberIntStatement: Statement, Codable, Equatable {
 
     public var value: Int64
     public var target: Local
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct MakeNumberRefStatement: Statement, Codable, Equatable {
@@ -417,13 +284,6 @@ public struct MakeNumberRefStatement: Statement, Codable, Equatable {
 
     public var index: Int32
     public var target: Local
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct MakeObjectStatement: Statement, Codable, Equatable {
@@ -441,13 +301,6 @@ public struct MakeObjectStatement: Statement, Codable, Equatable {
         }
         self.target = target
     }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct MakeSetStatement: Statement, Codable, Equatable {
@@ -458,13 +311,6 @@ public struct MakeSetStatement: Statement, Codable, Equatable {
     }
 
     public var target: Local
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct NopStatement: Statement, Codable, Equatable {
@@ -477,13 +323,6 @@ public struct NopStatement: Statement, Codable, Equatable {
     // and do nothing.
     public init(from decoder: Decoder) throws {
     }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct NotStatement: Statement, Codable, Equatable {
@@ -494,13 +333,6 @@ public struct NotStatement: Statement, Codable, Equatable {
     }
 
     public var block: Block
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct NotEqualStatement: Statement, Codable, Equatable {
@@ -517,13 +349,6 @@ public struct NotEqualStatement: Statement, Codable, Equatable {
     public init(a: Operand, b: Operand) {
         self.a = a
         self.b = b
-    }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
     }
 }
 
@@ -544,13 +369,6 @@ public struct ObjectInsertOnceStatement: Statement, Codable, Equatable {
         self.key = key
         self.value = value
         self.object = object
-    }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
     }
 }
 
@@ -575,13 +393,6 @@ public struct ObjectInsertStatement: Statement, Codable, Equatable {
         self.value = value
         self.object = object
     }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct ObjectMergeStatement: Statement, Codable, Equatable {
@@ -596,13 +407,6 @@ public struct ObjectMergeStatement: Statement, Codable, Equatable {
     public var a: Local
     public var b: Local
     public var target: Local
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct ResetLocalStatement: Statement, Codable, Equatable {
@@ -613,13 +417,6 @@ public struct ResetLocalStatement: Statement, Codable, Equatable {
     }
 
     public var target: Local
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct ResultSetAddStatement: Statement, Codable, Equatable {
@@ -634,13 +431,6 @@ public struct ResultSetAddStatement: Statement, Codable, Equatable {
     public init(value: Local) {
         self.value = value
     }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct ReturnLocalStatement: Statement, Codable, Equatable {
@@ -651,13 +441,6 @@ public struct ReturnLocalStatement: Statement, Codable, Equatable {
     }
 
     public var source: Local
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct ScanStatement: Statement, Codable, Equatable {
@@ -681,13 +464,6 @@ public struct ScanStatement: Statement, Codable, Equatable {
         self.value = value
         self.block = block
     }
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct SetAddStatement: Statement, Codable, Equatable {
@@ -700,13 +476,6 @@ public struct SetAddStatement: Statement, Codable, Equatable {
 
     public var value: Operand
     public var set: Local
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }
 
 public struct WithStatement: Statement, Codable, Equatable {
@@ -723,11 +492,4 @@ public struct WithStatement: Statement, Codable, Equatable {
     public var path: [Int32]?  // TODO when is this ever allowed to be null/missing?
     public var value: Operand
     public var block: Block
-
-    public func isEqual(to other: any Statement) -> Bool {
-        guard let rhs = other as? Self else {
-            return false
-        }
-        return self == rhs
-    }
 }

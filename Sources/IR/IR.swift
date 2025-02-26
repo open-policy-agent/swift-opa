@@ -447,13 +447,13 @@ public enum AnyStatement: Sendable, Equatable {
 
 // AnyInnerStatement represents the generic stmt field, which should always contain location fields.
 public struct AnyInnerStatement: Codable, Equatable {
-    public var location: Location {
-        Location(row: row, col: col, file: file)
-    }
-
     public var row: Int = 0
     public var col: Int = 0
     public var file: Int = 0
+
+    public var location: Location {
+        Location(row: row, col: col, file: file)
+    }
 }
 
 public struct Location: Codable, Equatable, Sendable {
@@ -480,9 +480,6 @@ public enum EncodingError: Error {
 public protocol Statement: Sendable, Codable {
     // Location coordinates, shared by all concrete statement
     var location: Location { get set }
-
-    // This will be used to implement Equatable dynamically between heterogenous statement types
-    func isEqual(to other: any Statement) -> Bool
 }
 
 extension Statement {
@@ -580,11 +577,5 @@ extension Operand: Codable {
             let v = try container.decode(Int.self, forKey: .value)
             self.value = Value.stringIndex(v)
         }
-    }
-
-    public func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(self.value, forKey: .value)
-        try container.encode(self.type, forKey: .type)
     }
 }

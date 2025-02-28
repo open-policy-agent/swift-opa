@@ -2,6 +2,13 @@ import AST
 import Foundation
 
 extension BuiltinFuncs {
+    // can't use CharacterSet.whitespacesAndNewlines because it does not contain
+    // \v (0x0B - vertical tab) and \f (0x0C - form feed)
+    // Golang implementation has: '\t', '\n', '\v', '\f', '\r', ' ', 0x85, 0xA0
+    fileprivate static let customWhitespace = CharacterSet(charactersIn: "\t\n\r ").union(
+        [UnicodeScalar(0x0B), UnicodeScalar(0x0C), UnicodeScalar(0x85), UnicodeScalar(0xA0)]
+    )
+
     static func concat(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
@@ -71,6 +78,30 @@ extension BuiltinFuncs {
         return .boolean(search.hasSuffix(base))
     }
 
+    static func formatInt(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .number(let num) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "number", got: args[0].typeName, want: "number")
+        }
+
+        guard case .number(_) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "base", got: args[1].typeName, want: "number")
+        }
+
+        guard !args[1].isFloat, let radix = args[1].integerValue else {
+            throw BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}")
+        }
+        guard radix == 2 || radix == 8 || radix == 10 || radix == 16 else {
+            throw BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}")
+        }
+
+        let roundedNum = Int64(_floor(num.doubleValue))
+        return .string(String(roundedNum, radix: Int(radix)))
+    }
+
     static func indexOf(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
@@ -94,6 +125,29 @@ extension BuiltinFuncs {
             return .number(-1)
         }
         return .number(NSNumber(value: haystack.distance(from: haystack.startIndex, to: range.lowerBound)))
+    }
+
+    static func indexOfN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .string(let haystack) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "haystack", got: args[0].typeName, want: "string")
+        }
+
+        guard case .string(let needle) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "needle", got: args[1].typeName, want: "string")
+        }
+
+        // Special case to behave like the Go version does
+        guard !needle.isEmpty else {
+            throw BuiltinError.evalError(msg: "empty search character")  // matching go error
+        }
+
+        let ranges = haystack.allRanges(of: needle)
+        return .array(
+            ranges.map({ .number(NSNumber(value: haystack.distance(from: haystack.startIndex, to: $0.lowerBound))) }))
     }
 
     static func lower(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -133,6 +187,38 @@ extension BuiltinFuncs {
         return .array(parts.map { .string(String($0)) })
     }
 
+    static func replace(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 3 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 3)
+        }
+
+        guard case .string(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
+        }
+
+        guard case .string(let old) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "old", got: args[1].typeName, want: "string")
+        }
+
+        guard case .string(let new) = args[2] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "new", got: args[2].typeName, want: "string")
+        }
+
+        return .string(x.replacingOccurrences(of: old, with: new))
+    }
+
+    static func reverse(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+        }
+
+        guard case .string(let value) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[0].typeName, want: "string")
+        }
+
+        return .string(String(value.reversed()))
+    }
+
     static func sprintf(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
@@ -147,6 +233,64 @@ extension BuiltinFuncs {
         }
 
         return .string(sprintfRegoValuesMostlyLikeHowGoDoes(format, values))
+    }
+
+    static func startsWith(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .string(let search) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "search", got: args[0].typeName, want: "string")
+        }
+
+        guard case .string(let base) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "base", got: args[1].typeName, want: "string")
+        }
+
+        return .boolean(search.hasPrefix(base))
+    }
+
+    static func substring(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 3 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 3)
+        }
+
+        guard case .string(let value) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[0].typeName, want: "string")
+        }
+
+        guard case .number(_) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "offset", got: args[1].typeName, want: "number")
+        }
+
+        guard case .number(_) = args[2] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "length", got: args[2].typeName, want: "number")
+        }
+
+        guard !args[1].isFloat, let offset = args[1].integerValue else {
+            throw BuiltinError.evalError(msg: "operand 2 must be integer number but got floating-point number")
+        }
+
+        guard offset >= 0 else {
+            throw BuiltinError.evalError(msg: "negative offset")
+        }
+
+        guard !args[2].isFloat, let length = args[2].integerValue else {
+            throw BuiltinError.evalError(msg: "operand 3 must be integer number but got floating-point number")
+        }
+
+        if offset >= value.count || length == 0 {
+            return .string("")
+        }
+        let startIdx = value.index(value.startIndex, offsetBy: Int(offset))
+
+        if length < 0 || offset + length > value.count {
+            return .string(String(value[startIdx...]))
+        }
+        let endIdx = value.index(startIdx, offsetBy: Int(length))
+
+        return .string(String(value[startIdx..<endIdx]))
     }
 
     // trim returns value with all leading or trailing instances of the cutset characters removed.
@@ -167,6 +311,107 @@ extension BuiltinFuncs {
         return .string(trimmedValue)
     }
 
+    static func trimLeft(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .string(let value) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[0].typeName, want: "string")
+        }
+
+        guard case .string(let cutset) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "cutset", got: args[1].typeName, want: "string")
+        }
+
+        guard !value.isEmpty else {
+            return .string("")
+        }
+
+        let characterSet = Set(cutset)
+        let trimmedValue = value.drop(while: { characterSet.contains($0) })
+        return .string(String(trimmedValue))
+    }
+
+    static func trimPrefix(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .string(let value) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[0].typeName, want: "string")
+        }
+
+        guard case .string(let prefix) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "prefix", got: args[1].typeName, want: "string")
+        }
+
+        guard value.hasPrefix(prefix) else {
+            return .string(value)
+        }
+        return .string(String(value.dropFirst(prefix.count)))
+    }
+
+    static func trimRight(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .string(let value) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[0].typeName, want: "string")
+        }
+
+        guard case .string(let cutset) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "cutset", got: args[1].typeName, want: "string")
+        }
+
+        guard !value.isEmpty else {
+            return .string("")
+        }
+
+        let characterSet = Set(cutset)
+        // Start from the end of the string and check each character
+        var idx = value.endIndex
+        while idx > value.startIndex && characterSet.contains(value[value.index(before: idx)]) {
+            idx = value.index(before: idx)
+        }
+
+        // Return the substring up to the last index found to NOT match the characters
+        return .string(String(value[..<idx]))
+    }
+
+    static func trimSpace(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+        }
+
+        guard case .string(let value) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[0].typeName, want: "string")
+        }
+
+        let trimmedValue = value.trimmingCharacters(in: customWhitespace)
+        return .string(trimmedValue)
+    }
+
+    static func trimSuffix(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+        }
+
+        guard case .string(let value) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[0].typeName, want: "string")
+        }
+
+        guard case .string(let suffix) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "suffix", got: args[1].typeName, want: "string")
+        }
+
+        guard value.hasSuffix(suffix) else {
+            return .string(value)
+        }
+        return .string(String(value.dropLast(suffix.count)))
+    }
+
     static func upper(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
@@ -177,6 +422,34 @@ extension BuiltinFuncs {
         }
 
         return .string(x.uppercased())
+    }
+}
+
+extension String {
+    /// Returns all non-overlapping ranges in this string that match another string
+    fileprivate func allRanges(
+        of aString: String,
+        options: String.CompareOptions = [],
+        locale: Locale? = nil
+    ) -> [Range<Index>] {
+        var results: [Range<Index>] = []
+        // We start from startIndex of the string OR,
+        // if we have already detected matches, from an upper bound of the last match
+        // to detect the next range of a substring in this string.
+        // As we discover matching ranges, we add them to the list
+        // and so the next crank of the loop always starts from the latest found range.
+        // The loop halts when the range is no longer discovered over the remainder of
+        // this string.
+        while let r = self.range(
+            of: aString,
+            options: options,
+            range: (results.last?.upperBound ?? startIndex)..<endIndex,
+            locale: locale)
+        {
+            results.append(r)
+        }
+
+        return results
     }
 }
 

@@ -334,6 +334,45 @@ extension BuiltinTests.StringsTests {
         ),
     ]
 
+    static let indexOfNTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "base case positive",
+            name: "indexof_n",
+            args: ["hello, world world worldy-world! ", "world"],
+            expected: .success([7, 13, 19, 26])
+        ),
+        BuiltinTests.TestCase(
+            description: "base case negative",
+            name: "indexof_n",
+            args: ["hello, world!", "zzzzz"],
+            expected: .success([])
+        ),
+        BuiltinTests.TestCase(
+            description: "empty needle",
+            name: "indexof_n",
+            args: ["hello, world!", ""],
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "empty search character"))
+        ),
+        BuiltinTests.TestCase(
+            description: "full match",
+            name: "indexof_n",
+            args: ["abc", "abc"],
+            expected: .success([0])
+        ),
+        BuiltinTests.TestCase(
+            description: "more than a full match",
+            name: "indexof_n",
+            args: ["bc", "abcd"],
+            expected: .success([])
+        ),
+        BuiltinTests.TestCase(
+            description: "empty haystack",
+            name: "indexof_n",
+            args: ["", "abc"],
+            expected: .success([])
+        ),
+    ]
+
     static let lowerTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "base",
@@ -520,6 +559,147 @@ extension BuiltinTests.StringsTests {
         ),
     ]
 
+    static let trimLeftTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "cuts leading characters but not suffix",
+            name: "trim_left",
+            args: ["{}{}{}{}{}{}{!#}lorem ipsum{!#}", "{!#}"],
+            expected: .success("lorem ipsum{!#}")
+        ),
+        BuiltinTests.TestCase(
+            description: "cutset empty",
+            name: "trim_left",
+            args: ["lorem ipsum", ""],
+            expected: .success("lorem ipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "cuts whole string",
+            name: "trim_left",
+            args: ["{!#}{!#}!#", "{!#}"],
+            expected: .success("")
+        ),
+        BuiltinTests.TestCase(
+            description: "cutset doesn't match",
+            name: "trim_left",
+            args: ["lorem ipsum", "X"],
+            expected: .success("lorem ipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "value empty",
+            name: "trim_left",
+            args: ["", "f"],
+            expected: .success("")
+        ),
+    ]
+
+    static let trimRightTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "cuts trailing characters but not prefix",
+            name: "trim_right",
+            args: ["{!#}lorem ipsum{!#}!#", "{!#}"],
+            expected: .success("{!#}lorem ipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "cuts whole string",
+            name: "trim_right",
+            args: ["{!#}{!#}!#", "{!#}"],
+            expected: .success("")
+        ),
+        BuiltinTests.TestCase(
+            description: "cutset doesn't match",
+            name: "trim_right",
+            args: ["lorem ipsum", "X"],
+            expected: .success("lorem ipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "cutset empty",
+            name: "trim_right",
+            args: ["lorem ipsum", ""],
+            expected: .success("lorem ipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "value empty",
+            name: "trim_right",
+            args: ["", "f"],
+            expected: .success("")
+        ),
+    ]
+
+    static let trimPrefixTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "cuts leading prefix",
+            name: "trim_prefix",
+            args: ["foolorem ipsum", "foo"],
+            expected: .success("lorem ipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "prefix empty",
+            name: "trim_prefix",
+            args: ["lorem ipsum", ""],
+            expected: .success("lorem ipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "value does not start with prefix",
+            name: "trim_prefix",
+            args: ["lorem ipsum", "bar"],
+            expected: .success("lorem ipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "value empty",
+            name: "trim_prefix",
+            args: ["", "f"],
+            expected: .success("")
+        ),
+    ]
+
+    static let trimSpaceTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "removes spaces, tabs, carriage returns",
+            name: "trim_space",
+            args: ["    \t\t\t lorem ipsum\t\t        \r"],
+            expected: .success("lorem ipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "does not modify strings without whitespaces",
+            name: "trim_space",
+            args: ["loremipsum"],
+            expected: .success("loremipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "does not remove inner whitespace",
+            name: "trim_space",
+            args: ["lorem \t\t ipsum"],
+            expected: .success("lorem \t\t ipsum")
+        ),
+    ]
+
+    static let trimSuffixTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "cuts trailing suffix",
+            name: "trim_suffix",
+            args: ["lorem ipsumfoo", "foo"],
+            expected: .success("lorem ipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "suffix empty",
+            name: "trim_suffix",
+            args: ["lorem ipsum", ""],
+            expected: .success("lorem ipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "value does not end with suffix",
+            name: "trim_suffix",
+            args: ["lorem ipsum", "bar"],
+            expected: .success("lorem ipsum")
+        ),
+        BuiltinTests.TestCase(
+            description: "value empty",
+            name: "trim_suffix",
+            args: ["", "f"],
+            expected: .success("")
+        ),
+    ]
+
     static let upperTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "base",
@@ -565,6 +745,281 @@ extension BuiltinTests.StringsTests {
         ),
     ]
 
+    static let startsWithTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "base case positive",
+            name: "startswith",
+            args: ["hello, world!", "hello"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "base case negative",
+            name: "startswith",
+            args: ["hello, world!", "world!"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "empty base",
+            name: "startswith",
+            args: ["hello, world!", ""],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "full match",
+            name: "startswith",
+            args: ["abc", "abc"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "more than a full match",
+            name: "startswith",
+            args: ["bc", "abcd"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "empty search",
+            name: "startswith",
+            args: ["", "abc"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "both empty",
+            name: "startswith",
+            args: ["", ""],
+            expected: .success(true)
+        ),
+    ]
+
+    static let formatIntTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "integer base 10",
+            name: "format_int",
+            args: [123, 10],
+            expected: .success("123")
+        ),
+        BuiltinTests.TestCase(
+            description: "integer base 16",
+            name: "format_int",
+            args: [123, 16],
+            expected: .success("7b")
+        ),
+        BuiltinTests.TestCase(
+            description: "integer base 8",
+            name: "format_int",
+            args: [123, 8],
+            expected: .success("173")
+        ),
+        BuiltinTests.TestCase(
+            description: "integer base 2",
+            name: "format_int",
+            args: [123, 2],
+            expected: .success("1111011")
+        ),
+        BuiltinTests.TestCase(
+            description: "unsupported base",
+            name: "format_int",
+            args: [123, 7],
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}"))
+        ),
+        BuiltinTests.TestCase(
+            description: "negative base",
+            name: "format_int",
+            args: [123, -2],
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}"))
+        ),
+        BuiltinTests.TestCase(
+            description: "float base",
+            name: "format_int",
+            args: [123, 10.1],
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}"))
+        ),
+        BuiltinTests.TestCase(
+            description: "float base with integer value",
+            name: "format_int",
+            args: [123, 10.0],
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}"))
+        ),
+        BuiltinTests.TestCase(
+            description: "float base 10 uses floor",
+            name: "format_int",
+            args: [123.9, 10],
+            expected: .success("123")
+        ),
+        BuiltinTests.TestCase(
+            description: "float base 16 uses floor",
+            name: "format_int",
+            args: [123.9, 16],
+            expected: .success("7b")
+        ),
+        BuiltinTests.TestCase(
+            description: "float base 8 uses floor",
+            name: "format_int",
+            args: [123.9, 8],
+            expected: .success("173")
+        ),
+        BuiltinTests.TestCase(
+            description: "float base 2 uses floor",
+            name: "format_int",
+            args: [123.9, 2],
+            expected: .success("1111011")
+        ),
+        BuiltinTests.TestCase(
+            description: "negative float base 10 uses floor",
+            name: "format_int",
+            args: [-122.1, 10],
+            expected: .success("-123")
+        ),
+        BuiltinTests.TestCase(
+            description: "negative float base 16 uses floor",
+            name: "format_int",
+            args: [-122.1, 16],
+            expected: .success("-7b")
+        ),
+        BuiltinTests.TestCase(
+            description: "negative float base 8 uses floor",
+            name: "format_int",
+            args: [-122.1, 8],
+            expected: .success("-173")
+        ),
+        BuiltinTests.TestCase(
+            description: "negative float base 2 uses floor",
+            name: "format_int",
+            args: [-122.1, 2],
+            expected: .success("-1111011")
+        ),
+    ]
+
+    static let replaceTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "base case positive",
+            name: "replace",
+            args: ["hello, world world worldy-world!", "world", "universe"],
+            expected: .success("hello, universe universe universey-universe!")
+        ),
+        BuiltinTests.TestCase(
+            description: "base case negative",
+            name: "replace",
+            args: ["hello, world world worldy-world!", "foo", "universe"],
+            expected: .success("hello, world world worldy-world!")
+        ),
+        BuiltinTests.TestCase(
+            description: "empty search string",
+            name: "replace",
+            args: ["", "foo", "bar"],
+            expected: .success("")
+        ),
+        BuiltinTests.TestCase(
+            description: "empty old string",
+            name: "replace",
+            args: ["foo", "", "bar"],
+            expected: .success("foo")
+        ),
+        BuiltinTests.TestCase(
+            description: "empty new string",
+            name: "replace",
+            args: ["foo", "o", ""],
+            expected: .success("f")
+        ),
+    ]
+
+    static let reverseTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "reverses a string",
+            name: "strings.reverse",
+            args: ["abcdefg"],
+            expected: .success("gfedcba")
+        ),
+        BuiltinTests.TestCase(
+            description: "reverses empty string",
+            name: "strings.reverse",
+            args: [""],
+            expected: .success("")
+        ),
+    ]
+
+    static let substringTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "negative offset",
+            name: "substring",
+            args: ["abcdefgh", -1, 3],
+            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "negative offset"))
+        ),
+        BuiltinTests.TestCase(
+            description: "float offset",
+            name: "substring",
+            args: ["abcdefgh", 0.1, 3],
+            expected: .failure(
+                BuiltinFuncs.BuiltinError.evalError(
+                    msg: "operand 2 must be integer number but got floating-point number"))
+        ),
+        BuiltinTests.TestCase(
+            description: "float offset with integer value",
+            name: "substring",
+            args: ["abcdefgh", 0.0, 3],
+            expected: .failure(
+                BuiltinFuncs.BuiltinError.evalError(
+                    msg: "operand 2 must be integer number but got floating-point number"))
+        ),
+        BuiltinTests.TestCase(
+            description: "float length",
+            name: "substring",
+            args: ["abcdefgh", 0, 3.3],
+            expected: .failure(
+                BuiltinFuncs.BuiltinError.evalError(
+                    msg: "operand 3 must be integer number but got floating-point number"))
+        ),
+        BuiltinTests.TestCase(
+            description: "float length with integer value",
+            name: "substring",
+            args: ["abcdefgh", 0, 3.0],
+            expected: .failure(
+                BuiltinFuncs.BuiltinError.evalError(
+                    msg: "operand 3 must be integer number but got floating-point number"))
+        ),
+        BuiltinTests.TestCase(
+            description: "returns correct substring",
+            name: "substring",
+            args: ["abcdefgh", 2, 4],
+            expected: .success("cdef")
+        ),
+        BuiltinTests.TestCase(
+            description: "negative length returns remainder of the string",
+            name: "substring",
+            args: ["abcdefgh", 2, -1],
+            expected: .success("cdefgh")
+        ),
+        BuiltinTests.TestCase(
+            description: "long length returns remainder of the string",
+            name: "substring",
+            args: ["abcdefgh", 2, 100],
+            expected: .success("cdefgh")
+        ),
+        BuiltinTests.TestCase(
+            description: "offset + length = len(string) returns remainder of the string",
+            name: "substring",
+            args: ["abcdefgh", 2, 6],
+            expected: .success("cdefgh")
+        ),
+        BuiltinTests.TestCase(
+            description: "zero length returns empty string",
+            name: "substring",
+            args: ["abcdefgh", 2, 0],
+            expected: .success("")
+        ),
+        BuiltinTests.TestCase(
+            description: "offset beyond string length returns empty string",
+            name: "substring",
+            args: ["abcdefgh", 9, 1],
+            expected: .success("")
+        ),
+        BuiltinTests.TestCase(
+            description: "offset equal to string length returns empty string",
+            name: "substring",
+            args: ["abcdefgh", 8, 1],
+            expected: .success("")
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
             concatTests,
@@ -576,6 +1031,94 @@ extension BuiltinTests.StringsTests {
             sprintfBasicTests,
             trimTests,
             upperTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "startswith", sampleArgs: ["a", "b"], argIndex: 0, argName: "search",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "startswith", sampleArgs: ["a", "b"], argIndex: 1, argName: "base",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            startsWithTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "format_int", sampleArgs: [123, 10], argIndex: 0, argName: "number",
+                allowedArgTypes: ["number"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "format_int", sampleArgs: [123, 10], argIndex: 1, argName: "base",
+                allowedArgTypes: ["number"], generateNumberOfArgsTest: false),
+            formatIntTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "indexof_n", sampleArgs: ["haystack", "needle"], argIndex: 0, argName: "haystack",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "indexof_n", sampleArgs: ["haystack", "needle"], argIndex: 1, argName: "needle",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            indexOfNTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "replace", sampleArgs: ["s", "old", "new"], argIndex: 0, argName: "s",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "replace", sampleArgs: ["s", "old", "new"], argIndex: 1, argName: "old",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            BuiltinTests.generateFailureTests(
+                builtinName: "replace", sampleArgs: ["s", "old", "new"], argIndex: 2, argName: "new",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            replaceTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "string.reverse", sampleArgs: ["value"], argIndex: 0, argName: "value",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            reverseTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "trim_left", sampleArgs: ["value", "cutset"], argIndex: 0, argName: "value",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "trim_left", sampleArgs: ["value", "cutset"], argIndex: 1, argName: "cutset",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            trimLeftTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "trim_prefix", sampleArgs: ["value", "prefix"], argIndex: 0, argName: "value",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "trim_prefix", sampleArgs: ["value", "prefix"], argIndex: 1, argName: "prefix",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            trimPrefixTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "trim_right", sampleArgs: ["value", "prefix"], argIndex: 0, argName: "value",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "trim_right", sampleArgs: ["value", "prefix"], argIndex: 1, argName: "prefix",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            trimRightTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "trim_space", sampleArgs: ["value"], argIndex: 0, argName: "value",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            trimSpaceTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "trim_suffix", sampleArgs: ["value", "suffix"], argIndex: 0, argName: "value",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "trim_suffix", sampleArgs: ["value", "suffix"], argIndex: 1, argName: "suffix",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            trimSuffixTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "substring", sampleArgs: ["value", 1, 2], argIndex: 0, argName: "value",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "substring", sampleArgs: ["value", 1, 2], argIndex: 1, argName: "offset",
+                allowedArgTypes: ["number"], generateNumberOfArgsTest: false),
+            BuiltinTests.generateFailureTests(
+                builtinName: "substring", sampleArgs: ["value", 1, 2], argIndex: 2, argName: "length",
+                allowedArgTypes: ["number"], generateNumberOfArgsTest: false),
+            substringTests,
         ].flatMap { $0 }
     }
 

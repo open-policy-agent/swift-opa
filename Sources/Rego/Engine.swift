@@ -9,8 +9,8 @@ public struct Engine {
     // bundles are bundles after loading from disk
     private var bundles: [String: Bundle] = [:]
 
-    // evaluator is a cached evaluator for evaluating policy
-    private var evaluator: IREvaluator?
+    // directly load IR Policies, mostly useful for testing
+    private var policies: [IR.Policy] = []
 
     // store is an interface for passing data to the evaluator
     private var store: any Store = InMemoryStore(initialData: .object([:]))
@@ -24,55 +24,74 @@ public struct Engine {
     }
 
     public init(withPolicies policies: [IR.Policy], andStore store: any Store) {
-        self.evaluator = IREvaluator(withPolicies: policies)
+        self.policies = policies
         self.store = store
     }
 
-    public mutating func prepare() async throws {
+    public struct PreparedQuery {
+        let query: String
+        let evaluator: any Evaluator
+        let store: any Store
+
+        public func evaluate(
+            input: AST.RegoValue = .undefined,
+            tracer: QueryTracer? = nil,
+            strictBuiltins: Bool = false
+        ) async throws -> ResultSet {
+            let ctx = EvaluationContext(
+                query: self.query,
+                input: input,
+                store: self.store,
+                builtins: defaultBuiltinRegistry,
+                tracer: tracer,
+                strictBuiltins: strictBuiltins
+            )
+
+            return try await evaluator.evaluate(withContext: ctx)
+        }
+    }
+
+    public mutating func prepareForEval(query: String) async throws -> PreparedQuery {
         // Load all the bundles from disk
         // This includes parsing their data trees, etc.
+        var loadedBundles = self.bundles
         for path in bundlePaths ?? [] {
+            guard loadedBundles[path.name] == nil else {
+                throw Err.bundleNameConflictError(bundle: path.name)
+            }
             var b: Bundle
             do {
                 b = try BundleLoader.load(fromFile: path.url)
             } catch {
                 throw Err.bundleLoadError(bundle: path.name, error: error)
             }
-            bundles[path.name] = b
+            loadedBundles[path.name] = b
         }
 
         // Verify correctness of this bundle set
-        try checkBundlesForOverlap(bundleSet: bundles)
+        try checkBundlesForOverlap(bundleSet: loadedBundles)
 
         // Patch all the bundle data into the data tree on the store
-        for (_, bundle) in bundles {
+        for (_, bundle) in loadedBundles {
             try await store.write(path: StoreKeyPath(["data"]), value: bundle.data)
         }
 
-        // Parse/compile the evaluation plans
-        self.evaluator = try IREvaluator(bundles: bundles)
-    }
-
-    public func evaluate(
-        query: String,
-        input: AST.RegoValue = .undefined,
-        tracer: QueryTracer? = nil,
-        strictBuiltins: Bool = false
-    ) async throws -> ResultSet {
-        let ctx = EvaluationContext(
-            query: query,
-            input: input,
-            store: self.store,
-            builtins: defaultBuiltinRegistry,
-            tracer: tracer,
-            strictBuiltins: strictBuiltins
-        )
-
-        guard let evaluator = self.evaluator else {
-            throw Err.unpreparedError
+        if self.policies.count > 0 {
+            guard loadedBundles.isEmpty else {
+                throw Err.invalidArgumentError("Cannot mix direct IR policies with bundles")
+            }
+            return PreparedQuery(
+                query: query,
+                evaluator: IREvaluator(withPolicies: self.policies),
+                store: self.store
+            )
         }
 
-        return try await evaluator.evaluate(withContext: ctx)
+        return PreparedQuery(
+            query: query,
+            evaluator: try IREvaluator(bundles: loadedBundles),
+            store: self.store
+        )
     }
 
     public struct BundlePath: Codable {
@@ -89,6 +108,8 @@ public struct Engine {
         case internalError(String)
         case bundleLoadError(bundle: String, error: Error)
         case unpreparedError
-        case bundleConflictError(bundle: String)
+        case bundleNameConflictError(bundle: String)
+        case bundleRootConflictError(bundle: String)
+        case invalidArgumentError(String)
     }
 }

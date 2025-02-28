@@ -20,11 +20,10 @@ struct BenchCommand: AsyncParsableCommand {
 
         // Prepare does as much pre-processing as possible to get ready to evaluate queries.
         // This only needs to be done once when loading the engine and after updating it.
-        try await regoEngine.prepare()
+        let preparedQuery = try await regoEngine.prepareForEval(query: self.evalOptions.query)
 
         let report = try await measureAsync(iterations: Int(count)) {
-            let _ = try await regoEngine.evaluate(
-                query: self.evalOptions.query,
+            let _ = try await preparedQuery.evaluate(
                 input: self.evalOptions.inputValue,
                 strictBuiltins: self.evalOptions.strictBuiltinErrors
             )

@@ -16,14 +16,14 @@ struct EvalCommand: AsyncParsableCommand {
         // Initialize a Rego.Engine initially configured with our bundles from the CLI options.
         var regoEngine = try Rego.Engine(withBundlePaths: self.evalOptions.bundlePaths)
 
-        // Prepare does as much pre-processing as possible to get ready to evaluate queries.
-        // This only needs to be done once when loading the engine and after updating it.
-        try await regoEngine.prepare()
-
         let tracer = tracerForLevel(self.evalOptions.explain)
 
-        let resultSet = try await regoEngine.evaluate(
-            query: self.evalOptions.query,
+        // Prepare does as much pre-processing as possible to get ready to evaluate queries.
+        // This only needs to be done once when loading the engine and after updating it. These
+        // PreparedQuery's can be re-used.
+        let preparedQuery = try await regoEngine.prepareForEval(query: self.evalOptions.query)
+
+        let resultSet = try await preparedQuery.evaluate(
             input: self.evalOptions.inputValue,
             tracer: tracer,
             strictBuiltins: self.evalOptions.strictBuiltinErrors

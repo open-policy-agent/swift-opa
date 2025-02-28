@@ -137,10 +137,8 @@ struct IREvaluatorTests {
     @Test(arguments: validTestCases)
     func testValidEvaluations(tc: TestCase) async throws {
         var engine = try Engine(withBundlePaths: [Engine.BundlePath(name: "default", url: tc.sourceBundle)])
-        try await engine.prepare()
         let bufferTracer = BufferedQueryTracer(level: .full)
-        let actual = try await engine.evaluate(
-            query: tc.query,
+        let actual = try await engine.prepareForEval(query: tc.query).evaluate(
             input: tc.input,
             tracer: bufferTracer
         )
@@ -168,8 +166,7 @@ struct IREvaluatorTests {
         var engine = try Engine(withBundlePaths: [Engine.BundlePath(name: "default", url: tc.sourceBundle)])
 
         await #expect(Comment(rawValue: tc.description)) {
-            try await engine.prepare()
-            let _ = try await engine.evaluate(query: tc.query, input: tc.input)
+            let _ = try await engine.prepareForEval(query: tc.query).evaluate(input: tc.input)
             #expect(Bool(false), "expected evaluation to throw an error")
         } throws: { error in
             let gotMirror = Mirror(reflecting: error)

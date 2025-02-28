@@ -15,7 +15,7 @@ extension Engine {
             do {
                 allRoots = try mergeTrie(allRoots, withBundleRoots: bundle.manifest.roots)
             } catch Bundle.BundleError.overlappingRoots {
-                throw Err.bundleConflictError(bundle: name)
+                throw Err.bundleRootConflictError(bundle: name)
             } catch Bundle.BundleError.internalError(let msg) {
                 throw Err.internalError(msg)
             }

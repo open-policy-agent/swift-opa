@@ -176,4 +176,9 @@ extension Data {
     var hexEncoded: String {
         self.map { String(format: "%02x", $0) }.joined()
     }
+
+    /// Hex Encoding the Data with a given separator
+    func hexEncodedWithSeparator(separator: String = "") -> String {
+        self.map { String(format: "%02x", $0) }.joined(separator: separator)
+    }
 }

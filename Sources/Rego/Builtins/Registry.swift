@@ -6,10 +6,15 @@ typealias Builtin = (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoVa
 public struct BuiltinContext {
     public let location: TraceLocation
     public var tracer: QueryTracer?
+    internal let cache: Ptr<BuiltinsCache>
 
-    init(location: TraceLocation = TraceLocation(), tracer: QueryTracer? = nil) {
+    init(location: TraceLocation = TraceLocation(), tracer: QueryTracer? = nil, cache: Ptr<BuiltinsCache>? = nil) {
         self.location = location
         self.tracer = tracer
+        // Note that we will create a new cache if one hasn't been provided -
+        // some builtin evaluations (e.g. UUID) expect the cache.
+        // In most/all? cases, we expect a shared cache to be passed in here from EvaluationContext
+        self.cache = cache ?? Ptr<BuiltinsCache>(toCopyOf: BuiltinsCache())
     }
 }
 
@@ -126,6 +131,10 @@ public struct BuiltinRegistry {
             // Units
             "units.parse": BuiltinFuncs.parseUnits,
             "units.parse_bytes": BuiltinFuncs.parseByteUnits,
+
+            // UUID
+            "uuid.rfc4122": BuiltinFuncs.makeRfc4122UUID,
+            "uuid.parse": BuiltinFuncs.parseUUID,
         ]
     }
 

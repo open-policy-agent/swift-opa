@@ -6,7 +6,7 @@ import PackageDescription
 import class Foundation.ProcessInfo
 
 let package = Package(
-    name: "SwiftRego",
+    name: "swift-rego",
     platforms: [
         .macOS(.v13),
         .iOS(.v16),

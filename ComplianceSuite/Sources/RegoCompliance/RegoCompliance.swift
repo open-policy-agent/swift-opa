@@ -202,7 +202,9 @@ public struct ComplianceTesting {
         public var knownIssue: String?
     }
 
-    public static func runTest(config: TestConfig, _ tc: IRTestCase) async -> IRTestResult {
+    public static func runTest(config: TestConfig, _ tc: IRTestCase, _ customBuiltins: [String: Builtin] = [:]) async
+        -> IRTestResult
+    {
         var testResult = IRTestResult(testCase: tc)
 
         for knownIssue in config.knownIssues {
@@ -228,7 +230,7 @@ public struct ComplianceTesting {
             ])
         )
 
-        var engine = OPA.Engine(policies: [tc.base.plan], store: store)
+        var engine = OPA.Engine(policies: [tc.base.plan], store: store, customBuiltins: customBuiltins)
 
         // The logic - ignore query and want.
         // We care about entrypoints and want_plan_result, which have been teased out to

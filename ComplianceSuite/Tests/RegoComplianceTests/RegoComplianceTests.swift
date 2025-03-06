@@ -96,7 +96,8 @@ struct ComplianceTests {
         // be it an unexpected error, an expected error that wasn't there, or some other expectation
         // mismatch.
         print("\t🧬 executing \(tc.testDescription)")
-        let result = try await ComplianceTesting.runTest(config: ComplianceTests.testConfig, tc)
+        let result = try await ComplianceTesting.runTest(
+            config: ComplianceTests.testConfig, tc, ComplianceTests.customBuiltins)
         if testConfig.traceLevel != .none && result.trace != nil {
             result.trace!.prettyPrint(to: .standardOutput)
         }
@@ -121,8 +122,114 @@ struct ComplianceTests {
         }
         return
     }
+
+    fileprivate static var customBuiltins: [String: Builtin] {
+        return [
+            "test.sleep": TestBuiltins.testSleep
+        ]
+    }
 }
 
 extension ComplianceTesting.IRTestCase: CustomTestStringConvertible {
     public var testDescription: String { "\(description)" }
+}
+
+struct TestBuiltins {
+    static func testSleep(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+
+        guard case .string(let x) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
+        }
+
+        guard let timeDuration = try? parseDurationNanoseconds(x), timeDuration > 0 else {
+            return .null
+        }
+
+        try await Task.sleep(nanoseconds: UInt64(timeDuration))
+
+        return .null
+    }
+
+    enum DurationParseError: Error {
+        case invalidFormat
+    }
+
+    /// Parses a duration string and returns the equivalent duration in nanoseconds.
+    ///
+    /// - Parameters:
+    ///   - duration: A string representing a duration with parts in the format of numeric values followed by a unit (e.g., "10m", "1s", "10ms").
+    ///
+    /// - Returns: The duration represented as an `Int64` in nanoseconds.
+    ///
+    /// - Throws: `DurationParseError.invalidFormat` if the input string doesn't conform to the expected format.
+    ///
+    /// - Note: Supports units such as nanoseconds (ns), microseconds (us, µs),
+    ///        milliseconds (ms), seconds (s), minutes (m), and hours (h).
+    static func parseDurationNanoseconds(_ duration: String) throws -> Int64 {
+        var isNegative = false
+        var durationValue = duration.trimmingCharacters(in: .whitespaces)
+
+        // Check for negative sign at the start
+        if duration.hasPrefix("-") {
+            isNegative = true
+            durationValue = String(duration.dropFirst())
+        }
+
+        let regex = /(?<value>\d+)(?<unit>ns|us|µs|ms|s|m|h)/
+        let results = durationValue.matches(of: regex)
+
+        guard !results.isEmpty else {
+            throw DurationParseError.invalidFormat
+        }
+        var totalNanoseconds: Int64 = 0
+
+        // Keep matching the string accumulating nanoseconds
+        var expectedIndex = durationValue.startIndex
+        for match in results {
+            // We want to make sure the match starts where we expect it to start
+            // If it does not, we skipped over some parts of the string that
+            // did not match the regex, and we have to fail
+            guard match.range.lowerBound == expectedIndex else {
+                throw DurationParseError.invalidFormat
+            }
+            let valuePart = match.value
+            let unitPart = match.unit
+
+            guard let value = Int64(valuePart) else {
+                throw DurationParseError.invalidFormat
+            }
+
+            switch unitPart {
+            case "ns":
+                totalNanoseconds += value
+            case "us", "µs":
+                totalNanoseconds += value * 1_000
+            case "ms":
+                totalNanoseconds += value * 1_000_000
+            case "s":
+                totalNanoseconds += value * 1_000_000_000
+            case "m":
+                totalNanoseconds += value * 60 * 1_000_000_000
+            case "h":
+                totalNanoseconds += value * 60 * 60 * 1_000_000_000
+            default:
+                throw DurationParseError.invalidFormat
+            }
+            // The next match is expected to start right after this match ends
+            expectedIndex = match.range.upperBound
+        }
+        // Now, we MUST reach the end of the string
+        // if we didn't it means that there are other parts that don't match our regex
+        guard expectedIndex == durationValue.endIndex else {
+            throw DurationParseError.invalidFormat
+        }
+
+        // Adjust for negative
+        totalNanoseconds = isNegative ? -totalNanoseconds : totalNanoseconds
+
+        return totalNanoseconds
+    }
 }

@@ -11,13 +11,19 @@ fmt:
 lint:
 	swift format lint --parallel --recursive .
 
+.PHONY: test
+test:
+	mkdir -p .build/test-results
+	swift test \
+	--xunit-output .build/test-results/junit.xml
+
 .PHONY: test-compliance
 test-compliance:
 	mkdir -p .build/test-results
 	OPA_COMPLIANCE_TESTS="$(OPA_COMPLIANCE_TESTS)" \
 		swift test \
 		--filter ComplianceTests.ComplianceTests \
-		--xunit-output .build/test-results/junit.xml
+		--xunit-output .build/test-results/junit-compliance.xml
 
 .PHONY: test-failed
 test-failed:

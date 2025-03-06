@@ -138,12 +138,13 @@ extension OPA.Engine {
         guard conflictingBuiltins.isEmpty else {
             throw RegoError(
                 code: .ambiguousBuiltinError,
-                message: "encountered conflicting builtin names between custom and default builtins: \(conflictingBuiltins)"
+                message:
+                    "encountered conflicting builtin names between custom and default builtins: \(conflictingBuiltins)"
             )
         }
         let builtins = self.customBuiltins.merging(
             registryBuiltins,
-            uniquingKeysWith: { $1 }    // should never happen, see guard above
+            uniquingKeysWith: { $1 }  // should never happen, see guard above
         )
         let mergedBuiltinRegistry = BuiltinRegistry(builtins: builtins)
 
@@ -191,7 +192,8 @@ extension OPA.Engine {
         }
 
         // Verifies that builtins are available in the OPA capabilities and builtin registry
-        try await Self.verifyCapabilitiesAndBuiltIns(capabilities: self.capabilities, builtins: builtins, evaluator: evaluator)
+        try await Self.verifyCapabilitiesAndBuiltIns(
+            capabilities: self.capabilities, builtins: builtins, evaluator: evaluator)
 
         return PreparedQuery(
             query: query,

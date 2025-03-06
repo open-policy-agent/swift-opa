@@ -108,32 +108,8 @@ struct BuiltinTests {
         ]
         var tests: [BuiltinTests.TestCase] = []
         if generateNumberOfArgsTest {
-            // Only generate "too few" test case when expected number of arguments is > 0
-            if sampleArgs.count > 0 {
-                tests.append(
-                    BuiltinTests.TestCase(
-                        description: "wrong number of arguments (too few)",
-                        name: builtinName,
-                        args: [],
-                        expected: .failure(
-                            BuiltinError.argumentCountMismatch(got: 0, want: sampleArgs.count))
-                    )
-                )
-            }
-            // too many args case
-            var tooManyArgs = sampleArgs  // copy
-            tooManyArgs.append(.null)
             tests.append(
-                BuiltinTests.TestCase(
-                    description: "wrong number of arguments (too many) with " + String(tooManyArgs.count)
-                        + " arguments",
-                    name: builtinName,
-                    args: tooManyArgs,
-                    expected: .failure(
-                        BuiltinError.argumentCountMismatch(
-                            got: tooManyArgs.count, want: sampleArgs.count))
-                )
-            )
+                contentsOf: generateNumberOfArgumentsFailureTests(builtinName: builtinName, sampleArgs: sampleArgs))
         }
         // Formulating "want" part of the error message:
         // when passed explicitly, we will use the expression passed in
@@ -157,6 +133,47 @@ struct BuiltinTests {
                 )
             )
         }
+
+        return tests
+    }
+
+    /// For covering argument count checks ONLY,
+    /// this method generates a series of tests for correct number of arguments being passed into a builtin.
+    /// Returns a list of test cases.
+    /// - Parameters:
+    ///   - builtinName: The name of the builtin function being tested.
+    ///   - sampleArgs: The sample arguments to use. Use correct arguments for the builtin you are testing.
+    static func generateNumberOfArgumentsFailureTests(
+        builtinName: String,
+        sampleArgs: [RegoValue]
+    ) -> [BuiltinTests.TestCase] {
+        var tests: [BuiltinTests.TestCase] = []
+        // Only generate "too few" test case when expected number of arguments is > 0
+        if sampleArgs.count > 0 {
+            tests.append(
+                BuiltinTests.TestCase(
+                    description: "wrong number of arguments (too few)",
+                    name: builtinName,
+                    args: [],
+                    expected: .failure(
+                        BuiltinError.argumentCountMismatch(got: 0, want: sampleArgs.count))
+                )
+            )
+        }
+        // Too many args case
+        var tooManyArgs = sampleArgs  // copy
+        tooManyArgs.append(.null)
+        tests.append(
+            BuiltinTests.TestCase(
+                description: "wrong number of arguments (too many) with " + String(tooManyArgs.count)
+                    + (tooManyArgs.count == 1 ? " argument" : " arguments"),
+                name: builtinName,
+                args: tooManyArgs,
+                expected: .failure(
+                    BuiltinError.argumentCountMismatch(
+                        got: tooManyArgs.count, want: sampleArgs.count))
+            )
+        )
 
         return tests
     }

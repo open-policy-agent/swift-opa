@@ -6,12 +6,16 @@ public typealias Builtin = @Sendable (BuiltinContext, [AST.RegoValue]) async thr
 public struct BuiltinContext {
     public let location: OPA.Trace.Location
     public var tracer: OPA.Trace.QueryTracer?
+    /// Date and Time of Context creation
+    public let timestamp: Date
     internal let cache: Ptr<BuiltinsCache>
 
     init(
+
         location: OPA.Trace.Location = .init(),
         tracer: OPA.Trace.QueryTracer? = nil,
-        cache: Ptr<BuiltinsCache>? = nil
+        cache: Ptr<BuiltinsCache>? = nil,
+        timestamp: Date? = nil
     ) {
         self.location = location
         self.tracer = tracer
@@ -19,6 +23,7 @@ public struct BuiltinContext {
         // some builtin evaluations (e.g. UUID) expect the cache.
         // In most/all? cases, we expect a shared cache to be passed in here from EvaluationContext
         self.cache = cache ?? Ptr<BuiltinsCache>(toCopyOf: BuiltinsCache())
+        self.timestamp = timestamp ?? Date()
     }
 }
 
@@ -136,6 +141,9 @@ public struct BuiltinRegistry: Sendable {
             "trim_space": BuiltinFuncs.trimSpace,
             "trim_suffix": BuiltinFuncs.trimSuffix,
             "upper": BuiltinFuncs.upper,
+
+            // Time
+            "time.now_ns": BuiltinFuncs.timeNowNanos,
 
             // Trace
             "trace": BuiltinFuncs.trace,

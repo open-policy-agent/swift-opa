@@ -1,5 +1,6 @@
 // Evaluator.swift - this file contains code related to evaluating an Rego IR Plan.
 import AST
+import Foundation
 import IR
 
 protocol Evaluator {
@@ -14,6 +15,8 @@ internal struct EvaluationContext {
     public var builtins: BuiltinRegistry
     public var tracer: OPA.Trace.QueryTracer?
     public var strictBuiltins: Bool = false
+    /// Time of Context creation since epoch, in nanoseconds
+    public let timeNanos: UInt64
 
     init(
         query: String,
@@ -21,7 +24,8 @@ internal struct EvaluationContext {
         store: OPA.Store = NullStore(),
         builtins: BuiltinRegistry = .defaultRegistry,
         tracer: OPA.Trace.QueryTracer? = nil,
-        strictBuiltins: Bool = false
+        strictBuiltins: Bool = false,
+        timeNanos: UInt64? = nil
     ) {
         self.query = query
         self.input = input
@@ -29,6 +33,7 @@ internal struct EvaluationContext {
         self.builtins = builtins
         self.tracer = tracer
         self.strictBuiltins = strictBuiltins
+        self.timeNanos = timeNanos ?? UInt64(Date().timeIntervalSince1970 * 1_000_000_000)
     }
 }
 

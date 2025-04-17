@@ -3,7 +3,7 @@ import Foundation
 
 extension RegoValue: Codable {
     // Constructor for use with JSONSerialization
-    public init(from: Any) throws(ValueError) {
+    package init(from: Any) throws(ValueError) {
         switch from {
         case let v as String:
             self = .string(v)
@@ -39,7 +39,7 @@ extension RegoValue: Codable {
     }
 
     // Initialize a RegoValue from raw JSON-encoded data
-    public init(fromJson rawJson: Data) throws {
+    public init(jsonData rawJson: Data) throws {
         // TODO throws deserializationerror, valuerror
         let d = try JSONSerialization.jsonObject(with: rawJson, options: [])
         try self.init(from: d)

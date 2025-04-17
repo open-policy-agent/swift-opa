@@ -19,40 +19,40 @@ extension BuiltinTests.UnitsTests {
             description: "empty string causes units.parse: no amount provided",
             name: "units.parse",
             args: [""],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "no amount provided"))
+            expected: .failure(BuiltinError.evalError(msg: "no amount provided"))
         ),
         BuiltinTests.TestCase(
             description: "solo unit string causes units.parse: no amount provided",
             name: "units.parse",
             args: ["G"],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "no amount provided"))
+            expected: .failure(BuiltinError.evalError(msg: "no amount provided"))
         ),
         BuiltinTests.TestCase(
             description: "non-number causes units.parse: could not parse amount to a number",
             name: "units.parse",
             args: ["foo"],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.evalError(msg: "could not parse amount to a number"))
+                BuiltinError.evalError(msg: "could not parse amount to a number"))
         ),
         BuiltinTests.TestCase(
             description: "invalid number causes units.parse: could not parse amount to a number",
             name: "units.parse",
             args: ["0.0.0"],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.evalError(msg: "could not parse amount to a number"))
+                BuiltinError.evalError(msg: "could not parse amount to a number"))
         ),
         BuiltinTests.TestCase(
             description: "spaces causes units.parse: spaces not allowed in resource strings",
             name: "units.parse",
             args: ["10 0G"],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.evalError(msg: "spaces not allowed in resource strings"))
+                BuiltinError.evalError(msg: "spaces not allowed in resource strings"))
         ),
         BuiltinTests.TestCase(
             description: "unknown unit causes units.parse: unknown unit",
             name: "units.parse",
             args: ["0Z"],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "unknown unit"))
+            expected: .failure(BuiltinError.evalError(msg: "unknown unit"))
         ),
     ]
 
@@ -371,21 +371,21 @@ extension BuiltinTests.UnitsTests {
             name: "units.parse_bytes",
             args: [""],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.evalError(msg: "no byte amount provided"))
+                BuiltinError.evalError(msg: "no byte amount provided"))
         ),
         BuiltinTests.TestCase(
             description: "solo unit string causes units.parse_bytes: no byte amount provided",
             name: "units.parse_bytes",
             args: ["G"],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.evalError(msg: "no byte amount provided"))
+                BuiltinError.evalError(msg: "no byte amount provided"))
         ),
         BuiltinTests.TestCase(
             description: "non-number causes units.parse_bytes: could not parse byte amount to a number",
             name: "units.parse_bytes",
             args: ["foo"],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.evalError(
+                BuiltinError.evalError(
                     msg: "could not parse byte amount to a number"))
         ),
         BuiltinTests.TestCase(
@@ -393,21 +393,21 @@ extension BuiltinTests.UnitsTests {
             name: "units.parse_bytes",
             args: ["0.0.0"],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.evalError(msg: "could not parse byte amount to a number"))
+                BuiltinError.evalError(msg: "could not parse byte amount to a number"))
         ),
         BuiltinTests.TestCase(
             description: "spaces causes units.parse_bytes: spaces not allowed in resource strings",
             name: "units.parse_bytes",
             args: ["10 0G"],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.evalError(msg: "spaces not allowed in resource strings")
+                BuiltinError.evalError(msg: "spaces not allowed in resource strings")
             )
         ),
         BuiltinTests.TestCase(
             description: "unknown unit causes units.parse: unknown unit",
             name: "units.parse_bytes",
             args: ["0Z"],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "unknown unit"))
+            expected: .failure(BuiltinError.evalError(msg: "unknown unit"))
         ),
     ]
 

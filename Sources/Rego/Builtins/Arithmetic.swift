@@ -10,7 +10,7 @@ let _floor = floor
 extension BuiltinFuncs {
     static func plus(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .number(let x) = args[0] else {
@@ -26,7 +26,7 @@ extension BuiltinFuncs {
 
     static func minus(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         switch args[0] {
@@ -49,7 +49,7 @@ extension BuiltinFuncs {
     // Returns: the product of `x` and `y`
     static func mul(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .number(let x) = args[0] else {
@@ -67,7 +67,7 @@ extension BuiltinFuncs {
     // Returns: the result of `x` divided by `y`
     static func div(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .number(let x) = args[0] else {
@@ -88,7 +88,7 @@ extension BuiltinFuncs {
 
     static func round(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .number(let x) = args[0] else {
@@ -104,7 +104,7 @@ extension BuiltinFuncs {
 
     static func ceil(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .number(let x) = args[0] else {
@@ -120,7 +120,7 @@ extension BuiltinFuncs {
 
     static func floor(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .number(let x) = args[0] else {
@@ -136,7 +136,7 @@ extension BuiltinFuncs {
 
     static func abs(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .number(let x) = args[0] else {
@@ -149,7 +149,7 @@ extension BuiltinFuncs {
     // Returns the remainder for of `x` divided by `y`, for `y != 0`.
     static func rem(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .number = args[0] else {

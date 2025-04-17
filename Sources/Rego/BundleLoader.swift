@@ -2,22 +2,22 @@ import AST
 import Foundation
 
 struct BundleLoader {
-    var bundleFiles: any Sequence<Result<BundleFile, any Error>>
+    var bundleFiles: any Sequence<Result<BundleFile, any Swift.Error>>
 
-    init(fromFileSequence files: any Sequence<Result<BundleFile, any Error>>) {
+    init(fromFileSequence files: any Sequence<Result<BundleFile, any Swift.Error>>) {
         self.bundleFiles = files
     }
 
-    public enum LoadError: Error {
+    enum LoadError: Swift.Error {
         case unexpectedManifest(URL)
         case unexpectedData(URL)
-        case manifestParseError(URL, Error)
-        case dataParseError(URL, Error)
+        case manifestParseError(URL, Swift.Error)
+        case dataParseError(URL, Swift.Error)
         case dataEscapedRoot
         case unsupported(String)
     }
 
-    func load() throws -> Bundle {
+    func load() throws -> OPA.Bundle {
         // Unwrap files, throw first error if we encounter one
         let files: [BundleFile] = try bundleFiles.map { try $0.get() }
 
@@ -31,7 +31,7 @@ struct BundleLoader {
 
         var regoFiles: [BundleFile] = []
         var planFiles: [BundleFile] = []
-        var manifest: Manifest?
+        var manifest: OPA.Manifest?
         var data: AST.RegoValue = AST.RegoValue.object([:])
 
         for f in files {
@@ -46,13 +46,13 @@ struct BundleLoader {
                     throw LoadError.unexpectedManifest(f.url)
                 }
 
-                manifest = try Manifest(from: f.data)
+                manifest = try OPA.Manifest(from: f.data)
 
             case "data.json":
                 // Parse JSON into AST values
                 var parsed: AST.RegoValue
                 do {
-                    parsed = try AST.RegoValue(fromJson: f.data)
+                    parsed = try AST.RegoValue(jsonData: f.data)
                 } catch {
                     throw LoadError.dataParseError(f.url, error)
                 }
@@ -75,8 +75,8 @@ struct BundleLoader {
         regoFiles.sort(by: { $0.url.path < $1.url.path })
         planFiles.sort(by: { $0.url.path < $1.url.path })
 
-        manifest = manifest ?? Manifest()  // Default manifest if none was provided
-        let bundle = try Bundle(manifest: manifest!, planFiles: planFiles, regoFiles: regoFiles, data: data)
+        manifest = manifest ?? OPA.Manifest()  // Default manifest if none was provided
+        let bundle = try OPA.Bundle(manifest: manifest!, planFiles: planFiles, regoFiles: regoFiles, data: data)
 
         // Validate the data paths are all under the declared roots
         if !bundle.rootsTrie.contains(dataTree: data) {
@@ -86,14 +86,14 @@ struct BundleLoader {
         return bundle
     }
 
-    public static func load(fromDirectory url: URL) throws -> Bundle {
+    public static func load(fromDirectory url: URL) throws -> OPA.Bundle {
         let files = DirectoryLoader(baseURL: url)
         return try BundleLoader(fromFileSequence: files).load()
     }
 
     // Accept either a directory to load a bundle from or a path to an individual file
     // which will be treated as a bundle tarball.
-    public static func load(fromFile url: URL) throws -> Bundle {
+    public static func load(fromFile url: URL) throws -> OPA.Bundle {
         let isDir = (try url.resourceValues(forKeys: [.isDirectoryKey])).isDirectory ?? false
         if isDir {
             return try load(fromDirectory: url)
@@ -114,7 +114,7 @@ struct DirectoryLoader: Sequence {
         self.baseURL = baseURL
     }
 
-    func makeIterator() -> AnyIterator<Result<BundleFile, any Error>> {
+    func makeIterator() -> AnyIterator<Result<BundleFile, any Swift.Error>> {
         let iter = DirectorySequence(baseURL: baseURL).lazy.filter({ elem in
             switch elem {
             case .failure:
@@ -154,7 +154,7 @@ private struct DirectorySequence: Sequence {
     struct DirectoryIterator: IteratorProtocol {
         var baseURL: URL
         var innerIter: (any IteratorProtocol)?
-        fileprivate var fileError: Box<(any Error)?> = .init(nil)
+        fileprivate var fileError: Box<(any Swift.Error)?> = .init(nil)
         var done: Bool = false
 
         init(baseURL: URL) {
@@ -164,7 +164,7 @@ private struct DirectorySequence: Sequence {
             // captureError. It can't directly hold a reference to self, so instead self and
             // the current scope share the same underlying error storage.
             // For this to be ok, we need to hope the handler is always called on our same thread.
-            let captureError = Box<(any Error)?>(nil)
+            let captureError = Box<(any Swift.Error)?>(nil)
             self.fileError = captureError
 
             let enumerator = FileManager.default.enumerator(
@@ -185,7 +185,8 @@ private struct DirectorySequence: Sequence {
             }
             self.innerIter = enumerator.makeIterator()
         }
-        mutating func next() -> Result<BundleFile, Error>? {
+
+        mutating func next() -> Result<BundleFile, Swift.Error>? {
             if done {
                 return nil
             }
@@ -221,7 +222,7 @@ private struct DirectorySequence: Sequence {
             return .success(BundleFile(url: relativeURL, data: Data()))
         }
 
-        enum Err: Error {
+        enum Err: Swift.Error {
             case unknownError
             case unexpectedType
             case relativeURLError

@@ -4,7 +4,7 @@ import Foundation
 extension BuiltinFuncs {
     static func and(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .set(let x) = args[0] else {
@@ -24,7 +24,7 @@ extension BuiltinFuncs {
     // returns: the intersection of all `xs` sets
     static func intersection(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .set(let inputSet) = args[0] else {
@@ -55,7 +55,7 @@ extension BuiltinFuncs {
 
     static func or(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .set(let x) = args[0] else {
@@ -75,7 +75,7 @@ extension BuiltinFuncs {
     // returns: the union of all `xs` sets
     static func union(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .set(let inputSet) = args[0] else {

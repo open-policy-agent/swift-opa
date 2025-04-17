@@ -17,7 +17,7 @@ struct StoreTests {
         let description: String
         let data: Data
         let path: StoreKeyPath
-        let expectedErr: any (Error.Type)
+        let expectedErr: RegoError.Code
     }
 
     private static var successCases: [TestCase] {
@@ -37,16 +37,16 @@ struct StoreTests {
                 description: "key not found",
                 data: #" {"data": {"foo": {"bar": 42}}} "#.data(using: .utf8)!,
                 path: StoreKeyPath(["data", "nope", "bar"]),
-                expectedErr: StoreError.self
+                expectedErr: RegoError.Code.storePathNotFound
             )
         ]
     }
 
     @Test(arguments: successCases)
     func testStoreReads(tc: TestCase) async throws {
-        let root = try AST.RegoValue(fromJson: tc.data)
-        let store = InMemoryStore(initialData: root)
-        let actual = try await store.read(path: tc.path)
+        let root = try AST.RegoValue(jsonData: tc.data)
+        let store = OPA.InMemoryStore(initialData: root)
+        let actual = try await store.read(from: tc.path)
 
         print(actual)
         #expect(actual == tc.expected)
@@ -54,14 +54,16 @@ struct StoreTests {
 
     @Test(arguments: errorCases)
     func testStoreReadsFailures(tc: ErrorCase) async throws {
-        let root = try AST.RegoValue(fromJson: tc.data)
-        let store = InMemoryStore(initialData: root)
+        let root = try AST.RegoValue(jsonData: tc.data)
+        let store = OPA.InMemoryStore(initialData: root)
 
         await #expect() {
-            let _ = try await store.read(path: tc.path)
+            let _ = try await store.read(from: tc.path)
         } throws: { error in
-            let mirror = Mirror(reflecting: error)
-            let b: Bool = mirror.subjectType == tc.expectedErr
+            guard let regoError = error as? RegoError else {
+                return false
+            }
+            let b: Bool = regoError.code == tc.expectedErr
             return b
         }
     }

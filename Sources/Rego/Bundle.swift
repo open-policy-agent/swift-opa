@@ -1,17 +1,42 @@
 import AST
 import Foundation
 
-public struct Bundle: Equatable, Sendable {
-    public var manifest: Manifest = Manifest()
-    public var planFiles: [BundleFile] = []
-    public var regoFiles: [BundleFile] = []
-    public var data: AST.RegoValue = .object([:])
+extension OPA {
+    /// A collection of policy and data, along with related metadata.
+    ///
+    /// See: https://www.openpolicyagent.org/docs/latest/management-bundles/#bundle-file-format
+    public struct Bundle: Equatable, Sendable {
+        public var manifest: OPA.Manifest = OPA.Manifest()
+        public var planFiles: [BundleFile] = []
+        public var regoFiles: [BundleFile] = []
+        public var data: AST.RegoValue = .object([:])
 
-    // Internal - trie built from the manifest roots
-    var rootsTrie: TrieNode
+        // Internal - trie built from the manifest roots
+        var rootsTrie: TrieNode
+    }
 
+    /// Metadata describing an ``OPA/Bundle``.
+    public struct Manifest: Equatable, Sendable {
+        /// The revision of the bundle.
+        public var revision: String = ""
+        /// The list of path prefixes declaring the scope of the data managed in the bundle.
+        public var roots: [String] = [""]
+        /// The version of Rego used in the bundle. Only ``Version/regoV1`` is supported.
+        public var regoVersion: Version = .regoV1
+        /// Additional structured metadata from the manifest.
+        public var metadata: AST.RegoValue = .null
+
+        /// Specifies a version of the Rego language.
+        public enum Version: Int, Sendable {
+            case regoV0 = 0
+            case regoV1 = 1
+        }
+    }
+}
+
+extension OPA.Bundle {
     init(
-        manifest: Manifest = Manifest(), planFiles: [BundleFile] = [], regoFiles: [BundleFile] = [],
+        manifest: OPA.Manifest = OPA.Manifest(), planFiles: [BundleFile] = [], regoFiles: [BundleFile] = [],
         data: AST.RegoValue = .object([:])
     ) throws(BundleError) {
         self.manifest = manifest
@@ -31,25 +56,15 @@ public struct Bundle: Equatable, Sendable {
         self.rootsTrie = trie
     }
 
-    enum BundleError: Error {
+    enum BundleError: Swift.Error {
         case overlappingRoots(String)
         case internalError(String)
     }
 }
 
-public struct Manifest: Equatable, Sendable {
-    public var revision: String = ""
-    public var roots: [String] = [""]
-    public var regoVersion: Version = .regoV1
-    public var metadata: AST.RegoValue = .null
-
-    public enum Version: Int, Sendable {
-        case regoV0 = 0
-        case regoV1 = 1
-    }
-}
-
-extension Manifest {
+extension OPA.Manifest {
+    /// Construct a manifest by parsing the provided JSON-encoded data.
+    /// - Parameter jsonData: The JSON-encoded manifest data.
     public init(from jsonData: Data) throws {
         let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
         guard let jsonDict = jsonObject as? [String: Any] else {
@@ -91,7 +106,7 @@ extension Manifest {
         self.metadata = metadataValue
     }
 
-    public enum CodingKeys: String, CodingKey {
+    enum CodingKeys: String, CodingKey {
         case revision = "revision"
         case roots = "roots"
         case regoVersion = "rego_version"
@@ -99,7 +114,10 @@ extension Manifest {
     }
 }
 
+/// A descriptor pointing to an on-disk serialized ``OPA/Bundle``
 public struct BundleFile: Sendable, Hashable {
+    /// The path to an individual file within an ``OPA/Bundle``.
     public let url: URL  // relative to bundle root
+    /// The raw file contents.
     public let data: Data
 }

@@ -60,7 +60,7 @@ extension BuiltinFuncs {
         msgNoSpacesAllowed: String
     ) throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .string(let value) = args[0] else {

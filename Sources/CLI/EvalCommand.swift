@@ -14,14 +14,14 @@ struct EvalCommand: AsyncParsableCommand {
 
     mutating func run() async throws {
         // Initialize a Rego.Engine initially configured with our bundles from the CLI options.
-        var regoEngine = try Rego.Engine(withBundlePaths: self.evalOptions.bundlePaths)
+        var regoEngine = try Rego.OPA.Engine(bundlePaths: self.evalOptions.bundlePaths)
 
         let tracer = tracerForLevel(self.evalOptions.explain)
 
         // Prepare does as much pre-processing as possible to get ready to evaluate queries.
         // This only needs to be done once when loading the engine and after updating it. These
         // PreparedQuery's can be re-used.
-        let preparedQuery = try await regoEngine.prepareForEval(query: self.evalOptions.query)
+        let preparedQuery = try await regoEngine.prepareForEvaluation(query: self.evalOptions.query)
 
         let resultSet = try await preparedQuery.evaluate(
             input: self.evalOptions.inputValue,
@@ -37,16 +37,16 @@ struct EvalCommand: AsyncParsableCommand {
             return
         }
         print("Trace:")
-        tracer.prettyPrint(out: FileHandle.standardOutput)
+        tracer.prettyPrint(to: FileHandle.standardOutput)
     }
 }
 
-func tracerForLevel(_ level: ExplainLevel) -> Rego.BufferedQueryTracer? {
+func tracerForLevel(_ level: ExplainLevel) -> OPA.Trace.BufferedQueryTracer? {
     return switch level {
     case .full:
-        Rego.BufferedQueryTracer(level: .full)
+        OPA.Trace.BufferedQueryTracer(level: .full)
     case .notes:
-        Rego.BufferedQueryTracer(level: .note)
+        OPA.Trace.BufferedQueryTracer(level: .note)
     default:
         nil
     }

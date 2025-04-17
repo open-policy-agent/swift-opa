@@ -42,25 +42,25 @@ extension BuiltinTests.ArithmeticTests {
             description: "not enough args",
             name: "plus",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "plus",
             args: [1, 1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong lhs arg type",
             name: "plus",
             args: ["1", 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+            expected: .failure(argumentTypeMismatch(arg: "x"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
             name: "plus",
             args: [1, "1"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "y"))
+            expected: .failure(argumentTypeMismatch(arg: "y"))
         ),
     ]
 
@@ -87,25 +87,25 @@ extension BuiltinTests.ArithmeticTests {
             description: "not enough args",
             name: "minus",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "minus",
             args: [1, 1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong lhs arg type",
             name: "minus",
             args: ["1", 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+            expected: .failure(argumentTypeMismatch(arg: "x"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
             name: "minus",
             args: [1, "1"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "y"))
+            expected: .failure(argumentTypeMismatch(arg: "y"))
         ),
     ]
 
@@ -138,13 +138,13 @@ extension BuiltinTests.ArithmeticTests {
             description: "mixed set and number lhs",
             name: "minus",
             args: [1, .set([1])],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+            expected: .failure(argumentTypeMismatch(arg: "x"))
         ),
         BuiltinTests.TestCase(
             description: "mixed set and number rhs",
             name: "minus",
             args: [.set([1]), 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "y"))
+            expected: .failure(argumentTypeMismatch(arg: "y"))
         ),
     ]
 
@@ -180,25 +180,25 @@ extension BuiltinTests.ArithmeticTests {
             description: "not enough args",
             name: "mul",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "mul",
             args: [1, 1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong lhs arg type",
             name: "mul",
             args: ["1", 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+            expected: .failure(argumentTypeMismatch(arg: "x"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
             name: "mul",
             args: [1, "1"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "y"))
+            expected: .failure(argumentTypeMismatch(arg: "y"))
         ),
     ]
 
@@ -227,31 +227,31 @@ extension BuiltinTests.ArithmeticTests {
             description: "divide by 0",
             name: "div",
             args: [3, 0],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "divide by zero"))
+            expected: .failure(BuiltinError.evalError(msg: "divide by zero"))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
             name: "div",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "div",
             args: [1, 1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong lhs arg type",
             name: "div",
             args: ["1", 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+            expected: .failure(argumentTypeMismatch(arg: "x"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
             name: "div",
             args: [1, "1"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "y"))
+            expected: .failure(argumentTypeMismatch(arg: "y"))
         ),
     ]
 
@@ -290,19 +290,19 @@ extension BuiltinTests.ArithmeticTests {
             description: "not enough args",
             name: "round",
             args: [],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "round",
             args: [1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 2, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "wrong arg type",
             name: "round",
             args: ["1"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+            expected: .failure(argumentTypeMismatch(arg: "x"))
         ),
     ]
 
@@ -341,19 +341,19 @@ extension BuiltinTests.ArithmeticTests {
             description: "not enough args",
             name: "ceil",
             args: [],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "ceil",
             args: [1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 2, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "wrong arg type",
             name: "ceil",
             args: ["1"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+            expected: .failure(argumentTypeMismatch(arg: "x"))
         ),
     ]
 
@@ -392,19 +392,19 @@ extension BuiltinTests.ArithmeticTests {
             description: "not enough args",
             name: "floor",
             args: [],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "floor",
             args: [1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 2, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "wrong arg type",
             name: "floor",
             args: ["1"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+            expected: .failure(argumentTypeMismatch(arg: "x"))
         ),
     ]
 
@@ -425,43 +425,43 @@ extension BuiltinTests.ArithmeticTests {
             description: "divide by 0",
             name: "rem",
             args: [3, 0],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "rem by zero"))
+            expected: .failure(BuiltinError.evalError(msg: "rem by zero"))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
             name: "rem",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "rem",
             args: [1, 1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "float arg lhs",
             name: "rem",
             args: [1.2345, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "modulo on floating-point number"))
+            expected: .failure(BuiltinError.evalError(msg: "modulo on floating-point number"))
         ),
         BuiltinTests.TestCase(
             description: "float arg rhs",
             name: "rem",
             args: [10, 1.2345],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "modulo on floating-point number"))
+            expected: .failure(BuiltinError.evalError(msg: "modulo on floating-point number"))
         ),
         BuiltinTests.TestCase(
             description: "wrong lhs arg type",
             name: "rem",
             args: ["1", 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+            expected: .failure(argumentTypeMismatch(arg: "x"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
             name: "rem",
             args: [1, "1"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "y"))
+            expected: .failure(argumentTypeMismatch(arg: "y"))
         ),
     ]
 

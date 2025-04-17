@@ -4,7 +4,7 @@ import Foundation
 // Helpers for encoding a ResultSet
 
 extension ResultSet {
-    // jsonString returns a pretty-print encoded representation of the ResultSet.
+    /// A pretty-print encoded representation of the ResultSet.
     public var jsonString: String {
         get throws {
             let encoder = JSONEncoder()

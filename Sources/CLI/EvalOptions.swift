@@ -22,7 +22,7 @@ struct EvalOptions: ParsableArguments {
 
     // Parsed inputs during validation
     var inputValue: AST.RegoValue = .object([:])
-    var bundlePaths: [Rego.Engine.BundlePath] = []
+    var bundlePaths: [Rego.OPA.Engine.BundlePath] = []
 
     enum CodingKeys: String, CodingKey {
         case inputValue
@@ -58,7 +58,7 @@ struct EvalOptions: ParsableArguments {
 
         if let inputData = inputData {
             do {
-                self.inputValue = try AST.RegoValue(fromJson: inputData)
+                self.inputValue = try AST.RegoValue(jsonData: inputData)
             } catch {
                 throw ValidationError("Failed to parse input JSON: \(error)")
             }
@@ -70,7 +70,7 @@ struct EvalOptions: ParsableArguments {
             guard let url = URL(string: $0, relativeTo: cwd) else {
                 throw ValidationError("Invalid bundle path: \($0): must be a valid file URL")
             }
-            return Rego.Engine.BundlePath(
+            return Rego.OPA.Engine.BundlePath(
                 name: $0,
                 url: url
             )

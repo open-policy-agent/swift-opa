@@ -93,13 +93,13 @@ extension BuiltinTests.TypesTests {
                 description: "wrong number of arguments (too few)",
                 name: name,
                 args: [],
-                expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 1))
+                expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 1))
             ),
             BuiltinTests.TestCase(
                 description: "wrong number of arguments (too many)",
                 name: name,
                 args: [1, 2, 3],
-                expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 1))
+                expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 1))
             ),
             BuiltinTests.TestCase(
                 description: "boolean true argument",

@@ -9,6 +9,11 @@ extension BuiltinTests {
     struct StringsTests {}
 }
 
+// internal adapter for partial error expectations
+internal func argumentTypeMismatch(arg: String) -> Error {
+    return BuiltinError.argumentTypeMismatch(arg: arg, got: "", want: "")
+}
+
 extension BuiltinTests.StringsTests {
     static let concatTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
@@ -69,43 +74,43 @@ extension BuiltinTests.StringsTests {
             description: "too many args",
             name: "array.concat",
             args: [1, 1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too few args 1",
             name: "array.concat",
             args: [","],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too few args 2",
             name: "array.concat",
             args: [["a"]],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong delineator type",
             name: "concat",
             args: [123, ["a", "b", "c"]],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "delineator"))
+            expected: .failure(argumentTypeMismatch(arg: "delineator"))
         ),
         BuiltinTests.TestCase(
             description: "wrong collection type",
             name: "concat",
             args: [",", .object(["not an array or set": "but still a swift Collection"])],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "collection"))
+            expected: .failure(argumentTypeMismatch(arg: "collection"))
         ),
         BuiltinTests.TestCase(
             description: "wrong collection element type in array",
             name: "concat",
             args: [",", ["a", 123, "c"]],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "collection element 123"))
+            expected: .failure(argumentTypeMismatch(arg: "collection element 123"))
         ),
         BuiltinTests.TestCase(
             description: "wrong collection element type in set",
             name: "concat",
             args: [",", .set(["a", 123, "c"])],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "collection element 123"))
+            expected: .failure(argumentTypeMismatch(arg: "collection element 123"))
         ),
     ]
 
@@ -156,31 +161,31 @@ extension BuiltinTests.StringsTests {
             description: "too many args",
             name: "contains",
             args: ["hello, world!", "world", "extra"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
             name: "contains",
             args: ["hello, world!"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "no args",
             name: "contains",
             args: [],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong type needle",
             name: "contains",
             args: ["hello, world!", 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "needle"))
+            expected: .failure(argumentTypeMismatch(arg: "needle"))
         ),
         BuiltinTests.TestCase(
             description: "wrong type haystack",
             name: "contains",
             args: [1, "hello, world!"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "needle"))
+            expected: .failure(argumentTypeMismatch(arg: "needle"))
         ),
     ]
 
@@ -231,31 +236,31 @@ extension BuiltinTests.StringsTests {
             description: "too many args",
             name: "endswith",
             args: ["hello, world!", "world!", "extra"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
             name: "endswith",
             args: ["hello, world!"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "no args",
             name: "endswith",
             args: [],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong type search",
             name: "endswith",
             args: ["hello, world!", 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "search"))
+            expected: .failure(argumentTypeMismatch(arg: "search"))
         ),
         BuiltinTests.TestCase(
             description: "wrong type base",
             name: "endswith",
             args: [1, "hello, world!"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "base"))
+            expected: .failure(argumentTypeMismatch(arg: "base"))
         ),
     ]
 
@@ -276,7 +281,7 @@ extension BuiltinTests.StringsTests {
             description: "empty needle",
             name: "indexof",
             args: ["hello, world!", ""],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "empty search character"))
+            expected: .failure(BuiltinError.evalError(msg: "empty search character"))
         ),
         BuiltinTests.TestCase(
             description: "full match",
@@ -300,37 +305,37 @@ extension BuiltinTests.StringsTests {
             description: "both empty",
             name: "indexof",
             args: ["", ""],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "empty search character"))
+            expected: .failure(BuiltinError.evalError(msg: "empty search character"))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "indexof",
             args: ["hello, world!", "world", "extra"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
             name: "indexof",
             args: ["hello, world!"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "no args",
             name: "indexof",
             args: [],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong type needle",
             name: "indexof",
             args: ["hello, world!", 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "needle"))
+            expected: .failure(argumentTypeMismatch(arg: "needle"))
         ),
         BuiltinTests.TestCase(
             description: "wrong type haystack",
             name: "indexof",
             args: [1, "hello, world!"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "needle"))
+            expected: .failure(argumentTypeMismatch(arg: "needle"))
         ),
     ]
 
@@ -351,7 +356,7 @@ extension BuiltinTests.StringsTests {
             description: "empty needle",
             name: "indexof_n",
             args: ["hello, world!", ""],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "empty search character"))
+            expected: .failure(BuiltinError.evalError(msg: "empty search character"))
         ),
         BuiltinTests.TestCase(
             description: "full match",
@@ -402,19 +407,19 @@ extension BuiltinTests.StringsTests {
             description: "too many args",
             name: "lower",
             args: ["hello, world!", "world"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 2, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
             name: "lower",
             args: [],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "wrong type arg",
             name: "lower",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+            expected: .failure(argumentTypeMismatch(arg: "x"))
         ),
     ]
 
@@ -510,25 +515,25 @@ extension BuiltinTests.StringsTests {
             description: "too many args",
             name: "sprintf",
             args: ["hello, world!", "world"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 2, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
             name: "sprintf",
             args: ["%s"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong type arg 1",
             name: "sprintf",
             args: [["%s"], ["world!"]],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "format"))
+            expected: .failure(argumentTypeMismatch(arg: "format"))
         ),
         BuiltinTests.TestCase(
             description: "wrong type arg 2",
             name: "sprintf",
             args: ["hello, %s", "world!"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "values"))
+            expected: .failure(argumentTypeMismatch(arg: "values"))
         ),
     ]
 
@@ -729,19 +734,19 @@ extension BuiltinTests.StringsTests {
             description: "too many args",
             name: "upper",
             args: ["hello, world!", "world"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 2, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
             name: "upper",
             args: [],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "wrong type arg",
             name: "upper",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+            expected: .failure(argumentTypeMismatch(arg: "x"))
         ),
     ]
 
@@ -819,25 +824,25 @@ extension BuiltinTests.StringsTests {
             description: "unsupported base",
             name: "format_int",
             args: [123, 7],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}"))
+            expected: .failure(BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}"))
         ),
         BuiltinTests.TestCase(
             description: "negative base",
             name: "format_int",
             args: [123, -2],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}"))
+            expected: .failure(BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}"))
         ),
         BuiltinTests.TestCase(
             description: "float base",
             name: "format_int",
             args: [123, 10.1],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}"))
+            expected: .failure(BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}"))
         ),
         BuiltinTests.TestCase(
             description: "float base with integer value",
             name: "format_int",
             args: [123, 10.0],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}"))
+            expected: .failure(BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}"))
         ),
         BuiltinTests.TestCase(
             description: "float base 10 uses floor",
@@ -942,14 +947,14 @@ extension BuiltinTests.StringsTests {
             description: "negative offset",
             name: "substring",
             args: ["abcdefgh", -1, 3],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "negative offset"))
+            expected: .failure(BuiltinError.evalError(msg: "negative offset"))
         ),
         BuiltinTests.TestCase(
             description: "float offset",
             name: "substring",
             args: ["abcdefgh", 0.1, 3],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.evalError(
+                BuiltinError.evalError(
                     msg: "operand 2 must be integer number but got floating-point number"))
         ),
         BuiltinTests.TestCase(
@@ -957,7 +962,7 @@ extension BuiltinTests.StringsTests {
             name: "substring",
             args: ["abcdefgh", 0.0, 3],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.evalError(
+                BuiltinError.evalError(
                     msg: "operand 2 must be integer number but got floating-point number"))
         ),
         BuiltinTests.TestCase(
@@ -965,7 +970,7 @@ extension BuiltinTests.StringsTests {
             name: "substring",
             args: ["abcdefgh", 0, 3.3],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.evalError(
+                BuiltinError.evalError(
                     msg: "operand 3 must be integer number but got floating-point number"))
         ),
         BuiltinTests.TestCase(
@@ -973,7 +978,7 @@ extension BuiltinTests.StringsTests {
             name: "substring",
             args: ["abcdefgh", 0, 3.0],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.evalError(
+                BuiltinError.evalError(
                     msg: "operand 3 must be integer number but got floating-point number"))
         ),
         BuiltinTests.TestCase(

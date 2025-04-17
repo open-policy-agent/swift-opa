@@ -1,7 +1,10 @@
 import CoreFoundation
 import Foundation
 
-// RegoValue represents any concrete JSON-representable value consumable by Rego
+/// RegoValue represents structured data over which policy can be evaluated.
+///
+/// RegoValue maps closely to JSON types, but expands on these by supporting sets
+/// and arbitrary values as object keys.
 public enum RegoValue: Sendable, Hashable {
     case array([RegoValue])
     case boolean(Bool)
@@ -15,12 +18,12 @@ public enum RegoValue: Sendable, Hashable {
 
 // Related erorrs
 extension RegoValue {
-    public enum ValueError: Error {
+    package enum ValueError: Error {
         case unsupportedArrayElement
         case unsupportedObjectElement
         case unsupportedType(Any.Type)
     }
-    public enum RegoEncodingError: Error {
+    package enum RegoEncodingError: Error {
         case invalidUTF8
     }
 }
@@ -30,7 +33,7 @@ extension RegoValue {
     // count returns the element count for the value
     // if it is a collection type (array|object|set|string),
     // otherwise it returns zero.
-    public var count: Int? {
+    package var count: Int? {
         switch self {
         case .array(let a):
             return a.count
@@ -45,14 +48,14 @@ extension RegoValue {
         }
     }
 
-    public func isUndefined() -> Bool {
+    package var isUndefined: Bool {
         guard case .undefined = self else {
             return false
         }
         return true
     }
 
-    public var isCollection: Bool {
+    package var isCollection: Bool {
         switch self {
         case .array, .object, .set:
             return true
@@ -61,7 +64,7 @@ extension RegoValue {
         }
     }
 
-    public var isFloat: Bool {
+    package var isFloat: Bool {
         guard case .number(let n) = self else {
             return false
         }
@@ -73,7 +76,7 @@ extension RegoValue {
     /// This does not do rounding or truncation and instead (for float types) relies on Decimal implementaion
     /// to detect whether or not a decimal is a whole number or not.
     /// In all other cases, including different types of RegoValue, nil is returned.
-    public var integerValue: Int64? {
+    package var integerValue: Int64? {
         guard case .number(let number) = self else {
             return nil
         }
@@ -93,6 +96,9 @@ extension RegoValue {
         return number.int64Value
     }
 
+    /// The name repesenting the concrete type of this ``RegoValue``.
+    ///
+    /// Valid types are: [array|boolean|null|number|object|set|string|undefined].
     public var typeName: String {
         switch self {
         case .array(_):

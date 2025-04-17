@@ -32,12 +32,8 @@ endif
 
 .PHONY: install-release
 install-release: build-release ensure-bindir
-	install $(shell swift build --show-bin-path -c release)/swift-rego-cli $(BINDIR)/
+	install $(shell swift build --show-bin-path -c release)/swift-opa-cli $(BINDIR)/
 
 .PHONY: clean
 clean:
 	rm -rf .build
-
-.PHONY: bench
-bench:
-	OPA_BENCHMARK=enabled swift package benchmark

@@ -7,7 +7,7 @@ extension BuiltinFuncs {
     // For objects, we are checking the values, not the keys.
     static func isMemberOf(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         switch args[1] {

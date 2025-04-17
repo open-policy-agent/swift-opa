@@ -10,7 +10,7 @@ extension BuiltinFuncs {
     /// However, the spec just required UUID generation to be consistent *within* en evaluation, so caching the values is okay.
     static func makeRfc4122UUID(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .string(let key) = args[0] else {
@@ -30,7 +30,7 @@ extension BuiltinFuncs {
 
     static func parseUUID(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .string(let uuidString) = args[0] else {

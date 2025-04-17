@@ -63,7 +63,7 @@ extension BuiltinTests.ArrayTests {
                 .null,
                 ["c", "d"],
             ],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "x"))
+            expected: .failure(argumentTypeMismatch(arg: "x"))
         ),
     ]
 
@@ -123,13 +123,13 @@ extension BuiltinTests.ArrayTests {
             description: "start is not an integer",
             name: "array.slice",
             args: [["a", "b", "c", "d"], 1.1, 3],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "start and stop must be integers"))
+            expected: .failure(BuiltinError.evalError(msg: "start and stop must be integers"))
         ),
         BuiltinTests.TestCase(
             description: "stop is not an integer",
             name: "array.slice",
             args: [["a", "b", "c", "d"], 1, 3.1],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "start and stop must be integers"))
+            expected: .failure(BuiltinError.evalError(msg: "start and stop must be integers"))
         ),
     ]
 

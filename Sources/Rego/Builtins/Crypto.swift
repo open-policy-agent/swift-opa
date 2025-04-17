@@ -38,7 +38,7 @@ extension BuiltinFuncs {
 
     static func hmacsEqual(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let x) = args[0] else {
@@ -57,7 +57,7 @@ extension BuiltinFuncs {
         -> AST.RegoValue
     {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let x) = args[0] else {
@@ -79,7 +79,7 @@ extension BuiltinFuncs {
         -> AST.RegoValue
     {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .string(let x) = args[0] else {

@@ -6,7 +6,7 @@ extension BuiltinFuncs {
         // x: array - the first array
         // y: array - the second array
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
         guard case .array(let x) = args[0] else {
             throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "array")
@@ -21,7 +21,7 @@ extension BuiltinFuncs {
     static func arrayReverse(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         // x: array
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
         guard case .array(let x) = args[0] else {
             throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "array")
@@ -33,7 +33,7 @@ extension BuiltinFuncs {
     static func arraySlice(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         // x: array, start, stop: number
         guard args.count == 3 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 3)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
         }
 
         guard case .array(let x) = args[0] else {

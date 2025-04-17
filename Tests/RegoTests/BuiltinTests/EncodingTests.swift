@@ -42,7 +42,7 @@ extension BuiltinTests.EncodingTests {
             description: "returns undefined for an invalid base64 string",
             name: "base64.decode",
             args: ["this is not a valid base64 input"],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "invalid base64 string"))
+            expected: .failure(BuiltinError.evalError(msg: "invalid base64 string"))
         ),
     ]
 
@@ -105,13 +105,13 @@ extension BuiltinTests.EncodingTests {
             description: "invalid hex string",
             name: "hex.decode",
             args: ["fghijkl"],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "invalid hex string"))
+            expected: .failure(BuiltinError.evalError(msg: "invalid hex string"))
         ),
         BuiltinTests.TestCase(
             description: "returns undefined for an odd-sized hex string",
             name: "hex.decode",
             args: ["4c6f726"],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "invalid hex string"))
+            expected: .failure(BuiltinError.evalError(msg: "invalid hex string"))
         ),
     ]
 
@@ -194,7 +194,7 @@ extension BuiltinTests.EncodingTests {
             description: "invalid base64 string",
             name: "base64url.decode",
             args: ["this is not a valid base64 input"],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "invalid base64 string"))
+            expected: .failure(BuiltinError.evalError(msg: "invalid base64 string"))
         ),
     ]
 

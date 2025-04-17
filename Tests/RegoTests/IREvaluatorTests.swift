@@ -20,7 +20,7 @@ struct IREvaluatorTests {
         let sourceBundle: URL
         var query: String = ""
         var input: AST.RegoValue = [:]
-        let expectedError: Error
+        let expectedError: Rego.RegoError.Code
     }
 
     static func relPath(_ path: String) -> URL {
@@ -114,31 +114,28 @@ struct IREvaluatorTests {
                 sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
                 query: "data.not.found.query",
                 input: [:],
-                expectedError: Rego.EvaluationError.unknownQuery(query: "not/found/query").self
+                expectedError: Rego.RegoError.Code.unknownQuery
             ),
             ErrorCase(
                 description: "bundle with no plan json",
                 sourceBundle: relPath("TestData/Bundles/simple-directory-no-plan-bundle"),
                 query: "data.not.found.query",
                 input: [:],
-                expectedError: Rego.EvaluationError.unknownQuery(query: "not/found/query").self
+                expectedError: Rego.RegoError.Code.unknownQuery
             ),
             ErrorCase(
                 description: "bundle with invalid plan json",
                 sourceBundle: relPath("TestData/Bundles/invalid-plan-json-bundle"),
-                expectedError: Rego.EvaluatorError.bundleInitializationFailed(
-                    bundle: "invalid-plan-json-bundle",
-                    reason: ""
-                ).self
+                expectedError: Rego.RegoError.Code.bundleInitializationError
             ),
         ]
     }
 
     @Test(arguments: validTestCases)
     func testValidEvaluations(tc: TestCase) async throws {
-        var engine = try Engine(withBundlePaths: [Engine.BundlePath(name: "default", url: tc.sourceBundle)])
-        let bufferTracer = BufferedQueryTracer(level: .full)
-        let actual = try await engine.prepareForEval(query: tc.query).evaluate(
+        var engine = try OPA.Engine(bundlePaths: [OPA.Engine.BundlePath(name: "default", url: tc.sourceBundle)])
+        let bufferTracer = OPA.Trace.BufferedQueryTracer(level: .full)
+        let actual = try await engine.prepareForEvaluation(query: tc.query).evaluate(
             input: tc.input,
             tracer: bufferTracer
         )
@@ -154,7 +151,7 @@ struct IREvaluatorTests {
                 )
             } else {
                 let tempFileHandle = try FileHandle(forWritingTo: tempFileURL)
-                bufferTracer.prettyPrint(out: tempFileHandle)
+                bufferTracer.prettyPrint(to: tempFileHandle)
                 print("Debug Trace: \(tempFileURL.path)")
             }
         }
@@ -163,16 +160,16 @@ struct IREvaluatorTests {
 
     @Test(arguments: errorTestCases)
     func testInvalidEvaluations(tc: ErrorCase) async throws {
-        var engine = try Engine(withBundlePaths: [Engine.BundlePath(name: "default", url: tc.sourceBundle)])
+        var engine = try OPA.Engine(bundlePaths: [OPA.Engine.BundlePath(name: "default", url: tc.sourceBundle)])
 
         await #expect(Comment(rawValue: tc.description)) {
-            let _ = try await engine.prepareForEval(query: tc.query).evaluate(input: tc.input)
+            let _ = try await engine.prepareForEvaluation(query: tc.query).evaluate(input: tc.input)
             #expect(Bool(false), "expected evaluation to throw an error")
         } throws: { error in
-            let gotMirror = Mirror(reflecting: error)
-            let wantMirror = Mirror(reflecting: tc.expectedError)
-            // TODO: Can/should we compare the actual error contents too?
-            return gotMirror.subjectType == wantMirror.subjectType
+            guard let regoError = error as? Rego.RegoError else {
+                return false
+            }
+            return regoError.code == tc.expectedError
         }
     }
 }

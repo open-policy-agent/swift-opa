@@ -5,11 +5,11 @@ extension RegoValue {
     // the original patched or overlayed with another RegoValue
     // at the provided path.
     // If the path does not yet exist, it will be created.
-    public func patch(with overlay: RegoValue, at path: [String]) -> RegoValue {
+    package func patch(with overlay: RegoValue, at path: [String]) -> RegoValue {
         return patch(with: overlay, at: path[...])
     }
 
-    public func patch(with overlay: RegoValue, at path: ArraySlice<String>) -> RegoValue {
+    package func patch(with overlay: RegoValue, at path: ArraySlice<String>) -> RegoValue {
         // Base case
         if path.isEmpty {
             return overlay
@@ -42,7 +42,7 @@ extension RegoValue {
 
 // Support for merging a .object RegoValue with another
 extension [RegoValue: RegoValue] {
-    public func merge(with other: [RegoValue: RegoValue]) -> [RegoValue: RegoValue] {
+    package func merge(with other: [RegoValue: RegoValue]) -> [RegoValue: RegoValue] {
         var result = self
         for (k, v) in other {
             if case .object(let objValueSelf) = self[k], case .object(let objValueOther) = v {

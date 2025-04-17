@@ -101,7 +101,7 @@ extension RegoValue: Comparable {
     }
 
     // ref: https://github.com/open-policy-agent/opa/blob/da69c328192f0ec4b9b4b4bcce9ca88d02c291cf/v1/types/types.go#L1189
-    public var sortOrder: Int {
+    private var sortOrder: Int {
         return switch self {
         case .undefined: 0
         case .null: 1

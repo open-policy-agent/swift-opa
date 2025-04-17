@@ -7,8 +7,8 @@ import Foundation
 /// This implementation wraps a simple dictionary with composite keys made of namespace + key and values being RegoValues.
 /// Since Dictionary is not concurrency-safe, neither is BuiltinsCache, but since its intent is to be used within a single evaluation,
 /// we do not concurrency support.
-public struct BuiltinsCache {
-    public struct Namespace: Hashable, Sendable {
+internal struct BuiltinsCache {
+    struct Namespace: Hashable, Sendable {
         let ns: String
         init(_ ns: String) {
             self.ns = ns
@@ -35,11 +35,11 @@ public struct BuiltinsCache {
 
     private var cache: [CompositeKey: RegoValue]
 
-    public init() {
+    internal init() {
         self.cache = [CompositeKey: RegoValue]()
     }
 
-    public subscript(key: String, namespace: Namespace = .global) -> RegoValue? {
+    internal subscript(key: String, namespace: Namespace = .global) -> RegoValue? {
         get {
             return self.cache[CompositeKey(key, namespace: namespace)]
         }
@@ -54,11 +54,11 @@ public struct BuiltinsCache {
         }
     }
 
-    public mutating func removeAll() {
+    internal mutating func removeAll() {
         self.cache.removeAll()
     }
 
-    public var count: Int {
+    internal var count: Int {
         return self.cache.count
     }
 }

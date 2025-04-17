@@ -132,13 +132,13 @@ extension BuiltinTests.ComparisonTests {
             description: "not enough args",
             name: "gt",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "gt",
             args: [1, 1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
     ]
 
@@ -263,13 +263,13 @@ extension BuiltinTests.ComparisonTests {
             description: "not enough args",
             name: "gte",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "gte",
             args: [1, 1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
     ]
 
@@ -394,13 +394,13 @@ extension BuiltinTests.ComparisonTests {
             description: "not enough args",
             name: "lt",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "lt",
             args: [1, 1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
     ]
 
@@ -525,13 +525,13 @@ extension BuiltinTests.ComparisonTests {
             description: "not enough args",
             name: "lte",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "lte",
             args: [1, 1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
     ]
 
@@ -656,13 +656,13 @@ extension BuiltinTests.ComparisonTests {
             description: "not enough args",
             name: "neq",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "neq",
             args: [1, 1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
     ]
 
@@ -787,13 +787,13 @@ extension BuiltinTests.ComparisonTests {
             description: "not enough args",
             name: "equal",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "equal",
             args: [1, 1, 1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
     ]
 

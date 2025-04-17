@@ -6,7 +6,7 @@ import PackageDescription
 import class Foundation.ProcessInfo
 
 let package = Package(
-    name: "swift-rego",
+    name: "swift-opa",
     platforms: [
         .macOS(.v13),
         .iOS(.v16),
@@ -14,10 +14,10 @@ let package = Package(
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
-            name: "SwiftRego",
-            targets: ["SwiftRego"]),
+            name: "SwiftOPA",
+            targets: ["SwiftOPA"]),
         .executable(
-            name: "swift-rego-cli",
+            name: "swift-opa-cli",
             targets: ["CLI"]
         ),
     ],
@@ -29,11 +29,14 @@ let package = Package(
         // Targets are the basic building blocks of a package, defining a module or a test suite.
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "SwiftRego",
-            dependencies: ["AST", "IR", "Runtime", "Rego"]
+            name: "SwiftOPA",
+            dependencies: ["AST", "IR", "Rego"]
         ),
         .target(name: "AST"),
-        .target(name: "IR"),
+        .target(
+            name: "IR",
+            dependencies: ["AST"]
+        ),
         .target(
             name: "Rego",
             dependencies: [
@@ -42,9 +45,6 @@ let package = Package(
                 .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
             ]
         ),
-        .target(
-            name: "Runtime",
-            dependencies: ["AST"]),
         // Internal module tests
         .testTarget(
             name: "ASTTests",
@@ -62,8 +62,8 @@ let package = Package(
         ),
         // Public API surface tests
         .testTarget(
-            name: "SwiftRegoTests",
-            dependencies: ["SwiftRego"]
+            name: "SwiftOPATests",
+            dependencies: ["SwiftOPA"]
         ),
         .executableTarget(
             name: "CLI",
@@ -74,25 +74,3 @@ let package = Package(
         ),
     ]
 )
-
-// Workaround to jemalloc build failures in Xcode - we'll need to explicitly
-// enable benchmarks with OPA_BENCHMARK=enabled from CLI to use.
-if ProcessInfo.processInfo.environment["OPA_BENCHMARK"] != nil {
-    package.dependencies += [
-        .package(url: "https://github.com/ordo-one/package-benchmark", .upToNextMajor(from: "1.4.0"))
-    ]
-    package.targets += [
-        .executableTarget(
-            name: "RegoBenchmarks",
-            dependencies: [
-                "AST",
-                .product(name: "Benchmark", package: "package-benchmark"),
-            ],
-            path: "Benchmarks/RegoBenchmarks",
-            resources: [.copy("TestData")],
-            plugins: [
-                .plugin(name: "BenchmarkPlugin", package: "package-benchmark")
-            ]
-        )
-    ]
-}

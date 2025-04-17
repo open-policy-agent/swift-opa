@@ -2,22 +2,25 @@ import AST
 import Foundation
 import IR
 
-extension Engine {
+extension OPA.Engine {
     // checkBundlesForOverlap verifies whether a set of bundles is valid
     // together, in that there are no overlaps of their reserved roots
     // space within the logical data tree.
     // Throws a bundleConflictError if a conflict is detected.
-    func checkBundlesForOverlap(bundleSet bundles: [String: Bundle]) throws {
+    func checkBundlesForOverlap(bundleSet bundles: [String: OPA.Bundle]) throws {
         // Patch all the bundle data into the data tree on the store
         var allRoots = TrieNode(value: "data", isLeaf: false, children: [:])
         for (name, bundle) in bundles {
             // Perform cross-bundle root overlap check
             do {
                 allRoots = try mergeTrie(allRoots, withBundleRoots: bundle.manifest.roots)
-            } catch Bundle.BundleError.overlappingRoots {
-                throw Err.bundleRootConflictError(bundle: name)
-            } catch Bundle.BundleError.internalError(let msg) {
-                throw Err.internalError(msg)
+            } catch OPA.Bundle.BundleError.overlappingRoots {
+                throw RegoError(
+                    code: .bundleRootConflictError,
+                    message: "bundle \(name) overlaps with existing bundle roots"
+                )
+            } catch OPA.Bundle.BundleError.internalError(let msg) {
+                throw RegoError(code: .internalError, message: msg)
             }
         }
     }
@@ -28,7 +31,7 @@ extension Engine {
 // e.g. 'app/rbac' or 'user_roles'.
 // Throws BundleError.overlappingRoots if the bundle overlaps with paths already
 // captured in the trie.
-func mergeTrie(_ trie: TrieNode, withBundleRoots roots: [String]) throws(Bundle.BundleError) -> TrieNode {
+func mergeTrie(_ trie: TrieNode, withBundleRoots roots: [String]) throws(OPA.Bundle.BundleError) -> TrieNode {
     guard !roots.isEmpty else {
         // Expect [""], not [] when roots were undefined.
         // We rely on that below to enter the loop and

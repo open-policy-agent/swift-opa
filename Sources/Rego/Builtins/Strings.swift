@@ -11,7 +11,7 @@ extension BuiltinFuncs {
 
     static func concat(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let delimiter) = args[0] else {
@@ -44,7 +44,7 @@ extension BuiltinFuncs {
 
     static func contains(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let haystack) = args[0] else {
@@ -64,7 +64,7 @@ extension BuiltinFuncs {
 
     static func endsWith(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let search) = args[0] else {
@@ -80,7 +80,7 @@ extension BuiltinFuncs {
 
     static func formatInt(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .number(let num) = args[0] else {
@@ -104,7 +104,7 @@ extension BuiltinFuncs {
 
     static func indexOf(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let haystack) = args[0] else {
@@ -129,7 +129,7 @@ extension BuiltinFuncs {
 
     static func indexOfN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let haystack) = args[0] else {
@@ -152,7 +152,7 @@ extension BuiltinFuncs {
 
     static func lower(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .string(let x) = args[0] else {
@@ -165,7 +165,7 @@ extension BuiltinFuncs {
     // split returns an array containing elements of the input string split on a delimiter
     static func split(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let x) = args[0] else {
@@ -189,7 +189,7 @@ extension BuiltinFuncs {
 
     static func replace(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 3 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 3)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
         }
 
         guard case .string(let x) = args[0] else {
@@ -209,7 +209,7 @@ extension BuiltinFuncs {
 
     static func reverse(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .string(let value) = args[0] else {
@@ -221,15 +221,15 @@ extension BuiltinFuncs {
 
     static func sprintf(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let format) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "format")
+            throw BuiltinError.argumentTypeMismatch(arg: "format", got: args[0].typeName, want: "string")
         }
 
         guard case .array(let values) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "values")
+            throw BuiltinError.argumentTypeMismatch(arg: "values", got: args[1].typeName, want: "array")
         }
 
         return .string(sprintfRegoValuesMostlyLikeHowGoDoes(format, values))
@@ -237,7 +237,7 @@ extension BuiltinFuncs {
 
     static func startsWith(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let search) = args[0] else {
@@ -253,7 +253,7 @@ extension BuiltinFuncs {
 
     static func substring(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 3 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 3)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
         }
 
         guard case .string(let value) = args[0] else {
@@ -296,7 +296,7 @@ extension BuiltinFuncs {
     // trim returns value with all leading or trailing instances of the cutset characters removed.
     static func trim(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let value) = args[0] else {
@@ -313,7 +313,7 @@ extension BuiltinFuncs {
 
     static func trimLeft(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let value) = args[0] else {
@@ -335,7 +335,7 @@ extension BuiltinFuncs {
 
     static func trimPrefix(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let value) = args[0] else {
@@ -354,7 +354,7 @@ extension BuiltinFuncs {
 
     static func trimRight(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let value) = args[0] else {
@@ -382,7 +382,7 @@ extension BuiltinFuncs {
 
     static func trimSpace(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .string(let value) = args[0] else {
@@ -395,7 +395,7 @@ extension BuiltinFuncs {
 
     static func trimSuffix(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard case .string(let value) = args[0] else {
@@ -414,7 +414,7 @@ extension BuiltinFuncs {
 
     static func upper(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .string(let x) = args[0] else {

@@ -3,12 +3,16 @@ import Foundation
 
 typealias Builtin = (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
 
-public struct BuiltinContext {
-    public let location: TraceLocation
-    public var tracer: QueryTracer?
+struct BuiltinContext {
+    public let location: OPA.Trace.Location
+    public var tracer: OPA.Trace.QueryTracer?
     internal let cache: Ptr<BuiltinsCache>
 
-    init(location: TraceLocation = TraceLocation(), tracer: QueryTracer? = nil, cache: Ptr<BuiltinsCache>? = nil) {
+    init(
+        location: OPA.Trace.Location = .init(),
+        tracer: OPA.Trace.QueryTracer? = nil,
+        cache: Ptr<BuiltinsCache>? = nil
+    ) {
         self.location = location
         self.tracer = tracer
         // Note that we will create a new cache if one hasn't been provided -
@@ -20,6 +24,13 @@ public struct BuiltinContext {
 
 public struct BuiltinRegistry {
     var builtins: [String: Builtin]
+
+    // defaultRegistry is the BuiltinRegistry with all capabilities enabled
+    public static var defaultRegistry: BuiltinRegistry {
+        BuiltinRegistry(
+            builtins: BuiltinRegistry.defaultBuiltins
+        )
+    }
 
     fileprivate static var defaultBuiltins: [String: Builtin] {
         return [
@@ -139,7 +150,7 @@ public struct BuiltinRegistry {
     }
 
     func invoke(
-        withCtx ctx: BuiltinContext,
+        withContext ctx: BuiltinContext,
         name: String,
         args: [AST.RegoValue],
         strict: Bool = false
@@ -150,7 +161,7 @@ public struct BuiltinRegistry {
         do {
             return try await builtin(ctx, args)
         } catch {
-            if case .halt = error as? BuiltinFuncs.BuiltinError {
+            if BuiltinError.isHaltError(error) {
                 // halt errors mean we propagate, always.
                 throw error
             }
@@ -169,21 +180,14 @@ public struct BuiltinRegistry {
     }
 }
 
-// DefaultBuiltinRegistry is the BuiltinRegistry with all capabilities enabled
-public var defaultBuiltinRegistry: BuiltinRegistry {
-    BuiltinRegistry(
-        builtins: BuiltinRegistry.defaultBuiltins
-    )
-}
-
 extension BuiltinRegistry {
-    enum RegistryError: Error {
+    enum RegistryError: Swift.Error {
         case builtinNotFound(name: String)
     }
 }
 
-public struct BuiltinNoteEvent: TraceableEvent {
-    public var operation: TraceOperation = .note
+struct BuiltinNoteEvent: OPA.Trace.TraceableEvent {
+    public var operation: OPA.Trace.Operation = .note
     public var message: String
-    public var location: TraceLocation
+    public var location: OPA.Trace.Location
 }

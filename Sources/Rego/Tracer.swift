@@ -1,59 +1,75 @@
 import Foundation
 import IR
 
-public protocol QueryTracer {
-    func traceEvent(_ event: any TraceableEvent)
-}
-
-public enum TraceLevel: String, Codable, Equatable, Sendable {
-    // Subset of the standard OPA "explain" levels, add more as needed
-    case none
-    case full
-    case note
-}
-
-public enum TraceOperation: String, Codable, Equatable, Sendable {
-    // Subset of the Go OPA topdown trace op's, add more as needed
-    case enter
-    case eval
-    case fail
-    case exit
-    case note
-}
-
-// TraceEvent is defined as a protocol and may be implemented by the
-// different evaluators as they will likely have additional metadata and
-// requirements for serialization/formatting
-public protocol TraceableEvent: Encodable, Sendable {
-    var operation: TraceOperation { get }
-    var message: String { get }
-    var location: TraceLocation { get }
-}
-
-public struct TraceLocation: Codable, Equatable, Sendable {
-    public var row: Int = 0
-    public var col: Int = 0
-    public var file: String = "<unknown>"
-
-    var string: String {
-        return "\(file):\(row):\(col)"
+extension OPA {
+    /// Namespace for tracing-related types
+    public enum Trace {
     }
 }
 
-public struct NoOpQueryTracer: QueryTracer {
-    public func traceEvent(_ event: any TraceableEvent) {}
-    public init() {}
-}
-
-public class BufferedQueryTracer: QueryTracer {
-    var level: TraceLevel
-    var traceEvents: [any TraceableEvent] = []
-
-    public init(level: TraceLevel) {
-        self.level = level
+extension OPA.Trace {
+    /// Specifies the tracing verbosity
+    public enum Level: String, Codable, Equatable, Sendable {
+        // Subset of the standard OPA "explain" levels, add more as needed
+        case none
+        case full
+        case note
     }
 
-    public func traceEvent(_ event: any TraceableEvent) {
+    /// Describes the type of traceable operation that occured
+    public enum Operation: String, Codable, Equatable, Sendable {
+        // Subset of the Go OPA topdown trace op's, add more as needed
+        case enter
+        case eval
+        case fail
+        case exit
+        case note
+    }
+
+    /// Describes the source location at which a trace event occured
+    public struct Location: Codable, Equatable, Sendable {
+        public var row: Int = 0
+        public var col: Int = 0
+        public var file: String = "<unknown>"
+
+        var string: String {
+            return "\(file):\(row):\(col)"
+        }
+    }
+
+    /// A tracer records events during evaluation
+    public protocol QueryTracer {
+        func traceEvent(_ event: any TraceableEvent)
+    }
+
+    /// A tracer which can be used when no tracing is desired
+    public struct NoOpQueryTracer: QueryTracer {
+        public func traceEvent(_ event: any TraceableEvent) {}
+        public init() {}
+    }
+
+    /// A tracer which buffers events
+    public class BufferedQueryTracer: QueryTracer {
+        var level: OPA.Trace.Level
+        var traceEvents: [any TraceableEvent] = []
+
+        public init(level: OPA.Trace.Level) {
+            self.level = level
+        }
+    }
+
+    /// TraceEvent is defined as a protocol and may be implemented by the
+    /// different evaluators as they will likely have additional metadata and
+    /// requirements for serialization/formatting
+    public protocol TraceableEvent: Encodable, Sendable {
+        var operation: OPA.Trace.Operation { get }
+        var message: String { get }
+        var location: OPA.Trace.Location { get }
+    }
+}
+
+extension OPA.Trace.BufferedQueryTracer {
+    public func traceEvent(_ event: any OPA.Trace.TraceableEvent) {
         guard level != .none else {
             return
         }
@@ -65,7 +81,7 @@ public class BufferedQueryTracer: QueryTracer {
     }
 
     // TODO: Where's the io.Writer at?
-    public func prettyPrint(out: FileHandle) {
+    public func prettyPrint(to file: FileHandle) {
         var currentIndent = 0
 
         var widestLocationStringSize = 0
@@ -84,20 +100,20 @@ public class BufferedQueryTracer: QueryTracer {
 
         for event in traceEvents {
             // location
-            out.write(event.location.string.data(using: .utf8)!)
+            file.write(event.location.string.data(using: .utf8)!)
 
             // computed padding to align the op + message plus a little extra space between
             // the location and op strings
             let padding = widestLocationStringSize - event.location.string.count + 4
             for _ in 0..<padding {
-                out.write(" ".data(using: .utf8)!)
+                file.write(" ".data(using: .utf8)!)
             }
 
             for _ in 0..<currentIndent {
-                out.write("| ".data(using: .utf8)!)
+                file.write("| ".data(using: .utf8)!)
             }
 
-            out.write("\(event.operation) \(event.message)".data(using: .utf8)!)
+            file.write("\(event.operation) \(event.message)".data(using: .utf8)!)
 
             switch event.operation {
             case .enter:
@@ -107,7 +123,7 @@ public class BufferedQueryTracer: QueryTracer {
             default:
                 break
             }
-            out.write("\n".data(using: .utf8)!)
+            file.write("\n".data(using: .utf8)!)
         }
     }
 }

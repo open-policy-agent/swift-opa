@@ -4,7 +4,7 @@ import Foundation
 extension BuiltinFuncs {
     static func bitsShiftLeft(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard let intA = args[0].integerValue else {
@@ -28,7 +28,7 @@ extension BuiltinFuncs {
 
     static func bitsShiftRight(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard let intA = args[0].integerValue else {
@@ -48,7 +48,7 @@ extension BuiltinFuncs {
 
     static func bitsNegate(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 1)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard let intX = args[0].integerValue else {
@@ -76,7 +76,7 @@ extension BuiltinFuncs {
         op: (Int64, Int64) -> Int64
     ) throws -> AST.RegoValue {
         guard args.count == 2 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, expected: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
         guard let intX = args[0].integerValue else {

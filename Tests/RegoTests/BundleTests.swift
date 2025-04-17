@@ -9,7 +9,7 @@ struct BundleDecodingTests {
     struct TestCase: Sendable {
         let description: String
         let data: Data
-        let expected: Manifest
+        let expected: OPA.Manifest
     }
     struct ErrorCase {
         let description: String
@@ -28,7 +28,7 @@ struct BundleDecodingTests {
                     }
                     """#.data(using: .utf8)!,
                 expected:
-                    Manifest(
+                    OPA.Manifest(
                         revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
                         roots: ["roles", "http/example/authz"],
                         regoVersion: .regoV1,
@@ -48,7 +48,7 @@ struct BundleDecodingTests {
                     }
                     """#.data(using: .utf8)!,
                 expected:
-                    Manifest(
+                    OPA.Manifest(
                         revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
                         roots: ["roles", "http/example/authz"],
                         regoVersion: .regoV1,
@@ -68,7 +68,7 @@ struct BundleDecodingTests {
                     }
                     """#.data(using: .utf8)!,
                 expected:
-                    Manifest(
+                    OPA.Manifest(
                         revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
                         roots: ["roles", "http/example/authz"],
                         regoVersion: .regoV0,
@@ -85,7 +85,7 @@ struct BundleDecodingTests {
                     }
                     """#.data(using: .utf8)!,
                 expected:
-                    Manifest(
+                    OPA.Manifest(
                         revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
                         roots: ["roles", "http/example/authz"],
                         regoVersion: .regoV1,
@@ -101,7 +101,7 @@ struct BundleDecodingTests {
                     }
                     """#.data(using: .utf8)!,
                 expected:
-                    Manifest(
+                    OPA.Manifest(
                         revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
                         // Empty roots is coerced into one root empty string
                         roots: [""],
@@ -117,7 +117,7 @@ struct BundleDecodingTests {
                     }
                     """#.data(using: .utf8)!,
                 expected:
-                    Manifest(
+                    OPA.Manifest(
                         revision: "",
                         roots: ["roles", "http/example/authz"],
                         regoVersion: .regoV1,
@@ -132,7 +132,7 @@ struct BundleDecodingTests {
                     }
                     """#.data(using: .utf8)!,
                 expected:
-                    Manifest(
+                    OPA.Manifest(
                         revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
                         roots: [""]
                     )
@@ -146,7 +146,7 @@ struct BundleDecodingTests {
                     }
                     """#.data(using: .utf8)!,
                 expected:
-                    Manifest(
+                    OPA.Manifest(
                         revision: "7864d60dd78d748dbce54b569e939f5b0dc07486",
                         roots: [""]
                     )
@@ -156,7 +156,7 @@ struct BundleDecodingTests {
 
     @Test(arguments: validTestCases)
     func testValidDecodeManifests(tc: TestCase) throws {
-        let manifest = try Manifest(from: tc.data)
+        let manifest = try OPA.Manifest(from: tc.data)
         #expect(manifest == tc.expected)
     }
 
@@ -179,7 +179,7 @@ struct BundleDecodingTests {
     @Test(arguments: invalidTestCases)
     func testInvalidDecodeManifests(tc: ErrorCase) throws {
         #expect() {
-            try Manifest(from: tc.data)
+            try OPA.Manifest(from: tc.data)
         } throws: { error in
             let mirror = Mirror(reflecting: error)
             let b: Bool = mirror.subjectType == tc.expectedErr
@@ -243,7 +243,7 @@ struct BundleDirectoryLoaderTests {
 struct BundleLoaderTests {
     struct TestCase {
         let sourceBundle: URL
-        let expected: Rego.Bundle
+        let expected: Rego.OPA.Bundle
     }
     struct ErrorCase {
         let sourceBundle: URL
@@ -260,11 +260,11 @@ struct BundleLoaderTests {
             return [
                 TestCase(
                     sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
-                    expected: try Rego.Bundle(
-                        manifest: Rego.Manifest(
+                    expected: try Rego.OPA.Bundle(
+                        manifest: Rego.OPA.Manifest(
                             revision: "e6f1a8ad-5b47-498f-a6eb-d1ecc86b63ae",
                             roots: [""],
-                            regoVersion: Rego.Manifest.Version.regoV1,
+                            regoVersion: Rego.OPA.Manifest.Version.regoV1,
                             metadata: ["name": "example-rbac"]
                         ),
                         planFiles: [
@@ -345,11 +345,11 @@ struct BundleLoaderTests {
                 ),
                 TestCase(
                     sourceBundle: relPath("TestData/Bundles/nested-data-trees"),
-                    expected: try Rego.Bundle(
-                        manifest: Manifest(
+                    expected: try Rego.OPA.Bundle(
+                        manifest: OPA.Manifest(
                             revision: "",
                             roots: [""],
-                            regoVersion: Rego.Manifest.Version.regoV1,
+                            regoVersion: Rego.OPA.Manifest.Version.regoV1,
                             metadata: .null
                         ),
                         data: [
@@ -407,7 +407,7 @@ struct BundleLoaderTests {
         }
     }
 
-    func fuzzyBundleEquals(_ lhs: Rego.Bundle, _ rhs: Rego.Bundle) -> Bool {
+    func fuzzyBundleEquals(_ lhs: Rego.OPA.Bundle, _ rhs: Rego.OPA.Bundle) -> Bool {
         guard lhs.manifest == rhs.manifest else {
             return false
         }

@@ -73,7 +73,7 @@ extension BuiltinTests.UuidTests {
             description: "does not ignore braces in UUID when NOT at the ends",
             name: "uuid.parse",
             args: [.string("00000000-{0000}-4000-8000-000000000000")],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "invalid UUID format"))
+            expected: .failure(BuiltinError.evalError(msg: "invalid UUID format"))
         ),
         BuiltinTests.TestCase(
             description: "ignores leading urn:uuid:",
@@ -88,7 +88,7 @@ extension BuiltinTests.UuidTests {
             description: "does not ignore urn:uuid: in the middle",
             name: "uuid.parse",
             args: [.string("00000000-urn:uuid:0000-4000-8000-000000000000")],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "invalid UUID format"))
+            expected: .failure(BuiltinError.evalError(msg: "invalid UUID format"))
         ),
         BuiltinTests.TestCase(
             description: "parses UUID without dashes",
@@ -103,7 +103,7 @@ extension BuiltinTests.UuidTests {
             description: "returns undefined for invalid UUID",
             name: "uuid.parse",
             args: [.string("this is not valid UUID")],
-            expected: .failure(BuiltinFuncs.BuiltinError.evalError(msg: "invalid UUID format"))
+            expected: .failure(BuiltinError.evalError(msg: "invalid UUID format"))
         ),
     ]
 
@@ -127,9 +127,9 @@ extension BuiltinTests.UuidTests {
 
     @Test
     func rfc4122ReturnsValidUUID() async throws {
-        let reg = defaultBuiltinRegistry
+        let reg = BuiltinRegistry.defaultRegistry
         let ctx = BuiltinContext()
-        let result = try await reg.invoke(withCtx: ctx, name: "uuid.rfc4122", args: ["foo"], strict: true)
+        let result = try await reg.invoke(withContext: ctx, name: "uuid.rfc4122", args: ["foo"], strict: true)
         // Make sure the output is *actually* a UUID
         switch result {
         case .string(let uuid):
@@ -141,29 +141,29 @@ extension BuiltinTests.UuidTests {
 
     @Test
     func rfc4122ReturnsSameValueForSameKey() async throws {
-        let reg = defaultBuiltinRegistry
+        let reg = BuiltinRegistry.defaultRegistry
         let ctx = BuiltinContext()
-        let result1 = try await reg.invoke(withCtx: ctx, name: "uuid.rfc4122", args: ["foo"], strict: true)
-        let result2 = try await reg.invoke(withCtx: ctx, name: "uuid.rfc4122", args: ["foo"], strict: true)
+        let result1 = try await reg.invoke(withContext: ctx, name: "uuid.rfc4122", args: ["foo"], strict: true)
+        let result2 = try await reg.invoke(withContext: ctx, name: "uuid.rfc4122", args: ["foo"], strict: true)
         #expect(result1 == result2)
     }
 
     @Test
     func rfc4122ReturnsDifferentValuesForNewContext() async throws {
-        let reg = defaultBuiltinRegistry
+        let reg = BuiltinRegistry.defaultRegistry
         let ctx1 = BuiltinContext()
-        let result1 = try await reg.invoke(withCtx: ctx1, name: "uuid.rfc4122", args: ["foo"], strict: true)
+        let result1 = try await reg.invoke(withContext: ctx1, name: "uuid.rfc4122", args: ["foo"], strict: true)
         let ctx2 = BuiltinContext()
-        let result2 = try await reg.invoke(withCtx: ctx2, name: "uuid.rfc4122", args: ["foo"], strict: true)
+        let result2 = try await reg.invoke(withContext: ctx2, name: "uuid.rfc4122", args: ["foo"], strict: true)
         #expect(result1 != result2)
     }
 
     @Test
     func rfc4122ReturnsDifferentValuesForDifferentKeys() async throws {
-        let reg = defaultBuiltinRegistry
+        let reg = BuiltinRegistry.defaultRegistry
         let ctx = BuiltinContext()
-        let result1 = try await reg.invoke(withCtx: ctx, name: "uuid.rfc4122", args: ["foo"], strict: true)
-        let result2 = try await reg.invoke(withCtx: ctx, name: "uuid.rfc4122", args: ["bar"], strict: true)
+        let result1 = try await reg.invoke(withContext: ctx, name: "uuid.rfc4122", args: ["foo"], strict: true)
+        let result2 = try await reg.invoke(withContext: ctx, name: "uuid.rfc4122", args: ["bar"], strict: true)
         #expect(result1 != result2)
     }
 }

@@ -16,11 +16,11 @@ struct BenchCommand: AsyncParsableCommand {
 
     mutating func run() async throws {
         // Initialize a Rego.Engine initially configured with our bundles from the CLI options.
-        var regoEngine = try Rego.Engine(withBundlePaths: self.evalOptions.bundlePaths)
+        var regoEngine = try Rego.OPA.Engine(bundlePaths: self.evalOptions.bundlePaths)
 
         // Prepare does as much pre-processing as possible to get ready to evaluate queries.
         // This only needs to be done once when loading the engine and after updating it.
-        let preparedQuery = try await regoEngine.prepareForEval(query: self.evalOptions.query)
+        let preparedQuery = try await regoEngine.prepareForEvaluation(query: self.evalOptions.query)
 
         let report = try await measureAsync(iterations: Int(count)) {
             let _ = try await preparedQuery.evaluate(

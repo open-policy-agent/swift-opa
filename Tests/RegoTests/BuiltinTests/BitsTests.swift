@@ -63,13 +63,13 @@ extension BuiltinTests.BitsTests {
             description: "second argument cannot be negative",
             name: "bits.lsh",
             args: [1, -1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b"))
+            expected: .failure(argumentTypeMismatch(arg: "b"))
         ),
         BuiltinTests.TestCase(
             description: "second argument cannot be non-integer",
             name: "bits.lsh",
             args: [100, 1.5],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b"))
+            expected: .failure(argumentTypeMismatch(arg: "b"))
         ),
     ]
 
@@ -108,13 +108,13 @@ extension BuiltinTests.BitsTests {
             description: "second argument cannot be negative",
             name: "bits.rsh",
             args: [1, -1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b"))
+            expected: .failure(argumentTypeMismatch(arg: "b"))
         ),
         BuiltinTests.TestCase(
             description: "second argument cannot be non-integer",
             name: "bits.rsh",
             args: [100, 1.5],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b"))
+            expected: .failure(argumentTypeMismatch(arg: "b"))
         ),
     ]
 
@@ -130,14 +130,14 @@ extension BuiltinTests.BitsTests {
             name: "bits.and",
             args: [42.5, 28],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "a", got: "number", want: "number[integer]"))
+                BuiltinError.argumentTypeMismatch(arg: "a", got: "number", want: "number[integer]"))
         ),
         BuiltinTests.TestCase(
             description: "b must be an integer",
             name: "bits.and",
             args: [42, 28.3],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b", got: "number", want: "number[integer]"))
+                BuiltinError.argumentTypeMismatch(arg: "b", got: "number", want: "number[integer]"))
         ),
     ]
 
@@ -153,14 +153,14 @@ extension BuiltinTests.BitsTests {
             name: "bits.or",
             args: [42.5, 28],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "a", got: "number", want: "number[integer]"))
+                BuiltinError.argumentTypeMismatch(arg: "a", got: "number", want: "number[integer]"))
         ),
         BuiltinTests.TestCase(
             description: "b must be an integer",
             name: "bits.or",
             args: [42, 28.3],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b", got: "number", want: "number[integer]"))
+                BuiltinError.argumentTypeMismatch(arg: "b", got: "number", want: "number[integer]"))
         ),
     ]
 
@@ -176,14 +176,14 @@ extension BuiltinTests.BitsTests {
             name: "bits.xor",
             args: [42.5, 28],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "a", got: "number", want: "number[integer]"))
+                BuiltinError.argumentTypeMismatch(arg: "a", got: "number", want: "number[integer]"))
         ),
         BuiltinTests.TestCase(
             description: "b must be an integer",
             name: "bits.xor",
             args: [42, 28.3],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b", got: "number", want: "number[integer]"))
+                BuiltinError.argumentTypeMismatch(arg: "b", got: "number", want: "number[integer]"))
         ),
     ]
 
@@ -199,7 +199,7 @@ extension BuiltinTests.BitsTests {
             name: "bits.negate",
             args: [42.5],
             expected: .failure(
-                BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "a", got: "number", want: "number[integer]"))
+                BuiltinError.argumentTypeMismatch(arg: "a", got: "number", want: "number[integer]"))
         ),
     ]
 

@@ -27,9 +27,16 @@ struct BuiltinTests {
     }
 
     static func testBuiltin(tc: TestCase) async throws {
-        let reg = defaultBuiltinRegistry
+        let reg = BuiltinRegistry.defaultRegistry
         let bctx = BuiltinContext()
-        let result = await Result { try await reg.invoke(withCtx: bctx, name: tc.name, args: tc.args, strict: true) }
+        let result = await Result {
+            try await reg.invoke(
+                withContext: bctx,
+                name: tc.name,
+                args: tc.args,
+                strict: true
+            )
+        }
         switch tc.expected {
         case .success:
             #expect(successEquals(result, tc.expected))
@@ -81,7 +88,7 @@ struct BuiltinTests {
                         name: builtinName,
                         args: [],
                         expected: .failure(
-                            BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: sampleArgs.count))
+                            BuiltinError.argumentCountMismatch(got: 0, want: sampleArgs.count))
                     )
                 )
             }
@@ -95,8 +102,8 @@ struct BuiltinTests {
                     name: builtinName,
                     args: tooManyArgs,
                     expected: .failure(
-                        BuiltinFuncs.BuiltinError.argumentCountMismatch(
-                            got: tooManyArgs.count, expected: sampleArgs.count))
+                        BuiltinError.argumentCountMismatch(
+                            got: tooManyArgs.count, want: sampleArgs.count))
                 )
             )
         }
@@ -114,7 +121,7 @@ struct BuiltinTests {
                     name: builtinName,
                     args: wrongArgs,
                     expected: .failure(
-                        BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: argName, got: testType, want: want))
+                        BuiltinError.argumentTypeMismatch(arg: argName, got: testType, want: want))
                 )
             )
         }

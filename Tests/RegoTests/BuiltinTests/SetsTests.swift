@@ -33,25 +33,25 @@ extension BuiltinTests.SetsTests {
             description: "not enough args",
             name: "and",
             args: [.set([1])],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "and",
             args: [.set([1]), .set([1]), .set([1])],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong lhs arg type",
             name: "and",
             args: ["1", .set([1])],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "a"))
+            expected: .failure(argumentTypeMismatch(arg: "a"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
             name: "and",
             args: [.set([1]), "1"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b"))
+            expected: .failure(argumentTypeMismatch(arg: "b"))
         ),
     ]
 
@@ -102,25 +102,25 @@ extension BuiltinTests.SetsTests {
             description: "not enough args",
             name: "intersection",
             args: [],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "intersection",
             args: [.set([1]), .set([1])],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "wrong arg type",
             name: "intersection",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "xs"))
+            expected: .failure(argumentTypeMismatch(arg: "xs"))
         ),
         BuiltinTests.TestCase(
             description: "wrong element arg type",
             name: "intersection",
             args: [.set([1]), "1"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b"))
+            expected: .failure(argumentTypeMismatch(arg: "b"))
         ),
     ]
 
@@ -147,25 +147,25 @@ extension BuiltinTests.SetsTests {
             description: "not enough args",
             name: "or",
             args: [.set([1])],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "or",
             args: [.set([1]), .set([1]), .set([1])],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 2))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
         ),
         BuiltinTests.TestCase(
             description: "wrong lhs arg type",
             name: "or",
             args: ["1", .set([1])],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "a"))
+            expected: .failure(argumentTypeMismatch(arg: "a"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
             name: "or",
             args: [.set([1]), "1"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b"))
+            expected: .failure(argumentTypeMismatch(arg: "b"))
         ),
     ]
 
@@ -216,25 +216,25 @@ extension BuiltinTests.SetsTests {
             description: "not enough args",
             name: "union",
             args: [],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 1, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
             name: "union",
             args: [.set([1]), .set([1])],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 3, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "wrong arg type",
             name: "union",
             args: [1],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "xs"))
+            expected: .failure(argumentTypeMismatch(arg: "xs"))
         ),
         BuiltinTests.TestCase(
             description: "wrong element arg type",
             name: "union",
             args: [.set([1]), "1"],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "b"))
+            expected: .failure(argumentTypeMismatch(arg: "b"))
         ),
     ]
 

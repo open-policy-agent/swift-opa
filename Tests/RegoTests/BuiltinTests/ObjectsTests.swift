@@ -180,7 +180,7 @@ extension BuiltinTests.ObjectTests {
                 ["c", "d"],
                 "default_value",
             ],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "object"))
+            expected: .failure(argumentTypeMismatch(arg: "object"))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
@@ -192,7 +192,7 @@ extension BuiltinTests.ObjectTests {
                 ],
                 ["c", "d"],
             ],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 3))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 2, want: 3))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
@@ -206,7 +206,7 @@ extension BuiltinTests.ObjectTests {
                 ["c", "d"],
                 "default_value",
             ],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 4, expected: 3))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 4, want: 3))
         ),
         BuiltinTests.TestCase(
             description: "string->array found",
@@ -394,13 +394,13 @@ extension BuiltinTests.ObjectTests {
             args: [
                 ["c", "d"]
             ],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentTypeMismatch(arg: "object"))
+            expected: .failure(argumentTypeMismatch(arg: "object"))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
             name: "object.keys",
             args: [],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 0, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 1))
         ),
         BuiltinTests.TestCase(
             description: "too many args",
@@ -415,7 +415,7 @@ extension BuiltinTests.ObjectTests {
                     "c": 2,
                 ],
             ],
-            expected: .failure(BuiltinFuncs.BuiltinError.argumentCountMismatch(got: 2, expected: 1))
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 2, want: 1))
         ),
     ]
 

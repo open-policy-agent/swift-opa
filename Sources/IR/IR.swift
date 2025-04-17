@@ -1,3 +1,4 @@
+import AST
 import Foundation
 
 public struct Policy: Codable, Equatable, Sendable {
@@ -34,6 +35,11 @@ public struct Static: Codable, Equatable, Sendable {
         case builtinFuncs = "builtin_funcs"
         case files
     }
+}
+
+public struct BuiltinFunc: Codable, Equatable, Sendable {
+    var name: String
+    var decl: AST.FunctionTypeDecl
 }
 
 public struct ConstString: Codable, Equatable, Sendable {
@@ -466,14 +472,6 @@ public struct Location: Codable, Equatable, Sendable {
         self.col = col
         self.file = file
     }
-}
-
-public enum StatementError: Error {
-    case unknown(String)
-}
-
-public enum EncodingError: Error {
-    case unsupported
 }
 
 // Statement is implemented by each conctete statement type

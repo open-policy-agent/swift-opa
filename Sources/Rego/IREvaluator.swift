@@ -8,16 +8,20 @@ let localIdxData = Local(1)
 internal struct IREvaluator {
     private var policies: [IndexedIRPolicy] = []
 
-    init(bundles: [String: Bundle]) throws {
+    init(bundles: [String: OPA.Bundle]) throws {
         for (bundleName, bundle) in bundles {
             for planFile in bundle.planFiles {
                 do {
-                    let parsed = try IR.Policy(fromJson: planFile.data)
+                    let parsed = try IR.Policy(jsonData: planFile.data)
                     self.policies.append(IndexedIRPolicy(policy: parsed))
                 } catch {
-                    throw EvaluatorError.bundleInitializationFailed(
-                        bundle: bundleName,
-                        reason: "IR plan file '\(planFile.url)' parsing failed: \(error)"
+                    throw RegoError(
+                        code: .bundleInitializationError,
+                        message: """
+                            intialization failed for bundle \(bundleName), \
+                            parsing failed in file: \(planFile.url)
+                            """,
+                        cause: error
                     )
                 }
             }
@@ -25,8 +29,8 @@ internal struct IREvaluator {
     }
 
     // Initialize directly with parsed policies - useful for testing
-    init(withPolicies: [IR.Policy]) {
-        self.policies = withPolicies.map { IndexedIRPolicy(policy: $0) }
+    init(policies: [IR.Policy]) {
+        self.policies = policies.map { IndexedIRPolicy(policy: $0) }
     }
 }
 
@@ -45,14 +49,14 @@ extension IREvaluator: Evaluator {
                 )
             }
         }
-        throw EvaluationError.unknownQuery(query: ctx.query)
+        throw RegoError(code: .unknownQuery, message: "query not found in plan: \(ctx.query)")
     }
 }
 
 func queryToEntryPoint(_ query: String) throws -> String {
     let prefix = "data"
     guard query.hasPrefix(prefix) else {
-        throw EvaluationError.unsupportedQuery(query: query)
+        throw RegoError(code: .unsupportedQuery, message: "unsupported query: \(query), must start with 'data'")
     }
     if query == prefix {
         // done!
@@ -155,13 +159,13 @@ internal struct Frame {
 
     func currentScope() throws -> Ptr<Scope> {
         guard !self.scopeStack.isEmpty else {
-            throw EvaluationError.internalError(reason: "no scopes remain on the frame")
+            throw RegoError(code: .internalError, message: "no scopes remain on the frame")
         }
         return self.scopeStack.last!
     }
 
-    func currentLocation(withCtx ctx: IREvaluationContext, stmt: IR.AnyStatement) throws -> TraceLocation {
-        return TraceLocation(
+    func currentLocation(withContext ctx: IREvaluationContext, stmt: IR.AnyStatement) throws -> OPA.Trace.Location {
+        return OPA.Trace.Location(
             row: stmt.location.row,
             col: stmt.location.col,
             file: ctx.policy.ir.staticData?.files?[stmt.location.file].value ?? "<unknown>"
@@ -183,8 +187,10 @@ internal struct Frame {
 
     mutating func assignLocal(idx: IR.Local, value: AST.RegoValue) throws {
         guard !self.scopeStack.isEmpty else {
-            throw EvaluationError.internalError(
-                reason: "attempted to assign local with no scope on the frame")
+            throw RegoError(
+                code: .internalError,
+                message: "attempted to assign local with no scope on the frame"
+            )
         }
         self.scopeStack.last!.v.locals[idx] = value
     }
@@ -203,15 +209,17 @@ internal struct Frame {
 
     func resolveStaticString(ctx: IREvaluationContext, _ idx: Int) throws -> String {
         guard let v = ctx.policy.resolveStaticString(idx) else {
-            throw EvaluationError.invalidOperand(
-                reason: "unable to resolve static string: \(idx)")
+            throw RegoError(
+                code: .invalidOperand,
+                message: "unable to resolve static string: \(idx)"
+            )
         }
         return v
     }
 
     func traceEvent(
-        withCtx ctx: IREvaluationContext,
-        op: TraceOperation,
+        withContext ctx: IREvaluationContext,
+        op: OPA.Trace.Operation,
         anyStmt: IR.AnyStatement,
         _ message: String = ""
     ) {
@@ -233,7 +241,7 @@ internal struct Frame {
                 msg = "function \(stmt.callFunc)"
             case .callDynamicStmt(let stmt):
                 // Resolve dynamic call path
-                let pathStr = resolveDynamicFunctionCallPath(withCtx: ctx, path: stmt.path)
+                let pathStr = resolveDynamicFunctionCallPath(withContext: ctx, path: stmt.path)
                 msg = "dynamic function \(pathStr)"
             default:
                 if let stmt = anyStmt.statement {
@@ -249,7 +257,7 @@ internal struct Frame {
             case .callStmt(let stmt):
                 msg = "function call \(stmt.callFunc)"
             case .callDynamicStmt(let stmt):
-                let pathStr = resolveDynamicFunctionCallPath(withCtx: ctx, path: stmt.path)
+                let pathStr = resolveDynamicFunctionCallPath(withContext: ctx, path: stmt.path)
                 msg = "dynamic function \(pathStr)"
             default:
                 if let stmt = anyStmt.statement {
@@ -270,7 +278,7 @@ internal struct Frame {
             IRTraceEvent(
                 operation: op,
                 message: msg,
-                location: TraceLocation(
+                location: OPA.Trace.Location(
                     row: traceLocation.row,
                     col: traceLocation.col,
                     file: ctx.policy.ir.staticData?.files?[traceLocation.file].value ?? "<unknown>"
@@ -280,7 +288,7 @@ internal struct Frame {
     }
 
     // helper for rendering a dynamic call path into a string
-    private func resolveDynamicFunctionCallPath(withCtx ctx: IREvaluationContext, path: [IR.Operand]) -> String {
+    private func resolveDynamicFunctionCallPath(withContext ctx: IREvaluationContext, path: [IR.Operand]) -> String {
         let path = path.map {
             let v = (try? self.resolveOperand(ctx: ctx, $0)) ?? "<unknown>"
             if case .string(let s) = v {
@@ -304,10 +312,10 @@ internal struct Scope: Encodable {
     }
 }
 
-private struct IRTraceEvent: TraceableEvent {
-    var operation: TraceOperation
+private struct IRTraceEvent: OPA.Trace.TraceableEvent {
+    var operation: OPA.Trace.Operation
     var message: String
-    var location: TraceLocation
+    var location: OPA.Trace.Location
 
     // IR Specific stuff
     // Note: this won't be seen in pretty prints but should be dumped in super verbose JSON output
@@ -329,7 +337,7 @@ private func evalPlan(
             // ¯\_(ツ)_/¯ for now we'll just drop the whole thang in here as it simplifies the
             // other statments. We can refactor that part later to optimize.
             localIdxInput: ctx.ctx.input,
-            localIdxData: try await ctx.ctx.store.read(path: StoreKeyPath(["data"])),
+            localIdxData: try await ctx.ctx.store.read(from: StoreKeyPath(["data"])),
         ]
     )
 
@@ -357,7 +365,7 @@ internal func evalPlanFrame(
         // Evaluate the statements in the block
         let blockResult = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: caller, block: block)
         guard !blockResult.shouldBreak else {
-            throw EvaluationError.internalError(reason: "break statement jumped out of frame")
+            throw RegoError(code: .internalError, message: "break statement jumped out of frame")
         }
         if blockResult.isUndefined {
             continue
@@ -378,14 +386,14 @@ internal func evalCallFrame(
     for block in blocks {
         let blockResult = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: caller, block: block)
         guard !blockResult.shouldBreak else {
-            throw EvaluationError.internalError(reason: "break statement jumped out of frame")
+            throw RegoError(code: .internalError, message: "break statement jumped out of frame")
         }
         if blockResult.isUndefined {
             continue
         }
         if blockResult.functionReturnValue != nil {
             guard result.functionReturnValue == nil else {
-                throw EvaluationError.internalError(reason: "multiple return values from a function")
+                throw RegoError(code: .internalError, message: "multiple return values from a function")
             }
             result.functionReturnValue = blockResult.functionReturnValue
         }
@@ -464,7 +472,7 @@ func failWithUndefined(
     framePtr: Ptr<Frame>,
     stmt: IR.AnyStatement
 ) -> BlockResult {
-    framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.fail, anyStmt: stmt, "undefined")
+    framePtr.v.traceEvent(withContext: ctx, op: .fail, anyStmt: stmt, "undefined")
     return .undefined
 }
 
@@ -477,16 +485,16 @@ func evalBlock(
     var currentScopePtr = try framePtr.v.currentScope()
     var results = ResultSet.empty
 
-    framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.enter, anyStmt: caller)
-    defer { framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.exit, anyStmt: caller) }
+    framePtr.v.traceEvent(withContext: ctx, op: .enter, anyStmt: caller)
+    defer { framePtr.v.traceEvent(withContext: ctx, op: .exit, anyStmt: caller) }
 
     stmtLoop: for (i, statement) in block.statements.enumerated() {
 
         if Task.isCancelled {
-            throw EvaluationError.evaluationCancelled(reason: "parent task cancelled")
+            throw RegoError(code: .evaluationCancelled, message: "parent task cancelled")
         }
 
-        framePtr.v.traceEvent(withCtx: ctx, op: TraceOperation.eval, anyStmt: statement)
+        framePtr.v.traceEvent(withContext: ctx, op: .eval, anyStmt: statement)
 
         switch statement {
         case .arrayAppendStmt(let stmt):
@@ -515,7 +523,7 @@ func evalBlock(
 
             // Repeated assignments can only be of the same value, otherwise throw an exception
             if targetValue != sourceValue {
-                throw EvaluationError.assignOnceError(reason: "local already assigned with different value")
+                throw RegoError(code: .assignOnceError, message: "local already assigned with different value")
             }
 
         case .assignVarStmt(let stmt):
@@ -680,9 +688,12 @@ func evalBlock(
             }
 
             guard let len = sourceValue.count else {
-                throw EvaluationError.invalidDataType(
-                    reason:
-                        "LenStmt invalid on provided operand type. got: \(sourceValue.typeName), want: (array|object|string|set)"
+                throw RegoError(
+                    code: .invalidDataType,
+                    message: """
+                        LenStmt invalid on provided operand type. got: \(sourceValue.typeName), \
+                        want: (array|object|string|set)
+                        """
                 )
             }
 
@@ -706,8 +717,7 @@ func evalBlock(
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
             guard let n = formatter.number(from: sourceStringValue) else {
-                throw EvaluationError.invalidDataType(
-                    reason: "invalid number literal with MakeNumberRefStatement")
+                throw RegoError(code: .invalidDataType, message: "invalid number literal with MakeNumberRefStatement")
             }
             try framePtr.v.assignLocal(idx: stmt.target, value: .number(n))
 
@@ -754,8 +764,9 @@ func evalBlock(
                 return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
             }
             guard case .object(var targetObjectValue) = target else {
-                throw EvaluationError.invalidDataType(
-                    reason: "unable to perform ObjectInsertStatement on target value of type \(target.typeName))"
+                throw RegoError(
+                    code: .invalidDataType,
+                    message: "unable to perform ObjectInsertStatement on target value of type \(target.typeName))"
                 )
             }
 
@@ -763,8 +774,10 @@ func evalBlock(
             // _or_ it has, but the old value must be equal to the new value
             let currentValue = targetObjectValue[key]
             guard currentValue == nil || currentValue! == targetValue else {
-                throw EvaluationError.objectInsertOnceError(
-                    reason: "key '\(key)' already exists in object with different value")
+                throw RegoError(
+                    code: .objectInsertOnceError,
+                    message: "key '\(key)' already exists in object with different value"
+                )
             }
             targetObjectValue[key] = targetValue
             try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
@@ -777,9 +790,9 @@ func evalBlock(
                 return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
             }
             guard case .object(var targetObjectValue) = target else {
-                throw EvaluationError.invalidDataType(
-                    reason:
-                        "unable to perform ObjectInsertStatement on target value of type \(target.typeName))"
+                throw RegoError(
+                    code: .invalidDataType,
+                    message: "unable to perform ObjectInsertStatement on target value of type \(target.typeName))"
                 )
             }
             targetObjectValue[key] = value
@@ -792,9 +805,9 @@ func evalBlock(
                 return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
             }
             guard case .object(let objectValueA) = a, case .object(let objectValueB) = b else {
-                throw EvaluationError.invalidDataType(
-                    reason:
-                        "unable to perform ObjectMergeStatement with types \(a.typeName)) and \(b.typeName))"
+                throw RegoError(
+                    code: .invalidDataType,
+                    message: "unable to perform ObjectMergeStatement with types \(a.typeName)) and \(b.typeName))"
                 )
             }
 
@@ -812,8 +825,9 @@ func evalBlock(
         case .resultSetAddStmt(let stmt):
             guard i == block.statements.count - 1 else {
                 // TODO can this be a warning?
-                throw EvaluationError.internalError(
-                    reason: "ResultSetAddStatement can only be used in the last statement of a block"
+                throw RegoError(
+                    code: .internalError,
+                    message: "ResultSetAddStatement can only be used in the last statement of a block"
                 )
             }
             let value = framePtr.v.resolveLocal(idx: stmt.value)
@@ -858,9 +872,9 @@ func evalBlock(
                 return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
             }
             guard case .set(var targetSetValue) = target else {
-                throw EvaluationError.invalidDataType(
-                    reason:
-                        "unable to perform SetAddStatement on target value of type \(target.typeName))"
+                throw RegoError(
+                    code: .invalidDataType,
+                    message: "unable to perform SetAddStatement on target value of type \(target.typeName)"
                 )
             }
             targetSetValue.insert(value)
@@ -879,8 +893,10 @@ func evalBlock(
                 ctx.policy.resolveStaticString(Int($0))
             }
             if path.count != pathOfInts.count {
-                throw EvaluationError.internalError(
-                    reason: "invalid path - some segments could not resolve to strings")
+                throw RegoError(
+                    code: .internalError,
+                    message: "invalid path - some segments could not resolve to strings"
+                )
             }
 
             let patched = toPatch.patch(with: overlayValue, at: path)
@@ -918,7 +934,7 @@ func evalBlock(
         case .unknown(let location):
             // Included for completeness, but this won't happen in practice as IR.Block's
             // decoder will have already failed to parse any unknown statements.
-            throw EvaluationError.internalError(reason: "unexpected statement at location: \(location)")
+            throw RegoError(code: .internalError, message: "unexpected statement at location: \(location)")
         }
 
         // Next statement of current block
@@ -983,12 +999,12 @@ private func evalCall(
     }
 
     let bctx = BuiltinContext(
-        location: try frame.v.currentLocation(withCtx: ctx, stmt: caller),
+        location: try frame.v.currentLocation(withContext: ctx, stmt: caller),
         tracer: ctx.ctx.tracer
     )
 
     return try await ctx.ctx.builtins.invoke(
-        withCtx: bctx,
+        withContext: bctx,
         name: funcName,
         args: argValues,
         strict: ctx.ctx.strictBuiltins
@@ -1004,15 +1020,13 @@ private func callPlanFunc(
     args: [AST.RegoValue]
 ) async throws -> AST.RegoValue {
     guard let fn = ctx.policy.funcs[funcName] else {
-        throw EvaluationError.internalError(
-            reason: "function definition not found: \(funcName)")
+        throw RegoError(code: .internalError, message: "function definition not found: \(funcName)")
     }
     guard fn.params.count == args.count else {
-        throw EvaluationError.internalError(
-            reason: "mismatched argument count for function \(funcName)")
+        throw RegoError(code: .internalError, message: "mismatched argument count for function \(funcName)")
     }
     guard ctx.callDepth < ctx.maxCallDepth else {
-        throw EvaluationError.maxCallDepthExceeded(depth: ctx.callDepth)
+        throw RegoError(code: .maxCallDepthExceeded, message: "maximum call depth exceeded: \(ctx.callDepth)")
     }
 
     // Match source arguments to target params
@@ -1098,7 +1112,7 @@ private func evalScanBlock(
     // Copy out any locals set on the nested block and put the scope back
     let updatedLocals = currentScopePtr.v.locals
     guard let parentScope = frame.v.popScope() else {
-        throw EvaluationError.internalError(reason: "scope stack exhausted")
+        throw RegoError(code: .internalError, message: "scope stack exhausted")
     }
     parentScope.v.locals = updatedLocals
     return rs.results
@@ -1111,7 +1125,7 @@ private func popAndSquash(frame: Ptr<Frame>) throws -> Ptr<Scope> {
     let currentLocals = scope.v.locals
 
     guard let parentScope = frame.v.popScope() else {
-        throw EvaluationError.internalError(reason: "scope stack exhausted")
+        throw RegoError(code: .internalError, message: "scope stack exhausted")
     }
 
     // Propagate any modified locals from the scope we just popped off

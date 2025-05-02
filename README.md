@@ -16,7 +16,7 @@ let package = Package(
     // name, platforms, products, etc.
     dependencies: [
         // other dependencies
-        .package(url: "https://github.com/open-policy-agent/swift-opa"),
+        .package(url: "https://github.com/open-policy-agent/swift-opa", branch: "main"),
     ],
     targets: [
         .[executable|library]Target(name: "<target-name>", dependencies: [
@@ -35,46 +35,49 @@ An `OPA.Engine` can be initialized with an on-disk bundle using its constructor:
 
 ```swift
 import Rego
+import Foundation
 
-...
+// ...
 
 let path = "some/local/path"
-let bundlePath = OPA.Engine.BundlePath(name: "policyBundle", url: URL(fileURLWithPath: path)
+let bundlePath = OPA.Engine.BundlePath(name: "policyBundle", url: URL(fileURLWithPath: path))
 var regoEngine = try OPA.Engine(bundlePaths: [bundlePath])
 
 // Prepare does as much pre-processing as possible to get ready to evaluate queries.
 // This only needs to be done once when loading the engine and after updating it.
 // PreparedQuery's can be re-used.
-let preparedQuery = try await regoEngine.prepareForEvaluation(query: self.evalOptions.query)
+let rawQuery = "data.policy.main.is_valid"
+let preparedQuery = try await regoEngine.prepareForEvaluation(query: rawQuery)
 ```
 
-Policies often expect an `input` document to be passed in. This can be parsed from JSON data:
+Policies often expect an `input` document to be passed in. This can be parsed from JSON data, for example:
 
-```
+```swift
 import AST
 
-let inputDocument = try AST.RegoValue(jsonData: data)
+// ...
+
+let rawInput = #"{"favorite_fruit": "apple"}"#.data(using: .utf8)!
+let inputDocument = try AST.RegoValue(jsonData: rawInput)
 ```
 
-Evaluation is performed by providing a query. For example, given the following policy:
+Evaluation is performed with the prepared query. We used `data.policy.main.is_valid` above, which makes sense given our policy source:
 
 ```rego
 package policy.main
 
 default is_valid := false
 is_valid := true if {
-    ...
+    input.favorite_fruit == "apple"
 }
 ```
 
-... we could query `data.policy.main.is_valid`.
+Putting it all together, we can evaluate our query and interpret the results, in this case just printing them:
 
-
-Putting it all together, we can evaluate our query:
-
-```
+```swift
 let resultSet = try await preparedQuery.evaluate(
-    query: queryString,
     input: inputDocument
 )
+
+print(try resultSet.jsonString)
 ```

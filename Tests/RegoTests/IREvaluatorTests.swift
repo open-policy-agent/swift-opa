@@ -133,7 +133,7 @@ struct IREvaluatorTests {
 
     @Test(arguments: validTestCases)
     func testValidEvaluations(tc: TestCase) async throws {
-        var engine = try OPA.Engine(bundlePaths: [OPA.Engine.BundlePath(name: "default", url: tc.sourceBundle)])
+        var engine = OPA.Engine(bundlePaths: [OPA.Engine.BundlePath(name: "default", url: tc.sourceBundle)])
         let bufferTracer = OPA.Trace.BufferedQueryTracer(level: .full)
         let actual = try await engine.prepareForEvaluation(query: tc.query).evaluate(
             input: tc.input,
@@ -160,7 +160,7 @@ struct IREvaluatorTests {
 
     @Test(arguments: errorTestCases)
     func testInvalidEvaluations(tc: ErrorCase) async throws {
-        var engine = try OPA.Engine(bundlePaths: [OPA.Engine.BundlePath(name: "default", url: tc.sourceBundle)])
+        var engine = OPA.Engine(bundlePaths: [OPA.Engine.BundlePath(name: "default", url: tc.sourceBundle)])
 
         await #expect(Comment(rawValue: tc.description)) {
             let _ = try await engine.prepareForEvaluation(query: tc.query).evaluate(input: tc.input)

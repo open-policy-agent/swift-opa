@@ -38,6 +38,9 @@ public struct BuiltinRegistry: Sendable {
             "count": BuiltinFuncs.count,
             "max": BuiltinFuncs.max,
             "min": BuiltinFuncs.min,
+            "product": BuiltinFuncs.product,
+            "sort": BuiltinFuncs.sort,
+            "sum": BuiltinFuncs.sum,
 
             // Arithmetic
             "plus": BuiltinFuncs.plus,
@@ -65,6 +68,7 @@ public struct BuiltinRegistry: Sendable {
 
             // Collections
             "internal.member_2": BuiltinFuncs.isMemberOf,
+            "internal.member_3": BuiltinFuncs.isMemberOfWithKey,
 
             // Comparison
             "gt": BuiltinFuncs.greaterThan,

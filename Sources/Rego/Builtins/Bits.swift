@@ -7,10 +7,14 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
+        // NOTE that we are okay with this argument being a float with integer value
+        // bits.lsh(1.0, 2.0) works just fine
         guard let intA = args[0].integerValue else {
             throw BuiltinError.argumentTypeMismatch(arg: "a", got: args[0].typeName, want: "number[integer]")
         }
 
+        // NOTE that we are okay with this argument being a float with integer value
+        // bits.lsh(1.0, 2.0) works just fine
         guard let intB = args[1].integerValue else {
             throw BuiltinError.argumentTypeMismatch(arg: "b", got: args[1].typeName, want: "number[integer]")
         }
@@ -31,10 +35,14 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
+        // NOTE that we are okay with this argument being a float with integer value
+        // bits.rsh(8.0, 2.0) works just fine
         guard let intA = args[0].integerValue else {
             throw BuiltinError.argumentTypeMismatch(arg: "a", got: args[0].typeName, want: "number[integer]")
         }
 
+        // NOTE that we are okay with this argument being a float with integer value
+        // bits.rsh(8.0, 2.0) works just fine
         guard let intB = args[1].integerValue else {
             throw BuiltinError.argumentTypeMismatch(arg: "b", got: args[1].typeName, want: "number[integer]")
         }
@@ -51,6 +59,8 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
+        // NOTE that we are okay with this argument being a float with integer value
+        // bits.negate(9.0) works just fine
         guard let intX = args[0].integerValue else {
             throw BuiltinError.argumentTypeMismatch(arg: "a", got: args[0].typeName, want: "number[integer]")
         }
@@ -79,10 +89,14 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
 
+        // NOTE that we are okay with this argument being a float with integer value
+        // bits.and(1.0, 2.0) works just fine
         guard let intX = args[0].integerValue else {
             throw BuiltinError.argumentTypeMismatch(arg: "a", got: args[0].typeName, want: "number[integer]")
         }
 
+        // NOTE that we are okay with this argument being a float with integer value
+        // bits.and(1.0, 2.0) works just fine
         guard let intY = args[1].integerValue else {
             throw BuiltinError.argumentTypeMismatch(arg: "b", got: args[1].typeName, want: "number[integer]")
         }

@@ -9,7 +9,7 @@ import Testing
 struct IREvaluatorTests {
     struct TestCase: Sendable {
         let description: String
-        let sourceBundle: URL
+        let sourceBundles: [URL]
         let query: String
         let input: AST.RegoValue
         let expectedResult: Rego.ResultSet
@@ -32,7 +32,7 @@ struct IREvaluatorTests {
         return [
             TestCase(
                 description: "happy path basic policy with input allow",
-                sourceBundle: relPath("TestData/Bundles/basic-policy-with-input-bundle"),
+                sourceBundles: [relPath("TestData/Bundles/basic-policy-with-input-bundle")],
                 query: "data.main.allow",
                 input: [
                     "should_allow": true
@@ -45,7 +45,7 @@ struct IREvaluatorTests {
             ),
             TestCase(
                 description: "happy path basic policy with input deny explicit",
-                sourceBundle: relPath("TestData/Bundles/basic-policy-with-input-bundle"),
+                sourceBundles: [relPath("TestData/Bundles/basic-policy-with-input-bundle")],
                 query: "data.main.allow",
                 input: [
                     "should_allow": false
@@ -54,14 +54,14 @@ struct IREvaluatorTests {
             ),
             TestCase(
                 description: "happy path basic policy with input deny undefined input key",
-                sourceBundle: relPath("TestData/Bundles/basic-policy-with-input-bundle"),
+                sourceBundles: [relPath("TestData/Bundles/basic-policy-with-input-bundle")],
                 query: "data.main.allow",
                 input: [:],
                 expectedResult: Rego.ResultSet.empty
             ),
             TestCase(
                 description: "happy path rbac allow non-admin",
-                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                sourceBundles: [relPath("TestData/Bundles/simple-directory-bundle")],
                 query: "data.app.rbac.allow",
                 input: [
                     "user": "bob",
@@ -76,7 +76,7 @@ struct IREvaluatorTests {
             ),
             TestCase(
                 description: "happy path rbac allow admin",
-                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                sourceBundles: [relPath("TestData/Bundles/simple-directory-bundle")],
                 query: "data.app.rbac.allow",
                 input: [
                     "user": "alice",
@@ -91,7 +91,7 @@ struct IREvaluatorTests {
             ),
             TestCase(
                 description: "happy path rbac deny missing grant in data json",
-                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                sourceBundles: [relPath("TestData/Bundles/simple-directory-bundle")],
                 query: "data.app.rbac.allow",
                 input: [
                     "user": "bob",
@@ -101,6 +101,22 @@ struct IREvaluatorTests {
                 expectedResult: [
                     [
                         "result": false
+                    ]
+                ]
+            ),
+            TestCase(
+                description: "happy path basic, separate bundles with rego and data",
+                sourceBundles: [
+                    relPath("TestData/Bundles/basic-policy-no-data-bundle"),
+                    relPath("TestData/Bundles/basic-policy-only-data-bundle"),
+                ],
+                query: "data.app.basic.allow",
+                input: [
+                    "variety": "cosmic crisp",
+                ],
+                expectedResult: [
+                    [
+                        "result": true
                     ]
                 ]
             ),
@@ -133,7 +149,8 @@ struct IREvaluatorTests {
 
     @Test(arguments: validTestCases)
     func testValidEvaluations(tc: TestCase) async throws {
-        var engine = try OPA.Engine(bundlePaths: [OPA.Engine.BundlePath(name: "default", url: tc.sourceBundle)])
+        var engine = try OPA.Engine(
+            bundlePaths: tc.sourceBundles.map({ OPA.Engine.BundlePath(name: $0.lastPathComponent, url: $0) }))
         let bufferTracer = OPA.Trace.BufferedQueryTracer(level: .full)
         let actual = try await engine.prepareForEvaluation(query: tc.query).evaluate(
             input: tc.input,

@@ -1,0 +1,12 @@
+{
+  "apples": [
+    {
+      "variety": "cosmic crisp",
+      "rating": 5
+    },
+    {
+      "variety": "red delicious",
+      "rating": 0
+    }
+  ]
+}

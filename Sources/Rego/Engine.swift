@@ -36,7 +36,7 @@ extension OPA.Engine {
     ///
     /// The PreparedQuery can be evaluated by calling ``evaluate(input:tracer:strictBuiltins:)``.
     /// PreparedQuery can be re-used for multuple evaluations against different inputs.
-    public struct PreparedQuery {
+    public struct PreparedQuery: Sendable {
         let query: String
         let evaluator: any Evaluator
         let store: any OPA.Store

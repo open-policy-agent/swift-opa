@@ -1,0 +1,271 @@
+{
+	"cases": [
+		{
+			"note": "jwtverifyrsa/success-jwk",
+			"query": "data.generated.p = x",
+			"modules": [
+				"package generated\n\np := x if {\n\tio.jwt.verify_rs384(\"eyJhbGciOiJSUzM4NCJ9.eyJTY29wZXMiOlsiZm9vIiwiYmFyIl0sIm5iZiI6MTQ1MTYwNjQwMH0.b__y2zjqMoD7iWbHeQ0lNpnche3ph5-AwrIQICLMQQGtEz9WMBteHydkC5g01bm3TBX1d04Z5IEOsuK6btAtWma04c5NYqaUyNEUJKYCFoY02uH0jGdGfL6R5Kkv0lkNvN0s3Nex9jMaVVgqx8bcrOU0uRBFT67sXcm11LHaB9BwKFslolzHClxgXy5RIZb4OFk_7Yk7xTC6PcvEWkkGR9uXBhfDEig5WqdwOWPeulimvARDw14U35rzeh9xpGAPjBKeE-y20fXAk0cSF1H69C-Qa1jDQheYIrAJ6XMYGNZWuay5-smmeefe67eweEt1q-AD1NFepqkmZX382DGuYQ\", `{\"kty\":\"RSA\",\"n\":\"3kZsoF_3zjlLuVpvdTxTaLBwxtQsxvWtYigY1HjIIvW110nFH2rT5rDZcW-erkotEV1LLyZmP8sZCCIUcmqcVuPY9onQDN0hhi9ZzmX_13aQx2LABRWdt-xxm_AzhJP6d8Qhb9LR_4kPpCz9-hDNfrZ-gX1F3SZ1cr5EitojDXkWOwOAzF-7Bl9_S17FSYgqJCAvBNEFBa0o76wJvXoyhLT6I8naOHN1VMS35hbsjF6A9235NSb-YtieUY7aJo4CuszQr4GM6bKYqHRwoZM5VF_MpNmKpQB1913SQPeC2gxNpDV4jkJxZFG_BrD-4ZhG8BrTFBEInvo34CqZcSePQQ\",\"e\":\"AQAB\"}`, x)\n}\n"
+			],
+			"data": {},
+			"want_result": [
+				{
+					"x": true
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "eyJhbGciOiJSUzM4NCJ9.eyJTY29wZXMiOlsiZm9vIiwiYmFyIl0sIm5iZiI6MTQ1MTYwNjQwMH0.b__y2zjqMoD7iWbHeQ0lNpnche3ph5-AwrIQICLMQQGtEz9WMBteHydkC5g01bm3TBX1d04Z5IEOsuK6btAtWma04c5NYqaUyNEUJKYCFoY02uH0jGdGfL6R5Kkv0lkNvN0s3Nex9jMaVVgqx8bcrOU0uRBFT67sXcm11LHaB9BwKFslolzHClxgXy5RIZb4OFk_7Yk7xTC6PcvEWkkGR9uXBhfDEig5WqdwOWPeulimvARDw14U35rzeh9xpGAPjBKeE-y20fXAk0cSF1H69C-Qa1jDQheYIrAJ6XMYGNZWuay5-smmeefe67eweEt1q-AD1NFepqkmZX382DGuYQ"
+						},
+						{
+							"value": "{\"kty\":\"RSA\",\"n\":\"3kZsoF_3zjlLuVpvdTxTaLBwxtQsxvWtYigY1HjIIvW110nFH2rT5rDZcW-erkotEV1LLyZmP8sZCCIUcmqcVuPY9onQDN0hhi9ZzmX_13aQx2LABRWdt-xxm_AzhJP6d8Qhb9LR_4kPpCz9-hDNfrZ-gX1F3SZ1cr5EitojDXkWOwOAzF-7Bl9_S17FSYgqJCAvBNEFBa0o76wJvXoyhLT6I8naOHN1VMS35hbsjF6A9235NSb-YtieUY7aJo4CuszQr4GM6bKYqHRwoZM5VF_MpNmKpQB1913SQPeC2gxNpDV4jkJxZFG_BrD-4ZhG8BrTFBEInvo34CqZcSePQQ\",\"e\":\"AQAB\"}"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "io.jwt.verify_rs384",
+							"decl": {
+								"args": [
+									{
+										"description": "JWT token whose signature is to be verified",
+										"name": "jwt",
+										"type": "string"
+									},
+									{
+										"description": "PEM encoded certificate, PEM encoded public key, or the JWK key (set) used to verify the signature",
+										"name": "certificate",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "`true` if the signature is valid, `false` otherwise",
+									"name": "result",
+									"type": "boolean"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.generated.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.generated.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "io.jwt.verify_rs384",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"generated",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": true
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,696 @@
+{
+	"cases": [
+		{
+			"note": "jwtdecodeverify/invalid-exp",
+			"query": "data.generated.decoded = x",
+			"modules": [
+				"package generated\n\ntoken := io.jwt.encode_sign({\"alg\": \"HS256\"}, {\"exp\": null}, {\"kty\": \"oct\", \"k\": base64url.encode_no_pad(\"42\")})\n\ndecoded := io.jwt.decode_verify(token, {\"secret\": \"42\"})\n"
+			],
+			"want_error_code": "eval_builtin_error",
+			"want_error": "exp value must be a number",
+			"strict_error": true,
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "42"
+						},
+						{
+							"value": "alg"
+						},
+						{
+							"value": "HS256"
+						},
+						{
+							"value": "exp"
+						},
+						{
+							"value": "k"
+						},
+						{
+							"value": "kty"
+						},
+						{
+							"value": "oct"
+						},
+						{
+							"value": "secret"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "base64url.encode_no_pad",
+							"decl": {
+								"args": [
+									{
+										"description": "string to encode",
+										"name": "x",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "base64url serialization of `x`",
+									"name": "y",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						},
+						{
+							"name": "io.jwt.decode_verify",
+							"decl": {
+								"args": [
+									{
+										"description": "JWT token whose signature is to be verified and whose claims are to be checked",
+										"name": "jwt",
+										"type": "string"
+									},
+									{
+										"description": "claim verification constraints",
+										"dynamic": {
+											"key": {
+												"type": "string"
+											},
+											"value": {
+												"type": "any"
+											}
+										},
+										"name": "constraints",
+										"type": "object"
+									}
+								],
+								"result": {
+									"description": "`[valid, header, payload]`:  if the input token is verified and meets the requirements of `constraints` then `valid` is `true`; `header` and `payload` are objects containing the JOSE header and the JWT claim set; otherwise, `valid` is `false`, `header` and `payload` are `{}`",
+									"name": "output",
+									"static": [
+										{
+											"type": "boolean"
+										},
+										{
+											"dynamic": {
+												"key": {
+													"type": "any"
+												},
+												"value": {
+													"type": "any"
+												}
+											},
+											"type": "object"
+										},
+										{
+											"dynamic": {
+												"key": {
+													"type": "any"
+												},
+												"value": {
+													"type": "any"
+												}
+											},
+											"type": "object"
+										}
+									],
+									"type": "array"
+								},
+								"type": "function"
+							}
+						},
+						{
+							"name": "io.jwt.encode_sign",
+							"decl": {
+								"args": [
+									{
+										"description": "JWS Protected Header",
+										"dynamic": {
+											"key": {
+												"type": "string"
+											},
+											"value": {
+												"type": "any"
+											}
+										},
+										"name": "headers",
+										"type": "object"
+									},
+									{
+										"description": "JWS Payload",
+										"dynamic": {
+											"key": {
+												"type": "string"
+											},
+											"value": {
+												"type": "any"
+											}
+										},
+										"name": "payload",
+										"type": "object"
+									},
+									{
+										"description": "JSON Web Key (RFC7517)",
+										"dynamic": {
+											"key": {
+												"type": "string"
+											},
+											"value": {
+												"type": "any"
+											}
+										},
+										"name": "key",
+										"type": "object"
+									}
+								],
+								"result": {
+									"description": "signed JWT",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.generated.decoded",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.generated.token",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "base64url.encode_no_pad",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 82,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 82,
+												"row": 3
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 6,
+												"file": 0,
+												"col": 10,
+												"row": 3
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 2
+												},
+												"value": {
+													"type": "string_index",
+													"value": 3
+												},
+												"object": 6,
+												"file": 0,
+												"col": 10,
+												"row": 3
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 7,
+												"file": 0,
+												"col": 10,
+												"row": 3
+											}
+										},
+										{
+											"type": "MakeNullStmt",
+											"stmt": {
+												"target": 8,
+												"file": 0,
+												"col": 10,
+												"row": 3
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 4
+												},
+												"value": {
+													"type": "local",
+													"value": 8
+												},
+												"object": 7,
+												"file": 0,
+												"col": 10,
+												"row": 3
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 9,
+												"file": 0,
+												"col": 10,
+												"row": 3
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 5
+												},
+												"value": {
+													"type": "local",
+													"value": 5
+												},
+												"object": 9,
+												"file": 0,
+												"col": 10,
+												"row": 3
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 6
+												},
+												"value": {
+													"type": "string_index",
+													"value": 7
+												},
+												"object": 9,
+												"file": 0,
+												"col": 10,
+												"row": 3
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "io.jwt.encode_sign",
+												"args": [
+													{
+														"type": "local",
+														"value": 6
+													},
+													{
+														"type": "local",
+														"value": 7
+													},
+													{
+														"type": "local",
+														"value": 9
+													}
+												],
+												"result": 10,
+												"file": 0,
+												"col": 10,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 10
+												},
+												"target": 11,
+												"file": 0,
+												"col": 10,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 11
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"generated",
+								"token"
+							]
+						},
+						{
+							"name": "g0.data.generated.decoded",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.generated.token",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 33,
+												"row": 5
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 33,
+												"row": 5
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 6,
+												"file": 0,
+												"col": 12,
+												"row": 5
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 8
+												},
+												"value": {
+													"type": "string_index",
+													"value": 1
+												},
+												"object": 6,
+												"file": 0,
+												"col": 12,
+												"row": 5
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "io.jwt.decode_verify",
+												"args": [
+													{
+														"type": "local",
+														"value": 5
+													},
+													{
+														"type": "local",
+														"value": 6
+													}
+												],
+												"result": 7,
+												"file": 0,
+												"col": 12,
+												"row": 5
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 7
+												},
+												"target": 8,
+												"file": 0,
+												"col": 12,
+												"row": 5
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 8
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"generated",
+								"decoded"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": null
+		}
+	]
+}

@@ -2,7 +2,7 @@
 import AST
 import IR
 
-protocol Evaluator {
+protocol Evaluator: Sendable {
     func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet
 }
 

@@ -6,14 +6,15 @@ let localIdxInput = Local(0)
 let localIdxData = Local(1)
 
 internal struct IREvaluator {
-    private var policies: [IndexedIRPolicy] = []
+    private let policies: [IndexedIRPolicy]
 
     init(bundles: [String: OPA.Bundle]) throws {
+        var policies: [IndexedIRPolicy] = []
         for (bundleName, bundle) in bundles {
             for planFile in bundle.planFiles {
                 do {
                     let parsed = try IR.Policy(jsonData: planFile.data)
-                    self.policies.append(IndexedIRPolicy(policy: parsed))
+                    policies.append(IndexedIRPolicy(policy: parsed))
                 } catch {
                     throw RegoError(
                         code: .bundleInitializationError,
@@ -29,6 +30,7 @@ internal struct IREvaluator {
         guard !policies.isEmpty else {
             throw RegoError(code: .noPlansFoundError, message: "no IR plans were found in any of the provided bundles")
         }
+        self.policies = policies
     }
 
     // Initialize directly with parsed policies - useful for testing

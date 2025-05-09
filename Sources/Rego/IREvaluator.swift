@@ -32,24 +32,43 @@ internal struct IREvaluator {
     init(policies: [IR.Policy]) {
         self.policies = policies.map { IndexedIRPolicy(policy: $0) }
     }
+
+    func findPlanAndPolicy(entrypoint: String) -> (IndexedIRPolicy, Plan)? {
+        // TODO: We're assuming that queries are only ever defined in a single policy... that _should_ hold true.. but who's checkin?
+        for policy in policies {
+            if let plan = policy.plans[entrypoint] {
+                return (policy, plan)
+            }
+        }
+
+        return nil
+    }
+
+    func unknownQueryError(query: String) -> RegoError {
+        RegoError(code: .unknownQuery, message: "query not found in plan: \(query)")
+    }
 }
 
 extension IREvaluator: Evaluator {
-    func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet {
-        // TODO: We're assuming that queries are only ever defined in a single policy... that _should_ hold true.. but who's checkin?
+    func ensureQueryIsSupported(_ query: String) throws {
+        let entrypoint = try queryToEntryPoint(query)
 
+        guard findPlanAndPolicy(entrypoint: entrypoint) != nil else {
+            throw unknownQueryError(query: query)
+        }
+    }
+
+    func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet {
         let entrypoint = try queryToEntryPoint(ctx.query)
 
-        for policy in policies {
-            if let plan = policy.plans[entrypoint] {
-                let ctx = IREvaluationContext(ctx: ctx, policy: policy)
-                return try await evalPlan(
-                    withContext: ctx,
-                    plan: plan
-                )
-            }
+        guard let (policy, plan) = findPlanAndPolicy(entrypoint: entrypoint) else {
+            throw unknownQueryError(query: ctx.query)
         }
-        throw RegoError(code: .unknownQuery, message: "query not found in plan: \(ctx.query)")
+
+        return try await evalPlan(
+            withContext: IREvaluationContext(ctx: ctx, policy: policy),
+            plan: plan
+        )
     }
 }
 

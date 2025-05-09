@@ -117,6 +117,16 @@ struct IREvaluatorTests {
                 expectedError: Rego.RegoError.Code.unknownQuery
             ),
             ErrorCase(
+                description: "duplicate valid bundles",
+                sourceBundles: [
+                    relPath("TestData/Bundles/simple-directory-bundle"),
+                    // The test uses the last path element as the bundle name, so these collide.
+                    relPath("TestData/Bundles/simple-directory-bundle"),
+                ],
+                query: "data.app.rbac.allow",
+                expectedError: Rego.RegoError.Code.bundleNameConflictError
+            ),
+            ErrorCase(
                 description: "bundle with rego but no plan json",
                 sourceBundles: [relPath("TestData/Bundles/simple-directory-no-plan-bundle")],
                 expectedError: Rego.RegoError.Code.noPlansFoundError

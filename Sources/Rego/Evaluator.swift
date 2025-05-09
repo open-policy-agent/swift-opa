@@ -3,6 +3,7 @@ import AST
 import IR
 
 protocol Evaluator {
+    func ensureQueryIsSupported(_ query: String) throws
     func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet
 }
 

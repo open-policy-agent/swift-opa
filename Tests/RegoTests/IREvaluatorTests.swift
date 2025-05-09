@@ -117,11 +117,16 @@ struct IREvaluatorTests {
                 expectedError: Rego.RegoError.Code.unknownQuery
             ),
             ErrorCase(
-                description: "bundle with no plan json",
+                description: "bundle with rego but no plan json",
                 sourceBundles: [relPath("TestData/Bundles/simple-directory-no-plan-bundle")],
-                query: "data.not.found.query",
-                input: [:],
-                expectedError: Rego.RegoError.Code.unknownQuery
+                expectedError: Rego.RegoError.Code.noPlansFoundError
+            ),
+            ErrorCase(
+                description: "all data no plan",
+                sourceBundles: [
+                    relPath("TestData/Bundles/nested-data-trees")
+                ],
+                expectedError: Rego.RegoError.Code.noPlansFoundError
             ),
             ErrorCase(
                 description: "bundle with invalid plan json",

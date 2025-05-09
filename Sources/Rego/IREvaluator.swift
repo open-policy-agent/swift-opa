@@ -26,6 +26,9 @@ internal struct IREvaluator {
                 }
             }
         }
+        guard !policies.isEmpty else {
+            throw RegoError(code: .noPlansFoundError, message: "no IR plans were found in any of the provided bundles")
+        }
     }
 
     // Initialize directly with parsed policies - useful for testing

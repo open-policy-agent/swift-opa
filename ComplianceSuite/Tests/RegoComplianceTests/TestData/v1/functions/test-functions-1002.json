@@ -1,0 +1,411 @@
+{
+	"cases": [
+		{
+			"note": "functions/same package call",
+			"query": "data.test.samepkg = x",
+			"modules": [
+				"package ex\n\nfoo(__local193__) := y if {\n\tsplit(__local193__, \"i\", y)\n}\n\nbar[x] := y if {\n\tdata.l[_].a = x\n\tdata.ex.foo(x, y)\n}\n\nchain0(__local194__) := y if {\n\tdata.ex.foo(__local194__, y)\n}\n\nchain1(__local195__) := b if {\n\tdata.ex.chain0(__local195__, b)\n}\n\nchain2 := d if {\n\tdata.ex.chain1(\"fooibar\", d)\n}\n\ncross(__local196__) := [a, b] if {\n\tsplit(__local196__, \"i\", y)\n\t__local27__ = y[1]\n\tdata.ex.foo(__local27__, b)\n\t__local28__ = y[2]\n\tdata.test.foo(__local28__, a)\n}\n\nfalsy_func(__local197__) := false\n\nfalsy_func_else(__local198__) if {\n\t__local198__ = 1\n}\n\nelse := false\n\nfalsy_undefined if {\n\tdata.ex.falsy_func(1)\n}\n\nfalsy_negation if {\n\tnot data.ex.falsy_func(1)\n}\n\nfalsy_else_value := __local23__ if {\n\ttrue\n\tdata.ex.falsy_func_else(2, __local23__)\n}\n\nfalsy_else_undefined if {\n\tdata.ex.falsy_func_else(2)\n}\n\nfalsy_else_negation if {\n\tnot data.ex.falsy_func_else(2)\n}\n\narrays([__local200__, __local201__]) := [a, b] if {\n\tdata.ex.foo(__local200__, a)\n\tdata.ex.foo(__local201__, b)\n}\n\narraysrule := y if {\n\tdata.ex.arrays([\"hih\", \"foo\"], y)\n}\n\nobjects({\"foo\": __local202__, \"bar\": __local203__}) := z if {\n\tdata.ex.foo(__local202__, a)\n\tdata.test.foo(__local203__, b)\n\tz = [a, b]\n}\n\nobjectsrule := y if {\n\tdata.ex.objects({\"bar\": \"hi ho\", \"foo\": \"hih\"}, y)\n}\n\nrefoutput := y if {\n\tdata.ex.foo(\"hih\", z)\n\ty = z[1]\n}\n\nvoid(__local204__) if {\n\t__local204__ = \"foo\"\n}\n\nvoidGood if {\n\tnot data.ex.void(\"bar\", true)\n}\n\nvoidBad if {\n\tdata.ex.void(\"bar\", true)\n}\n\nmulti(1, __local205__) := y if {\n\ty = __local205__\n}\n\nmulti(2, __local206__) := y if {\n\t__local24__ = 2 * __local206__\n\ta = __local24__\n\t__local25__ = a + 1\n\ty = __local25__\n}\n\nmulti(3, __local207__) := y if {\n\t__local26__ = __local207__ * 10\n\ty = __local26__\n}\n\nmulti(\"foo\", __local208__) := y if {\n\ty = \"bar\"\n}\n\nmulti1 := y if {\n\tdata.ex.multi(1, 2, y)\n}\n\nmulti2 := y if {\n\tdata.ex.multi(2, 2, y)\n}\n\nmulti3 := y if {\n\tdata.ex.multi(3, 2, y)\n}\n\nmulti4 := y if {\n\tdata.ex.multi(\"foo\", 2, y)\n}\n\nalways_true_fn(__local209__) := true\n\nalways_true if {\n\tdata.ex.always_true_fn(1)\n}\n",
+				"package test\n\nfoo(__local244__) := y if {\n\ttrim(__local244__, \"h o\", y)\n}\n\ncross := y if {\n\tdata.ex.cross(\"hi, my name is foo\", y)\n}\n\nmulti(\"foo\", __local245__) := y if {\n\ty = __local245__\n}\n\nmulti(\"bar\", __local246__) := y if {\n\ty = \"baz\"\n}\n\nmulti_cross_pkg := [y, z] if {\n\tdata.test.multi(\"foo\", \"bar\", y)\n\tdata.ex.multi(2, 1, z)\n}\n",
+				"package test\n\nsamepkg := y if {\n\tdata.test.foo(\"how do you do?\", y)\n}\n",
+				"package test.l1.l3\n\ng(__local259__) := __local259__\n",
+				"package test.l1.l2\n\np := true\n\nf(__local270__) := __local270__\n",
+				"package test.omit_result\n\nf(__local281__) := __local281__\n\np if {\n\tdata.test.omit_result.f(1)\n}\n",
+				"package topdown_test_partial\n\n__result__ := _result if {\n\t_result = true\n}\n"
+			],
+			"data": {},
+			"want_result": [
+				{
+					"x": "w do you do?"
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "h o"
+						},
+						{
+							"value": "how do you do?"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "trim",
+							"decl": {
+								"args": [
+									{
+										"description": "string to trim",
+										"name": "value",
+										"type": "string"
+									},
+									{
+										"description": "string of characters that are cut off",
+										"name": "cutset",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "string trimmed of `cutset` characters",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-2.rego"
+						},
+						{
+							"value": "module-1.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.samepkg",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 2,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 2,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 2,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 2,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 2,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.foo",
+							"params": [
+								0,
+								1,
+								3
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 5,
+												"file": 1,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "trim",
+												"args": [
+													{
+														"type": "local",
+														"value": 5
+													},
+													{
+														"type": "string_index",
+														"value": 1
+													}
+												],
+												"result": 6,
+												"file": 1,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 6
+												},
+												"target": 7,
+												"file": 1,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 7
+												},
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 4,
+												"file": 1,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 2,
+												"file": 1,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 1,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"foo"
+							]
+						},
+						{
+							"name": "g0.data.test.samepkg",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.foo",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"samepkg"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": "w do you do?"
+				}
+			]
+		}
+	]
+}

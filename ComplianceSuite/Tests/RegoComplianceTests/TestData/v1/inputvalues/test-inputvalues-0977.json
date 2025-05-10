@@ -1,0 +1,234 @@
+{
+	"cases": [
+		{
+			"note": "inputvalues/loopback",
+			"query": "data.z.loopback = x",
+			"modules": [
+				"package z\n\np if {\n\tdata.a[i] = x\n\tinput.req1.foo = x\n\tinput.req2.bar = x\n\tdata.z.q[x]\n}\n\nq contains x if {\n\tinput.req1.foo = x\n\tinput.req2.bar = x\n\tdata.z.r[x]\n}\n\nr contains x if {\n\t__local1__ = input.req2.bar\n\t__local2__ = input.req1.foo\n\t{\"bar\": [x], \"foo\": __local1__} = {\"bar\": [__local2__], \"foo\": x}\n}\n\ns if {\n\tinput.req3.a.b.x[0] = 1\n}\n\nt if {\n\tinput.req4.a.b.x[0] = 1\n}\n\nu contains x if {\n\tinput.req3.a.b[_] = x\n\tx \u003e 1\n}\n\nw := [[1, 2], [3, 4]]\n\ngt1 if {\n\t__local3__ = input.req1\n\t__local3__ \u003e 1\n}\n\nkeys[x] := y if {\n\tdata.numbers[_] = x\n\tto_number(x, y)\n}\n\nloopback := __local0__ if {\n\ttrue\n\t__local0__ = input\n}\n\nsets if {\n\tinput.foo[{1}][1] = 1\n}\n"
+			],
+			"data": {},
+			"input_term": "{\"foo\": 1}",
+			"want_result": [
+				{
+					"x": {
+						"foo": 1
+					}
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.z.loopback",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.z.loopback",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 47
+											}
+										},
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 0,
+												"file": 0,
+												"col": 2,
+												"row": 49
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 0
+												},
+												"target": 4,
+												"file": 0,
+												"col": 2,
+												"row": 49
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 47
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 47
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 47
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 47
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"z",
+								"loopback"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": {
+						"foo": 1
+					}
+				}
+			]
+		}
+	]
+}

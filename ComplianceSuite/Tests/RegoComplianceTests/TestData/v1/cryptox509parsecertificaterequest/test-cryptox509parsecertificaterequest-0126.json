@@ -1,0 +1,446 @@
+{
+	"cases": [
+		{
+			"note": "cryptox509parsecertificaterequest/PEM, string",
+			"query": "data.generated.p = x",
+			"modules": [
+				"package generated\n\ncsr := \"-----BEGIN CERTIFICATE REQUEST-----\\nMIICmDCCAYACAQAwUzELMAkGA1UEBhMCVVMxFDASBgNVBAMMC2V4YW1wbGUuY29t\\nMQowCAYDVQQHDAEgMQowCAYDVQQKDAEgMQowCAYDVQQIDAEgMQowCAYDVQQLDAEg\\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2ZdhmshDAU0XbxgNMFAk\\nxGVBschwVok9upASfUX08TYj0VkWEq6+fzgNvdPJwz6meP9g/MaFhOaou6huPHfo\\nSU9J7QbMnzRKlsEIO3htC5AKw9v2fWUdjBA/vCWYuu5iG5e7mPsWZ7uplnTfRzC8\\nRK+K+Yrm4D84q5lty4C3KkQsAcSLPfOL1s/b2rWmJGAhWsRkghMY6WwskuXYtH59\\nG9yUDGQHhjZkpqedV49C8sCp1O/YZoSHgp7G+BbhTmkNBG678VGDJeNpwHozvtcU\\nrASFDRxZxOu1GG17/QbUoR5Ud93piKZSE6PuCSeBs/TBaIsvpPknuXd9r8Xj/mWy\\nkQIDAQABoAAwDQYJKoZIhvcNAQELBQADggEBAAx2dh+d1MBhL0h2XfIqh5Dc/eaj\\nSLZtaMMiIcXup/zQ9vxCWJFeHf3s0Iuyb0Hd2VMgPRaO2uddcbYtQe+2gYKkO1LX\\nBtwPqw0Xp0yAvt51G2ofeBl+EkJm697FSmzh8x2IdQAJC3Z/Q8WLVhw4X6ZUbrxj\\n2gN2fiXcKDJledqH1cexYUonyKH6nln0o43QKD8YRdoa5Qjor1oBdcwRM04T38jM\\nWPwwbYN3kTODkKbiQUUlUxVn6qge9MMktsINZG4x65Bb0ilStq1Ed07f96eglsJh\\nYTOUFvid6UJEDpBsr8rdTNImIBHBvI+kPGKajqo7gEMsxEbCdzaGQ3YfsXY=\\n-----END CERTIFICATE REQUEST-----\"\n\np := __local1__ if {\n\t__local3__ = data.generated.csr\n\tcrypto.x509.parse_certificate_request(__local3__, __local2__)\n\t__local0__ = __local2__\n\t__local1__ = __local0__.Subject.CommonName\n}\n"
+			],
+			"data": {},
+			"want_result": [
+				{
+					"x": "example.com"
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "-----BEGIN CERTIFICATE REQUEST-----\nMIICmDCCAYACAQAwUzELMAkGA1UEBhMCVVMxFDASBgNVBAMMC2V4YW1wbGUuY29t\nMQowCAYDVQQHDAEgMQowCAYDVQQKDAEgMQowCAYDVQQIDAEgMQowCAYDVQQLDAEg\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2ZdhmshDAU0XbxgNMFAk\nxGVBschwVok9upASfUX08TYj0VkWEq6+fzgNvdPJwz6meP9g/MaFhOaou6huPHfo\nSU9J7QbMnzRKlsEIO3htC5AKw9v2fWUdjBA/vCWYuu5iG5e7mPsWZ7uplnTfRzC8\nRK+K+Yrm4D84q5lty4C3KkQsAcSLPfOL1s/b2rWmJGAhWsRkghMY6WwskuXYtH59\nG9yUDGQHhjZkpqedV49C8sCp1O/YZoSHgp7G+BbhTmkNBG678VGDJeNpwHozvtcU\nrASFDRxZxOu1GG17/QbUoR5Ud93piKZSE6PuCSeBs/TBaIsvpPknuXd9r8Xj/mWy\nkQIDAQABoAAwDQYJKoZIhvcNAQELBQADggEBAAx2dh+d1MBhL0h2XfIqh5Dc/eaj\nSLZtaMMiIcXup/zQ9vxCWJFeHf3s0Iuyb0Hd2VMgPRaO2uddcbYtQe+2gYKkO1LX\nBtwPqw0Xp0yAvt51G2ofeBl+EkJm697FSmzh8x2IdQAJC3Z/Q8WLVhw4X6ZUbrxj\n2gN2fiXcKDJledqH1cexYUonyKH6nln0o43QKD8YRdoa5Qjor1oBdcwRM04T38jM\nWPwwbYN3kTODkKbiQUUlUxVn6qge9MMktsINZG4x65Bb0ilStq1Ed07f96eglsJh\nYTOUFvid6UJEDpBsr8rdTNImIBHBvI+kPGKajqo7gEMsxEbCdzaGQ3YfsXY=\n-----END CERTIFICATE REQUEST-----"
+						},
+						{
+							"value": "Subject"
+						},
+						{
+							"value": "CommonName"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "crypto.x509.parse_certificate_request",
+							"decl": {
+								"args": [
+									{
+										"description": "base64 string containing either a PEM encoded or DER CSR or a string containing a PEM CSR",
+										"name": "csr",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "X.509 CSR represented as an object",
+									"dynamic": {
+										"key": {
+											"type": "string"
+										},
+										"value": {
+											"type": "any"
+										}
+									},
+									"name": "output",
+									"type": "object"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.generated.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.generated.csr",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "string_index",
+													"value": 1
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"generated",
+								"csr"
+							]
+						},
+						{
+							"name": "g0.data.generated.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.generated.csr",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 2,
+												"row": 6
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 2,
+												"row": 6
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "crypto.x509.parse_certificate_request",
+												"args": [
+													{
+														"type": "local",
+														"value": 5
+													}
+												],
+												"result": 6,
+												"file": 0,
+												"col": 2,
+												"row": 7
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 6
+												},
+												"target": 7,
+												"file": 0,
+												"col": 2,
+												"row": 7
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 7
+												},
+												"target": 8,
+												"file": 0,
+												"col": 2,
+												"row": 8
+											}
+										},
+										{
+											"type": "DotStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 8
+												},
+												"key": {
+													"type": "string_index",
+													"value": 2
+												},
+												"target": 9,
+												"file": 0,
+												"col": 2,
+												"row": 9
+											}
+										},
+										{
+											"type": "DotStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 9
+												},
+												"key": {
+													"type": "string_index",
+													"value": 3
+												},
+												"target": 10,
+												"file": 0,
+												"col": 2,
+												"row": 9
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 10
+												},
+												"target": 11,
+												"file": 0,
+												"col": 2,
+												"row": 9
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 11
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"generated",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": "example.com"
+				}
+			]
+		}
+	]
+}

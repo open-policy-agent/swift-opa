@@ -16,6 +16,10 @@ test:
 	mkdir -p .build/test-results
 	swift test --xunit-output .build/test-results/junit.xml
 
+.PHONY: test-compliance
+test-compliance:
+	$(MAKE) -C ComplianceSuite test-compliance
+
 .PHONY: build
 build:
 	swift build

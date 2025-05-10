@@ -1,0 +1,1060 @@
+{
+	"cases": [
+		{
+			"note": "replacen/bad pattern object operand/non-string key",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\n\np := strings.replace_n({2: \"x\" | true}, \"foo\")\n"
+			],
+			"want_error_code": "eval_type_error",
+			"want_error": "strings.replace_n: operand 1 non-string key found in pattern object",
+			"strict_error": true,
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "2"
+						},
+						{
+							"value": "foo"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "strings.replace_n",
+							"decl": {
+								"args": [
+									{
+										"description": "replacement pairs",
+										"dynamic": {
+											"key": {
+												"type": "string"
+											},
+											"value": {
+												"type": "string"
+											}
+										},
+										"name": "patterns",
+										"type": "object"
+									},
+									{
+										"description": "string to replace substring matches in",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "string with replaced substrings",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 0,
+												"col": 24,
+												"row": 3
+											}
+										},
+										{
+											"type": "BlockStmt",
+											"stmt": {
+												"blocks": [
+													{
+														"stmts": [
+															{
+																"type": "MakeNumberRefStmt",
+																"stmt": {
+																	"Index": 1,
+																	"target": 5,
+																	"file": 0,
+																	"col": 24,
+																	"row": 3
+																}
+															},
+															{
+																"type": "ObjectInsertOnceStmt",
+																"stmt": {
+																	"key": {
+																		"type": "local",
+																		"value": 5
+																	},
+																	"value": {
+																		"type": "string_index",
+																		"value": 0
+																	},
+																	"object": 4,
+																	"file": 0,
+																	"col": 24,
+																	"row": 3
+																}
+															}
+														]
+													}
+												],
+												"file": 0,
+												"col": 24,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 6,
+												"file": 0,
+												"col": 24,
+												"row": 3
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "strings.replace_n",
+												"args": [
+													{
+														"type": "local",
+														"value": 6
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													}
+												],
+												"result": 7,
+												"file": 0,
+												"col": 6,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 7
+												},
+												"target": 8,
+												"file": 0,
+												"col": 6,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 8
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": null
+		},
+		{
+			"note": "replacen/bad pattern object operand/non-string value",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\n\np := strings.replace_n(data.pattern, \"foo\")\n"
+			],
+			"data": {
+				"pattern": {
+					"f": 100
+				}
+			},
+			"want_error_code": "eval_type_error",
+			"want_error": "strings.replace_n: operand 1 non-string value found in pattern object",
+			"strict_error": true,
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "pattern"
+						},
+						{
+							"value": "foo"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "strings.replace_n",
+							"decl": {
+								"args": [
+									{
+										"description": "replacement pairs",
+										"dynamic": {
+											"key": {
+												"type": "string"
+											},
+											"value": {
+												"type": "string"
+											}
+										},
+										"name": "patterns",
+										"type": "object"
+									},
+									{
+										"description": "string to replace substring matches in",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "string with replaced substrings",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "BlockStmt",
+											"stmt": {
+												"blocks": [
+													{
+														"stmts": [
+															{
+																"type": "BlockStmt",
+																"stmt": {
+																	"blocks": [
+																		{
+																			"stmts": [
+																				{
+																					"type": "DotStmt",
+																					"stmt": {
+																						"source": {
+																							"type": "local",
+																							"value": 1
+																						},
+																						"key": {
+																							"type": "string_index",
+																							"value": 1
+																						},
+																						"target": 6,
+																						"file": 0,
+																						"col": 24,
+																						"row": 3
+																					}
+																				},
+																				{
+																					"type": "BreakStmt",
+																					"stmt": {
+																						"index": 1,
+																						"file": 0,
+																						"col": 24,
+																						"row": 3
+																					}
+																				}
+																			]
+																		}
+																	],
+																	"file": 0,
+																	"col": 24,
+																	"row": 3
+																}
+															},
+															{
+																"type": "BreakStmt",
+																"stmt": {
+																	"index": 1,
+																	"file": 0,
+																	"col": 24,
+																	"row": 3
+																}
+															}
+														]
+													}
+												],
+												"file": 0,
+												"col": 24,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 6
+												},
+												"target": 7,
+												"file": 0,
+												"col": 24,
+												"row": 3
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "strings.replace_n",
+												"args": [
+													{
+														"type": "local",
+														"value": 7
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													}
+												],
+												"result": 8,
+												"file": 0,
+												"col": 6,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 8
+												},
+												"target": 9,
+												"file": 0,
+												"col": 6,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 9
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": null
+		},
+		{
+			"note": "replacen/bad pattern object operand/non-string value",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\n\np := strings.replace_n({\"foo\": \"baz\"}, data.string)\n"
+			],
+			"data": {
+				"string": 100
+			},
+			"want_error_code": "eval_type_error",
+			"want_error": "strings.replace_n: operand 2 must be string but got number",
+			"strict_error": true,
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "string"
+						},
+						{
+							"value": "foo"
+						},
+						{
+							"value": "baz"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "strings.replace_n",
+							"decl": {
+								"args": [
+									{
+										"description": "replacement pairs",
+										"dynamic": {
+											"key": {
+												"type": "string"
+											},
+											"value": {
+												"type": "string"
+											}
+										},
+										"name": "patterns",
+										"type": "object"
+									},
+									{
+										"description": "string to replace substring matches in",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "string with replaced substrings",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "BlockStmt",
+											"stmt": {
+												"blocks": [
+													{
+														"stmts": [
+															{
+																"type": "BlockStmt",
+																"stmt": {
+																	"blocks": [
+																		{
+																			"stmts": [
+																				{
+																					"type": "DotStmt",
+																					"stmt": {
+																						"source": {
+																							"type": "local",
+																							"value": 1
+																						},
+																						"key": {
+																							"type": "string_index",
+																							"value": 1
+																						},
+																						"target": 6,
+																						"file": 0,
+																						"col": 40,
+																						"row": 3
+																					}
+																				},
+																				{
+																					"type": "BreakStmt",
+																					"stmt": {
+																						"index": 1,
+																						"file": 0,
+																						"col": 40,
+																						"row": 3
+																					}
+																				}
+																			]
+																		}
+																	],
+																	"file": 0,
+																	"col": 40,
+																	"row": 3
+																}
+															},
+															{
+																"type": "BreakStmt",
+																"stmt": {
+																	"index": 1,
+																	"file": 0,
+																	"col": 40,
+																	"row": 3
+																}
+															}
+														]
+													}
+												],
+												"file": 0,
+												"col": 40,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 6
+												},
+												"target": 7,
+												"file": 0,
+												"col": 40,
+												"row": 3
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 8,
+												"file": 0,
+												"col": 6,
+												"row": 3
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 2
+												},
+												"value": {
+													"type": "string_index",
+													"value": 3
+												},
+												"object": 8,
+												"file": 0,
+												"col": 6,
+												"row": 3
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "strings.replace_n",
+												"args": [
+													{
+														"type": "local",
+														"value": 8
+													},
+													{
+														"type": "local",
+														"value": 7
+													}
+												],
+												"result": 9,
+												"file": 0,
+												"col": 6,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 9
+												},
+												"target": 10,
+												"file": 0,
+												"col": 6,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 10
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": null
+		}
+	]
+}

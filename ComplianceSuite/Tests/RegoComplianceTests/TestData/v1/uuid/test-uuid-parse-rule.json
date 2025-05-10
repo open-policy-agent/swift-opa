@@ -1,0 +1,481 @@
+{
+	"cases": [
+		{
+			"note": "uuid-parse-rule/positive",
+			"query": "data.test.validuser = x",
+			"modules": [
+				"package test\n\nvaliduser if {\n\tis_string(input.userid)\n\tparsed_uuid := uuid.parse(input.userid)\n\tparsed_uuid.variant == \"RFC4122\"\n\tparsed_uuid.version == 4\n}\n"
+			],
+			"data": {},
+			"input": {
+				"userid": "00000000-0000-4000-8000-000000000000"
+			},
+			"want_result": [
+				{
+					"x": true
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "userid"
+						},
+						{
+							"value": "variant"
+						},
+						{
+							"value": "RFC4122"
+						},
+						{
+							"value": "version"
+						},
+						{
+							"value": "4"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "is_string",
+							"decl": {
+								"args": [
+									{
+										"description": "input value",
+										"name": "x",
+										"type": "any"
+									}
+								],
+								"result": {
+									"description": "`true` if `x` is a string, `false` otherwise.",
+									"name": "result",
+									"type": "boolean"
+								},
+								"type": "function"
+							}
+						},
+						{
+							"name": "uuid.parse",
+							"decl": {
+								"args": [
+									{
+										"description": "UUID string to parse",
+										"name": "uuid",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "Properties of UUID if valid (version, variant, etc). Undefined otherwise.",
+									"dynamic": {
+										"key": {
+											"type": "string"
+										},
+										"value": {
+											"type": "any"
+										}
+									},
+									"name": "result",
+									"type": "object"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.validuser",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.validuser",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "DotStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 0
+												},
+												"key": {
+													"type": "string_index",
+													"value": 1
+												},
+												"target": 4,
+												"file": 0,
+												"col": 12,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 12,
+												"row": 4
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "is_string",
+												"args": [
+													{
+														"type": "local",
+														"value": 5
+													}
+												],
+												"result": 6,
+												"file": 0,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "NotEqualStmt",
+											"stmt": {
+												"a": {
+													"type": "local",
+													"value": 6
+												},
+												"b": {
+													"type": "bool",
+													"value": false
+												},
+												"file": 0,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "DotStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 0
+												},
+												"key": {
+													"type": "string_index",
+													"value": 1
+												},
+												"target": 7,
+												"file": 0,
+												"col": 28,
+												"row": 5
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 7
+												},
+												"target": 8,
+												"file": 0,
+												"col": 28,
+												"row": 5
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "uuid.parse",
+												"args": [
+													{
+														"type": "local",
+														"value": 8
+													}
+												],
+												"result": 9,
+												"file": 0,
+												"col": 17,
+												"row": 5
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 9
+												},
+												"target": 10,
+												"file": 0,
+												"col": 17,
+												"row": 5
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 10
+												},
+												"target": 11,
+												"file": 0,
+												"col": 2,
+												"row": 5
+											}
+										},
+										{
+											"type": "DotStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 11
+												},
+												"key": {
+													"type": "string_index",
+													"value": 2
+												},
+												"target": 12,
+												"file": 0,
+												"col": 2,
+												"row": 6
+											}
+										},
+										{
+											"type": "EqualStmt",
+											"stmt": {
+												"a": {
+													"type": "local",
+													"value": 12
+												},
+												"b": {
+													"type": "string_index",
+													"value": 3
+												},
+												"file": 0,
+												"col": 2,
+												"row": 6
+											}
+										},
+										{
+											"type": "DotStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 11
+												},
+												"key": {
+													"type": "string_index",
+													"value": 4
+												},
+												"target": 13,
+												"file": 0,
+												"col": 2,
+												"row": 7
+											}
+										},
+										{
+											"type": "MakeNumberRefStmt",
+											"stmt": {
+												"Index": 5,
+												"target": 14,
+												"file": 0,
+												"col": 2,
+												"row": 7
+											}
+										},
+										{
+											"type": "EqualStmt",
+											"stmt": {
+												"a": {
+													"type": "local",
+													"value": 13
+												},
+												"b": {
+													"type": "local",
+													"value": 14
+												},
+												"file": 0,
+												"col": 2,
+												"row": 7
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "bool",
+													"value": true
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"validuser"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": true
+				}
+			]
+		}
+	]
+}

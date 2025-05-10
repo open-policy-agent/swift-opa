@@ -1,0 +1,531 @@
+{
+	"cases": [
+		{
+			"note": "cryptox509parsecertificates/PEM, single cert, string",
+			"query": "data.generated.p = x",
+			"modules": [
+				"package generated\n\ncerts := \"-----BEGIN CERTIFICATE-----\\nMIIFdzCCBF+gAwIBAgISA3NriAEus/+cvflvhVQOW5zTMA0GCSqGSIb3DQEBCwUA\\nMEoxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MSMwIQYDVQQD\\nExpMZXQncyBFbmNyeXB0IEF1dGhvcml0eSBYMzAeFw0yMDA3MTAxNjAwMzBaFw0y\\nMDEwMDgxNjAwMzBaMB4xHDAaBgNVBAMTE29wZW5wb2xpY3lhZ2VudC5vcmcwggEi\\nMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCyy8HZXVTJ2TSHXYnoL+CKYpo4\\nwz1wowUcdt/XBgN08f37NxaNk+VAj8GD2s6zhoHLShyYS2PVosf7xumvyG914PLp\\nIHO9WmCaZMqwEyvMM/VE9dBkKfaTo78BT6aXyJmnkjpeFmBOGs3uP5bUARj3Onnr\\n7Aos9j45rgrytpelYTMlLi6jVtBv5RIZuMoJ15W252t8eIgsOq57ad0Bobeyy4Tu\\nGhveP0V3vUJvI3ibqH5E9cWzI2f8UtoirUNf0J3tcng8JqSOuuzWDYWrRDAzQbJY\\nqKzvVDcN+ptqV7GZ6JuqHhdwgDeqBOsveDbzAAyYSVPJjRWYea8MxlM7OXbtAgMB\\nAAGjggKBMIICfTAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEG\\nCCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFHDweb6KprSvWrw/vR6k\\nwTVpudPtMB8GA1UdIwQYMBaAFKhKamMEfd265tE5t6ZFZe/zqOyhMG8GCCsGAQUF\\nBwEBBGMwYTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AuaW50LXgzLmxldHNlbmNy\\neXB0Lm9yZzAvBggrBgEFBQcwAoYjaHR0cDovL2NlcnQuaW50LXgzLmxldHNlbmNy\\neXB0Lm9yZy8wNwYDVR0RBDAwLoITb3BlbnBvbGljeWFnZW50Lm9yZ4IXd3d3Lm9w\\nZW5wb2xpY3lhZ2VudC5vcmcwTAYDVR0gBEUwQzAIBgZngQwBAgEwNwYLKwYBBAGC\\n3xMBAQEwKDAmBggrBgEFBQcCARYaaHR0cDovL2Nwcy5sZXRzZW5jcnlwdC5vcmcw\\nggEEBgorBgEEAdZ5AgQCBIH1BIHyAPAAdgBep3P531bA57U2SH3QSeAyepGaDISh\\nEhKEGHWWgXFFWAAAAXM5q9vDAAAEAwBHMEUCIQCRHqgrtl07Y6TryfMmQN6TNKRV\\nm1LTy9vI3Mh/krbSQQIgYgVAKwXRoPR+BN1pcJbJv3Aivbh6E7L987rMSEQk5VoA\\ndgCyHgXMi6LNiiBOh2b5K7mKJSBna9r6cOeySVMt74uQXgAAAXM5q9uuAAAEAwBH\\nMEUCIQDdruTutQ/UchckqYQ+2p9mutnrSnnQXa8xLA41YGzZHgIgXXETFbGfns2C\\n7YJ8cDoYYAjmdzMg8k7hKXQGu/KsAb4wDQYJKoZIhvcNAQELBQADggEBAGk9p5yt\\nOaDIPRPk5ImpH1f6f010mULWPV5Pjn6kzMHP9z5ndMz++1NOvHV4GVBCoeuKq1bp\\nFCD+IgA9pcJAEXQ/u4GpmbAKUZzmfMIb89aRgnJp0mx9Y4BBd45ExUWs8w4cfgFZ\\nyZUeHvWs1anpAcR2FIZpAVMQCaIgjOt2ddR1xv4acCw+mD/B9oKfGZEUgyIANvpB\\nIDabggLSwFa9OKKXRBVRAafo7Oac21HQU7E3sXphaHZGfn2F27dD/qoqUcLqr4lC\\nc7lNE0YGp6r+aPo9VLcH2V0lN4t+1VbVArwKznsNdcQnwKBetgqvZrgLg4+qjo4y\\nuixJY38XU/b7baU=\\n-----END CERTIFICATE-----\"\n\np := __local2__ if {\n\t__local4__ = data.generated.certs\n\tcrypto.x509.parse_certificates(__local4__, __local3__)\n\t__local0__ = __local3__\n\t__local2__ = [__local1__ | __local1__ = __local0__[_].Subject.CommonName]\n}\n"
+			],
+			"data": {},
+			"want_result": [
+				{
+					"x": [
+						"openpolicyagent.org"
+					]
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "-----BEGIN CERTIFICATE-----\nMIIFdzCCBF+gAwIBAgISA3NriAEus/+cvflvhVQOW5zTMA0GCSqGSIb3DQEBCwUA\nMEoxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MSMwIQYDVQQD\nExpMZXQncyBFbmNyeXB0IEF1dGhvcml0eSBYMzAeFw0yMDA3MTAxNjAwMzBaFw0y\nMDEwMDgxNjAwMzBaMB4xHDAaBgNVBAMTE29wZW5wb2xpY3lhZ2VudC5vcmcwggEi\nMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCyy8HZXVTJ2TSHXYnoL+CKYpo4\nwz1wowUcdt/XBgN08f37NxaNk+VAj8GD2s6zhoHLShyYS2PVosf7xumvyG914PLp\nIHO9WmCaZMqwEyvMM/VE9dBkKfaTo78BT6aXyJmnkjpeFmBOGs3uP5bUARj3Onnr\n7Aos9j45rgrytpelYTMlLi6jVtBv5RIZuMoJ15W252t8eIgsOq57ad0Bobeyy4Tu\nGhveP0V3vUJvI3ibqH5E9cWzI2f8UtoirUNf0J3tcng8JqSOuuzWDYWrRDAzQbJY\nqKzvVDcN+ptqV7GZ6JuqHhdwgDeqBOsveDbzAAyYSVPJjRWYea8MxlM7OXbtAgMB\nAAGjggKBMIICfTAOBgNVHQ8BAf8EBAMCBaAwHQYDVR0lBBYwFAYIKwYBBQUHAwEG\nCCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFHDweb6KprSvWrw/vR6k\nwTVpudPtMB8GA1UdIwQYMBaAFKhKamMEfd265tE5t6ZFZe/zqOyhMG8GCCsGAQUF\nBwEBBGMwYTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AuaW50LXgzLmxldHNlbmNy\neXB0Lm9yZzAvBggrBgEFBQcwAoYjaHR0cDovL2NlcnQuaW50LXgzLmxldHNlbmNy\neXB0Lm9yZy8wNwYDVR0RBDAwLoITb3BlbnBvbGljeWFnZW50Lm9yZ4IXd3d3Lm9w\nZW5wb2xpY3lhZ2VudC5vcmcwTAYDVR0gBEUwQzAIBgZngQwBAgEwNwYLKwYBBAGC\n3xMBAQEwKDAmBggrBgEFBQcCARYaaHR0cDovL2Nwcy5sZXRzZW5jcnlwdC5vcmcw\nggEEBgorBgEEAdZ5AgQCBIH1BIHyAPAAdgBep3P531bA57U2SH3QSeAyepGaDISh\nEhKEGHWWgXFFWAAAAXM5q9vDAAAEAwBHMEUCIQCRHqgrtl07Y6TryfMmQN6TNKRV\nm1LTy9vI3Mh/krbSQQIgYgVAKwXRoPR+BN1pcJbJv3Aivbh6E7L987rMSEQk5VoA\ndgCyHgXMi6LNiiBOh2b5K7mKJSBna9r6cOeySVMt74uQXgAAAXM5q9uuAAAEAwBH\nMEUCIQDdruTutQ/UchckqYQ+2p9mutnrSnnQXa8xLA41YGzZHgIgXXETFbGfns2C\n7YJ8cDoYYAjmdzMg8k7hKXQGu/KsAb4wDQYJKoZIhvcNAQELBQADggEBAGk9p5yt\nOaDIPRPk5ImpH1f6f010mULWPV5Pjn6kzMHP9z5ndMz++1NOvHV4GVBCoeuKq1bp\nFCD+IgA9pcJAEXQ/u4GpmbAKUZzmfMIb89aRgnJp0mx9Y4BBd45ExUWs8w4cfgFZ\nyZUeHvWs1anpAcR2FIZpAVMQCaIgjOt2ddR1xv4acCw+mD/B9oKfGZEUgyIANvpB\nIDabggLSwFa9OKKXRBVRAafo7Oac21HQU7E3sXphaHZGfn2F27dD/qoqUcLqr4lC\nc7lNE0YGp6r+aPo9VLcH2V0lN4t+1VbVArwKznsNdcQnwKBetgqvZrgLg4+qjo4y\nuixJY38XU/b7baU=\n-----END CERTIFICATE-----"
+						},
+						{
+							"value": "Subject"
+						},
+						{
+							"value": "CommonName"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "crypto.x509.parse_certificates",
+							"decl": {
+								"args": [
+									{
+										"description": "base64 encoded DER or PEM data containing one or more certificates or a PEM string of one or more certificates",
+										"name": "certs",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "parsed X.509 certificates represented as objects",
+									"dynamic": {
+										"dynamic": {
+											"key": {
+												"type": "string"
+											},
+											"value": {
+												"type": "any"
+											}
+										},
+										"type": "object"
+									},
+									"name": "output",
+									"type": "array"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.generated.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.generated.certs",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "string_index",
+													"value": 1
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"generated",
+								"certs"
+							]
+						},
+						{
+							"name": "g0.data.generated.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.generated.certs",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 2,
+												"row": 6
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 2,
+												"row": 6
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "crypto.x509.parse_certificates",
+												"args": [
+													{
+														"type": "local",
+														"value": 5
+													}
+												],
+												"result": 6,
+												"file": 0,
+												"col": 2,
+												"row": 7
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 6
+												},
+												"target": 7,
+												"file": 0,
+												"col": 2,
+												"row": 7
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 7
+												},
+												"target": 8,
+												"file": 0,
+												"col": 2,
+												"row": 8
+											}
+										},
+										{
+											"type": "MakeArrayStmt",
+											"stmt": {
+												"capacity": 0,
+												"target": 9,
+												"file": 0,
+												"col": 15,
+												"row": 9
+											}
+										},
+										{
+											"type": "BlockStmt",
+											"stmt": {
+												"blocks": [
+													{
+														"stmts": [
+															{
+																"type": "ScanStmt",
+																"stmt": {
+																	"source": 8,
+																	"key": 10,
+																	"value": 11,
+																	"block": {
+																		"stmts": [
+																			{
+																				"type": "AssignVarStmt",
+																				"stmt": {
+																					"source": {
+																						"type": "local",
+																						"value": 10
+																					},
+																					"target": 12,
+																					"file": 0,
+																					"col": 29,
+																					"row": 9
+																				}
+																			},
+																			{
+																				"type": "DotStmt",
+																				"stmt": {
+																					"source": {
+																						"type": "local",
+																						"value": 11
+																					},
+																					"key": {
+																						"type": "string_index",
+																						"value": 2
+																					},
+																					"target": 13,
+																					"file": 0,
+																					"col": 29,
+																					"row": 9
+																				}
+																			},
+																			{
+																				"type": "DotStmt",
+																				"stmt": {
+																					"source": {
+																						"type": "local",
+																						"value": 13
+																					},
+																					"key": {
+																						"type": "string_index",
+																						"value": 3
+																					},
+																					"target": 14,
+																					"file": 0,
+																					"col": 29,
+																					"row": 9
+																				}
+																			},
+																			{
+																				"type": "AssignVarStmt",
+																				"stmt": {
+																					"source": {
+																						"type": "local",
+																						"value": 14
+																					},
+																					"target": 15,
+																					"file": 0,
+																					"col": 29,
+																					"row": 9
+																				}
+																			},
+																			{
+																				"type": "ArrayAppendStmt",
+																				"stmt": {
+																					"value": {
+																						"type": "local",
+																						"value": 15
+																					},
+																					"array": 9,
+																					"file": 0,
+																					"col": 15,
+																					"row": 9
+																				}
+																			}
+																		]
+																	},
+																	"file": 0,
+																	"col": 29,
+																	"row": 9
+																}
+															}
+														]
+													}
+												],
+												"file": 0,
+												"col": 15,
+												"row": 9
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 9
+												},
+												"target": 16,
+												"file": 0,
+												"col": 15,
+												"row": 9
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 16
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 5
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"generated",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": [
+						"openpolicyagent.org"
+					]
+				}
+			]
+		}
+	]
+}

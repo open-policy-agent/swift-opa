@@ -94,6 +94,10 @@ public struct BuiltinRegistry {
             "hex.encode": BuiltinFuncs.hexEncode,
             "hex.decode": BuiltinFuncs.hexDecode,
 
+            // Numbers
+            "numbers.range": BuiltinFuncs.numbersRange,
+            "numbers.range_step": BuiltinFuncs.numbersRangeStep,
+
             // Objects
             "object.get": BuiltinFuncs.objectGet,
             "object.keys": BuiltinFuncs.objectKeys,

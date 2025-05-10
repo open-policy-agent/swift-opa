@@ -1,0 +1,271 @@
+{
+	"cases": [
+		{
+			"note": "jwtverifyrsa/success-es512-cert",
+			"query": "data.generated.p = x",
+			"modules": [
+				"package generated\n\np := x if {\n\tio.jwt.verify_es512(\"eyJhbGciOiJFUzUxMiJ9.eyJTY29wZXMiOlsiZm9vIiwiYmFyIl0sIm5iZiI6MTQ1MTYwNjQwMH0.AYpssEoEqq9We9aKsnRykpECAVEOBRJJu8UgDzoL-F8fmB2LPxpS4Gl7D-9wAO5AJt4-9YSsgOb5FLc20MrZN30AAFYopZf75T1pEJQFrdDmOKT45abbrorcR7G_AHDbhBdDNM_R6GojYFg_HPxHndof745Yq5Tfw9PpJc-9kSyk6kqO\", \"-----BEGIN CERTIFICATE-----\\nMIICWDCCAbmgAwIBAgIBAjAKBggqhkjOPQQDBDBWMQswCQYDVQQGEwJVUzEVMBMG\\nA1UEBxMMUmVkd29vZCBDaXR5MQ4wDAYDVQQKEwVTdHlyYTEMMAoGA1UECxMDRGV2\\nMRIwEAYDVQQDEwlsb2NhbGhvc3QwHhcNMjAwNTA3MTA1NDM3WhcNMjAwNTA3MTI1\\nNDM3WjBWMQswCQYDVQQGEwJVUzEVMBMGA1UEBxMMUmVkd29vZCBDaXR5MQ4wDAYD\\nVQQKEwVTdHlyYTEMMAoGA1UECxMDRGV2MRIwEAYDVQQDEwlsb2NhbGhvc3QwgZsw\\nEAYHKoZIzj0CAQYFK4EEACMDgYYABAHLm3IMD/88vC/S1cCTyjrCjwHIGsjibFBw\\nPBXt36YKCjUdS7jiJJR5YQVPypSv7gPaKKn1E8CqkfVdd3rrp1TocAEms4XvigtW\\nZBZzffw9xyZCgmtQ2dTHsufi/5W/Yx8N3Uw+D2wl1LKcJraouo+qgamGfuou6WbA\\noPEtdOg0+B4jF6M1MDMwDgYDVR0PAQH/BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUF\\nBwMBMAwGA1UdEwEB/wQCMAAwCgYIKoZIzj0EAwQDgYwAMIGIAkIAzAAYDqMghX3S\\n8UbS8s5TPAztJy9oNXFra5V8pPlUdNFc2ov2LN++scW46wCb/cJUyEc58sY7xFuK\\nI5sCOkv95N8CQgFXmu354LZJ31zIovuUA8druOPe3TDnxMGwEEm2Lt43JNuhzNyP\\nhJYh9/QKfe2AiwrLXEG4VVOIXdjq7vexl87evg==\\n-----END CERTIFICATE-----\", x)\n}\n"
+			],
+			"data": {},
+			"want_result": [
+				{
+					"x": true
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "eyJhbGciOiJFUzUxMiJ9.eyJTY29wZXMiOlsiZm9vIiwiYmFyIl0sIm5iZiI6MTQ1MTYwNjQwMH0.AYpssEoEqq9We9aKsnRykpECAVEOBRJJu8UgDzoL-F8fmB2LPxpS4Gl7D-9wAO5AJt4-9YSsgOb5FLc20MrZN30AAFYopZf75T1pEJQFrdDmOKT45abbrorcR7G_AHDbhBdDNM_R6GojYFg_HPxHndof745Yq5Tfw9PpJc-9kSyk6kqO"
+						},
+						{
+							"value": "-----BEGIN CERTIFICATE-----\nMIICWDCCAbmgAwIBAgIBAjAKBggqhkjOPQQDBDBWMQswCQYDVQQGEwJVUzEVMBMG\nA1UEBxMMUmVkd29vZCBDaXR5MQ4wDAYDVQQKEwVTdHlyYTEMMAoGA1UECxMDRGV2\nMRIwEAYDVQQDEwlsb2NhbGhvc3QwHhcNMjAwNTA3MTA1NDM3WhcNMjAwNTA3MTI1\nNDM3WjBWMQswCQYDVQQGEwJVUzEVMBMGA1UEBxMMUmVkd29vZCBDaXR5MQ4wDAYD\nVQQKEwVTdHlyYTEMMAoGA1UECxMDRGV2MRIwEAYDVQQDEwlsb2NhbGhvc3QwgZsw\nEAYHKoZIzj0CAQYFK4EEACMDgYYABAHLm3IMD/88vC/S1cCTyjrCjwHIGsjibFBw\nPBXt36YKCjUdS7jiJJR5YQVPypSv7gPaKKn1E8CqkfVdd3rrp1TocAEms4XvigtW\nZBZzffw9xyZCgmtQ2dTHsufi/5W/Yx8N3Uw+D2wl1LKcJraouo+qgamGfuou6WbA\noPEtdOg0+B4jF6M1MDMwDgYDVR0PAQH/BAQDAgWgMBMGA1UdJQQMMAoGCCsGAQUF\nBwMBMAwGA1UdEwEB/wQCMAAwCgYIKoZIzj0EAwQDgYwAMIGIAkIAzAAYDqMghX3S\n8UbS8s5TPAztJy9oNXFra5V8pPlUdNFc2ov2LN++scW46wCb/cJUyEc58sY7xFuK\nI5sCOkv95N8CQgFXmu354LZJ31zIovuUA8druOPe3TDnxMGwEEm2Lt43JNuhzNyP\nhJYh9/QKfe2AiwrLXEG4VVOIXdjq7vexl87evg==\n-----END CERTIFICATE-----"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "io.jwt.verify_es512",
+							"decl": {
+								"args": [
+									{
+										"description": "JWT token whose signature is to be verified",
+										"name": "jwt",
+										"type": "string"
+									},
+									{
+										"description": "PEM encoded certificate, PEM encoded public key, or the JWK key (set) used to verify the signature",
+										"name": "certificate",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "`true` if the signature is valid, `false` otherwise",
+									"name": "result",
+									"type": "boolean"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.generated.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.generated.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "io.jwt.verify_es512",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"generated",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": true
+				}
+			]
+		}
+	]
+}

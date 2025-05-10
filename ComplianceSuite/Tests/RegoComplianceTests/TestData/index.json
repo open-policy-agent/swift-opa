@@ -1,0 +1,7378 @@
+[
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0001.json",
+    "note": [
+      "aggregates/count"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0002.json",
+    "note": [
+      "aggregates/count virtual"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0003.json",
+    "note": [
+      "aggregates/count keys"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0004.json",
+    "note": [
+      "aggregates/count keys virtual"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0005.json",
+    "note": [
+      "aggregates/count set"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0006.json",
+    "note": [
+      "aggregates/sum"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0007.json",
+    "note": [
+      "aggregates/sum set"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0008.json",
+    "note": [
+      "aggregates/sum virtual"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0009.json",
+    "note": [
+      "aggregates/sum virtual set"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0010.json",
+    "note": [
+      "aggregates/bug 2469 - precision"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0011.json",
+    "note": [
+      "aggregates/product"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0012.json",
+    "note": [
+      "aggregates/product set"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0013.json",
+    "note": [
+      "aggregates/max"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0014.json",
+    "note": [
+      "aggregates/max set"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0015.json",
+    "note": [
+      "aggregates/max virtual"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0016.json",
+    "note": [
+      "aggregates/max virtual set"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0017.json",
+    "note": [
+      "aggregates/min"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0018.json",
+    "note": [
+      "aggregates/min dups"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0019.json",
+    "note": [
+      "aggregates/min out-of-order"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0020.json",
+    "note": [
+      "aggregates/min set"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0021.json",
+    "note": [
+      "aggregates/min virtual"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0022.json",
+    "note": [
+      "aggregates/min virtual set"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0023.json",
+    "note": [
+      "aggregates/reduce ref dest"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0024.json",
+    "note": [
+      "aggregates/reduce ref dest (2)"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0025.json",
+    "note": [
+      "aggregates/sort"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0026.json",
+    "note": [
+      "aggregates/sort set"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0027.json",
+    "note": [
+      "aggregates/count string",
+      "aggregates/count string"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-0028.json",
+    "note": [
+      "aggregates/count error null",
+      "aggregates/count error number"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-aggregates-bad-utf8-runes.json",
+    "note": [
+      "aggregates/count with invalid utf-8 chars (0xFFFD)"
+    ]
+  },
+  {
+    "file": "TestData/v1/aggregates/test-membership.json",
+    "note": [
+      "aggregates/member simple, set",
+      "aggregates/member simple, array",
+      "aggregates/member simple, object",
+      "aggregates/member object with key",
+      "aggregates/member array with index",
+      "aggregates/member array with index, nested",
+      "aggregates/member array with index, nested, associativity without parens",
+      "aggregates/member object with key, nested, associativity without parens",
+      "aggregates/member object with key, nested",
+      "aggregates/member simple false, set",
+      "aggregates/member simple false, array",
+      "aggregates/member simple false, object",
+      "aggregates/member chained",
+      "aggregates/member with vars",
+      "aggregates/member with not",
+      "aggregates/member operator precedence with other infix operator (+)",
+      "aggregates/member operator precedence in list (set)",
+      "aggregates/member operator precedence in list with parens (set)",
+      "aggregates/member operator precedence in list (array)",
+      "aggregates/member operator precedence in list with parens (array)",
+      "aggregates/member operator precedence in list (fun args)",
+      "aggregates/member operator precedence in list with parens (fun args)",
+      "aggregates/member composite containee",
+      "aggregates/member non-collection string",
+      "aggregates/member non-collection number",
+      "aggregates/member with key in non-collection (number)",
+      "aggregates/member+some simple, array",
+      "aggregates/member+some ground value",
+      "aggregates/member+some containee is call",
+      "aggregates/member+some non-ground composite containee",
+      "aggregates/member+some non-ground composite containee, multiple bindings",
+      "aggregates/member+some ground composite containee",
+      "aggregates/member+some ground composite containee (false)",
+      "aggregates/member+some+key non-ground value",
+      "aggregates/member+some+key non-ground key",
+      "aggregates/member+some+key non-ground key+value",
+      "aggregates/member+some+key non-ground, composite key",
+      "aggregates/member+some+ref",
+      "aggregates/member+some+key+ref",
+      "aggregates/member+some+key+ref with other variable",
+      "aggregates/member+some+with"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0810.json",
+    "note": [
+      "arithmetic/plus"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0811.json",
+    "note": [
+      "arithmetic/minus"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0812.json",
+    "note": [
+      "arithmetic/multiply"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0813.json",
+    "note": [
+      "arithmetic/divide+round"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0814.json",
+    "note": [
+      "arithmetic/divide+error"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0815.json",
+    "note": [
+      "arithmetic/abs"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0816.json",
+    "note": [
+      "arithmetic/remainder"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0817.json",
+    "note": [
+      "arithmetic/remainder+error"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0818.json",
+    "note": [
+      "arithmetic/remainder+error+floating"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0819.json",
+    "note": [
+      "arithmetic/arity 1 ref dest"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0820.json",
+    "note": [
+      "arithmetic/arity 1 ref dest (2)"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0821.json",
+    "note": [
+      "arithmetic/arity 2 ref dest"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0822.json",
+    "note": [
+      "arithmetic/arity 2 ref dest (2)"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0823.json",
+    "note": [
+      "arithmetic/bug 2469 - precision"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0824.json",
+    "note": [
+      "ceil rounds up",
+      "ceil rounds up (2)",
+      "ceil rounds up (3)",
+      "ceil integer",
+      "ceil negative"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-0825.json",
+    "note": [
+      "floor rounds down",
+      "floor rounds down (2)",
+      "floor rounds down (3)",
+      "floor integer",
+      "floor negative"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-arithmetic-minus-type-error.json",
+    "note": [
+      "arithmetic/minus/type error",
+      "arithmetic/minus/type error"
+    ]
+  },
+  {
+    "file": "TestData/v1/arithmetic/test-big-int-0001.json",
+    "note": [
+      "arithmetic/big_int"
+    ]
+  },
+  {
+    "file": "TestData/v1/array/test-array-0041.json",
+    "note": [
+      "array/concat"
+    ]
+  },
+  {
+    "file": "TestData/v1/array/test-array-0042.json",
+    "note": [
+      "array/concat: err"
+    ]
+  },
+  {
+    "file": "TestData/v1/array/test-array-0043.json",
+    "note": [
+      "array/concat: err rhs"
+    ]
+  },
+  {
+    "file": "TestData/v1/array/test-array-0044.json",
+    "note": [
+      "array/slice"
+    ]
+  },
+  {
+    "file": "TestData/v1/array/test-array-0045.json",
+    "note": [
+      "array/slice: empty slice"
+    ]
+  },
+  {
+    "file": "TestData/v1/array/test-array-0046.json",
+    "note": [
+      "array/slice: negative indices"
+    ]
+  },
+  {
+    "file": "TestData/v1/array/test-array-0047.json",
+    "note": [
+      "array/slice: stopIndex < startIndex"
+    ]
+  },
+  {
+    "file": "TestData/v1/array/test-array-0048.json",
+    "note": [
+      "array/slice: clamp startIndex"
+    ]
+  },
+  {
+    "file": "TestData/v1/array/test-array-0049.json",
+    "note": [
+      "array/slice: clamp stopIndex"
+    ]
+  },
+  {
+    "file": "TestData/v1/array/test-array-0050.json",
+    "note": [
+      "array/slice: clamp both out of range"
+    ]
+  },
+  {
+    "file": "TestData/v1/array/test-array-0051.json",
+    "note": [
+      "array/slice: clamp both out of range non-empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/array/test-array-0052.json",
+    "note": [
+      "array/reverse_123",
+      "array/reverse_empty",
+      "array/reverse_object_error"
+    ]
+  },
+  {
+    "file": "TestData/v1/assignments/test-file-level-assignments.json",
+    "note": [
+      "assignments/file-level/default_value",
+      "assignments/file-level/rule",
+      "assignments/file-level/else_keyword",
+      "assignments/file-level/partial_rule",
+      "assignments/file-level/function_return_value"
+    ]
+  },
+  {
+    "file": "TestData/v1/base64builtins/test-base64builtins-0929.json",
+    "note": [
+      "base64builtins/encode-1"
+    ]
+  },
+  {
+    "file": "TestData/v1/base64builtins/test-base64builtins-0930.json",
+    "note": [
+      "base64builtins/encode-2"
+    ]
+  },
+  {
+    "file": "TestData/v1/base64builtins/test-base64builtins-0931.json",
+    "note": [
+      "base64builtins/decode-1"
+    ]
+  },
+  {
+    "file": "TestData/v1/base64builtins/test-base64builtins-0932.json",
+    "note": [
+      "base64builtins/decode-2"
+    ]
+  },
+  {
+    "file": "TestData/v1/base64builtins/test-base64builtins-0933.json",
+    "note": [
+      "base64builtins/encode-slash"
+    ]
+  },
+  {
+    "file": "TestData/v1/base64builtins/test-base64builtins-0934.json",
+    "note": [
+      "base64builtins/decode-slash"
+    ]
+  },
+  {
+    "file": "TestData/v1/base64builtins/test-base64builtins-0935.json",
+    "note": [
+      "base64builtins/is_valid-true",
+      "base64builtins/is_valid-false"
+    ]
+  },
+  {
+    "file": "TestData/v1/base64urlbuiltins/test-base64urlbuiltins-0935.json",
+    "note": [
+      "base64urlbuiltins/encode-1",
+      "base64urlbuiltins/encode-2"
+    ]
+  },
+  {
+    "file": "TestData/v1/base64urlbuiltins/test-base64urlbuiltins-0937.json",
+    "note": [
+      "base64urlbuiltins/decode-1 padded string",
+      "base64urlbuiltins/decode-2 non-padded string"
+    ]
+  },
+  {
+    "file": "TestData/v1/base64urlbuiltins/test-base64urlbuiltins-0939.json",
+    "note": [
+      "base64urlbuiltins/encode-1 without padding",
+      "base64urlbuiltins/encode-2 without padding"
+    ]
+  },
+  {
+    "file": "TestData/v1/baseandvirtualdocs/test-baseandvirtualdocs-0695.json",
+    "note": [
+      "baseandvirtualdocs/base/virtual"
+    ]
+  },
+  {
+    "file": "TestData/v1/baseandvirtualdocs/test-baseandvirtualdocs-0696.json",
+    "note": [
+      "baseandvirtualdocs/base/virtual: ground key"
+    ]
+  },
+  {
+    "file": "TestData/v1/baseandvirtualdocs/test-baseandvirtualdocs-0697.json",
+    "note": [
+      "baseandvirtualdocs/base/virtual: prefix"
+    ]
+  },
+  {
+    "file": "TestData/v1/baseandvirtualdocs/test-baseandvirtualdocs-0698.json",
+    "note": [
+      "baseandvirtualdocs/base/virtual: set"
+    ]
+  },
+  {
+    "file": "TestData/v1/baseandvirtualdocs/test-baseandvirtualdocs-0699.json",
+    "note": [
+      "baseandvirtualdocs/base/virtual: no base"
+    ]
+  },
+  {
+    "file": "TestData/v1/baseandvirtualdocs/test-baseandvirtualdocs-0700.json",
+    "note": [
+      "baseandvirtualdocs/base/virtual: undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/baseandvirtualdocs/test-baseandvirtualdocs-0701.json",
+    "note": [
+      "baseandvirtualdocs/base/virtual: undefined-2"
+    ]
+  },
+  {
+    "file": "TestData/v1/baseandvirtualdocs/test-baseandvirtualdocs-0702.json",
+    "note": [
+      "baseandvirtualdocs/base/virtual: missing input value"
+    ]
+  },
+  {
+    "file": "TestData/v1/baseandvirtualdocs/test-baseandvirtualdocs-0703.json",
+    "note": [
+      "baseandvirtualdocs/iterate ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/baseandvirtualdocs/test-baseandvirtualdocs-0704.json",
+    "note": [
+      "baseandvirtualdocs/base/virtual: conflicts"
+    ]
+  },
+  {
+    "file": "TestData/v1/baseandvirtualdocs/test-baseandvirtualdocs-0705.json",
+    "note": [
+      "baseandvirtualdocs/enumerate virtual errors"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsand/test-bitsand-0055.json",
+    "note": [
+      "bitsand/basic bitwise-and"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsand/test-bitsand-0056.json",
+    "note": [
+      "bitsand/and with zero is and"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsand/test-bitsand-0057.json",
+    "note": [
+      "bitsand/lhs (float) error"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsnegate/test-bitsnegate-0058.json",
+    "note": [
+      "bitsnegate/basic bitwise-negate"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsnegate/test-bitsnegate-0059.json",
+    "note": [
+      "bitsnegate/float error"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsor/test-bitsor-0052.json",
+    "note": [
+      "bitsor/basic bitwise-or"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsor/test-bitsor-0053.json",
+    "note": [
+      "bitsor/or with zero is value"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsor/test-bitsor-0054.json",
+    "note": [
+      "bitsor/lhs (float) error"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsshiftleft/test-bitsshiftleft-0063.json",
+    "note": [
+      "bitsshiftleft/basic shift-left"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsshiftleft/test-bitsshiftleft-0064.json",
+    "note": [
+      "bitsshiftleft/lhs (float) error"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsshiftleft/test-bitsshiftleft-0065.json",
+    "note": [
+      "bitsshiftleft/rhs must be unsigned"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsshiftleft/test-bitsshiftleft-0066.json",
+    "note": [
+      "bitsshiftleft/shift of max int32 doesn't overflow"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsshiftleft/test-bitsshiftleft-0067.json",
+    "note": [
+      "bitsshiftleft/shift of max int64 doesn't overflow and is not lossy"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsshiftright/test-bitsshiftright-0068.json",
+    "note": [
+      "bitsshiftright/basic shift-right"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsshiftright/test-bitsshiftright-0069.json",
+    "note": [
+      "bitsshiftright/lhs (float) error"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsshiftright/test-bitsshiftright-0070.json",
+    "note": [
+      "bitsshiftright/rhs must be unsigned"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsxor/test-bitsxor-0060.json",
+    "note": [
+      "bitsxor/basic bitwise-xor"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsxor/test-bitsxor-0061.json",
+    "note": [
+      "bitsxor/xor same is 0"
+    ]
+  },
+  {
+    "file": "TestData/v1/bitsxor/test-bitsxor-0062.json",
+    "note": [
+      "bitsxor/lhs (float) error"
+    ]
+  },
+  {
+    "file": "TestData/v1/casts/test-casts-0824.json",
+    "note": [
+      "casts/to_number"
+    ]
+  },
+  {
+    "file": "TestData/v1/casts/test-casts-0825.json",
+    "note": [
+      "casts/to_number ref dest"
+    ]
+  },
+  {
+    "file": "TestData/v1/casts/test-casts-0826.json",
+    "note": [
+      "casts/to_number ref dest"
+    ]
+  },
+  {
+    "file": "TestData/v1/casts/test-casts-0827.json",
+    "note": [
+      "casts/to_number: bad input"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0608.json",
+    "note": [
+      "comparisonexpr/equals"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0609.json",
+    "note": [
+      "comparisonexpr/noteq"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0610.json",
+    "note": [
+      "comparisonexpr/gt"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0611.json",
+    "note": [
+      "comparisonexpr/gteq"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0612.json",
+    "note": [
+      "comparisonexpr/lt"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0613.json",
+    "note": [
+      "comparisonexpr/lteq"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0614.json",
+    "note": [
+      "comparisonexpr/undefined: equals"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0615.json",
+    "note": [
+      "comparisonexpr/undefined: noteq"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0616.json",
+    "note": [
+      "comparisonexpr/undefined: gt"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0617.json",
+    "note": [
+      "comparisonexpr/undefined: gteq"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0618.json",
+    "note": [
+      "comparisonexpr/undefined: lt"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0619.json",
+    "note": [
+      "comparisonexpr/undefined: lteq"
+    ]
+  },
+  {
+    "file": "TestData/v1/comparisonexpr/test-comparisonexpr-0620.json",
+    "note": [
+      "comparisonexpr/numbers: int and float comparison",
+      "comparisonexpr/numbers: int and float array comparison",
+      "comparisonexpr/numbers: int and float object comparison",
+      "comparisonexpr/numbers: int and float nested object comparison"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0495.json",
+    "note": [
+      "completedoc/undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0496.json",
+    "note": [
+      "completedoc/null"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0497.json",
+    "note": [
+      "completedoc/bool: true"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0498.json",
+    "note": [
+      "completedoc/bool: false"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0499.json",
+    "note": [
+      "completedoc/number: 3"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0500.json",
+    "note": [
+      "completedoc/number: 3.0"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0501.json",
+    "note": [
+      "completedoc/number: 66.66667"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0502.json",
+    "note": [
+      "completedoc/string: \"hello\""
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0503.json",
+    "note": [
+      "completedoc/string: \"\""
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0504.json",
+    "note": [
+      "completedoc/array: [1,2,3,4]"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0505.json",
+    "note": [
+      "completedoc/array: []"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0506.json",
+    "note": [
+      "completedoc/object/nested composites: {\"a\": [1], \"b\": [2], \"c\": [3]}"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0507.json",
+    "note": [
+      "completedoc/object/non-string key:"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0508.json",
+    "note": [
+      "completedoc/set/nested: {{1,2},{2,3}}"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0509.json",
+    "note": [
+      "completedoc/vars"
+    ]
+  },
+  {
+    "file": "TestData/v1/completedoc/test-completedoc-0510.json",
+    "note": [
+      "completedoc/vars conflict"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositebasedereference/test-compositebasedereference-1073.json",
+    "note": [
+      "compositebasedereference/array"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositebasedereference/test-compositebasedereference-1074.json",
+    "note": [
+      "compositebasedereference/object"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositebasedereference/test-compositebasedereference-1075.json",
+    "note": [
+      "compositebasedereference/set"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0743.json",
+    "note": [
+      "compositereferences/array"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0744.json",
+    "note": [
+      "compositereferences/object"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0745.json",
+    "note": [
+      "compositereferences/set"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0746.json",
+    "note": [
+      "compositereferences/unify array"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0747.json",
+    "note": [
+      "compositereferences/unify object"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0748.json",
+    "note": [
+      "compositereferences/unify partial ground array"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0749.json",
+    "note": [
+      "compositereferences/complete doc unify"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0750.json",
+    "note": [
+      "compositereferences/partial doc unify"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0751.json",
+    "note": [
+      "compositereferences/empty set"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0752.json",
+    "note": [
+      "compositereferences/ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0753.json",
+    "note": [
+      "compositereferences/nested ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0754.json",
+    "note": [
+      "compositereferences/comprehension"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0755.json",
+    "note": [
+      "compositereferences/missing array"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0756.json",
+    "note": [
+      "compositereferences/missing object value"
+    ]
+  },
+  {
+    "file": "TestData/v1/compositereferences/test-compositereferences-0757.json",
+    "note": [
+      "compositereferences/missing set"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0781.json",
+    "note": [
+      "comprehensions/array simple"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0782.json",
+    "note": [
+      "comprehensions/array nested"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0783.json",
+    "note": [
+      "comprehensions/array embedded array"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0784.json",
+    "note": [
+      "comprehensions/array embedded object"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0785.json",
+    "note": [
+      "comprehensions/array embedded set"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0786.json",
+    "note": [
+      "comprehensions/array closure"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0787.json",
+    "note": [
+      "comprehensions/array dereference embedded"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0788.json",
+    "note": [
+      "comprehensions/object simple"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0789.json",
+    "note": [
+      "comprehensions/object non-string key"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0790.json",
+    "note": [
+      "comprehensions/object nested"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0791.json",
+    "note": [
+      "comprehensions/object embedded array"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0792.json",
+    "note": [
+      "comprehensions/object embedded object"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0793.json",
+    "note": [
+      "comprehensions/object embedded set"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0794.json",
+    "note": [
+      "comprehensions/object closure"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0795.json",
+    "note": [
+      "comprehensions/object dereference embedded"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0796.json",
+    "note": [
+      "comprehensions/object conflict"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0797.json",
+    "note": [
+      "comprehensions/set simple"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0798.json",
+    "note": [
+      "comprehensions/set nested"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0799.json",
+    "note": [
+      "comprehensions/set embedded array"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0800.json",
+    "note": [
+      "comprehensions/set embedded object"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0801.json",
+    "note": [
+      "comprehensions/set embedded set"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0802.json",
+    "note": [
+      "comprehensions/set closure"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-0803.json",
+    "note": [
+      "comprehensions/set dereference embedded"
+    ]
+  },
+  {
+    "file": "TestData/v1/comprehensions/test-comprehensions-and-vars.json",
+    "note": [
+      "comprehensions/var bindings have no effect outside"
+    ]
+  },
+  {
+    "file": "TestData/v1/containskeyword/test-contains-future-keyword.json",
+    "note": [
+      "containskeyword/base case",
+      "containskeyword/with unused kw import",
+      "containskeyword/with kw and builtin used",
+      "containskeyword/empty body",
+      "containskeyword/ordinary deny rule"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptohmacequal/test-cryptohmacequal.json",
+    "note": [
+      "cryptohmacequal/crypto.hmac.equal_md5",
+      "cryptohmacequal/crypto.hmac.equal_sha1",
+      "cryptohmacequal/crypto.hmac.equal_sha256",
+      "cryptohmacequal/crypto.hmac.equal_sha512",
+      "cryptohmacequal/crypto.hmac.equal_false"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptohmacmd5/test-cryptohmacmd5.json",
+    "note": [
+      "cryptohmacmd5/crypto.hmac.md5",
+      "cryptohmacmd5/crypto.hmac.md5_unicode"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptohmacsha1/test-cryptohmacsha1.json",
+    "note": [
+      "cryptohmacsha1/crypto.hmac.sha1",
+      "cryptohmacsha1/crypto.hmac.sha1_unicode"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptohmacsha256/test-cryptohmacsha256.json",
+    "note": [
+      "cryptohmacsha256/crypto.hmac.sha256",
+      "cryptohmacsha256/crypto.hmac.sha256_unicode"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptohmacsha512/test-cryptohmacsha512.json",
+    "note": [
+      "cryptohmacsha512/crypto.hmac.sha512",
+      "cryptohmacsha512/crypto.hmac.sha512_unicode"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptomd5/test-cryptomd5-0130.json",
+    "note": [
+      "cryptomd5/crypto.md5 with string"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptoparsersaprivatekeys/test-cryptoparsersaprivatekey-1.json",
+    "note": [
+      "cryptoparseprivatekey/valid",
+      "cryptoparseprivatekey/invalid",
+      "cryptoparseprivatekey/invalid"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptosha1/test-cryptosha1-0131.json",
+    "note": [
+      "cryptosha1/crypto.sha1 with string"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptosha256/test-cryptosha256-0132.json",
+    "note": [
+      "cryptosha256/crypto.sha256 with string"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parseandverifycertificates/test-cryptox509parseandverifycertificates.json",
+    "note": [
+      "cryptox509parseandverifycertificates/base_case",
+      "cryptox509parseandverifycertificates/uri_strings"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificaterequest/test-cryptox509parsecertificaterequest-0125.json",
+    "note": [
+      "cryptox509parsecertificaterequest/PEM, b64"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificaterequest/test-cryptox509parsecertificaterequest-0126.json",
+    "note": [
+      "cryptox509parsecertificaterequest/PEM, string"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificaterequest/test-cryptox509parsecertificaterequest-0127.json",
+    "note": [
+      "cryptox509parsecertificaterequest/DER, b64"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificaterequest/test-cryptox509parsecertificaterequest-0128.json",
+    "note": [
+      "cryptox509parsecertificaterequest/invalid DER or PEM data, b64"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificaterequest/test-cryptox509parsecertificaterequest-0129.json",
+    "note": [
+      "cryptox509parsecertificaterequest/invalid DER or PEM data, string"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificates/test-cryptox509parsecertificates-0117.json",
+    "note": [
+      "cryptox509parsecertificates/DER, single cert, b64"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificates/test-cryptox509parsecertificates-0118.json",
+    "note": [
+      "cryptox509parsecertificates/DER, chain, b64"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificates/test-cryptox509parsecertificates-0119.json",
+    "note": [
+      "cryptox509parsecertificates/PEM, single cert, b64"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificates/test-cryptox509parsecertificates-0120.json",
+    "note": [
+      "cryptox509parsecertificates/PEM, single cert, string"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificates/test-cryptox509parsecertificates-0121.json",
+    "note": [
+      "cryptox509parsecertificates/PEM, chain, b64"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificates/test-cryptox509parsecertificates-0122.json",
+    "note": [
+      "cryptox509parsecertificates/PEM, chain, string"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificates/test-cryptox509parsecertificates-0123.json",
+    "note": [
+      "cryptox509parsecertificates/invalid DER or PEM data, b64"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificates/test-cryptox509parsecertificates-0124.json",
+    "note": [
+      "cryptox509parsecertificates/invalid DER or PEM data, string"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsecertificates/test-cryptox509parsecertificates-raw-uris.json",
+    "note": [
+      "cryptox509parsecertificates/uri_strings",
+      "cryptox509parsecertificates/uri_strings_no_uris"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsekeypair/test-cryptox509parsekeypairs-0118.json",
+    "note": [
+      "cryptoX509ParseKeyPairs/PEM_encoded_string_cert_and_key"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsekeypair/test-cryptox509parsekeypairs-0119.json",
+    "note": [
+      "cryptoX509ParseKeyPairs/base64_encoded_string_cert_and_key"
+    ]
+  },
+  {
+    "file": "TestData/v1/cryptox509parsersaprivatekey/test-cryptox509parsersaprivatekey-1.json",
+    "note": [
+      "cryptox509parsersaprivatekey/valid",
+      "cryptox509parsersaprivatekey/invalid"
+    ]
+  },
+  {
+    "file": "TestData/v1/dataderef/test-data-derefs.json",
+    "note": [
+      "data/toplevel integer",
+      "data/nested integer",
+      "data/negative case: nested integer"
+    ]
+  },
+  {
+    "file": "TestData/v1/defaultkeyword/test-default-functions.json",
+    "note": [
+      "defaultkeyword/function with var arg",
+      "defaultkeyword/function with var arg, ref head",
+      "defaultkeyword/function with var arg, ref head query"
+    ]
+  },
+  {
+    "file": "TestData/v1/defaultkeyword/test-defaultkeyword-0804.json",
+    "note": [
+      "defaultkeyword/undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/defaultkeyword/test-defaultkeyword-0805.json",
+    "note": [
+      "defaultkeyword/defined"
+    ]
+  },
+  {
+    "file": "TestData/v1/defaultkeyword/test-defaultkeyword-0806.json",
+    "note": [
+      "defaultkeyword/defined-ooo"
+    ]
+  },
+  {
+    "file": "TestData/v1/defaultkeyword/test-defaultkeyword-0807.json",
+    "note": [
+      "defaultkeyword/array comprehension"
+    ]
+  },
+  {
+    "file": "TestData/v1/defaultkeyword/test-defaultkeyword-0808.json",
+    "note": [
+      "defaultkeyword/object comprehension"
+    ]
+  },
+  {
+    "file": "TestData/v1/defaultkeyword/test-defaultkeyword-0809.json",
+    "note": [
+      "defaultkeyword/set comprehension"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0763.json",
+    "note": [
+      "disjunction/incr: query set"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0764.json",
+    "note": [
+      "disjunction/incr: query set constants"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0765.json",
+    "note": [
+      "disjunction/incr: query object"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0766.json",
+    "note": [
+      "disjunction/incr: query object constant key"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0767.json",
+    "note": [
+      "disjunction/incr: iter set"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0768.json",
+    "note": [
+      "disjunction/incr: eval set"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0769.json",
+    "note": [
+      "disjunction/incr: eval object"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0770.json",
+    "note": [
+      "disjunction/incr: eval object constant key"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0771.json",
+    "note": [
+      "disjunction/complete: undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0772.json",
+    "note": [
+      "disjunction/complete: error"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0773.json",
+    "note": [
+      "disjunction/complete: valid"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0774.json",
+    "note": [
+      "disjunction/complete: valid-2"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0775.json",
+    "note": [
+      "disjunction/complete: reference error",
+      "disjunction/complete: nested conflict, else",
+      "disjunction/nested function with conflict",
+      "disjunction/nested function with conflict, else",
+      "disjunction/complete: conflict involving early-exit complete rule (set enumeration)",
+      "disjunction/complete: conflict involving early-exit complete rule (array enumeration)",
+      "disjunction/complete: conflict involving early-exit complete rule (object enumeration)",
+      "disjunction/complete: conflict involving early-exit partial rule",
+      "disjunction/complete: conflict involving early-exit complete rule, else",
+      "disjunction/complete: conflict involving early-exit complete rule, multiple",
+      "disjunction/complete: conflict involving early-exit complete rule, data array enumeration",
+      "disjunction/complete: conflict involving early-exit complete rule, data object enumeration"
+    ]
+  },
+  {
+    "file": "TestData/v1/disjunction/test-disjunction-0776.json",
+    "note": [
+      "disjunction/complete: reference valid"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1054.json",
+    "note": [
+      "elsekeyword/no-op"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1055.json",
+    "note": [
+      "elsekeyword/trivial"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1056.json",
+    "note": [
+      "elsekeyword/trivial-non-bool"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1057.json",
+    "note": [
+      "elsekeyword/trivial-3"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1058.json",
+    "note": [
+      "elsekeyword/var-head"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1059.json",
+    "note": [
+      "elsekeyword/ref-head"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1060.json",
+    "note": [
+      "elsekeyword/first-match"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1061.json",
+    "note": [
+      "elsekeyword/default-1"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1062.json",
+    "note": [
+      "elsekeyword/default-2"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1063.json",
+    "note": [
+      "elsekeyword/multiple-roots"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1064.json",
+    "note": [
+      "elsekeyword/indexed"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1065.json",
+    "note": [
+      "elsekeyword/conflict-1"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1066.json",
+    "note": [
+      "elsekeyword/conflict-2"
+    ]
+  },
+  {
+    "file": "TestData/v1/elsekeyword/test-elsekeyword-1067.json",
+    "note": [
+      "elsekeyword/functions"
+    ]
+  },
+  {
+    "file": "TestData/v1/embeddedvirtualdoc/test-embeddedvirtualdoc-0976.json",
+    "note": [
+      "embeddedvirtualdoc/deep embedded vdoc"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0545.json",
+    "note": [
+      "eqexpr/undefined: same type"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0546.json",
+    "note": [
+      "eqexpr/undefined: array order"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0547.json",
+    "note": [
+      "eqexpr/undefined: ref value"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0548.json",
+    "note": [
+      "eqexpr/undefined: ref values"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0549.json",
+    "note": [
+      "eqexpr/undefined: ground var"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0550.json",
+    "note": [
+      "eqexpr/undefined: array var 1"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0551.json",
+    "note": [
+      "eqexpr/undefined: array var 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0552.json",
+    "note": [
+      "eqexpr/undefined: object var 1"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0553.json",
+    "note": [
+      "eqexpr/undefined: array deep var 1"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0554.json",
+    "note": [
+      "eqexpr/undefined: array deep var 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0555.json",
+    "note": [
+      "eqexpr/undefined: set"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0556.json",
+    "note": [
+      "eqexpr/ground: bool"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0557.json",
+    "note": [
+      "eqexpr/ground: string"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0558.json",
+    "note": [
+      "eqexpr/ground: number"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0559.json",
+    "note": [
+      "eqexpr/ground: null"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0560.json",
+    "note": [
+      "eqexpr/ground: array"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0561.json",
+    "note": [
+      "eqexpr/ground: set"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0562.json",
+    "note": [
+      "eqexpr/ground: object"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0563.json",
+    "note": [
+      "eqexpr/ground: ref 1"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0564.json",
+    "note": [
+      "eqexpr/ground: ref 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0565.json",
+    "note": [
+      "eqexpr/ground: ref 3"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0566.json",
+    "note": [
+      "eqexpr/ground: ref 4"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0567.json",
+    "note": [
+      "eqexpr/var: x=y=z"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0568.json",
+    "note": [
+      "eqexpr/var: ref value"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0569.json",
+    "note": [
+      "eqexpr/var: ref values"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0570.json",
+    "note": [
+      "eqexpr/var: ref key"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0571.json",
+    "note": [
+      "eqexpr/var: ref keys"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0572.json",
+    "note": [
+      "eqexpr/var: ref ground var"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0573.json",
+    "note": [
+      "eqexpr/var: ref ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0574.json",
+    "note": [
+      "eqexpr/pattern: array"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0575.json",
+    "note": [
+      "eqexpr/pattern: array 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0576.json",
+    "note": [
+      "eqexpr/pattern: array same var"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0577.json",
+    "note": [
+      "eqexpr/pattern: array multiple vars"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0578.json",
+    "note": [
+      "eqexpr/pattern: array multiple vars 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0579.json",
+    "note": [
+      "eqexpr/pattern: array ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0580.json",
+    "note": [
+      "eqexpr/pattern: array non-ground ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0581.json",
+    "note": [
+      "eqexpr/pattern: array = ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0582.json",
+    "note": [
+      "eqexpr/pattern: array = ref (reversed)"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0583.json",
+    "note": [
+      "eqexpr/pattern: array = var"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0584.json",
+    "note": [
+      "eqexpr/pattern: object val"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0585.json",
+    "note": [
+      "eqexpr/pattern: object same var"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0586.json",
+    "note": [
+      "eqexpr/pattern: object multiple vars"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0587.json",
+    "note": [
+      "eqexpr/pattern: object multiple vars 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0588.json",
+    "note": [
+      "eqexpr/pattern: object ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0589.json",
+    "note": [
+      "eqexpr/pattern: object non-ground ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0590.json",
+    "note": [
+      "eqexpr/pattern: object = ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0591.json",
+    "note": [
+      "eqexpr/pattern: object = ref (reversed)"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0592.json",
+    "note": [
+      "eqexpr/pattern: object = var"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0593.json",
+    "note": [
+      "eqexpr/pattern: object/array nested"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0594.json",
+    "note": [
+      "eqexpr/pattern: object/array nested 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0595.json",
+    "note": [
+      "eqexpr/unordered: sets"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0596.json",
+    "note": [
+      "eqexpr/unordered: object keys"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0597.json",
+    "note": [
+      "eqexpr/unordered: object keys (reverse)"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0598.json",
+    "note": [
+      "eqexpr/indexing: intersection"
+    ]
+  },
+  {
+    "file": "TestData/v1/eqexpr/test-eqexpr-0599.json",
+    "note": [
+      "eqexpr/indexing: input is 1.0",
+      "eqexpr/indexing: input is 1"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0525.json",
+    "note": [
+      "evaltermexpr/true"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0526.json",
+    "note": [
+      "evaltermexpr/false"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0527.json",
+    "note": [
+      "evaltermexpr/number non-zero"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0528.json",
+    "note": [
+      "evaltermexpr/number zero"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0529.json",
+    "note": [
+      "evaltermexpr/null"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0530.json",
+    "note": [
+      "evaltermexpr/string non-empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0531.json",
+    "note": [
+      "evaltermexpr/string empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0532.json",
+    "note": [
+      "evaltermexpr/array non-empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0533.json",
+    "note": [
+      "evaltermexpr/array empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0534.json",
+    "note": [
+      "evaltermexpr/object non-empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0535.json",
+    "note": [
+      "evaltermexpr/object empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0536.json",
+    "note": [
+      "evaltermexpr/set non-empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0537.json",
+    "note": [
+      "evaltermexpr/set empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0538.json",
+    "note": [
+      "evaltermexpr/ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0539.json",
+    "note": [
+      "evaltermexpr/ref undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0540.json",
+    "note": [
+      "evaltermexpr/ref undefined (path)"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0541.json",
+    "note": [
+      "evaltermexpr/ref false"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0542.json",
+    "note": [
+      "evaltermexpr/array comprehension"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0543.json",
+    "note": [
+      "evaltermexpr/array comprehension empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/evaltermexpr/test-evaltermexpr-0544.json",
+    "note": [
+      "evaltermexpr/arbitrary position"
+    ]
+  },
+  {
+    "file": "TestData/v1/every/every.json",
+    "note": [
+      "every/empty domain (array)",
+      "every/empty domain (set)",
+      "every/empty domain (object)",
+      "every/empty domain (partial rule ref)",
+      "every/domain undefined (input)",
+      "every/domain undefined (data ref)",
+      "every/domain is call",
+      "every/simple key/val",
+      "every/simple key/val (set)",
+      "every/simple key/val (partial rule ref)",
+      "every/outer bindings",
+      "every/simple failure, first",
+      "every/simple failure, last",
+      "every/with: domain",
+      "every/with: body",
+      "every/followed by another query",
+      "every/array with calls",
+      "every/array with calls (fail)"
+    ]
+  },
+  {
+    "file": "TestData/v1/every/non_iterable_domain.json",
+    "note": [
+      "every/non-iter domain: int",
+      "every/non-iter domain: string",
+      "every/non-iter domain: bool",
+      "every/non-iter domain: null",
+      "every/non-iter domain: built-in call",
+      "every/non-iter domain: function call",
+      "every/non-iter domain: rule ref",
+      "every/non-iter domain: data int",
+      "every/non-iter domain: input int",
+      "every/non-iter domain: input int (1st level)"
+    ]
+  },
+  {
+    "file": "TestData/v1/every/textbook.json",
+    "note": [
+      "every/example, fail",
+      "every/example, success",
+      "every/example with two sets",
+      "every/example with two sets (fail)",
+      "every/example every/some, fail",
+      "every/example every/some, success",
+      "every/example some/every"
+    ]
+  },
+  {
+    "file": "TestData/v1/example/test-example-1070.json",
+    "note": [
+      "example/public servers"
+    ]
+  },
+  {
+    "file": "TestData/v1/example/test-example-1071.json",
+    "note": [
+      "example/violations"
+    ]
+  },
+  {
+    "file": "TestData/v1/example/test-example-1072.json",
+    "note": [
+      "example/both"
+    ]
+  },
+  {
+    "file": "TestData/v1/fix1863/test-fix1863-0706.json",
+    "note": [
+      "fix1863/is defined"
+    ]
+  },
+  {
+    "file": "TestData/v1/fix1863/test-fix1863-0707.json",
+    "note": [
+      "fix1863/is defined"
+    ]
+  },
+  {
+    "file": "TestData/v1/fix1863/test-fix1863-0708.json",
+    "note": [
+      "fix1863/is defined"
+    ]
+  },
+  {
+    "file": "TestData/v1/functionerrors/test-conflicts.json",
+    "note": [
+      "functionerrors/conflict: plain false and true result, first round",
+      "functionerrors/conflict: plain false and true result, second round"
+    ]
+  },
+  {
+    "file": "TestData/v1/functionerrors/test-functionerrors-1012.json",
+    "note": [
+      "functionerrors/function output conflict single",
+      "functionerrors/function output conflict, used as boolean"
+    ]
+  },
+  {
+    "file": "TestData/v1/functionerrors/test-functionerrors-1013.json",
+    "note": [
+      "functionerrors/function input no match"
+    ]
+  },
+  {
+    "file": "TestData/v1/functionerrors/test-functionerrors-1014.json",
+    "note": [
+      "functionerrors/function output conflict multiple"
+    ]
+  },
+  {
+    "file": "TestData/v1/functionerrors/test-functionerrors-undefined-builtin-result.json",
+    "note": [
+      "functionerrors/undefined builtin result"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-0990.json",
+    "note": [
+      "functions/basic call"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-0991.json",
+    "note": [
+      "functions/false result"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-0992.json",
+    "note": [
+      "functions/false result negation"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-0993.json",
+    "note": [
+      "functions/false else value"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-0994.json",
+    "note": [
+      "functions/false else undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-0995.json",
+    "note": [
+      "functions/false else negation"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-0996.json",
+    "note": [
+      "functions/chained"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-0997.json",
+    "note": [
+      "functions/cross package"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-0998.json",
+    "note": [
+      "functions/array params"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-0999.json",
+    "note": [
+      "functions/object params"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-1000.json",
+    "note": [
+      "functions/ref func output"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-1001.json",
+    "note": [
+      "functions/always_true"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-1002.json",
+    "note": [
+      "functions/same package call"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-1003.json",
+    "note": [
+      "functions/void good"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-1004.json",
+    "note": [
+      "functions/void bad"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-1005.json",
+    "note": [
+      "functions/multi1"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-1006.json",
+    "note": [
+      "functions/multi2"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-1007.json",
+    "note": [
+      "functions/multi3"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-1008.json",
+    "note": [
+      "functions/multi4"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-1009.json",
+    "note": [
+      "functions/multi cross package"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-1010.json",
+    "note": [
+      "functions/skip-functions"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-1011.json",
+    "note": [
+      "functions/omit result"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-default.json",
+    "note": [
+      "functions/default",
+      "functions/non default",
+      "functions/only default",
+      "functions/wildcard args",
+      "functions/comprehensions"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-nested-with-early-exit.json",
+    "note": [
+      "functions/nested complete doc with conflict",
+      "functions/nested complete doc with conflict, else",
+      "functions/nested function with conflict",
+      "functions/nested function with conflict, else",
+      "functions/nested function with conflict, else, no extra return"
+    ]
+  },
+  {
+    "file": "TestData/v1/functions/test-functions-unused-arg.json",
+    "note": [
+      "unused arg"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0133.json",
+    "note": [
+      "globmatch/glob match with . delimiter"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0134.json",
+    "note": [
+      "globmatch/super glob match with . delimiter"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0135.json",
+    "note": [
+      "globmatch/super glob match with . delimiter"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0136.json",
+    "note": [
+      "globmatch/glob match with : delimiter"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0137.json",
+    "note": [
+      "globmatch/glob no match with . delimiter"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0138.json",
+    "note": [
+      "globmatch/glob match with character-list matchers"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0139.json",
+    "note": [
+      "globmatch/glob no match with character-list matchers"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0140.json",
+    "note": [
+      "globmatch/glob match with negated character-list matchers"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0141.json",
+    "note": [
+      "globmatch/glob no match with negated character-list matchers"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0142.json",
+    "note": [
+      "globmatch/glob match with character-range matchers"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0143.json",
+    "note": [
+      "globmatch/glob no match with character-range matchers"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0144.json",
+    "note": [
+      "globmatch/glob no match with character-range matchers"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0145.json",
+    "note": [
+      "globmatch/glob match with character-range matchers"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0146.json",
+    "note": [
+      "globmatch/glob match with single wild-card"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0147.json",
+    "note": [
+      "globmatch/glob no match with single wild-card"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0148.json",
+    "note": [
+      "globmatch/glob match with single wild-card and delimiter"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0149.json",
+    "note": [
+      "globmatch/glob no match with single wild-card and delimiter"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0150.json",
+    "note": [
+      "globmatch/glob match with pattern-alternatives list (cat)"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0151.json",
+    "note": [
+      "globmatch/glob match with pattern-alternatives list (bat)"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0152.json",
+    "note": [
+      "globmatch/glob match with pattern-alternatives list (fat)"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0153.json",
+    "note": [
+      "globmatch/glob match with pattern-alternatives list (rat)"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0154.json",
+    "note": [
+      "globmatch/glob no match with pattern-alternatives list"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0155.json",
+    "note": [
+      "globmatch/glob match single with . delimiter"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0156.json",
+    "note": [
+      "globmatch/glob match single with default delimiter"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0157.json",
+    "note": [
+      "globmatch/glob no match single with . delimiter"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0158.json",
+    "note": [
+      "globmatch/glob no match single with default delimiter"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-0159.json",
+    "note": [
+      "globmatch/glob match single without default delimiter",
+      "globmatch/glob match single without default delimiter, glob non-empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-issue-5273.json",
+    "note": [
+      "globmatch/no deadlocks for glob match"
+    ]
+  },
+  {
+    "file": "TestData/v1/globmatch/test-globmatch-issue-5283.json",
+    "note": [
+      "globmatch/captured negative results, variable",
+      "globmatch/captured negative result, constant"
+    ]
+  },
+  {
+    "file": "TestData/v1/globquotemeta/test-globquotemeta-0159.json",
+    "note": [
+      "globquotemeta/glob quote meta"
+    ]
+  },
+  {
+    "file": "TestData/v1/globsmatch/test-globsmatch-0865.json",
+    "note": [
+      "globsmatch/regex.globs_match"
+    ]
+  },
+  {
+    "file": "TestData/v1/globsmatch/test-globsmatch-0866.json",
+    "note": [
+      "globsmatch/regex.globs_match"
+    ]
+  },
+  {
+    "file": "TestData/v1/globsmatch/test-globsmatch-0867.json",
+    "note": [
+      "globsmatch/regex.globs_match: bad pattern err"
+    ]
+  },
+  {
+    "file": "TestData/v1/globsmatch/test-globsmatch-0868.json",
+    "note": [
+      "globsmatch/regex.globs_match: ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/globsmatch/test-globsmatch-0869.json",
+    "note": [
+      "globsmatch/regex.globs_match: raw"
+    ]
+  },
+  {
+    "file": "TestData/v1/globsmatch/test-globsmatch-0870.json",
+    "note": [
+      "globsmatch/regex.globs_match: raw: undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/graphql/test-graphql-basic-ast.json",
+    "note": [
+      "graphql_parse_query/success-basic-ast simple query",
+      "graphql_parse_query/success-basic-ast with arguments",
+      "graphql_parse_query/success-basic-ast inline fragments and type conditions",
+      "graphql_parse_query/success-basic-ast meta fields and introspection"
+    ]
+  },
+  {
+    "file": "TestData/v1/graphql/test-graphql-is-valid.json",
+    "note": [
+      "graphql_is_valid/success extending non-existent types",
+      "graphql_is_valid/success validation rules are independent case 1",
+      "graphql_is_valid/success validation rules are independent case 2",
+      "graphql_is_valid/success deprecating types",
+      "graphql_is_valid/success no unused variables",
+      "graphql_is_valid/success - AST objects - Employee example"
+    ]
+  },
+  {
+    "file": "TestData/v1/graphql/test-graphql-parse-and-verify.json",
+    "note": [
+      "graphql_parse_and_verify/success extending non-existent types",
+      "graphql_parse_and_verify/success validation rules are independent case 1",
+      "graphql_parse_and_verify/success validation rules are independent case 2",
+      "graphql_parse_and_verify/success deprecating types",
+      "graphql_parse_and_verify/success no unused variables",
+      "graphql_parse_and_verify/success - AST objects - Employee example"
+    ]
+  },
+  {
+    "file": "TestData/v1/graphql/test-graphql-parse-query.json",
+    "note": [
+      "graphql_parse_query/failure-unclosed paren",
+      "graphql_parse_query/failure-missing on in fragment",
+      "graphql_parse_query/failure-missing name after alias",
+      "graphql_parse_query/failure-not an operation",
+      "graphql_parse_query/failure-a wild splat appears",
+      "graphql_parse_query/success-variables are allowed in args",
+      "graphql_parse_query/failure-variables are not allowed in default args",
+      "graphql_parse_query/success-variables can have directives",
+      "graphql_parse_query/failure-fragment can not be named 'on'",
+      "graphql_parse_query/failure-fragment can not spread fragments called 'on'",
+      "graphql_parse_query/success-encoding multibyte characters are supported",
+      "graphql_parse_query/success-keywords-allowed-where-names-are on",
+      "graphql_parse_query/success-keywords-allowed-where-names-are subscription",
+      "graphql_parse_query/success-keywords-allowed-where-names-are true",
+      "graphql_parse_query/success-operations anonymous mutation",
+      "graphql_parse_query/success-operations named mutation",
+      "graphql_parse_query/success-operations anonymous subscription",
+      "graphql_parse_query/success-operations named subscription",
+      "graphql_parse_query/success-ast simple query",
+      "graphql_parse_query/success-ast nameless query with no variables",
+      "graphql_parse_query/success-ast fragment defined variables",
+      "graphql_parse_query/success-values null",
+      "graphql_parse_query/success-values strings",
+      "graphql_parse_query/success-values list",
+      "graphql_parse_query/success-types common types",
+      "graphql_parse_query/success-large-queries kitchen sink",
+      "graphql_parse_query/failure-fuzzer 01",
+      "graphql_parse_query/failure-fuzzer 02"
+    ]
+  },
+  {
+    "file": "TestData/v1/graphql/test-graphql-parse-schema.json",
+    "note": [
+      "graphql_parse_schema/success-object-types simple",
+      "graphql_parse_schema/success-object-types with description",
+      "graphql_parse_schema/success-object-types with block description",
+      "graphql_parse_schema/success-object-types with field arg",
+      "graphql_parse_schema/success-object-types with field arg and default value",
+      "graphql_parse_schema/success-object-types with field list arg",
+      "graphql_parse_schema/success-object-types with two args",
+      "graphql_parse_schema/failure-object-types must define one or more fields",
+      "graphql_parse_schema/success-type-extensions Object extension",
+      "graphql_parse_schema/success-type-extensions without any fields",
+      "graphql_parse_schema/success-type-extensions without fields twice",
+      "graphql_parse_schema/failure-type-extensions without anything errors",
+      "graphql_parse_schema/failure-type-extensions can have descriptions",
+      "graphql_parse_schema/failure-type-extensions can not have descriptions on types",
+      "graphql_parse_schema/success-type-extensions all can have directives",
+      "graphql_parse_schema/success-schema-definition simple",
+      "graphql_parse_schema/success-schema-extensions simple",
+      "graphql_parse_schema/success-schema-extensions directive only",
+      "graphql_parse_schema/failure-schema-extensions without anything errors",
+      "graphql_parse_schema/success-inheritance single",
+      "graphql_parse_schema/success-inheritance multi",
+      "graphql_parse_schema/success-inheritance multi with leading amp",
+      "graphql_parse_schema/success-enums single value",
+      "graphql_parse_schema/success-enums double value",
+      "graphql_parse_schema/failure-enums must define one or more unique enum values",
+      "graphql_parse_schema/success-interface simple",
+      "graphql_parse_schema/failure-interface must define one or more fields",
+      "graphql_parse_schema/success-interface may define intermediate interfaces",
+      "graphql_parse_schema/success-unions simple",
+      "graphql_parse_schema/success-unions with two types",
+      "graphql_parse_schema/success-unions with leading pipe",
+      "graphql_parse_schema/failure-unions cant be empty",
+      "graphql_parse_schema/failure-unions cant double pipe",
+      "graphql_parse_schema/failure-unions cant have trailing pipe",
+      "graphql_parse_schema/success-scalar simple",
+      "graphql_parse_schema/success-input-object simple",
+      "graphql_parse_schema/failure-input-object can not have args",
+      "graphql_parse_schema/failure-input-object must define one or more input fields",
+      "graphql_parse_schema/success-directives simple",
+      "graphql_parse_schema/success-directives executable",
+      "graphql_parse_schema/success-directives repeatable",
+      "graphql_parse_schema/failure-directives invalid location",
+      "graphql_parse_schema/failure-fuzzer 1",
+      "graphql_parse_schema/failure-fuzzer 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/graphql/test-graphql-parse.json",
+    "note": [
+      "graphql_parse/success extending non-existent types",
+      "graphql_parse/failure validation rules are independent case 1",
+      "graphql_parse/success validation rules are independent case 2",
+      "graphql_parse/success deprecating types",
+      "graphql_parse/success no unused variables",
+      "graphql_parse/success - AST objects - Employee example"
+    ]
+  },
+  {
+    "file": "TestData/v1/graphql/test-graphql-schema-is-valid.json",
+    "note": [
+      "graphql_schema_is_valid/success extending non-existent types",
+      "graphql_schema_is_valid/success validation rules are independent case 1 and 2",
+      "graphql_schema_is_valid/success deprecating types",
+      "graphql_schema_is_valid/success no unused variables",
+      "graphql_schema_is_valid/success - AST objects - Employee example",
+      "graphql_schema_is_valid/success-object-extensions simple",
+      "graphql_schema_is_valid/success-object-extensions with description",
+      "graphql_schema_is_valid/success-object-extensions with block description",
+      "graphql_schema_is_valid/success-object-extensions with field arg",
+      "graphql_schema_is_valid/success-object-extensions with field arg and default value",
+      "graphql_schema_is_valid/success-object-extensions with field list arg",
+      "graphql_schema_is_valid/success-object-extensions with two args",
+      "graphql_schema_is_valid/failure-object-extensions must define one or more fields",
+      "graphql_schema_is_valid/success-type-extensions object extension",
+      "graphql_schema_is_valid/success-type-extensions without any fields",
+      "graphql_schema_is_valid/success-type-extensions without fields twice",
+      "graphql_schema_is_valid/failure-type-extensions without anything errors",
+      "graphql_schema_is_valid/failure-type-extensions can have descriptions",
+      "graphql_schema_is_valid/failure-type-extensions can not have descriptions on types",
+      "graphql_schema_is_valid/success-type-extensions all can have directives",
+      "graphql_schema_is_valid/success-schema-definition simple",
+      "graphql_schema_is_valid/success-schema-extensions simple",
+      "graphql_schema_is_valid/success-schema-extensions directive only",
+      "graphql_schema_is_valid/failure-schema-extensions without anything errors",
+      "graphql_schema_is_valid/failure-inheritance single",
+      "graphql_schema_is_valid/failure-inheritance multi",
+      "graphql_schema_is_valid/success-inheritance multi with leading amp",
+      "graphql_schema_is_valid/success-enums single value",
+      "graphql_schema_is_valid/success-enums double value",
+      "graphql_schema_is_valid/failure-enums must define one or more unique enum values",
+      "graphql_schema_is_valid/success-interface simple",
+      "graphql_schema_is_valid/failure-interface must define one or more fields",
+      "graphql_schema_is_valid/failure-interface may define intermediate interfaces",
+      "graphql_schema_is_valid/success-unions simple",
+      "graphql_schema_is_valid/success-unions with two types",
+      "graphql_schema_is_valid/success-unions with leading pipe",
+      "graphql_schema_is_valid/failure-unions cant be empty",
+      "graphql_schema_is_valid/failure-unions cant double pipe",
+      "graphql_schema_is_valid/failure-unions cant have trailing pipe",
+      "graphql_schema_is_valid/success-scalar simple",
+      "graphql_schema_is_valid/success-input-objects simple",
+      "graphql_schema_is_valid/failure-input-objects can not have args",
+      "graphql_schema_is_valid/failure-input-objects must define one or more input fields",
+      "graphql_schema_is_valid/success-directives simple",
+      "graphql_schema_is_valid/success-directives executable",
+      "graphql_schema_is_valid/success-directives repeatable",
+      "graphql_schema_is_valid/failure-directives invalid location"
+    ]
+  },
+  {
+    "file": "TestData/v1/helloworld/test-helloworld-1.json",
+    "note": [
+      "helloworld/test_case",
+      "helloworld/another_test_for_builtin_error"
+    ]
+  },
+  {
+    "file": "TestData/v1/hexbuiltins/test-hexbuiltins-0939.json",
+    "note": [
+      "hexbuiltins/hex_encode with string"
+    ]
+  },
+  {
+    "file": "TestData/v1/hexbuiltins/test-hexbuiltins-0940.json",
+    "note": [
+      "hexbuiltins/hex_decode with string"
+    ]
+  },
+  {
+    "file": "TestData/v1/hexbuiltins/test-hexbuiltins-0941.json",
+    "note": [
+      "hexbuiltins/hex_decode with invalid hex encoded string"
+    ]
+  },
+  {
+    "file": "TestData/v1/indexing/array-any.json",
+    "note": [
+      "indexing on any and arrays"
+    ]
+  },
+  {
+    "file": "TestData/v1/indirectreferences/test-indirectreferences-0758.json",
+    "note": [
+      "indirectreferences/array"
+    ]
+  },
+  {
+    "file": "TestData/v1/indirectreferences/test-indirectreferences-0759.json",
+    "note": [
+      "indirectreferences/call"
+    ]
+  },
+  {
+    "file": "TestData/v1/indirectreferences/test-indirectreferences-0760.json",
+    "note": [
+      "indirectreferences/multiple call"
+    ]
+  },
+  {
+    "file": "TestData/v1/indirectreferences/test-indirectreferences-0761.json",
+    "note": [
+      "indirectreferences/user call"
+    ]
+  },
+  {
+    "file": "TestData/v1/indirectreferences/test-indirectreferences-0762.json",
+    "note": [
+      "indirectreferences/user call in comprehension"
+    ]
+  },
+  {
+    "file": "TestData/v1/inputvalues/test-inputvalues-0977.json",
+    "note": [
+      "inputvalues/loopback"
+    ]
+  },
+  {
+    "file": "TestData/v1/inputvalues/test-inputvalues-0978.json",
+    "note": [
+      "inputvalues/loopback undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/inputvalues/test-inputvalues-0979.json",
+    "note": [
+      "inputvalues/simple"
+    ]
+  },
+  {
+    "file": "TestData/v1/inputvalues/test-inputvalues-0980.json",
+    "note": [
+      "inputvalues/missing"
+    ]
+  },
+  {
+    "file": "TestData/v1/inputvalues/test-inputvalues-0981.json",
+    "note": [
+      "inputvalues/namespaced"
+    ]
+  },
+  {
+    "file": "TestData/v1/inputvalues/test-inputvalues-0982.json",
+    "note": [
+      "inputvalues/namespaced with alias"
+    ]
+  },
+  {
+    "file": "TestData/v1/inputvalues/test-inputvalues-0983.json",
+    "note": [
+      "inputvalues/input set"
+    ]
+  },
+  {
+    "file": "TestData/v1/intersection/test-intersection-0352.json",
+    "note": [
+      "intersection/intersection_0_sets"
+    ]
+  },
+  {
+    "file": "TestData/v1/intersection/test-intersection-0353.json",
+    "note": [
+      "intersection/intersection_2_sets"
+    ]
+  },
+  {
+    "file": "TestData/v1/intersection/test-intersection-0354.json",
+    "note": [
+      "intersection/intersection_2_sets"
+    ]
+  },
+  {
+    "file": "TestData/v1/intersection/test-intersection-0355.json",
+    "note": [
+      "intersection/intersection_3_sets"
+    ]
+  },
+  {
+    "file": "TestData/v1/intersection/test-intersection-0356.json",
+    "note": [
+      "intersection/intersection_4_sets"
+    ]
+  },
+  {
+    "file": "TestData/v1/invalidkeyerror/test-invalidkeyerror-0176.json",
+    "note": [
+      "invalidkeyerror/invalid keys"
+    ]
+  },
+  {
+    "file": "TestData/v1/invalidkeyerror/test-invalidkeyerror-0177.json",
+    "note": [
+      "invalidkeyerror/missing keys"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonbuiltins/test-is-valid.json",
+    "note": [
+      "jsonbuiltins/json is_valid",
+      "jsonbuiltins/json is_valid not string",
+      "jsonbuiltins/yaml is_valid",
+      "jsonbuiltins/yaml is_valid not string"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonbuiltins/test-json-marshal-with-options.json",
+    "note": [
+      "jsonbuiltins/marshal_with_options-explicit-indent",
+      "jsonbuiltins/marshal_with_options-empty-object",
+      "jsonbuiltins/marshal_with_options-defaults",
+      "jsonbuiltins/marshal_with_options-explicit-disable",
+      "jsonbuiltins/marshal_with_options-prefix",
+      "jsonbuiltins/marshal_with_options-object",
+      "jsonbuiltins/marshal_with_options-empty-array",
+      "jsonbuiltins/marshal_with_options-deep-array",
+      "jsonbuiltins/marshal_with_options-invalid-key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonbuiltins/test-jsonbuiltins-0924.json",
+    "note": [
+      "jsonbuiltins/marshal"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonbuiltins/test-jsonbuiltins-0925.json",
+    "note": [
+      "jsonbuiltins/unmarshal"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonbuiltins/test-jsonbuiltins-0926.json",
+    "note": [
+      "jsonbuiltins/unmarshal-non-string"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonbuiltins/test-jsonbuiltins-0927.json",
+    "note": [
+      "jsonbuiltins/yaml round-trip"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonbuiltins/test-jsonbuiltins-0928.json",
+    "note": [
+      "jsonbuiltins/yaml unmarshal error"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonbuiltins/test-marshal-large-ints.json",
+    "note": [
+      "jsonbuiltins/marshal large integers"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonfilter/test-jsonfilter-0218.json",
+    "note": [
+      "jsonfilter/base"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonfilter/test-jsonfilter-0219.json",
+    "note": [
+      "jsonfilter/multiple roots"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonfilter/test-jsonfilter-0220.json",
+    "note": [
+      "jsonfilter/multiple roots array"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonfilter/test-jsonfilter-0221.json",
+    "note": [
+      "jsonfilter/shared roots"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonfilter/test-jsonfilter-0222.json",
+    "note": [
+      "jsonfilter/conflict"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonfilter/test-jsonfilter-0223.json",
+    "note": [
+      "jsonfilter/empty list"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonfilter/test-jsonfilter-0224.json",
+    "note": [
+      "jsonfilter/empty object"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonfilter/test-jsonfilter-0225.json",
+    "note": [
+      "jsonfilter/arrays"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonfilter/test-jsonfilter-0226.json",
+    "note": [
+      "jsonfilter/object with number keys"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonfilter/test-jsonfilter-0227.json",
+    "note": [
+      "jsonfilter/arrays of roots"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonfilter/test-jsonfilter-0228.json",
+    "note": [
+      "jsonfilter/mixed root types"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonfilteridempotent/test-jsonfilteridempotent-0229.json",
+    "note": [
+      "jsonfilteridempotent/TestBuiltinJSONFilterIdempotent"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonpatch/coverage.json",
+    "note": [
+      "jsonpatch/set-failure add-to-bad-path"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonpatch/json-patch-tests.json",
+    "note": [
+      "jsonpatch/json_patch_tests"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonpatch/set.json",
+    "note": [
+      "jsonpatch/set-success basic-remove",
+      "jsonpatch/set-success basic-add",
+      "jsonpatch/set-failure add-with-mismatched-key-value",
+      "jsonpatch/set-success basic-move",
+      "jsonpatch/set-success add-to-nested-array"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0230.json",
+    "note": [
+      "jsonremove/base"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0231.json",
+    "note": [
+      "jsonremove/multiple roots"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0232.json",
+    "note": [
+      "jsonremove/multiple roots array"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0233.json",
+    "note": [
+      "jsonremove/shared roots"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0234.json",
+    "note": [
+      "jsonremove/conflict"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0235.json",
+    "note": [
+      "jsonremove/empty list"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0236.json",
+    "note": [
+      "jsonremove/empty object"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0237.json",
+    "note": [
+      "jsonremove/delete all"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0238.json",
+    "note": [
+      "jsonremove/delete last in object"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0239.json",
+    "note": [
+      "jsonremove/arrays"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0240.json",
+    "note": [
+      "jsonremove/object with number keys"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0241.json",
+    "note": [
+      "jsonremove/arrays of roots"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0242.json",
+    "note": [
+      "jsonremove/mixed root types"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0243.json",
+    "note": [
+      "jsonremove/error invalid target type string input"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0244.json",
+    "note": [
+      "jsonremove/error invalid target type number input"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0245.json",
+    "note": [
+      "jsonremove/error invalid target type boolean input"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0246.json",
+    "note": [
+      "jsonremove/error invalid target type array input"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0247.json",
+    "note": [
+      "jsonremove/error invalid paths type string"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0248.json",
+    "note": [
+      "jsonremove/error invalid paths type number"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0249.json",
+    "note": [
+      "jsonremove/error invalid paths type boolean"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0250.json",
+    "note": [
+      "jsonremove/error invalid paths type object"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0251.json",
+    "note": [
+      "jsonremove/error invalid paths type set with numbers"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0252.json",
+    "note": [
+      "jsonremove/error invalid paths type set with objects"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0253.json",
+    "note": [
+      "jsonremove/error invalid paths type array with numbers"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremove/test-jsonremove-0254.json",
+    "note": [
+      "jsonremove/error invalid paths type array with objects"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonremoveidempotent/test-jsonremoveidempotent-0255.json",
+    "note": [
+      "jsonremoveidempotent/TestBuiltinJSONRemoveIdempotent"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonschema/test-json-match_schema.json",
+    "note": [
+      "json_match_schema/success",
+      "json_match_schema/success string document",
+      "json_match_schema/success string schema",
+      "json_match_schema/invalid document",
+      "json_match_schema/invalid schema"
+    ]
+  },
+  {
+    "file": "TestData/v1/jsonschema/test-json-verify_schema.json",
+    "note": [
+      "json_verify_schema/valid schema string",
+      "json_verify_schema/valid schema object",
+      "json_verify_schema/invalid schema string",
+      "json_verify_schema/invalid schema object"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtbuiltins/test-jwtbuiltins-0389.json",
+    "note": [
+      "jwtbuiltins/simple"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtbuiltins/test-jwtbuiltins-0390.json",
+    "note": [
+      "jwtbuiltins/simple-non-registered"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtbuiltins/test-jwtbuiltins-0391.json",
+    "note": [
+      "jwtbuiltins/no-support-jwe"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtbuiltins/test-jwtbuiltins-0392.json",
+    "note": [
+      "jwtbuiltins/no-periods"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtbuiltins/test-jwtbuiltins-0393.json",
+    "note": [
+      "jwtbuiltins/wrong-period-count"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtbuiltins/test-jwtbuiltins-0394.json",
+    "note": [
+      "jwtbuiltins/bad-header-encoding"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtbuiltins/test-jwtbuiltins-0395.json",
+    "note": [
+      "jwtbuiltins/bad-payload-encoding"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtbuiltins/test-jwtbuiltins-0396.json",
+    "note": [
+      "jwtbuiltins/bad-signature-encoding"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtbuiltins/test-jwtbuiltins-0397.json",
+    "note": [
+      "jwtbuiltins/nested"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtbuiltins/test-jwtbuiltins-0398.json",
+    "note": [
+      "jwtbuiltins/double-nested"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtbuiltins/test-jwtbuiltins-0399.json",
+    "note": [
+      "jwtbuiltins/complex-values"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtbuiltins/test-jwtbuiltins-0400.json",
+    "note": [
+      "jwtbuiltins/duplicate-keys"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0449.json",
+    "note": [
+      "jwtdecodeverify/ps256-unconstrained"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0450.json",
+    "note": [
+      "jwtdecodeverify/ps256-key-wrong"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0451.json",
+    "note": [
+      "jwtdecodeverify/rs256-key-wrong"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0452.json",
+    "note": [
+      "jwtdecodeverify/ps256-iss-ok"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0453.json",
+    "note": [
+      "jwtdecodeverify/ps256-iss-wrong"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0454.json",
+    "note": [
+      "jwtdecodeverify/ps256-alg-ok"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0455.json",
+    "note": [
+      "jwtdecodeverify/ps256-alg-wrong"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0456.json",
+    "note": [
+      "jwtdecodeverify/rs256-exp-ok"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0457.json",
+    "note": [
+      "jwtdecodeverify/rs256-exp-expired"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0458.json",
+    "note": [
+      "jwtdecodeverify/rs256-exp-now-expired"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0459.json",
+    "note": [
+      "jwtdecodeverify/rs256-exp-now-explicit-expired"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0460.json",
+    "note": [
+      "jwtdecodeverify/rs256-nbf-ok"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0461.json",
+    "note": [
+      "jwtdecodeverify/rs256-nbf-now-ok"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0462.json",
+    "note": [
+      "jwtdecodeverify/rs256-nbf-toosoon"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0463.json",
+    "note": [
+      "jwtdecodeverify/rs256-alg-missing"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0464.json",
+    "note": [
+      "jwtdecodeverify/rs256-crit-junk"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0465.json",
+    "note": [
+      "jwtdecodeverify/rsa256-nested"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0466.json",
+    "note": [
+      "jwtdecodeverify/rsa256-nested2"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0467.json",
+    "note": [
+      "jwtdecodeverify/es256-unconstrained"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0468.json",
+    "note": [
+      "jwtdecodeverify/hs256-unconstrained"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0469.json",
+    "note": [
+      "jwtdecodeverify/hs256-key-wrong"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0470.json",
+    "note": [
+      "jwtdecodeverify/rs256-aud"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0471.json",
+    "note": [
+      "jwtdecodeverify/rs256-aud-list"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0472.json",
+    "note": [
+      "jwtdecodeverify/ps256-no-aud"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0473.json",
+    "note": [
+      "jwtdecodeverify/rs256-missing-aud"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0474.json",
+    "note": [
+      "jwtdecodeverify/rs256-wrong-aud"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0475.json",
+    "note": [
+      "jwtdecodeverify/rs256-wrong-aud-list"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0476.json",
+    "note": [
+      "jwtdecodeverify/multiple-keys-one-valid"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0477.json",
+    "note": [
+      "jwtdecodeverify/multiple-keys-no-valid"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0478.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-nbf"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0479.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-nbf-not-valid"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0480.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-exp-valid"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0481.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-exp-expired"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0482.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-nbf-one-tenth-second-before"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0483.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-nbf-equal"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0484.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-one-millisecond-after-nbf"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0485.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-one-tenth-second-after-nbf"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0486.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-one-second-after-nbf"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0487.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-one-second-before-exp"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0488.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-one-tenth-second-before-exp"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0489.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-equal-exp"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0490.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-one-tenth-second-after-exp"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-0491.json",
+    "note": [
+      "jwtdecodeverify/hs256-float-one-second-after-exp"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-invalid-exp-type.json",
+    "note": [
+      "jwtdecodeverify/invalid-exp"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-invalid-nbf-type.json",
+    "note": [
+      "jwtdecodeverify/invalid-nbf"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-missing-iss-while-required.json",
+    "note": [
+      "jwtdecodeverify/missing-iss-while-required"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesign/test-jwtencodesign-0492.json",
+    "note": [
+      "jwtencodesign/https://tools.ietf.org/html/rfc7515#appendix-A.1"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesign/test-jwtencodesign-0493.json",
+    "note": [
+      "jwtencodesign/Empty JSON payload"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesign/test-jwtencodesign-0494.json",
+    "note": [
+      "jwtencodesign/https://tools.ietf.org/html/rfc7515#appendix-A.2"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesign/test-jwtencodesign-integer-timestamps.json",
+    "note": [
+      "jwtencodesign/plain integer timestamps"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesign/test-jwtencodesign-set-data.json",
+    "note": [
+      "set data"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignheadererrors/test-jwtencodesignheadererrors-0379.json",
+    "note": [
+      "jwtencodesignheadererrors/Unknown signature algorithm"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignheadererrors/test-jwtencodesignheadererrors-0380.json",
+    "note": [
+      "jwtencodesignheadererrors/unknown signature algorithm"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignheadererrors/test-jwtencodesignheadererrors-0381.json",
+    "note": [
+      "jwtencodesignheadererrors/Empty JSON header Error"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignheadererrors/test-jwtencodesignheadererrors-0382.json",
+    "note": [
+      "jwtencodesignheadererrors/Empty headers input error"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignheadererrors/test-jwtencodesignheadererrors-0383.json",
+    "note": [
+      "jwtencodesignheadererrors/No JSON Error"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignpayloaderrors/test-jwtencodesignpayloaderrors-0376.json",
+    "note": [
+      "jwtencodesignpayloaderrors/No Payload"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignpayloaderrors/test-jwtencodesignpayloaderrors-0377.json",
+    "note": [
+      "jwtencodesignpayloaderrors/Payload JSON Error"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignpayloaderrors/test-jwtencodesignpayloaderrors-0378.json",
+    "note": [
+      "jwtencodesignpayloaderrors/Non JSON Error"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignraw/test-jwtencodesignraw-0384.json",
+    "note": [
+      "jwtencodesignraw/https://tools.ietf.org/html/rfc7515#appendix-A.1"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignraw/test-jwtencodesignraw-0385.json",
+    "note": [
+      "jwtencodesignraw/No Payload but Media Type is Plain"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignraw/test-jwtencodesignraw-0386.json",
+    "note": [
+      "jwtencodesignraw/text/plain media type"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignraw/test-jwtencodesignraw-0387.json",
+    "note": [
+      "jwtencodesignraw/Empty JSON payload"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignraw/test-jwtencodesignraw-0388.json",
+    "note": [
+      "jwtencodesignraw/https://tools.ietf.org/html/rfc7515#appendix-A.2"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyhs256/test-jwtverifyhs256-0440.json",
+    "note": [
+      "jwtverifyhs256/success"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyhs256/test-jwtverifyhs256-0441.json",
+    "note": [
+      "jwtverifyhs256/failure-bad token"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyhs256/test-jwtverifyhs256-0442.json",
+    "note": [
+      "jwtverifyhs256/failure-invalid token"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyhs384/test-jwtverifyhs384-0443.json",
+    "note": [
+      "jwtverifyhs384/success"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyhs384/test-jwtverifyhs384-0444.json",
+    "note": [
+      "jwtverifyhs384/failure-bad token"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyhs384/test-jwtverifyhs384-0445.json",
+    "note": [
+      "jwtverifyhs384/failure-invalid token"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyhs512/test-jwtverifyhs512-0446.json",
+    "note": [
+      "jwtverifyhs512/success"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyhs512/test-jwtverifyhs512-0447.json",
+    "note": [
+      "jwtverifyhs512/failure-bad token"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyhs512/test-jwtverifyhs512-0448.json",
+    "note": [
+      "jwtverifyhs512/failure-invalid token"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0401.json",
+    "note": [
+      "jwtverifyrsa/success-cert"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0402.json",
+    "note": [
+      "jwtverifyrsa/success-cert"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0403.json",
+    "note": [
+      "jwtverifyrsa/success-jwk"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0404.json",
+    "note": [
+      "jwtverifyrsa/success-ps256-cert"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0405.json",
+    "note": [
+      "jwtverifyrsa/success-ps256-jwk"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0406.json",
+    "note": [
+      "jwtverifyrsa/success-es256-cert"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0407.json",
+    "note": [
+      "jwtverifyrsa/success-es256-jwk"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0408.json",
+    "note": [
+      "jwtverifyrsa/failure-bad token"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0409.json",
+    "note": [
+      "jwtverifyrsa/failure-wrong key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0410.json",
+    "note": [
+      "jwtverifyrsa/failure-wrong alg"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0411.json",
+    "note": [
+      "jwtverifyrsa/failure-invalid token"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0412.json",
+    "note": [
+      "jwtverifyrsa/failure-bad pem certificate block"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0413.json",
+    "note": [
+      "jwtverifyrsa/failure-extra data after pem certificate block"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0414.json",
+    "note": [
+      "jwtverifyrsa/failure-bad pem certificate"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0415.json",
+    "note": [
+      "jwtverifyrsa/failure-bad jwk key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0416.json",
+    "note": [
+      "jwtverifyrsa/success-cert"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0417.json",
+    "note": [
+      "jwtverifyrsa/success-key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0418.json",
+    "note": [
+      "jwtverifyrsa/success-jwk"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0419.json",
+    "note": [
+      "jwtverifyrsa/failure-wrong key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0420.json",
+    "note": [
+      "jwtverifyrsa/success-cert"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0421.json",
+    "note": [
+      "jwtverifyrsa/success-key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0422.json",
+    "note": [
+      "jwtverifyrsa/success-jwk"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0423.json",
+    "note": [
+      "jwtverifyrsa/failure-wrong key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0424.json",
+    "note": [
+      "jwtverifyrsa/success-ps384-cert"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0425.json",
+    "note": [
+      "jwtverifyrsa/success-ps384-key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0426.json",
+    "note": [
+      "jwtverifyrsa/success-ps384-jwk"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0427.json",
+    "note": [
+      "jwtverifyrsa/failure-ps384-wrong key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0428.json",
+    "note": [
+      "jwtverifyrsa/success-ps512-cert"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0429.json",
+    "note": [
+      "jwtverifyrsa/success-ps512-key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0430.json",
+    "note": [
+      "jwtverifyrsa/success-ps512-jwk"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0431.json",
+    "note": [
+      "jwtverifyrsa/failure-wrong key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0432.json",
+    "note": [
+      "jwtverifyrsa/success-es384-cert"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0433.json",
+    "note": [
+      "jwtverifyrsa/success-es384-key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0434.json",
+    "note": [
+      "jwtverifyrsa/success-es384-jwk"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0435.json",
+    "note": [
+      "jwtverifyrsa/failure-wrong key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0436.json",
+    "note": [
+      "jwtverifyrsa/success-es512-cert"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0437.json",
+    "note": [
+      "jwtverifyrsa/success-es512-key"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0438.json",
+    "note": [
+      "jwtverifyrsa/success-es512-jwk"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0439.json",
+    "note": [
+      "jwtverifyrsa/failure-wrong key"
+    ]
+  },
+  {
+    "file": "TestData/v1/negation/test-negation-0777.json",
+    "note": [
+      "negation/neg: constants"
+    ]
+  },
+  {
+    "file": "TestData/v1/negation/test-negation-0778.json",
+    "note": [
+      "negation/neg: constants"
+    ]
+  },
+  {
+    "file": "TestData/v1/negation/test-negation-0779.json",
+    "note": [
+      "negation/neg: set contains"
+    ]
+  },
+  {
+    "file": "TestData/v1/negation/test-negation-0780.json",
+    "note": [
+      "negation/neg: set contains undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/negation/test-negation-data-ref-with-var.json",
+    "note": [
+      "negation/pos: ref with variable",
+      "negation/neg: ref with variable",
+      "negation/neg: ref with variable (hit) and virtual doc (miss))",
+      "negation/neg: ref with variable (miss) and virtual doc (hit)"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0709.json",
+    "note": [
+      "nestedreferences/ground ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0710.json",
+    "note": [
+      "nestedreferences/non-ground ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0711.json",
+    "note": [
+      "nestedreferences/two deep"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0712.json",
+    "note": [
+      "nestedreferences/two deep"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0713.json",
+    "note": [
+      "nestedreferences/two deep repeated var"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0714.json",
+    "note": [
+      "nestedreferences/no suffix"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0715.json",
+    "note": [
+      "nestedreferences/var ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0716.json",
+    "note": [
+      "nestedreferences/undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0717.json",
+    "note": [
+      "nestedreferences/vdoc ref: complete"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0718.json",
+    "note": [
+      "nestedreferences/vdoc ref: complete: ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0719.json",
+    "note": [
+      "nestedreferences/vdoc ref: complete: no suffix"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0720.json",
+    "note": [
+      "nestedreferences/vdoc ref: partial object"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0721.json",
+    "note": [
+      "nestedreferences/vdoc ref: partial object: ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0722.json",
+    "note": [
+      "nestedreferences/vdoc ref: complete: nested bdoc ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0723.json",
+    "note": [
+      "nestedreferences/vdoc ref: partial object: nested bdoc ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0724.json",
+    "note": [
+      "nestedreferences/vdoc ref: partial object: nested bdoc ref-2"
+    ]
+  },
+  {
+    "file": "TestData/v1/nestedreferences/test-nestedreferences-0725.json",
+    "note": [
+      "nestedreferences/vdoc ref: multiple"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontains/test-netcidrcontains-0092.json",
+    "note": [
+      "netcidrcontains/cidr contains subnet"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontains/test-netcidrcontains-0093.json",
+    "note": [
+      "netcidrcontains/cidr does not contain subnet partial"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontains/test-netcidrcontains-0094.json",
+    "note": [
+      "netcidrcontains/cidr does not contain subnet"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontains/test-netcidrcontains-0095.json",
+    "note": [
+      "netcidrcontains/cidr contains single ip subnet"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontains/test-netcidrcontains-0096.json",
+    "note": [
+      "netcidrcontains/cidr contains subnet ipv6"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontains/test-netcidrcontains-0097.json",
+    "note": [
+      "netcidrcontains/cidr contains single ip subnet ipv6"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontains/test-netcidrcontains-0098.json",
+    "note": [
+      "netcidrcontains/cidr does not contain subnet partial ipv6"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontains/test-netcidrcontains-0099.json",
+    "note": [
+      "netcidrcontains/cidr does not contain subnet ipv6"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontains/test-netcidrcontains-0100.json",
+    "note": [
+      "netcidrcontains/cidr subnet overlap malformed cidr a"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontains/test-netcidrcontains-0101.json",
+    "note": [
+      "netcidrcontains/cidr subnet overlap malformed cidr b"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontains/test-netcidrcontains-0102.json",
+    "note": [
+      "netcidrcontains/cidr contains ip"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontains/test-netcidrcontains-0103.json",
+    "note": [
+      "netcidrcontains/cidr does not contain ip"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontainsmatches/test-netcidrcontainsmatches-0104.json",
+    "note": [
+      "netcidrcontainsmatches/strings"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontainsmatches/test-netcidrcontainsmatches-0105.json",
+    "note": [
+      "netcidrcontainsmatches/arrays"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontainsmatches/test-netcidrcontainsmatches-0106.json",
+    "note": [
+      "netcidrcontainsmatches/arrays of tuples"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontainsmatches/test-netcidrcontainsmatches-0107.json",
+    "note": [
+      "netcidrcontainsmatches/bad array"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontainsmatches/test-netcidrcontainsmatches-0108.json",
+    "note": [
+      "netcidrcontainsmatches/sets of strings"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontainsmatches/test-netcidrcontainsmatches-0109.json",
+    "note": [
+      "netcidrcontainsmatches/sets of tuples"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontainsmatches/test-netcidrcontainsmatches-0110.json",
+    "note": [
+      "netcidrcontainsmatches/bad set"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontainsmatches/test-netcidrcontainsmatches-0111.json",
+    "note": [
+      "netcidrcontainsmatches/bad set tuple element"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrcontainsmatches/test-netcidrcontainsmatches-0112.json",
+    "note": [
+      "netcidrcontainsmatches/objects"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrexpand/test-netcidrexpand-0113.json",
+    "note": [
+      "netcidrexpand/cidr includes host and broadcast"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrexpand/test-netcidrexpand-0114.json",
+    "note": [
+      "netcidrexpand/cidr last octet all 1s"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrexpand/test-netcidrexpand-0115.json",
+    "note": [
+      "netcidrexpand/cidr all bits"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrexpand/test-netcidrexpand-0116.json",
+    "note": [
+      "netcidrexpand/cidr invalid mask"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrintersects/test-netcidrintersects-0086.json",
+    "note": [
+      "netcidrintersects/cidr subnet overlaps"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrintersects/test-netcidrintersects-0087.json",
+    "note": [
+      "netcidrintersects/cidr subnet does not overlap"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrintersects/test-netcidrintersects-0088.json",
+    "note": [
+      "netcidrintersects/cidr ipv6 subnet overlaps"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrintersects/test-netcidrintersects-0089.json",
+    "note": [
+      "netcidrintersects/cidr ipv6 subnet does not overlap"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrintersects/test-netcidrintersects-0090.json",
+    "note": [
+      "netcidrintersects/cidr subnet overlap malformed cidr a"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrintersects/test-netcidrintersects-0091.json",
+    "note": [
+      "netcidrintersects/cidr subnet overlap malformed cidr b"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrisvalid/test_netcidrisvalid-0001.json",
+    "note": [
+      "valid ipv4 cidr",
+      "empty cidr",
+      "random string",
+      "valid ipv4 address",
+      "valid ipv6 cidr"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrmerge/test-ipv6-with-and-without-prefix.json",
+    "note": [
+      "netcidrmerge/cidr ipv6 with prefix",
+      "netcidrmerge/cidr ipv6 with prefix, same twice",
+      "netcidrmerge/cidr ipv6 with prefix, two different prefixes",
+      "netcidrmerge/cidr ipv6 without prefix",
+      "netcidrmerge/cidr ipv6 without prefix, same twice"
+    ]
+  },
+  {
+    "file": "TestData/v1/netcidrmerge/test-netcidrmerge0117.json",
+    "note": [
+      "netcidrmerge/cidr single subnet",
+      "netcidrmerge/cidr duplicate",
+      "netcidrmerge/cidr IPv4 zero address",
+      "netcidrmerge/cidr merge subnets case 1",
+      "netcidrmerge/cidr merge subnets case 2",
+      "netcidrmerge/cidr no overlap case 1",
+      "netcidrmerge/cidr no overlap case 2",
+      "netcidrmerge/cidr mix case 1",
+      "netcidrmerge/cidr mix case 2",
+      "netcidrmerge/cidr IPv6 zero address case 1",
+      "netcidrmerge/cidr IPv6 zero address case 2",
+      "netcidrmerge/cidr IPv4 and IPv6",
+      "netcidrmerge/cidr empty",
+      "netcidrmerge/cidr merge ip and subnets",
+      "netcidrmerge/cidr merge ip addresses",
+      "netcidrmerge/cidr merge subnets set",
+      "netcidrmerge/cidr invalid IP"
+    ]
+  },
+  {
+    "file": "TestData/v1/netlookupipaddr/test-netlookupipaddr.json",
+    "note": [
+      "net.lookup_ip_addr/simple ip4 returns that ip4",
+      "net.lookup_ip_addr/simple ip6 returns that ip6",
+      "net.lookup_ip_addr/localhost"
+    ]
+  },
+  {
+    "file": "TestData/v1/numbersrange/test-numbersrange-0256.json",
+    "note": [
+      "numbersrange/one"
+    ]
+  },
+  {
+    "file": "TestData/v1/numbersrange/test-numbersrange-0257.json",
+    "note": [
+      "numbersrange/ascending"
+    ]
+  },
+  {
+    "file": "TestData/v1/numbersrange/test-numbersrange-0258.json",
+    "note": [
+      "numbersrange/descending",
+      "numbersrange/descending (cheap optimization)"
+    ]
+  },
+  {
+    "file": "TestData/v1/numbersrange/test-numbersrange-0259.json",
+    "note": [
+      "numbersrange/precision"
+    ]
+  },
+  {
+    "file": "TestData/v1/numbersrange/test-numbersrange-0260.json",
+    "note": [
+      "numbersrange/error: floating-point number pos 1"
+    ]
+  },
+  {
+    "file": "TestData/v1/numbersrange/test-numbersrange-0261.json",
+    "note": [
+      "numbersrange/error: floating-point number pos 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/numbersrange/test-numbersrange-issue-7269.json",
+    "note": [
+      "numbersrange/issue 7269"
+    ]
+  },
+  {
+    "file": "TestData/v1/numbersrangestep/test-numbersrangestep.json",
+    "note": [
+      "numbersrangestep/ascending",
+      "numbersrangestep/descending",
+      "numbersrangestep/descending (cheap optimization)",
+      "numbersrangestep/negative",
+      "numbersrangestep/memoryexample",
+      "numbersrangestep/equal",
+      "numbersrangestep/notinrange"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0300.json",
+    "note": [
+      "objectfilter/base"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0301.json",
+    "note": [
+      "objectfilter/multiple roots set"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0302.json",
+    "note": [
+      "objectfilter/multiple roots array"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0303.json",
+    "note": [
+      "objectfilter/multiple roots object"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0304.json",
+    "note": [
+      "objectfilter/duplicate roots"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0305.json",
+    "note": [
+      "objectfilter/empty roots set"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0306.json",
+    "note": [
+      "objectfilter/empty roots array"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0307.json",
+    "note": [
+      "objectfilter/empty roots object"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0308.json",
+    "note": [
+      "objectfilter/empty object"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0309.json",
+    "note": [
+      "objectfilter/error invalid object param type array input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0310.json",
+    "note": [
+      "objectfilter/error invalid object param type bool input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0311.json",
+    "note": [
+      "objectfilter/error invalid object param type number input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0312.json",
+    "note": [
+      "objectfilter/error invalid object param type string input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0313.json",
+    "note": [
+      "objectfilter/error invalid object param type nil input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0314.json",
+    "note": [
+      "objectfilter/error invalid key param type string input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0315.json",
+    "note": [
+      "objectfilter/error invalid key param type boolean input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0316.json",
+    "note": [
+      "objectfilter/error invalid key param type number input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilter/test-objectfilter-0317.json",
+    "note": [
+      "objectfilter/error invalid key param type nil input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilteridempotent/test-objectfilteridempotent-0319.json",
+    "note": [
+      "objectfilteridempotent/TestBuiltinObjectFilterIdempotent"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectfilternonstringkey/test-objectfilternonstringkey-0318.json",
+    "note": [
+      "objectfilternonstringkey/non string root"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectget/test-objectget-0262.json",
+    "note": [
+      "objectget/basic case . found"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectget/test-objectget-0263.json",
+    "note": [
+      "objectget/basic case . not found"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectget/test-objectget-0264.json",
+    "note": [
+      "objectget/integer key found"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectget/test-objectget-0265.json",
+    "note": [
+      "objectget/integer key . not found"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectget/test-objectget-0266.json",
+    "note": [
+      "objectget/complex value . found"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectget/test-objectget-0267.json",
+    "note": [
+      "objectget/complex value . not found"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectget/test-objectget-path.json",
+    "note": [
+      "objectget/empty_path_returns_object",
+      "objectget/path_with_single_element",
+      "objectget/path_with_two_elements",
+      "objectget/path_with_three_elements",
+      "objectget/path_with_single_element_no_result",
+      "objectget/path_with_two_elements_no_result",
+      "objectget/path_with_three_elements_no_result",
+      "objectget/path_with_non_string_keys",
+      "objectget/get_intermediate_non_object",
+      "objectget/get_intermediate_array",
+      "objectget/get_for_non_object"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectkeys/test-objectkeys.json",
+    "note": [
+      "objectkeys/string_keys_found",
+      "objectkeys/number_keys_found",
+      "objectkeys/object_keys_found",
+      "objectkeys/set_keys_found",
+      "objectkeys/array_keys_found",
+      "objectkeys/empty_result",
+      "objectkeys/error_on_non_object"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0279.json",
+    "note": [
+      "objectremove/base"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0280.json",
+    "note": [
+      "objectremove/multiple keys set"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0281.json",
+    "note": [
+      "objectremove/multiple keys array"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0282.json",
+    "note": [
+      "objectremove/multiple keys object"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0283.json",
+    "note": [
+      "objectremove/multiple keys object nested"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0284.json",
+    "note": [
+      "objectremove/empty object"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0285.json",
+    "note": [
+      "objectremove/empty keys set"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0286.json",
+    "note": [
+      "objectremove/empty keys array"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0287.json",
+    "note": [
+      "objectremove/empty keys obj"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0288.json",
+    "note": [
+      "objectremove/key doesnt exist"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0289.json",
+    "note": [
+      "objectremove/error invalid object param type array input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0290.json",
+    "note": [
+      "objectremove/error invalid object param type bool input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0291.json",
+    "note": [
+      "objectremove/error invalid object param type number input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0292.json",
+    "note": [
+      "objectremove/error invalid object param type string input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0293.json",
+    "note": [
+      "objectremove/error invalid object param type nil input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0294.json",
+    "note": [
+      "objectremove/error invalid key param type string input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0295.json",
+    "note": [
+      "objectremove/error invalid key param type boolean input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0296.json",
+    "note": [
+      "objectremove/error invalid key param type number input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremove/test-objectremove-0297.json",
+    "note": [
+      "objectremove/error invalid key param type nil input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremoveidempotent/test-objectremoveidempotent-0298.json",
+    "note": [
+      "objectremoveidempotent/TestBuiltinObjectRemoveIdempotent"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectremovenonstringkey/test-objectremovenonstringkey-0299.json",
+    "note": [
+      "objectremovenonstringkey/non string root"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectunion/test-objectunion-0268.json",
+    "note": [
+      "objectunion/both empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectunion/test-objectunion-0269.json",
+    "note": [
+      "objectunion/left empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectunion/test-objectunion-0270.json",
+    "note": [
+      "objectunion/right empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectunion/test-objectunion-0271.json",
+    "note": [
+      "objectunion/base"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectunion/test-objectunion-0272.json",
+    "note": [
+      "objectunion/nested"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectunion/test-objectunion-0273.json",
+    "note": [
+      "objectunion/nested reverse"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectunion/test-objectunion-0274.json",
+    "note": [
+      "objectunion/conflict simple"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectunion/test-objectunion-0275.json",
+    "note": [
+      "objectunion/conflict nested and extra field"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectunion/test-objectunion-0276.json",
+    "note": [
+      "objectunion/conflict multiple"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectunion/test-objectunion-0277.json",
+    "note": [
+      "objectunion/error wrong lhs type input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectunion/test-objectunion-0278.json",
+    "note": [
+      "objectunion/error wrong rhs type input"
+    ]
+  },
+  {
+    "file": "TestData/v1/objectunionn/test-objectunionn-0001.json",
+    "note": [
+      "objectunionn/empty array",
+      "objectunionn/single item array",
+      "objectunionn/merge objects",
+      "objectunionn/merge objects conflict",
+      "objectunionn/merge objects extended",
+      "# 5073 regression test"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialdocconstants/test-partialdocconstants-0984.json",
+    "note": [
+      "partialdocconstants/obj-1"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialdocconstants/test-partialdocconstants-0985.json",
+    "note": [
+      "partialdocconstants/obj"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialdocconstants/test-partialdocconstants-0986.json",
+    "note": [
+      "partialdocconstants/obj-all"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialdocconstants/test-partialdocconstants-0987.json",
+    "note": [
+      "partialdocconstants/set-1"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialdocconstants/test-partialdocconstants-0988.json",
+    "note": [
+      "partialdocconstants/set"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialdocconstants/test-partialdocconstants-0989.json",
+    "note": [
+      "partialdocconstants/set-all"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialiter/test-partialiter-001.json",
+    "note": [
+      "partialiter/sets unique",
+      "partialiter/objects unique",
+      "partialiter/objects conflict"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialobjectdoc/test-partialobjectdoc-0519.json",
+    "note": [
+      "partialobjectdoc/identity"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialobjectdoc/test-partialobjectdoc-0520.json",
+    "note": [
+      "partialobjectdoc/composites"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialobjectdoc/test-partialobjectdoc-0521.json",
+    "note": [
+      "partialobjectdoc/body/join var"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialobjectdoc/test-partialobjectdoc-0522.json",
+    "note": [
+      "partialobjectdoc/composite value"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialobjectdoc/test-partialobjectdoc-0523.json",
+    "note": [
+      "partialobjectdoc/same key/value pair"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialobjectdoc/test-partialobjectdoc-0524.json",
+    "note": [
+      "partialobjectdoc/non-string key"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialobjectdoc/test-partialobjectdoc-ref.json",
+    "note": [
+      "partialobjectdoc/ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialobjectdoc/test-wasm-cases.json",
+    "note": [
+      "wasm/additive",
+      "wasm/additive (negative)",
+      "wasm/input",
+      "wasm/input (negative)",
+      "wasm/composites",
+      "wasm/conflict error",
+      "wasm/object dereference",
+      "wasm/object dereference (negative)"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialsetdoc/test-issue-3369.json",
+    "note": [
+      "partialsetdoc/unexpected 'var requires evaluation'"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialsetdoc/test-issue-3376.json",
+    "note": [
+      "partialsetdoc/iteration"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialsetdoc/test-issue-3819.json",
+    "note": [
+      "partialsetdoc: object sort while iter"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialsetdoc/test-partialsetdoc-0511.json",
+    "note": [
+      "partialsetdoc/array values"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialsetdoc/test-partialsetdoc-0512.json",
+    "note": [
+      "partialsetdoc/array indices"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialsetdoc/test-partialsetdoc-0513.json",
+    "note": [
+      "partialsetdoc/object keys"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialsetdoc/test-partialsetdoc-0514.json",
+    "note": [
+      "partialsetdoc/object values"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialsetdoc/test-partialsetdoc-0515.json",
+    "note": [
+      "partialsetdoc/nested composites"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialsetdoc/test-partialsetdoc-0516.json",
+    "note": [
+      "partialsetdoc/deep ref/heterogeneous"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialsetdoc/test-partialsetdoc-0517.json",
+    "note": [
+      "partialsetdoc/composite var value"
+    ]
+  },
+  {
+    "file": "TestData/v1/partialsetdoc/test-partialsetdoc-0518.json",
+    "note": [
+      "partialsetdoc/composite key"
+    ]
+  },
+  {
+    "file": "TestData/v1/planner-ir/test-array-ir-unify.json",
+    "note": [
+      "ir/unification array and array comprehension",
+      "ir/unification array comprehension and array",
+      "ir/fixpoint key/value (negative)",
+      "ir/fixpoint key/value"
+    ]
+  },
+  {
+    "file": "TestData/v1/planner-ir/test-call-dynamic.json",
+    "note": [
+      "ir/call_dynamic in comprehension",
+      "ir/no call-dynamic with mixed partial rules",
+      "ir/call-dynamic with mixed partial rules",
+      "ir/no call-dynamic with mixed partial rules, ref heads",
+      "ir/call-dynamic with mixed partial rules, ref heads",
+      "ir/call-dynamic with ref heads, issue 5839",
+      "ir/call-dynamic with ref heads, issue 5839, penultimate",
+      "ir/call-dynamic target undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/providers-aws/aws-sign_req-errors.json",
+    "note": [
+      "providers-aws-sign_req/failure-simple-missing http request keys",
+      "providers-aws-sign_req/failure-simple-invalid type http request keys",
+      "providers-aws-sign_req/failure-simple-missing aws keys",
+      "providers-aws-sign_req/failure-simple-invalid type aws keys",
+      "providers-aws-sign_req/failure-simple-bad timestamp",
+      "providers-aws-sign_req/failure-simple-bad-type-payload-signing-config"
+    ]
+  },
+  {
+    "file": "TestData/v1/providers-aws/aws-sign_req.json",
+    "note": [
+      "providers-aws-sign_req/success-simple-no body",
+      "providers-aws-sign_req/success-simple-with headers no body",
+      "providers-aws-sign_req/success-simple-no body-with session token",
+      "providers-aws-sign_req/success-simple-body",
+      "providers-aws-sign_req/success-simple-raw_body",
+      "providers-aws-sign_req/success-simple-body-and-raw_body",
+      "providers-aws-sign_req/success-simple-with-headers-no-body-with-payload-signing",
+      "providers-aws-sign_req/success-simple-with-headers-no-body-no-payload-signing",
+      "providers-aws-sign_req/success-simple-with-headers-with-body-with-payload-signing",
+      "providers-aws-sign_req/success-simple-with-headers-with-body-no-payload-signing",
+      "providers-aws-sign_req/success-simple-with-existing-sha-header-with-body-with-payload-signing",
+      "providers-aws-sign_req/success-simple-with-existing-sha-header-with-body-no-payload-signing"
+    ]
+  },
+  {
+    "file": "TestData/v1/rand/test-rand.intn.json",
+    "note": [
+      "rand.intn/consistent values for same arguments"
+    ]
+  },
+  {
+    "file": "TestData/v1/reachable/test-reachable-0322.json",
+    "note": [
+      "reachable/empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/reachable/test-reachable-0323.json",
+    "note": [
+      "reachable/cycle"
+    ]
+  },
+  {
+    "file": "TestData/v1/reachable/test-reachable-0324.json",
+    "note": [
+      "reachable/components"
+    ]
+  },
+  {
+    "file": "TestData/v1/reachable/test-reachable-0325.json",
+    "note": [
+      "reachable/arrays"
+    ]
+  },
+  {
+    "file": "TestData/v1/reachable/test-reachable-0326.json",
+    "note": [
+      "reachable/malformed 1"
+    ]
+  },
+  {
+    "file": "TestData/v1/reachable/test-reachable-0327.json",
+    "note": [
+      "reachable/malformed 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/reachable/test-reachable-0328.json",
+    "note": [
+      "reachable/malformed 3"
+    ]
+  },
+  {
+    "file": "TestData/v1/reachable/test-reachable-paths-0422.json",
+    "note": [
+      "reachable_paths/empty",
+      "reachable_paths/cycle",
+      "reachable_paths/components",
+      "reachable_paths/arrays",
+      "reachable_paths/malformed 1",
+      "reachable_paths/malformed 2",
+      "reachable_paths/malformed 3",
+      "reachable_paths/multiple_paths",
+      "reachable_paths/invalid_end"
+    ]
+  },
+  {
+    "file": "TestData/v1/reachable/test-reachable-paths-1022.json",
+    "note": [
+      "reachable_paths/cycle_1022_1",
+      "reachable_paths/cycle_1022_2",
+      "reachable_paths/cycle_1022_3"
+    ]
+  },
+  {
+    "file": "TestData/v1/refheads/test-generic-refs.json",
+    "note": [
+      "refheads/general, single var",
+      "refheads/general, multiple vars",
+      "refheads/general, deep query",
+      "refheads/general, overlapping rule, no conflict",
+      "refheads/general, overlapping rule, different dynamic depths, no conflict",
+      "refheads/general, self-conflict",
+      "refheads/general, overlapping rule, conflict",
+      "refheads/general, overlapping rule, deep override inside other rule object value, conflict",
+      "refheads/general, overlapping rule, deep injection into other rule object value, conflict",
+      "refheads/general, set leaf (shallow ref)",
+      "refheads/general, set leaf (other rule defines dynamic ref portion)",
+      "refheads/general, set leaf",
+      "refheads/general, set leaf, deep query",
+      "refheads/general, input var",
+      "refheads/general, external non-ground var",
+      "refheads/general, multiple result-set entries"
+    ]
+  },
+  {
+    "file": "TestData/v1/refheads/test-refs-as-rule-heads.json",
+    "note": [
+      "refheads/single-value",
+      "refheads/single-value, with var",
+      "refheads/single-value, with var, conflict",
+      "refheads/complete: direct query",
+      "refheads/complete: direct query q",
+      "refheads/complete: full package extent",
+      "refheads/complete+mixed",
+      "refheads/single-value rule",
+      "refheads/multi-value",
+      "refheads/single-value: previously partial object",
+      "refheads/multi-value: same rule",
+      "refheads/single-value default rule",
+      "refheads/single-value example",
+      "refheads/single-value example, false",
+      "refheads/mixed example, multiple rules",
+      "refheads/website-example/partial-obj",
+      "refheads/website-example/partial-set",
+      "refheads/many-vars"
+    ]
+  },
+  {
+    "file": "TestData/v1/refheads/test-regressions.json",
+    "note": [
+      "regression/ref-not-hashable",
+      "regression/function refs and package extent",
+      "regression/rule refs and package extent",
+      "regression/rule refs and package extents, multiple modules",
+      "regression/type checking with ref rules",
+      "regression/type checking with ref rules, number",
+      "regression/type checking with ref rules, bool",
+      "regression/full extent with partial object rule with empty indexer lookup result",
+      "regression/obj in ref head query",
+      "regression/full extent with non-string (number) last term",
+      "regression/full extent with non-string last term, comparison",
+      "regression/full extent with non-string (boolean) last term",
+      "regression/full extent with non-string last term, comparison",
+      "regression/virtual-cache key scope"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexfind/test-regexfind-0334.json",
+    "note": [
+      "regexfind/finds all match values"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexfind/test-regexfind-0335.json",
+    "note": [
+      "regexfind/finds specified number of match values"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexfind/test-regexfind-0336.json",
+    "note": [
+      "regexfind/finds no matching values"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexfindallstringsubmatch/test-regexfindallstringsubmatch-0337.json",
+    "note": [
+      "regexfindallstringsubmatch/finds no matches"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexfindallstringsubmatch/test-regexfindallstringsubmatch-0338.json",
+    "note": [
+      "regexfindallstringsubmatch/single match without captures"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexfindallstringsubmatch/test-regexfindallstringsubmatch-0339.json",
+    "note": [
+      "regexfindallstringsubmatch/single match with a capture"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexfindallstringsubmatch/test-regexfindallstringsubmatch-0340.json",
+    "note": [
+      "regexfindallstringsubmatch/multiple matches with captures-1"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexfindallstringsubmatch/test-regexfindallstringsubmatch-0341.json",
+    "note": [
+      "regexfindallstringsubmatch/multiple matches with captures-2"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexfindallstringsubmatch/test-regexfindallstringsubmatch-0342.json",
+    "note": [
+      "regexfindallstringsubmatch/multiple patterns, matches, and captures"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexfindallstringsubmatch/test-regexfindallstringsubmatch-0343.json",
+    "note": [
+      "regexfindallstringsubmatch/multiple patterns, matches, and captures with specified number of matches"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexfindallstringsubmatch/test-regexfindallstringsubmatch-large-input.json",
+    "note": [
+      "regexfindallstringsubmatch/large input"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexisvalid/test-regexisvalid-0329.json",
+    "note": [
+      "regexisvalid/bad operand type"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexisvalid/test-regexisvalid-0330.json",
+    "note": [
+      "regexisvalid/bad pattern"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexisvalid/test-regexisvalid-0331.json",
+    "note": [
+      "regexisvalid/good pattern"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexmatch/test-regexmatch-0861.json",
+    "note": [
+      "regexmatch/regex.match"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexmatchtemplate/test-regexmatchtemplate-0332.json",
+    "note": [
+      "regexmatchtemplate/matches wildcard with {}"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexmatchtemplate/test-regexmatchtemplate-0333.json",
+    "note": [
+      "regexmatchtemplate/matches wildcard with <>"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexreplace/test-regexreplace-0001.json",
+    "note": [
+      "regex.replace: test pattern match and replace",
+      "regex.replace: work with groups",
+      "regex.replace: bad regex pattern: Syntax error"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexsplit/test-regexsplit-0862.json",
+    "note": [
+      "regexsplit/regex.split: empty string"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexsplit/test-regexsplit-0863.json",
+    "note": [
+      "regexsplit/regex.split: non-repeat pattern"
+    ]
+  },
+  {
+    "file": "TestData/v1/regexsplit/test-regexsplit-0864.json",
+    "note": [
+      "regexsplit/regex.split: repeat pattern"
+    ]
+  },
+  {
+    "file": "TestData/v1/regometadatachain/test-regometadatachain-1.json",
+    "note": [
+      "regometadatachain/simple",
+      "regometadatachain/rule mixed scope",
+      "regometadatachain/package spanning modules"
+    ]
+  },
+  {
+    "file": "TestData/v1/regometadatarule/test-regometadatarule-1.json",
+    "note": [
+      "regometadatarule/simple",
+      "regometadatarule/rule scope only"
+    ]
+  },
+  {
+    "file": "TestData/v1/regoparsemodule/test-regoparsemodule-0320.json",
+    "note": [
+      "regoparsemodule/ok"
+    ]
+  },
+  {
+    "file": "TestData/v1/regoparsemodule/test-regoparsemodule-0321.json",
+    "note": [
+      "regoparsemodule/error"
+    ]
+  },
+  {
+    "file": "TestData/v1/rendertemplate/rendertemplate.json",
+    "note": [
+      "rendertemplate/simple",
+      "rendertemplate/simpleint",
+      "rendertemplate/complex",
+      "rendertemplate/missingkey"
+    ]
+  },
+  {
+    "file": "TestData/v1/replacen/test-replacen-0374.json",
+    "note": [
+      "replacen/replace multiple patterns",
+      "replacen/replace multiple patterns/overlapping",
+      "replacen/replace multiple patterns/overlapping/insertion order does not matter"
+    ]
+  },
+  {
+    "file": "TestData/v1/replacen/test-replacen-0375.json",
+    "note": [
+      "replacen/find no patterns"
+    ]
+  },
+  {
+    "file": "TestData/v1/replacen/test-replacen-bad-operands.json",
+    "note": [
+      "replacen/bad pattern object operand/non-string key",
+      "replacen/bad pattern object operand/non-string value",
+      "replacen/bad pattern object operand/non-string value"
+    ]
+  },
+  {
+    "file": "TestData/v1/semvercompare/test-semvercompare-0344.json",
+    "note": [
+      "semvercompare/a < b"
+    ]
+  },
+  {
+    "file": "TestData/v1/semvercompare/test-semvercompare-0345.json",
+    "note": [
+      "semvercompare/a > b"
+    ]
+  },
+  {
+    "file": "TestData/v1/semvercompare/test-semvercompare-0346.json",
+    "note": [
+      "semvercompare/a == b"
+    ]
+  },
+  {
+    "file": "TestData/v1/semvercompare/test-semvercompare-0347.json",
+    "note": [
+      "semvercompare/invalid version a"
+    ]
+  },
+  {
+    "file": "TestData/v1/semvercompare/test-semvercompare-0348.json",
+    "note": [
+      "semvercompare/invalid version b"
+    ]
+  },
+  {
+    "file": "TestData/v1/semverisvalid/test-semverisvalid-0349.json",
+    "note": [
+      "semverisvalid/valid"
+    ]
+  },
+  {
+    "file": "TestData/v1/semverisvalid/test-semverisvalid-0350.json",
+    "note": [
+      "semverisvalid/invalid version"
+    ]
+  },
+  {
+    "file": "TestData/v1/semverisvalid/test-semverisvalid-0351.json",
+    "note": [
+      "semverisvalid/invalid type"
+    ]
+  },
+  {
+    "file": "TestData/v1/sets/test-sets-0871.json",
+    "note": [
+      "sets/set_diff"
+    ]
+  },
+  {
+    "file": "TestData/v1/sets/test-sets-0872.json",
+    "note": [
+      "sets/set_diff: refs"
+    ]
+  },
+  {
+    "file": "TestData/v1/sets/test-sets-0873.json",
+    "note": [
+      "sets/set_diff: ground output"
+    ]
+  },
+  {
+    "file": "TestData/v1/sets/test-sets-0874.json",
+    "note": [
+      "sets/set_diff: virt docs"
+    ]
+  },
+  {
+    "file": "TestData/v1/sets/test-sets-0875.json",
+    "note": [
+      "sets/intersect"
+    ]
+  },
+  {
+    "file": "TestData/v1/sets/test-sets-0876.json",
+    "note": [
+      "sets/union"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-anyprefixmatch.json",
+    "note": [
+      "strings/any_prefix_match/match",
+      "strings/any_prefix_match/nomatch",
+      "strings/any_prefix_match/match",
+      "strings/any_prefix_match/match",
+      "strings/any_prefix_match/match",
+      "strings/any_prefix_match/nomatch",
+      "strings/any_prefix_match/nomatch",
+      "strings/any_prefix_match/nomatch",
+      "strings/any_prefix_match/nomatch",
+      "strings/any_prefix_match/nomatch",
+      "strings/any_prefix_match/match",
+      "strings/any_prefix_match/nomatch",
+      "strings/any_prefix_match/match",
+      "strings/any_prefix_match/nomatch",
+      "strings/any_prefix_match/match",
+      "strings/any_prefix_match/nomatch",
+      "strings/any_prefix_match/type_error_nostrict",
+      "strings/any_prefix_match/type_error_nostrict",
+      "strings/any_prefix_match/type_error_nostrict",
+      "strings/any_prefix_match/type_error_nostrict",
+      "strings/any_prefix_match/type_error_strict",
+      "strings/any_prefix_match/type_error_strict",
+      "strings/any_prefix_match/type_error_strict",
+      "strings/any_prefix_match/type_error_strict"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-anysuffixmatch.json",
+    "note": [
+      "strings/any_suffix_match/match",
+      "strings/any_suffix_match/nomatch",
+      "strings/any_suffix_match/match",
+      "strings/any_suffix_match/match",
+      "strings/any_suffix_match/match",
+      "strings/any_suffix_match/nomatch",
+      "strings/any_suffix_match/nomatch",
+      "strings/any_suffix_match/nomatch",
+      "strings/any_suffix_match/nomatch",
+      "strings/any_suffix_match/nomatch",
+      "strings/any_suffix_match/match",
+      "strings/any_suffix_match/nomatch",
+      "strings/any_suffix_match/match",
+      "strings/any_suffix_match/nomatch",
+      "strings/any_suffix_match/match",
+      "strings/any_suffix_match/nomatch",
+      "strings/any_suffix_match/type_error_nostrict",
+      "strings/any_suffix_match/type_error_nostrict",
+      "strings/any_suffix_match/type_error_nostrict",
+      "strings/any_suffix_match/type_error_nostrict",
+      "strings/any_suffix_match/type_error_strict",
+      "strings/any_suffix_match/type_error_strict",
+      "strings/any_suffix_match/type_error_strict",
+      "strings/any_suffix_match/type_error_strict"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0877.json",
+    "note": [
+      "strings/format_int"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0878.json",
+    "note": [
+      "strings/format_int: undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0879.json",
+    "note": [
+      "strings/format_int: ref dest"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0880.json",
+    "note": [
+      "strings/format_int: ref dest (2)"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0881.json",
+    "note": [
+      "strings/format_int: err: bad base"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0882.json",
+    "note": [
+      "strings/concat"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0883.json",
+    "note": [
+      "strings/concat: set"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0884.json",
+    "note": [
+      "strings/concat: undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0885.json",
+    "note": [
+      "strings/concat: ref dest"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0886.json",
+    "note": [
+      "strings/concat: ref dest (2)"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0887.json",
+    "note": [
+      "strings/indexof",
+      "strings/indexof"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0888.json",
+    "note": [
+      "strings/indexof: not found"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0889.json",
+    "note": [
+      "strings/substring",
+      "strings/substring: unicode"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0890.json",
+    "note": [
+      "strings/substring: remainder",
+      "strings/substring: remainder unicode"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0891.json",
+    "note": [
+      "strings/substring: too long",
+      "strings/substring: too long unicode"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0892.json",
+    "note": [
+      "strings/substring: offset negative",
+      "strings/substring: offset negative unicode"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0893.json",
+    "note": [
+      "strings/substring: offset too long",
+      "strings/substring: offset too long unicode"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0894.json",
+    "note": [
+      "strings/substring: offset too long 2",
+      "strings/substring: offset too long 2 unicode"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0895.json",
+    "note": [
+      "strings/contains"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0896.json",
+    "note": [
+      "strings/contains: undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0897.json",
+    "note": [
+      "strings/startswith"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0898.json",
+    "note": [
+      "strings/startswith: undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0899.json",
+    "note": [
+      "strings/endswith"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0900.json",
+    "note": [
+      "strings/endswith: undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0901.json",
+    "note": [
+      "strings/lower"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0902.json",
+    "note": [
+      "strings/upper"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0903.json",
+    "note": [
+      "strings/split: empty string"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0904.json",
+    "note": [
+      "strings/split: one"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0905.json",
+    "note": [
+      "strings/split: many"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0906.json",
+    "note": [
+      "strings/replace: empty string"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0907.json",
+    "note": [
+      "strings/replace: one"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0908.json",
+    "note": [
+      "strings/replace: many"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0909.json",
+    "note": [
+      "strings/replace: overlap"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0910.json",
+    "note": [
+      "strings/trim: empty string"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0911.json",
+    "note": [
+      "strings/trim: end"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0912.json",
+    "note": [
+      "strings/trim: start"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0913.json",
+    "note": [
+      "strings/trim: both"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0914.json",
+    "note": [
+      "strings/trim: multi-cutset"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0915.json",
+    "note": [
+      "strings/trim: multi-cutset-none"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0916.json",
+    "note": [
+      "strings/sprintf: none"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0917.json",
+    "note": [
+      "strings/sprintf: string"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0918.json",
+    "note": [
+      "strings/sprintf: int"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0919.json",
+    "note": [
+      "strings/sprintf: hex"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0920.json",
+    "note": [
+      "strings/sprintf: float"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0921.json",
+    "note": [
+      "strings/sprintf: float too big"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0922.json",
+    "note": [
+      "strings/sprintf: bool"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0923.json",
+    "note": [
+      "strings/sprintf: composite"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0924.json",
+    "note": [
+      "strings/reverse_bar",
+      "strings/reverse_unicode_multi_char_emojii",
+      "strings/reverse_unicode",
+      "strings/reverse_empty",
+      "strings/reverse_number_error",
+      "strings/reverse_object_error"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0925.json",
+    "note": [
+      "strings/indexof_n_single_match",
+      "strings/indexof_n_multiple_matches",
+      "strings/indexof_n_no_match",
+      "strings/indexof_n_unicode_matches",
+      "strings/indexof_n_unicode_no_match"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-0926.json",
+    "note": [
+      "strings/count_single_word_match",
+      "strings/count_multiple_separate_matches",
+      "strings/count_n_no_match"
+    ]
+  },
+  {
+    "file": "TestData/v1/strings/test-strings-indexof-unicode.json",
+    "note": [
+      "strings/indexof: unicode char",
+      "strings/indexof: unicode chars not found",
+      "strings/indexof: unicode string",
+      "strings/indexof: unicode string emoji",
+      "strings/indexof: unicode string emojis"
+    ]
+  },
+  {
+    "file": "TestData/v1/subset/test-subset.json",
+    "note": [
+      "subset/simple object subset 1",
+      "subset/simple object subset 2",
+      "subset/nested object subset 1",
+      "subset/nested object subset 2",
+      "subset/nested object subset 3",
+      "subset/sets 1",
+      "subset/nested sets 1",
+      "subset/nested sets 2",
+      "subset/arrays 1",
+      "subset/arrays 2",
+      "subset/arrays 3",
+      "subset/arrays 4",
+      "subset/array and set 1",
+      "subset/array and set 2",
+      "subset/arrays 5",
+      "subset/arrays 6"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0947.json",
+    "note": [
+      "time/time caching"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0948.json",
+    "note": [
+      "time/parse_nanos",
+      "time/parse_nanos_too_small",
+      "time/parse_nanos_too_large"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0949.json",
+    "note": [
+      "time/parse_rfc3339_nanos",
+      "time/parse_rfc3339_nanos_too_small",
+      "time/parse_rfc3339_nanos_too_large"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0950.json",
+    "note": [
+      "time/parse duration nanos"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0951.json",
+    "note": [
+      "time/date"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0952.json",
+    "note": [
+      "time/date with LA tz"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0953.json",
+    "note": [
+      "time/date with empty tz"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0954.json",
+    "note": [
+      "time/date leap day"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0955.json",
+    "note": [
+      "time/date too big"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0956.json",
+    "note": [
+      "time/clock"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0957.json",
+    "note": [
+      "time/clock with NY tz"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0958.json",
+    "note": [
+      "time/clock leap day"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0959.json",
+    "note": [
+      "time/clock too big"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0960.json",
+    "note": [
+      "time/weekday"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0961.json",
+    "note": [
+      "time/weekday"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0962.json",
+    "note": [
+      "time/weekday"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0963.json",
+    "note": [
+      "time/weekday"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0964.json",
+    "note": [
+      "time/weekday"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0965.json",
+    "note": [
+      "time/weekday"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0966.json",
+    "note": [
+      "time/weekday"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0967.json",
+    "note": [
+      "time/weekday too big"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0968.json",
+    "note": [
+      "time/add_date year month day",
+      "time/add_date too large result"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0969.json",
+    "note": [
+      "time/add_date negative values",
+      "time/add_date too small result"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0970.json",
+    "note": [
+      "time/diff"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0971.json",
+    "note": [
+      "time/format",
+      "time/format too big"
+    ]
+  },
+  {
+    "file": "TestData/v1/topdowndynamicdispatch/test-topdowndynamicdispatch-1068.json",
+    "note": [
+      "topdowndynamicdispatch/dynamic dispatch"
+    ]
+  },
+  {
+    "file": "TestData/v1/trim/test-trim-0362.json",
+    "note": [
+      "trim/trims '!¡' from string"
+    ]
+  },
+  {
+    "file": "TestData/v1/trim/test-trim-0363.json",
+    "note": [
+      "trim/trims nothing from string"
+    ]
+  },
+  {
+    "file": "TestData/v1/trimleft/test-trimleft-0364.json",
+    "note": [
+      "trimleft/trims leading '!¡' from string"
+    ]
+  },
+  {
+    "file": "TestData/v1/trimleft/test-trimleft-0365.json",
+    "note": [
+      "trimleft/trims nothing from string"
+    ]
+  },
+  {
+    "file": "TestData/v1/trimprefix/test-trimprefix-0366.json",
+    "note": [
+      "trimprefix/trims prefix '!¡' from string"
+    ]
+  },
+  {
+    "file": "TestData/v1/trimprefix/test-trimprefix-0367.json",
+    "note": [
+      "trimprefix/trims nothing from string"
+    ]
+  },
+  {
+    "file": "TestData/v1/trimright/test-trimright-0368.json",
+    "note": [
+      "trimright/trims trailing '!¡' from string"
+    ]
+  },
+  {
+    "file": "TestData/v1/trimright/test-trimright-0369.json",
+    "note": [
+      "trimright/trims nothing from string"
+    ]
+  },
+  {
+    "file": "TestData/v1/trimspace/test-trimspace-0372.json",
+    "note": [
+      "trimspace/trims all leading and trailing white space from string"
+    ]
+  },
+  {
+    "file": "TestData/v1/trimspace/test-trimspace-0373.json",
+    "note": [
+      "trimspace/trims nothing from string"
+    ]
+  },
+  {
+    "file": "TestData/v1/trimsuffix/test-trimsuffix-0370.json",
+    "note": [
+      "trimsuffix/trims suffix '!¡' from string"
+    ]
+  },
+  {
+    "file": "TestData/v1/trimsuffix/test-trimsuffix-0371.json",
+    "note": [
+      "trimsuffix/trims nothing from string"
+    ]
+  },
+  {
+    "file": "TestData/v1/type/test-regressions.json",
+    "note": [
+      "regression/partial-object override, different key type, query",
+      "regression/partial-object override, different key type, referenced in other rule",
+      "regression/dynamic object to static object comparison (https://github.com/open-policy-agent/opa/issues/6138)"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0828.json",
+    "note": [
+      "typebuiltin/is_number"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0829.json",
+    "note": [
+      "typebuiltin/is_number"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0830.json",
+    "note": [
+      "typebuiltin/is_number"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0831.json",
+    "note": [
+      "typebuiltin/is_number"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0832.json",
+    "note": [
+      "typebuiltin/is_string"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0833.json",
+    "note": [
+      "typebuiltin/is_string"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0834.json",
+    "note": [
+      "typebuiltin/is_string"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0835.json",
+    "note": [
+      "typebuiltin/is_string"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0836.json",
+    "note": [
+      "typebuiltin/is_boolean"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0837.json",
+    "note": [
+      "typebuiltin/is_boolean"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0838.json",
+    "note": [
+      "typebuiltin/is_boolean"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0839.json",
+    "note": [
+      "typebuiltin/is_boolean"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0840.json",
+    "note": [
+      "typebuiltin/is_array"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0841.json",
+    "note": [
+      "typebuiltin/is_array"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0842.json",
+    "note": [
+      "typebuiltin/is_set"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0843.json",
+    "note": [
+      "typebuiltin/is_set"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0844.json",
+    "note": [
+      "typebuiltin/is_object"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0845.json",
+    "note": [
+      "typebuiltin/is_object"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0846.json",
+    "note": [
+      "typebuiltin/is_null"
+    ]
+  },
+  {
+    "file": "TestData/v1/typebuiltin/test-typebuiltin-0847.json",
+    "note": [
+      "typebuiltin/is_null"
+    ]
+  },
+  {
+    "file": "TestData/v1/typenamebuiltin/test-typenamebuiltin-0848.json",
+    "note": [
+      "typenamebuiltin/type_name"
+    ]
+  },
+  {
+    "file": "TestData/v1/typenamebuiltin/test-typenamebuiltin-0849.json",
+    "note": [
+      "typenamebuiltin/type_name"
+    ]
+  },
+  {
+    "file": "TestData/v1/typenamebuiltin/test-typenamebuiltin-0850.json",
+    "note": [
+      "typenamebuiltin/type_name"
+    ]
+  },
+  {
+    "file": "TestData/v1/typenamebuiltin/test-typenamebuiltin-0851.json",
+    "note": [
+      "typenamebuiltin/type_name"
+    ]
+  },
+  {
+    "file": "TestData/v1/typenamebuiltin/test-typenamebuiltin-0852.json",
+    "note": [
+      "typenamebuiltin/type_name"
+    ]
+  },
+  {
+    "file": "TestData/v1/typenamebuiltin/test-typenamebuiltin-0853.json",
+    "note": [
+      "typenamebuiltin/type_name"
+    ]
+  },
+  {
+    "file": "TestData/v1/typenamebuiltin/test-typenamebuiltin-0854.json",
+    "note": [
+      "typenamebuiltin/type_name"
+    ]
+  },
+  {
+    "file": "TestData/v1/undos/test-undos-0599.json",
+    "note": [
+      "undos/array-type"
+    ]
+  },
+  {
+    "file": "TestData/v1/undos/test-undos-0600.json",
+    "note": [
+      "undos/arrays-element"
+    ]
+  },
+  {
+    "file": "TestData/v1/undos/test-undos-0601.json",
+    "note": [
+      "undos/arrays-length"
+    ]
+  },
+  {
+    "file": "TestData/v1/undos/test-undos-0602.json",
+    "note": [
+      "undos/array-ref-element"
+    ]
+  },
+  {
+    "file": "TestData/v1/undos/test-undos-0603.json",
+    "note": [
+      "undos/object-type"
+    ]
+  },
+  {
+    "file": "TestData/v1/undos/test-undos-0604.json",
+    "note": [
+      "undos/objects-element"
+    ]
+  },
+  {
+    "file": "TestData/v1/undos/test-undos-0605.json",
+    "note": [
+      "undos/objects-length"
+    ]
+  },
+  {
+    "file": "TestData/v1/undos/test-undos-0606.json",
+    "note": [
+      "undos/object-ref-element"
+    ]
+  },
+  {
+    "file": "TestData/v1/undos/test-undos-0607.json",
+    "note": [
+      "undos/object-ref-missing-key"
+    ]
+  },
+  {
+    "file": "TestData/v1/union/test-union-0357.json",
+    "note": [
+      "union/union_0_sets"
+    ]
+  },
+  {
+    "file": "TestData/v1/union/test-union-0358.json",
+    "note": [
+      "union/union_2_sets"
+    ]
+  },
+  {
+    "file": "TestData/v1/union/test-union-0359.json",
+    "note": [
+      "union/union_2_sets"
+    ]
+  },
+  {
+    "file": "TestData/v1/union/test-union-0360.json",
+    "note": [
+      "union/union_3_sets"
+    ]
+  },
+  {
+    "file": "TestData/v1/union/test-union-0361.json",
+    "note": [
+      "union/union_4_sets"
+    ]
+  },
+  {
+    "file": "TestData/v1/units/test-issue-4856.json",
+    "note": [
+      "units_parse/exact comparison - regression case 1",
+      "units_parse/exact comparison - regression case 2",
+      "units_parse/exact comparison - regression case 3"
+    ]
+  },
+  {
+    "file": "TestData/v1/units/test-parse-bytes-comparisons.json",
+    "note": [
+      "units_parse_bytes/comparison",
+      "units_parse_bytes/comparison",
+      "units_parse_bytes/comparison",
+      "units_parse_bytes/comparison",
+      "units_parse_bytes/comparison",
+      "units_parse_bytes/comparison",
+      "units_parse_bytes/comparison",
+      "units_parse_bytes/comparison",
+      "units_parse_bytes/comparison",
+      "units_parse_bytes/comparison"
+    ]
+  },
+  {
+    "file": "TestData/v1/units/test-parse-bytes-errors.json",
+    "note": [
+      "units_parse_bytes/failure",
+      "units_parse_bytes/failure",
+      "units_parse_bytes/failure",
+      "units_parse_bytes/failure",
+      "units_parse_bytes/failure",
+      "units_parse_bytes/failure",
+      "units_parse_bytes/failure"
+    ]
+  },
+  {
+    "file": "TestData/v1/units/test-parse-bytes.json",
+    "note": [
+      "units_parse_bytes/removes quotes and lowercases string",
+      "units_parse_bytes/zero",
+      "units_parse_bytes/zero float",
+      "units_parse_bytes/zero bare float",
+      "units_parse_bytes/raw number",
+      "units_parse_bytes/10 kilobytes uppercase",
+      "units_parse_bytes/10 KiB uppercase",
+      "units_parse_bytes/10 KB lowercase",
+      "units_parse_bytes/10 KiB mixed case",
+      "units_parse_bytes/200 megabytes as mb",
+      "units_parse_bytes/300 GiB",
+      "units_parse_bytes/1.1 KB floating point",
+      "units_parse_bytes/1.1 KiB floating point rounded",
+      "units_parse_bytes/.5 KB bare floating point",
+      "units_parse_bytes/100 kilobytes as k",
+      "units_parse_bytes/100 kilobytes as kb",
+      "units_parse_bytes/100 kibibytes as ki",
+      "units_parse_bytes/100 kibibytes as kib",
+      "units_parse_bytes/100 megabytes as m",
+      "units_parse_bytes/100 megabytes as mb",
+      "units_parse_bytes/100 mebibytes as mi",
+      "units_parse_bytes/100 mebibytes as mib",
+      "units_parse_bytes/100 gigabytes as g",
+      "units_parse_bytes/100 gigabytes as gb",
+      "units_parse_bytes/100 gibibytes as gi",
+      "units_parse_bytes/100 gibibytes as gib",
+      "units_parse_bytes/100 terabytes as t",
+      "units_parse_bytes/100 terabytes as tb",
+      "units_parse_bytes/100 tebibytes as ti",
+      "units_parse_bytes/100 tebibytes as tib",
+      "units_parse_bytes/100 petabytes as p",
+      "units_parse_bytes/100 petabytes as pb",
+      "units_parse_bytes/100 pebibytes as pi",
+      "units_parse_bytes/100 pebibytes as pib",
+      "units_parse_bytes/10 etabytes as e",
+      "units_parse_bytes/10 etabytes as eb",
+      "units_parse_bytes/10 ebibytes as ei",
+      "units_parse_bytes/10 ebibytes as eib",
+      "units_parse_bytes/scientific notation with KB",
+      "units_parse_bytes/uppercase scientific notation with MiB",
+      "units_parse_bytes/mixed case scientific notation with GiB",
+      "units_parse_bytes/scientific notation without unit",
+      "units_parse_bytes/scientific notation with negative exponent and KB",
+      "units_parse_bytes/uppercase scientific notation with GB",
+      "units_parse_bytes/mixed case scientific notation with TiB",
+      "units_parse_bytes/scientific notation with lowercase MiB",
+      "units_parse_bytes/invalid format with only E or e",
+      "units_parse_bytes/scientific notation with lowercase scientific notation and GiB"
+    ]
+  },
+  {
+    "file": "TestData/v1/units/test-parse-units-comparisons.json",
+    "note": [
+      "units_parse/comparison",
+      "units_parse/comparison",
+      "units_parse/comparison",
+      "units_parse/comparison",
+      "units_parse/comparison",
+      "units_parse/comparison",
+      "units_parse/comparison",
+      "units_parse/comparison",
+      "units_parse/comparison",
+      "units_parse/comparison"
+    ]
+  },
+  {
+    "file": "TestData/v1/units/test-parse-units-errors.json",
+    "note": [
+      "units_parse/failure",
+      "units_parse/failure",
+      "units_parse/failure",
+      "units_parse/failure",
+      "units_parse/failure",
+      "units_parse/failure",
+      "units_parse/failure"
+    ]
+  },
+  {
+    "file": "TestData/v1/units/test-parse-units.json",
+    "note": [
+      "units_parse/removes quotes and lowercases string",
+      "units_parse/zero",
+      "units_parse/zero float",
+      "units_parse/zero bare float",
+      "units_parse/raw number",
+      "units_parse/10 kilo uppercase",
+      "units_parse/10 Ki uppercase",
+      "units_parse/10 K lowercase",
+      "units_parse/10 Ki mixed case",
+      "units_parse/200 mega",
+      "units_parse/300 Gi",
+      "units_parse/1.1 K floating point",
+      "units_parse/1.1 Ki floating point, not rounded",
+      "units_parse/.5 K bare floating point",
+      "units_parse/100 kilo as k",
+      "units_parse/100 kilo as K",
+      "units_parse/100 kibi as ki",
+      "units_parse/100 kibi as Ki",
+      "units_parse/100 milli as m",
+      "units_parse/100 mega as M",
+      "units_parse/100 mebi as mi",
+      "units_parse/100 mebi as Mi",
+      "units_parse/100 giga as g",
+      "units_parse/100 gibi as gi",
+      "units_parse/100 tera as t",
+      "units_parse/100 tera as T",
+      "units_parse/100 tebi as ti",
+      "units_parse/100 tebi as Ti",
+      "units_parse/100 peta as p",
+      "units_parse/100 peta as P",
+      "units_parse/100 pebi as pi",
+      "units_parse/100 pebi as Pi",
+      "units_parse/10 eta as e",
+      "units_parse/10 eta as E",
+      "units_parse/10 ebi as ei",
+      "units_parse/10 ebi as Ei",
+      "units_parse/1e10 lowercase scientific notation without unit",
+      "units_parse/3.2E4 uppercase scientific notation without unit",
+      "units_parse/2.5e3 mixed case scientific notation with K",
+      "units_parse/1e3M lowercase scientific notation with M",
+      "units_parse/4E2G uppercase scientific notation with G",
+      "units_parse/5e1Gi mixed case scientific notation with Gi",
+      "units_parse/1e-2 lowercase scientific notation with negative exponent",
+      "units_parse/7.8E-1 uppercase scientific notation with negative exponent",
+      "units_parse/6e3Mi mixed case scientific notation with binary Mi",
+      "units_parse/invalid notation with single E",
+      "units_parse/number without exponent or unit",
+      "units_parse/negative number in scientific notation with unit"
+    ]
+  },
+  {
+    "file": "TestData/v1/units/test-units-precision.json",
+    "note": [
+      "units_parse/no decimal places for integers"
+    ]
+  },
+  {
+    "file": "TestData/v1/urlbuiltins/test-urlbuiltins-0939.json",
+    "note": [
+      "urlbuiltins/encode"
+    ]
+  },
+  {
+    "file": "TestData/v1/urlbuiltins/test-urlbuiltins-0940.json",
+    "note": [
+      "urlbuiltins/encode empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/urlbuiltins/test-urlbuiltins-0941.json",
+    "note": [
+      "urlbuiltins/decode"
+    ]
+  },
+  {
+    "file": "TestData/v1/urlbuiltins/test-urlbuiltins-0942.json",
+    "note": [
+      "urlbuiltins/encode_object empty"
+    ]
+  },
+  {
+    "file": "TestData/v1/urlbuiltins/test-urlbuiltins-0943.json",
+    "note": [
+      "urlbuiltins/encode_object strings"
+    ]
+  },
+  {
+    "file": "TestData/v1/urlbuiltins/test-urlbuiltins-0944.json",
+    "note": [
+      "urlbuiltins/encode_object escape"
+    ]
+  },
+  {
+    "file": "TestData/v1/urlbuiltins/test-urlbuiltins-0945.json",
+    "note": [
+      "urlbuiltins/encode_object array"
+    ]
+  },
+  {
+    "file": "TestData/v1/urlbuiltins/test-urlbuiltins-0946.json",
+    "note": [
+      "urlbuiltins/encode_object set"
+    ]
+  },
+  {
+    "file": "TestData/v1/urlbuiltins/test-urlbuiltins-1076.json",
+    "note": [
+      "urlbuiltins/decode_object multiple",
+      "urlbuiltins/decode_object empty parameter",
+      "urlbuiltins/decode_object empty string"
+    ]
+  },
+  {
+    "file": "TestData/v1/uuid/test-uuid-input-formats.json",
+    "note": [
+      "uuid-parse/positive-v4-braces",
+      "uuid-parse/positive-v2-urn",
+      "uuid-parse/positive-v3-no-dashes"
+    ]
+  },
+  {
+    "file": "TestData/v1/uuid/test-uuid-parse-rule.json",
+    "note": [
+      "uuid-parse-rule/positive"
+    ]
+  },
+  {
+    "file": "TestData/v1/uuid/test-uuid-parse.json",
+    "note": [
+      "uuid-parse/positive-v4",
+      "uuid-parse/positive-v2",
+      "uuid-parse/positive-v3",
+      "uuid-parse/negative"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0726.json",
+    "note": [
+      "varreferences/ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0727.json",
+    "note": [
+      "varreferences/non-ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0728.json",
+    "note": [
+      "varreferences/mixed"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0729.json",
+    "note": [
+      "varreferences/ref binding"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0730.json",
+    "note": [
+      "varreferences/existing ref binding"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0731.json",
+    "note": [
+      "varreferences/embedded"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0732.json",
+    "note": [
+      "varreferences/embedded ref binding"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0733.json",
+    "note": [
+      "varreferences/array: ground var"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0734.json",
+    "note": [
+      "varreferences/array: ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0735.json",
+    "note": [
+      "varreferences/object: ground var"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0736.json",
+    "note": [
+      "varreferences/object: ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0737.json",
+    "note": [
+      "varreferences/set: ground var"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0738.json",
+    "note": [
+      "varreferences/set: ref"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0739.json",
+    "note": [
+      "varreferences/set: lookup: base docs"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0740.json",
+    "note": [
+      "varreferences/set: lookup: embedded"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0741.json",
+    "note": [
+      "varreferences/set: lookup: dereference"
+    ]
+  },
+  {
+    "file": "TestData/v1/varreferences/test-varreferences-0742.json",
+    "note": [
+      "varreferences/avoids indexer"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0620.json",
+    "note": [
+      "virtualdocs/input: set 1"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0621.json",
+    "note": [
+      "virtualdocs/input: set 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0622.json",
+    "note": [
+      "virtualdocs/input: set embedded"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0623.json",
+    "note": [
+      "virtualdocs/input: set undefined"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0624.json",
+    "note": [
+      "virtualdocs/input: set dereference"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0625.json",
+    "note": [
+      "virtualdocs/input: set ground var"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0626.json",
+    "note": [
+      "virtualdocs/input: set ground composite (1)"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0627.json",
+    "note": [
+      "virtualdocs/input: set ground composite (2)"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0628.json",
+    "note": [
+      "virtualdocs/input: set ground composite (3)"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0629.json",
+    "note": [
+      "virtualdocs/input: set partially ground composite"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0630.json",
+    "note": [
+      "virtualdocs/input: object 1"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0631.json",
+    "note": [
+      "virtualdocs/input: object 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0632.json",
+    "note": [
+      "virtualdocs/input: object embedded 1"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0633.json",
+    "note": [
+      "virtualdocs/input: object embedded 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0634.json",
+    "note": [
+      "virtualdocs/input: object undefined val"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0635.json",
+    "note": [
+      "virtualdocs/input: object undefined key 1"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0636.json",
+    "note": [
+      "virtualdocs/input: object undefined key 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0637.json",
+    "note": [
+      "virtualdocs/input: object dereference ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0638.json",
+    "note": [
+      "virtualdocs/input: object dereference ground 2"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0639.json",
+    "note": [
+      "virtualdocs/input: object defererence non-ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0640.json",
+    "note": [
+      "virtualdocs/input: object ground var key"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0641.json",
+    "note": [
+      "virtualdocs/input: object non-string key"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0642.json",
+    "note": [
+      "virtualdocs/input: variable binding substitution"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0643.json",
+    "note": [
+      "virtualdocs/output: set"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0644.json",
+    "note": [
+      "virtualdocs/output: set embedded"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0645.json",
+    "note": [
+      "virtualdocs/output: set var binding"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0646.json",
+    "note": [
+      "virtualdocs/output: set dereference"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0647.json",
+    "note": [
+      "virtualdocs/output: set dereference deep"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0648.json",
+    "note": [
+      "virtualdocs/output: set falsy values"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0649.json",
+    "note": [
+      "virtualdocs/output: object key"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0650.json",
+    "note": [
+      "virtualdocs/output: object non-string key"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0651.json",
+    "note": [
+      "virtualdocs/output: object value"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0652.json",
+    "note": [
+      "virtualdocs/output: object embedded"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0653.json",
+    "note": [
+      "virtualdocs/output: object dereference ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0654.json",
+    "note": [
+      "virtualdocs/output: object defererence non-ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0655.json",
+    "note": [
+      "virtualdocs/output: object dereference array of refs"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0656.json",
+    "note": [
+      "virtualdocs/output: object dereference array of refs within object"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0657.json",
+    "note": [
+      "virtualdocs/output: object dereference object with key refs"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0658.json",
+    "note": [
+      "virtualdocs/output: object var binding"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0659.json",
+    "note": [
+      "virtualdocs/output: object key var binding"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0660.json",
+    "note": [
+      "virtualdocs/object: self-join"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0661.json",
+    "note": [
+      "virtualdocs/i/o: objects"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0662.json",
+    "note": [
+      "virtualdocs/i/o: undefined keys"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0663.json",
+    "note": [
+      "virtualdocs/input: complete array"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0664.json",
+    "note": [
+      "virtualdocs/input: complete object"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0665.json",
+    "note": [
+      "virtualdocs/input: complete set"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0666.json",
+    "note": [
+      "virtualdocs/input: complete array dereference ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0667.json",
+    "note": [
+      "virtualdocs/input: complete object dereference ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0668.json",
+    "note": [
+      "virtualdocs/input: complete array ground index"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0669.json",
+    "note": [
+      "virtualdocs/input: complete object ground key"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0670.json",
+    "note": [
+      "virtualdocs/input: complete vars"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0671.json",
+    "note": [
+      "virtualdocs/output: complete array"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0672.json",
+    "note": [
+      "virtualdocs/output: complete object"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0673.json",
+    "note": [
+      "virtualdocs/output: complete set"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0674.json",
+    "note": [
+      "virtualdocs/output: complete array dereference non-ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0675.json",
+    "note": [
+      "virtualdocs/output: complete object defererence non-ground"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0676.json",
+    "note": [
+      "virtualdocs/output: complete vars"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0677.json",
+    "note": [
+      "virtualdocs/no suffix: complete"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0678.json",
+    "note": [
+      "virtualdocs/no suffix: complete vars"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0679.json",
+    "note": [
+      "virtualdocs/no suffix: complete incr (error)"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0680.json",
+    "note": [
+      "virtualdocs/no suffix: complete incr"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0681.json",
+    "note": [
+      "virtualdocs/no suffix: object"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0682.json",
+    "note": [
+      "virtualdocs/no suffix: object incr"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0683.json",
+    "note": [
+      "virtualdocs/no suffix: chained"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0684.json",
+    "note": [
+      "virtualdocs/no suffix: object var binding"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0685.json",
+    "note": [
+      "virtualdocs/no suffix: object composite value"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0686.json",
+    "note": [
+      "virtualdocs/no suffix: bound ref with long prefix (#238)"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0687.json",
+    "note": [
+      "virtualdocs/no suffix: object conflict (error)"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0688.json",
+    "note": [
+      "virtualdocs/no suffix: set"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0689.json",
+    "note": [
+      "virtualdocs/empty partial set"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0690.json",
+    "note": [
+      "virtualdocs/empty partial object"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0691.json",
+    "note": [
+      "virtualdocs/input: non-ground object keys"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0692.json",
+    "note": [
+      "virtualdocs/input: non-ground set elements"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0693.json",
+    "note": [
+      "virtualdocs/output: non-ground object keys"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-0694.json",
+    "note": [
+      "virtualdocs/output: non-ground set elements"
+    ]
+  },
+  {
+    "file": "TestData/v1/virtualdocs/test-virtualdocs-undefined.json",
+    "note": [
+      "virtualdocs/undefined: in array literal",
+      "virtualdocs/undefined: in set literal",
+      "virtualdocs/undefined: in set coprehension body",
+      "virtualdocs/undefined: in array coprehension body"
+    ]
+  },
+  {
+    "file": "TestData/v1/walkbuiltin/test-walkbuiltin-0970.json",
+    "note": [
+      "walkbuiltin/scalar",
+      "walkbuiltin/scalar no path"
+    ]
+  },
+  {
+    "file": "TestData/v1/walkbuiltin/test-walkbuiltin-0971.json",
+    "note": [
+      "walkbuiltin/arrays",
+      "walkbuiltin/arrays no path"
+    ]
+  },
+  {
+    "file": "TestData/v1/walkbuiltin/test-walkbuiltin-0972.json",
+    "note": [
+      "walkbuiltin/objects",
+      "walkbuiltin/objects no path"
+    ]
+  },
+  {
+    "file": "TestData/v1/walkbuiltin/test-walkbuiltin-0973.json",
+    "note": [
+      "walkbuiltin/sets",
+      "walkbuiltin/sets no path"
+    ]
+  },
+  {
+    "file": "TestData/v1/walkbuiltin/test-walkbuiltin-0974.json",
+    "note": [
+      "walkbuiltin/match and filter"
+    ]
+  },
+  {
+    "file": "TestData/v1/walkbuiltin/test-walkbuiltin-0975.json",
+    "note": [
+      "walkbuiltin/partially ground path"
+    ]
+  },
+  {
+    "file": "TestData/v1/walkbuiltin/test-walkbuiltin-wildcard-path.json",
+    "note": [
+      "walkbuiltin/wildcard-path same values as when path provided"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-with-and-ndbcache-issue.json",
+    "note": [
+      "with: ndb_cache-issue"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-with-builtin-mock.json",
+    "note": [
+      "withkeyword/builtin: direct call, arity 0",
+      "withkeyword/builtin: direct call, arity 1",
+      "withkeyword/builtin: indirect call, arity 1",
+      "withkeyword/builtin: indirect call, arity 0",
+      "withkeyword/builtin: indirect call, arity 0, rule queried with and without mock",
+      "withkeyword/builtin: indirect call, arity 0, query package",
+      "withkeyword/builtin: http.send example",
+      "withkeyword/builtin: nested, multiple mocks",
+      "withkeyword/builtin: indirect call through function",
+      "withkeyword/builtin: indirect call through function, rule with and without mock",
+      "withkeyword/builtin: indirect call through function, query package",
+      "withkeyword/builtin: mock function calls original",
+      "withkeyword/builtin: mock function returns same result for both rule defs",
+      "withkeyword/builtin: nested, mock function calls original",
+      "withkeyword/builtin: multiple with",
+      "withkeyword/builtin: mock will not call other mock",
+      "withkeyword/builtin: nested scope handling",
+      "withkeyword/builtin-value: arity-0, captured output",
+      "withkeyword/builtin-value: arity-0, false",
+      "withkeyword/builtin-value: arity-0",
+      "withkeyword/builtin-value: arity-0, var",
+      "withkeyword/builtin-value: arity-1",
+      "withkeyword/builtin-value: arity-1, captured",
+      "withkeyword/builtin-value: arity-1, input must still be defined",
+      "withkeyword/builtin-builtin: arity 0",
+      "withkeyword/builtin-builtin: arity 1, replacement is compound",
+      "withkeyword/builtin-builtin: arity 1, replacement is simple",
+      "withkeyword/builtin: direct call, arity 1, replacement is value that needs eval (array comprehension)",
+      "withkeyword/builtin: indirect call, arity 1, replacement is value that needs eval (array comprehension)"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-with-function-mock.json",
+    "note": [
+      "withkeyword/function: direct call, value replacement, arity 1",
+      "withkeyword/function: direct call, function replacement, arity 1",
+      "withkeyword/function: direct call, function replacement, arity 1, result captured",
+      "withkeyword/function: direct call, built-in replacement, arity 1",
+      "withkeyword/function: direct call, built-in replacement, arity 1, result captured",
+      "withkeyword/function: nested scope handling",
+      "withkeyword/function: simple scope handling (no recursion here)",
+      "withkeyword/function: rule indexing irrelevant",
+      "withkeyword/function: direct call, arity 1, replacement is value that needs eval (array comprehension)",
+      "withkeyword/function: indirect call, arity 1, replacement is value that needs eval (array comprehension)"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-with-function-mocks-issue-5299.json",
+    "note": [
+      "withkeyword/function: direct call, rule replacement",
+      "withkeyword/function: captured result, rule replacement",
+      "withkeyword/builtin: direct call, arity 0, rule replacement",
+      "withkeyword/builtin: direct call, arity 1, rule replacement",
+      "withkeyword/builtin: indirect call, arity 1, rule replacement"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1015.json",
+    "note": [
+      "withkeyword/with"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1016.json",
+    "note": [
+      "withkeyword/with not"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1017.json",
+    "note": [
+      "withkeyword/with composite"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1018.json",
+    "note": [
+      "withkeyword/with vars"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1019.json",
+    "note": [
+      "withkeyword/with conflict"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1020.json",
+    "note": [
+      "withkeyword/with stack"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1021.json",
+    "note": [
+      "withkeyword/with not stack"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1022.json",
+    "note": [
+      "withkeyword/with stack (data)"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1023.json",
+    "note": [
+      "withkeyword/with not stack (data)"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1024.json",
+    "note": [
+      "withkeyword/with stack overwrites"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1025.json",
+    "note": [
+      "withkeyword/with stack overwrites (data)"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1026.json",
+    "note": [
+      "withkeyword/with invalidate"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1027.json",
+    "note": [
+      "withkeyword/with invalidate input stack"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1028.json",
+    "note": [
+      "withkeyword/with invalidate input stack iteration"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1029.json",
+    "note": [
+      "withkeyword/with invalidate virtual cache"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1030.json",
+    "note": [
+      "withkeyword/with invalidate data stack"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1031.json",
+    "note": [
+      "withkeyword/with invalidate data stack iteration"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1032.json",
+    "note": [
+      "withkeyword/with basic data"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1033.json",
+    "note": [
+      "withkeyword/with map data overwrite"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1034.json",
+    "note": [
+      "withkeyword/with map data new key"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1035.json",
+    "note": [
+      "withkeyword/with data conflict"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1036.json",
+    "note": [
+      "withkeyword/with base doc exact value"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1037.json",
+    "note": [
+      "withkeyword/with base doc any index"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1038.json",
+    "note": [
+      "withkeyword/undefined_1"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1039.json",
+    "note": [
+      "withkeyword/undefined_2"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1040.json",
+    "note": [
+      "withkeyword/with virtual doc exact value"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1041.json",
+    "note": [
+      "withkeyword/with virtual doc any index"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1042.json",
+    "note": [
+      "withkeyword/with virtual doc specific index"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1043.json",
+    "note": [
+      "withkeyword/with virtual doc not specific index"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1044.json",
+    "note": [
+      "withkeyword/with mock var"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1045.json",
+    "note": [
+      "withkeyword/with mock rule"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1046.json",
+    "note": [
+      "withkeyword/with rule chain"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1047.json",
+    "note": [
+      "withkeyword/with mock iteration on sets"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1048.json",
+    "note": [
+      "withkeyword/with mock iteration on objects"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1049.json",
+    "note": [
+      "withkeyword/with mock iteration on arrays"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1050.json",
+    "note": [
+      "withkeyword/bug 1083"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1051.json",
+    "note": [
+      "withkeyword/bug 1100"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1052.json",
+    "note": [
+      "withkeyword/set lookup"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1053.json",
+    "note": [
+      "withkeyword/invalidate comprehension cache"
+    ]
+  },
+  {
+    "file": "TestData/v1/withkeyword/test-withkeyword-1054.json",
+    "note": [
+      "withkeyword/rewrite declared variables in with value",
+      "withkeyword/rewrite declared variables nested in function call in with value",
+      "withkeyword/rewrite declared variables nested in array in with value",
+      "withkeyword/rewrite declared variables nested in object in with value",
+      "withkeyword/rewrite declared variables nested in function/array/object in with value"
+    ]
+  }
+]

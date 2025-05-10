@@ -1,0 +1,271 @@
+{
+	"cases": [
+		{
+			"note": "jwtverifyrsa/success-ps384-cert",
+			"query": "data.generated.p = x",
+			"modules": [
+				"package generated\n\np := x if {\n\tio.jwt.verify_ps384(\"eyJhbGciOiJQUzM4NCJ9.eyJTY29wZXMiOlsiZm9vIiwiYmFyIl0sIm5iZiI6MTQ1MTYwNjQwMH0.EHPUvPr6uJOYqdza95WbM1SYD8atZHJEVRggpwOWnHGsjQBoEarJb8QgW7TY22OXwGw2HWluTiyT_MAz02NaHRzZv6AgrmxCLChMWkCHLwPxqjs0xSvVAMLzHHq2X2Bcujo9KORGudR7zKz8pOX5Mfnm7Z6OGtqPCPLaIdVJlddNsG6a571NOuVuDWbcg0omeRDANZpCZMJeAQN2M-4Q61ef6zcQHK1R-QqzBhw6HzMgqR1LRJ0xbrmD-L5o53JM3pV1e1juKNXVK3vWkDQRCQORFn1lyH5isfSsiiHW-x90sUC7TrU_cOji4MMmOCME6kkwxe57ZgpeXtdVTvldpw\", \"-----BEGIN CERTIFICATE-----\\nMIIDXDCCAkSgAwIBAgIBKjANBgkqhkiG9w0BAQsFADBWMQswCQYDVQQGEwJVUzEV\\nMBMGA1UEBxMMUmVkd29vZCBDaXR5MQ4wDAYDVQQKEwVTdHlyYTEMMAoGA1UECxMD\\nRGV2MRIwEAYDVQQDEwlsb2NhbGhvc3QwHhcNMjAwNTA3MDkxMjU2WhcNMjAwNTA3\\nMTExMjU2WjBWMQswCQYDVQQGEwJVUzEVMBMGA1UEBxMMUmVkd29vZCBDaXR5MQ4w\\nDAYDVQQKEwVTdHlyYTEMMAoGA1UECxMDRGV2MRIwEAYDVQQDEwlsb2NhbGhvc3Qw\\nggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDtyVWH2FE8cU8LRcArH4Tw\\nDhBOFcmJF28LrvRObcbDYsae6rEwby0aRgSxjTEMgyGBjroBSl22wOSA93kwx4pu\\npfXEqbwywn9FhyKBb/OXQSglPmwrpmzQtPJGzBHncL+PPjRhPfqimwf7ZIPKAAgI\\nz9O6ppGhE/x4Ct444jthUIBZuG5cUXhgiPBQdIQ3K88QhgVwcufTZkNHj4iSDfhl\\nVFDHVjXjd2B/yGODjyv0TyChV0YBNGjMv7YFLWmIFUFzK+6qNSxu4czPtRkyfwaV\\n2GW/PBT5f8fc6fKgQZ6k6BLK6+pi0iPh5TUizyHtqtueWDbrJ+wfdJilQS8D+EGr\\nAgMBAAGjNTAzMA4GA1UdDwEB/wQEAwIFoDATBgNVHSUEDDAKBggrBgEFBQcDATAM\\nBgNVHRMBAf8EAjAAMA0GCSqGSIb3DQEBCwUAA4IBAQBgVAM50/0aBTBxESYKIKN4\\nE+qbV6aE0C+wYJLet0EWPTxwmFZamq5LNEO/D6xyoY5WHY60EyHRMs0agSB/ATBX\\n5ULdEwh9G0NjxqivCcoddQ1fuVS2PrrqNL7VlRnYbTpd8/Dh4qnyl5FltlyZ/29L\\ny7BWOwlcBlZdhsfH8svNX4PUxjRD+jmnczCDi7XSOKT8htKUV2ih1c9JrWpIhCi/\\nHzEXkaAxNdhBNdIsLQMo3qq9fkSgNZQk9/ecJNPeuJ/UYyr5Xa4PxIWl4U+P7yuI\\n+Q3FSPmUbiVsSGqMhh6V/DN8M+T5/KiSB47gFOfxc2/RR5aw4HkSp3WxwbT9njbE\\n-----END CERTIFICATE-----\", x)\n}\n"
+			],
+			"data": {},
+			"want_result": [
+				{
+					"x": true
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "eyJhbGciOiJQUzM4NCJ9.eyJTY29wZXMiOlsiZm9vIiwiYmFyIl0sIm5iZiI6MTQ1MTYwNjQwMH0.EHPUvPr6uJOYqdza95WbM1SYD8atZHJEVRggpwOWnHGsjQBoEarJb8QgW7TY22OXwGw2HWluTiyT_MAz02NaHRzZv6AgrmxCLChMWkCHLwPxqjs0xSvVAMLzHHq2X2Bcujo9KORGudR7zKz8pOX5Mfnm7Z6OGtqPCPLaIdVJlddNsG6a571NOuVuDWbcg0omeRDANZpCZMJeAQN2M-4Q61ef6zcQHK1R-QqzBhw6HzMgqR1LRJ0xbrmD-L5o53JM3pV1e1juKNXVK3vWkDQRCQORFn1lyH5isfSsiiHW-x90sUC7TrU_cOji4MMmOCME6kkwxe57ZgpeXtdVTvldpw"
+						},
+						{
+							"value": "-----BEGIN CERTIFICATE-----\nMIIDXDCCAkSgAwIBAgIBKjANBgkqhkiG9w0BAQsFADBWMQswCQYDVQQGEwJVUzEV\nMBMGA1UEBxMMUmVkd29vZCBDaXR5MQ4wDAYDVQQKEwVTdHlyYTEMMAoGA1UECxMD\nRGV2MRIwEAYDVQQDEwlsb2NhbGhvc3QwHhcNMjAwNTA3MDkxMjU2WhcNMjAwNTA3\nMTExMjU2WjBWMQswCQYDVQQGEwJVUzEVMBMGA1UEBxMMUmVkd29vZCBDaXR5MQ4w\nDAYDVQQKEwVTdHlyYTEMMAoGA1UECxMDRGV2MRIwEAYDVQQDEwlsb2NhbGhvc3Qw\nggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDtyVWH2FE8cU8LRcArH4Tw\nDhBOFcmJF28LrvRObcbDYsae6rEwby0aRgSxjTEMgyGBjroBSl22wOSA93kwx4pu\npfXEqbwywn9FhyKBb/OXQSglPmwrpmzQtPJGzBHncL+PPjRhPfqimwf7ZIPKAAgI\nz9O6ppGhE/x4Ct444jthUIBZuG5cUXhgiPBQdIQ3K88QhgVwcufTZkNHj4iSDfhl\nVFDHVjXjd2B/yGODjyv0TyChV0YBNGjMv7YFLWmIFUFzK+6qNSxu4czPtRkyfwaV\n2GW/PBT5f8fc6fKgQZ6k6BLK6+pi0iPh5TUizyHtqtueWDbrJ+wfdJilQS8D+EGr\nAgMBAAGjNTAzMA4GA1UdDwEB/wQEAwIFoDATBgNVHSUEDDAKBggrBgEFBQcDATAM\nBgNVHRMBAf8EAjAAMA0GCSqGSIb3DQEBCwUAA4IBAQBgVAM50/0aBTBxESYKIKN4\nE+qbV6aE0C+wYJLet0EWPTxwmFZamq5LNEO/D6xyoY5WHY60EyHRMs0agSB/ATBX\n5ULdEwh9G0NjxqivCcoddQ1fuVS2PrrqNL7VlRnYbTpd8/Dh4qnyl5FltlyZ/29L\ny7BWOwlcBlZdhsfH8svNX4PUxjRD+jmnczCDi7XSOKT8htKUV2ih1c9JrWpIhCi/\nHzEXkaAxNdhBNdIsLQMo3qq9fkSgNZQk9/ecJNPeuJ/UYyr5Xa4PxIWl4U+P7yuI\n+Q3FSPmUbiVsSGqMhh6V/DN8M+T5/KiSB47gFOfxc2/RR5aw4HkSp3WxwbT9njbE\n-----END CERTIFICATE-----"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "io.jwt.verify_ps384",
+							"decl": {
+								"args": [
+									{
+										"description": "JWT token whose signature is to be verified",
+										"name": "jwt",
+										"type": "string"
+									},
+									{
+										"description": "PEM encoded certificate, PEM encoded public key, or the JWK key (set) used to verify the signature",
+										"name": "certificate",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "`true` if the signature is valid, `false` otherwise",
+									"name": "result",
+									"type": "boolean"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.generated.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.generated.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "io.jwt.verify_ps384",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"generated",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": true
+				}
+			]
+		}
+	]
+}

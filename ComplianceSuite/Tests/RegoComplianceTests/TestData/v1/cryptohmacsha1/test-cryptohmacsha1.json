@@ -1,0 +1,673 @@
+{
+	"cases": [
+		{
+			"note": "cryptohmacsha1/crypto.hmac.sha1",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\n\np contains mac if {\n\tmac := crypto.hmac.sha1(input.message, input.key)\n}\n"
+			],
+			"input": {
+				"key": "bar",
+				"message": "foo"
+			},
+			"want_result": [
+				{
+					"x": [
+						"85d155c55ed286a300bd1cf124de08d87e914f3a"
+					]
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "message"
+						},
+						{
+							"value": "key"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "crypto.hmac.sha1",
+							"decl": {
+								"args": [
+									{
+										"description": "input string",
+										"name": "x",
+										"type": "string"
+									},
+									{
+										"description": "key to use",
+										"name": "key",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "SHA1-HMAC of `x`",
+									"name": "y",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "MakeSetStmt",
+											"stmt": {
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "DotStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 0
+												},
+												"key": {
+													"type": "string_index",
+													"value": 1
+												},
+												"target": 4,
+												"file": 0,
+												"col": 26,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 26,
+												"row": 4
+											}
+										},
+										{
+											"type": "DotStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 0
+												},
+												"key": {
+													"type": "string_index",
+													"value": 2
+												},
+												"target": 6,
+												"file": 0,
+												"col": 41,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 6
+												},
+												"target": 7,
+												"file": 0,
+												"col": 41,
+												"row": 4
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "crypto.hmac.sha1",
+												"args": [
+													{
+														"type": "local",
+														"value": 5
+													},
+													{
+														"type": "local",
+														"value": 7
+													}
+												],
+												"result": 8,
+												"file": 0,
+												"col": 9,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 8
+												},
+												"target": 9,
+												"file": 0,
+												"col": 9,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 9
+												},
+												"target": 10,
+												"file": 0,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "SetAddStmt",
+											"stmt": {
+												"value": {
+													"type": "local",
+													"value": 10
+												},
+												"set": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": [
+						"85d155c55ed286a300bd1cf124de08d87e914f3a"
+					]
+				}
+			]
+		},
+		{
+			"note": "cryptohmacsha1/crypto.hmac.sha1_unicode",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\n\np contains mac if {\n\tmac := crypto.hmac.sha1(input.message, input.key)\n}\n"
+			],
+			"input": {
+				"key": "秘密の",
+				"message": "åäöçß🥲♙Ω"
+			},
+			"want_result": [
+				{
+					"x": [
+						"81759c39013935fcf0de833d44c8018d7c1455dd"
+					]
+				}
+			],
+			"strict_error": true,
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "message"
+						},
+						{
+							"value": "key"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "crypto.hmac.sha1",
+							"decl": {
+								"args": [
+									{
+										"description": "input string",
+										"name": "x",
+										"type": "string"
+									},
+									{
+										"description": "key to use",
+										"name": "key",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "SHA1-HMAC of `x`",
+									"name": "y",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "MakeSetStmt",
+											"stmt": {
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "DotStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 0
+												},
+												"key": {
+													"type": "string_index",
+													"value": 1
+												},
+												"target": 4,
+												"file": 0,
+												"col": 26,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 26,
+												"row": 4
+											}
+										},
+										{
+											"type": "DotStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 0
+												},
+												"key": {
+													"type": "string_index",
+													"value": 2
+												},
+												"target": 6,
+												"file": 0,
+												"col": 41,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 6
+												},
+												"target": 7,
+												"file": 0,
+												"col": 41,
+												"row": 4
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "crypto.hmac.sha1",
+												"args": [
+													{
+														"type": "local",
+														"value": 5
+													},
+													{
+														"type": "local",
+														"value": 7
+													}
+												],
+												"result": 8,
+												"file": 0,
+												"col": 9,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 8
+												},
+												"target": 9,
+												"file": 0,
+												"col": 9,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 9
+												},
+												"target": 10,
+												"file": 0,
+												"col": 2,
+												"row": 4
+											}
+										},
+										{
+											"type": "SetAddStmt",
+											"stmt": {
+												"value": {
+													"type": "local",
+													"value": 10
+												},
+												"set": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": [
+						"81759c39013935fcf0de833d44c8018d7c1455dd"
+					]
+				}
+			]
+		}
+	]
+}

@@ -78,6 +78,9 @@ public struct BuiltinRegistry {
             "neq": BuiltinFuncs.notEq,
             "equal": BuiltinFuncs.equal,
 
+            // Conversions aka Casts
+            "to_number": BuiltinFuncs.toNumber,
+
             // Cryptography
             "crypto.hmac.equal": BuiltinFuncs.hmacsEqual,
             "crypto.hmac.md5": BuiltinFuncs.insecureMD5HMAC,

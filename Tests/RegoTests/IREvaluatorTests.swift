@@ -17,7 +17,7 @@ struct IREvaluatorTests {
 
     struct ErrorCase {
         let description: String
-        let sourceBundle: URL
+        let sourceBundles: [URL]
         var query: String = ""
         var input: AST.RegoValue = [:]
         let expectedError: Rego.RegoError.Code
@@ -111,22 +111,30 @@ struct IREvaluatorTests {
         return [
             ErrorCase(
                 description: "query not found in valid bundle",
-                sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
+                sourceBundles: [relPath("TestData/Bundles/simple-directory-bundle")],
                 query: "data.not.found.query",
                 input: [:],
                 expectedError: Rego.RegoError.Code.unknownQuery
             ),
             ErrorCase(
                 description: "bundle with no plan json",
-                sourceBundle: relPath("TestData/Bundles/simple-directory-no-plan-bundle"),
+                sourceBundles: [relPath("TestData/Bundles/simple-directory-no-plan-bundle")],
                 query: "data.not.found.query",
                 input: [:],
                 expectedError: Rego.RegoError.Code.unknownQuery
             ),
             ErrorCase(
                 description: "bundle with invalid plan json",
-                sourceBundle: relPath("TestData/Bundles/invalid-plan-json-bundle"),
+                sourceBundles: [relPath("TestData/Bundles/invalid-plan-json-bundle")],
                 expectedError: Rego.RegoError.Code.bundleInitializationError
+            ),
+            ErrorCase(
+                description: "multiple bundles",
+                sourceBundles: [
+                    relPath("TestData/Bundles/main-root-bundle"),
+                    relPath("TestData/Bundles/other-root-bundle"),
+                ],
+                expectedError: Rego.RegoError.Code.invalidArgumentError,
             ),
         ]
     }
@@ -160,7 +168,8 @@ struct IREvaluatorTests {
 
     @Test(arguments: errorTestCases)
     func testInvalidEvaluations(tc: ErrorCase) async throws {
-        var engine = try OPA.Engine(bundlePaths: [OPA.Engine.BundlePath(name: "default", url: tc.sourceBundle)])
+        var engine = try OPA.Engine(
+            bundlePaths: tc.sourceBundles.map({ OPA.Engine.BundlePath(name: $0.lastPathComponent, url: $0) }))
 
         await #expect(Comment(rawValue: tc.description)) {
             let _ = try await engine.prepareForEvaluation(query: tc.query).evaluate(input: tc.input)

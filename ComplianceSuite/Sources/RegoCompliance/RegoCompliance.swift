@@ -202,7 +202,7 @@ public struct ComplianceTesting {
         public var knownIssue: String?
     }
 
-    public static func runTest(config: TestConfig, _ tc: IRTestCase) async -> IRTestResult {
+    public static func runTest(config: TestConfig, _ tc: IRTestCase, _ builtins: BuiltinRegistry? = nil) async -> IRTestResult {
         var testResult = IRTestResult(testCase: tc)
 
         for knownIssue in config.knownIssues {
@@ -266,7 +266,8 @@ public struct ComplianceTesting {
             let actualResult = try await engine.prepareForEvaluation(query: query).evaluate(
                 input: input,
                 tracer: tracer,
-                strictBuiltins: tc.base.strictError ?? false
+                strictBuiltins: tc.base.strictError ?? false,
+                builtins: builtins
             )
 
             guard !wantError else {

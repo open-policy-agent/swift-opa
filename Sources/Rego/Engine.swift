@@ -48,16 +48,19 @@ extension OPA.Engine {
         ///   - tracer: (optional) The tracer to use for this evaluation.
         ///   - strictBuiltins: (optional) Whether to run in strict builtin evaluation mode.
         ///                     In strict mode, builtin errors abort evaluation, rather than returning undefined.
+        ///   - builtins: (optional) BuiltinRegistry to use for evaluation.
+        ///               When not provided, defaultRegistry will be used
         public func evaluate(
             input: AST.RegoValue = .undefined,
             tracer: OPA.Trace.QueryTracer? = nil,
-            strictBuiltins: Bool = false
+            strictBuiltins: Bool = false,
+            builtins: BuiltinRegistry? = nil
         ) async throws -> ResultSet {
             let ctx = EvaluationContext(
                 query: self.query,
                 input: input,
                 store: self.store,
-                builtins: .defaultRegistry,
+                builtins: builtins ?? .defaultRegistry,
                 tracer: tracer,
                 strictBuiltins: strictBuiltins
             )

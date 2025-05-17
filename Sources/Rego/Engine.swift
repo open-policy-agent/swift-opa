@@ -104,20 +104,21 @@ extension OPA.Engine {
             try await store.write(to: StoreKeyPath(["data"]), value: bundle.data)
         }
 
+        let evaluator: Evaluator
         if self.policies.count > 0 {
             guard loadedBundles.isEmpty else {
                 throw RegoError.init(code: .invalidArgumentError, message: "Cannot mix direct IR policies with bundles")
             }
-            return PreparedQuery(
-                query: query,
-                evaluator: IREvaluator(policies: self.policies),
-                store: self.store
-            )
+            evaluator = IREvaluator(policies: self.policies)
+        } else {
+            evaluator = try IREvaluator(bundles: loadedBundles)
         }
+
+        try evaluator.ensureQueryIsSupported(query)
 
         return PreparedQuery(
             query: query,
-            evaluator: try IREvaluator(bundles: loadedBundles),
+            evaluator: evaluator,
             store: self.store
         )
     }

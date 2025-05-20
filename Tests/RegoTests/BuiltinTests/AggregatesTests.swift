@@ -234,6 +234,172 @@ extension BuiltinTests.AggregatesTests {
         ),
     ]
 
+    static let sumTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "empty array",
+            name: "sum",
+            args: [[]],
+            expected: .success(0)
+        ),
+        BuiltinTests.TestCase(
+            description: "array",
+            name: "sum",
+            args: [[1, 2, 3.14, 4]],
+            expected: .success(.number(NSDecimalNumber(decimal: 1 + 2 + 3.14 + 4)))
+        ),
+        BuiltinTests.TestCase(
+            description: "array of various objects",
+            name: "sum",
+            args: [[1, "a", "b"]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "collection", got: "array[any<number, string>]", want: "any<array[number], set[number]>"))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty set",
+            name: "sum",
+            args: [.set([])],
+            expected: .success(0)
+        ),
+        BuiltinTests.TestCase(
+            description: "set",
+            name: "sum",
+            args: [.set([1, 5, 8.65])],
+            expected: .success(.number(NSDecimalNumber(decimal: 1 + 5 + 8.65)))
+        ),
+        BuiltinTests.TestCase(
+            description: "set of various objects",
+            name: "sum",
+            args: [.set([1, "a", "b"])],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "collection", got: "set[any<number, string>]", want: "any<array[number], set[number]>"))
+        ),
+    ]
+
+    static let productTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "empty array",
+            name: "product",
+            args: [[]],
+            expected: .success(1)
+        ),
+        BuiltinTests.TestCase(
+            description: "array",
+            name: "product",
+            args: [[1, 2, 3.14, 4]],
+            expected: .success(.number(NSDecimalNumber(decimal: 1 * 2 * 3.14 * 4)))
+        ),
+        BuiltinTests.TestCase(
+            description: "array of various objects",
+            name: "product",
+            args: [[1, "a"]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "collection", got: "array<number, string>", want: "any<array[number], set[number]>"))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty set",
+            name: "product",
+            args: [.set([])],
+            expected: .success(1)
+        ),
+        BuiltinTests.TestCase(
+            description: "set",
+            name: "product",
+            args: [.set([1, 5, 8.65])],
+            expected: .success(.number(NSDecimalNumber(decimal: 1 * 5 * 8.65)))
+        ),
+        BuiltinTests.TestCase(
+            description: "set of various objects",
+            name: "product",
+            args: [.set([1, "a"])],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "collection", got: "set<number, string>", want: "any<array[number], set[number]>"))
+        ),
+    ]
+
+    static let sortTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "array",
+            name: "sort",
+            args: [[1, 100, 2]],
+            expected: .success([1, 2, 100])
+        ),
+        BuiltinTests.TestCase(
+            description: "string array",
+            name: "sort",
+            args: [["b", "a"]],
+            expected: .success(["a", "b"])
+        ),
+        BuiltinTests.TestCase(
+            description: "empty array",
+            name: "sort",
+            args: [[]],
+            expected: .success([])
+        ),
+        BuiltinTests.TestCase(
+            description: "array of objects",
+            name: "sort",
+            args: [
+                [["a": 1], ["a": 100], ["a": 3]]
+            ],
+            expected: .success([["a": 1], ["a": 3], ["a": 100]])
+        ),
+        BuiltinTests.TestCase(
+            description: "array of objects with different keys",
+            name: "sort",
+            args: [
+                [["a": 100], ["c": 3, "d": 4], ["b": 101]]
+            ],
+            expected: .success([["a": 100], ["b": 101], ["c": 3, "d": 4]])
+        ),
+        BuiltinTests.TestCase(
+            description: "set",
+            name: "sort",
+            args: [.set([1, 100, 2])],
+            expected: .success([1, 2, 100])
+        ),
+        BuiltinTests.TestCase(
+            description: "string set",
+            name: "sort",
+            args: [.set(["b", "a"])],
+            expected: .success(["a", "b"])
+        ),
+        BuiltinTests.TestCase(
+            description: "empty set",
+            name: "sort",
+            args: [.set([])],
+            expected: .success([])
+        ),
+        BuiltinTests.TestCase(
+            description: "set of objects",
+            name: "sort",
+            args: [
+                .set([["a": 1], ["a": 100], ["a": 3]])
+            ],
+            expected: .success([["a": 1], ["a": 3], ["a": 100]])
+        ),
+        BuiltinTests.TestCase(
+            description: "set of objects with different keys",
+            name: "sort",
+            args: [
+                .set([["a": 100], ["c": 3, "d": 4], ["b": 101]])
+            ],
+            // 2nd element has largest key
+            expected: .success([["a": 100], ["b": 101], ["c": 3, "d": 4]])
+        ),
+        BuiltinTests.TestCase(
+            description: "array of different types",
+            name: "sort",
+            args: [
+                [[1, 100, 0], .object(["z": 999]), .set([0]), [999], "10000"]
+            ],
+            expected: .success(["10000", [1, 100, 0], [999], .object(["z": 999]), .set([0])])
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
             BuiltinTests.generateFailureTests(
@@ -256,6 +422,28 @@ extension BuiltinTests.AggregatesTests {
                 allowedArgTypes: ["array", "set"],
                 generateNumberOfArgsTest: true),
             minTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "sum", sampleArgs: [[]],
+                argIndex: 0, argName: "collection",
+                allowedArgTypes: ["array", "set"],
+                generateNumberOfArgsTest: true),
+            sumTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "product", sampleArgs: [[]],
+                argIndex: 0, argName: "collection",
+                allowedArgTypes: ["array", "set"],
+                generateNumberOfArgsTest: true),
+            productTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "sort", sampleArgs: [[]],
+                argIndex: 0, argName: "collection",
+                allowedArgTypes: ["array", "set"],
+                generateNumberOfArgsTest: true),
+            sortTests,
+
         ].flatMap { $0 }
     }
 

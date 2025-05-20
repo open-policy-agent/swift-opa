@@ -14,7 +14,7 @@ struct EvalCommand: AsyncParsableCommand {
 
     mutating func run() async throws {
         // Initialize a Rego.Engine initially configured with our bundles from the CLI options.
-        var regoEngine = try Rego.OPA.Engine(bundlePaths: self.evalOptions.bundlePaths)
+        var regoEngine = Rego.OPA.Engine(bundlePaths: self.evalOptions.bundlePaths)
 
         let tracer = tracerForLevel(self.evalOptions.explain)
 

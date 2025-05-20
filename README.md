@@ -41,7 +41,7 @@ import Foundation
 
 let path = "some/local/path"
 let bundlePath = OPA.Engine.BundlePath(name: "policyBundle", url: URL(fileURLWithPath: path))
-var regoEngine = try OPA.Engine(bundlePaths: [bundlePath])
+var regoEngine = OPA.Engine(bundlePaths: [bundlePath])
 
 // Prepare does as much pre-processing as possible to get ready to evaluate queries.
 // This only needs to be done once when loading the engine and after updating it.

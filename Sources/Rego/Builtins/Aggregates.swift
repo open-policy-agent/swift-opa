@@ -64,11 +64,11 @@ extension BuiltinFuncs {
     }
 
     static func sum(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
-        return try await doReduce(ctx: ctx, args: args, initialValue: .number(0), op: BuiltinFuncs.plus)
+        return try doReduce(args: args, initialValue: .number(0), op: BuiltinFuncs.doPlus)
     }
 
     static func product(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
-        return try await doReduce(ctx: ctx, args: args, initialValue: .number(1), op: BuiltinFuncs.mul)
+        return try doReduce(args: args, initialValue: .number(1), op: BuiltinFuncs.doMul)
     }
 
     /// Returns reduction over an array or set of RegoValues with a given async Builtin being used as an reducer operation.
@@ -79,10 +79,10 @@ extension BuiltinFuncs {
     ///   - initialValue: The initial value to start with.
     ///   - op: The Arithmetic builtin operation to be applied to the partial result an the next value in the sequence to produce the next result.
     private static func doReduce(
-        ctx: BuiltinContext, args: [AST.RegoValue],
+        args: [AST.RegoValue],
         initialValue: AST.RegoValue,
-        op: (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
-    ) async throws -> AST.RegoValue {
+        op: ([AST.RegoValue]) throws -> AST.RegoValue
+    ) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -100,11 +100,11 @@ extension BuiltinFuncs {
         }
 
         do {
-            // Can't use synchronous reduce here
-            var result = initialValue
-            for element in sequence {
-                result = try await op(ctx, [result, element])
-            }
+            let result = try sequence.reduce(
+                initialValue,
+                { x, y in
+                    try op([x, y])
+                })
             return result
         } catch is RegoError {
             let receivedTypes = Set(sequence.map({ $0.typeName })).joined(separator: ", ")

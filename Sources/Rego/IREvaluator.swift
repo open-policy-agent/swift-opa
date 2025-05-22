@@ -1001,7 +1001,7 @@ private func evalCall(
     let bctx = BuiltinContext(
         location: try frame.v.currentLocation(withContext: ctx, stmt: caller),
         tracer: ctx.ctx.tracer,
-        timeNanos: ctx.ctx.timeNanos
+        timestamp: ctx.ctx.timestamp
     )
 
     return try await ctx.ctx.builtins.invoke(

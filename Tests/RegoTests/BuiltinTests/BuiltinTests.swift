@@ -129,7 +129,7 @@ struct BuiltinTests {
             )
         }
         // Too many args case
-        var tooManyArgs = sampleArgs // copy
+        var tooManyArgs = sampleArgs  // copy
         tooManyArgs.append(.null)
         tests.append(
             BuiltinTests.TestCase(

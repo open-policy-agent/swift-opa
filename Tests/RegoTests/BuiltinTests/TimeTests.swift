@@ -39,14 +39,14 @@ extension BuiltinTests.TimeTests {
 
     @Test
     func timeNowNanosReturnsTimeFromContext() async throws {
-        let expected = UInt64(Date().timeIntervalSince1970 * 1_000_000_000)
+        let expected = Date()
         let reg = BuiltinRegistry.defaultRegistry
-        let ctx = BuiltinContext(timeNanos: expected)
+        let ctx = BuiltinContext(timestamp: expected)
         let result = try await reg.invoke(withContext: ctx, name: "time.now_ns", args: [], strict: true)
         // Make sure the output is *actually* an integer that represents current time
         switch result {
         case .number(let actual):
-            #expect(actual.uint64Value == expected)
+            #expect(actual.uint64Value == UInt64(expected.timeIntervalSince1970 * 1_000_000_000))
         default:
             Issue.record("time.now_ns should return a number, but got: \(result)")
         }
@@ -65,7 +65,7 @@ extension BuiltinTests.TimeTests {
     func timeNowNanosReturnsDifferentValuesForDifferentContexts() async throws {
         let reg = BuiltinRegistry.defaultRegistry
         let ctx1 = BuiltinContext()
-        let ctx2 = BuiltinContext(timeNanos: ctx1.timeNanos + 2)
+        let ctx2 = BuiltinContext(timestamp: ctx1.timestamp.addingTimeInterval(2))
         let result1 = try await reg.invoke(withContext: ctx1, name: "time.now_ns", args: [], strict: true)
         let result2 = try await reg.invoke(withContext: ctx2, name: "time.now_ns", args: [], strict: true)
         #expect(result2 > result1)

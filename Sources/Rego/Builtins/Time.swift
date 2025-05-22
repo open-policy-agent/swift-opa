@@ -10,6 +10,6 @@ extension BuiltinFuncs {
         // This is done so that multiple calls to this built-in function within a single policy evaluation query
         // will always return the same value.
         // This is by design and is documented in https://www.openpolicyagent.org/docs/latest/policy-reference/#time
-        return .number(NSNumber(value: ctx.timeNanos))
+        return .number(NSNumber(value: ctx.timeNanos()))
     }
 }

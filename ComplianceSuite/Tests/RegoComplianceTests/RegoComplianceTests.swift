@@ -23,7 +23,7 @@ func complianceEnabled() -> Bool {
 @Suite("Compliance Tests", .tags(.compliance), .enabled(if: complianceEnabled()))
 struct ComplianceTests {
     var expandedComplianceRegistry = ComplianceTests.addTestBuiltins(to: BuiltinRegistry.defaultRegistry)
-    
+
     // testFilterFromEnv is an environment-variable based mechanism for running only
     // conformance tests from files matching the filter.
     // To set a filter, set OPA_COMPLIANCE_TESTS to the test regex matching test cases
@@ -98,7 +98,8 @@ struct ComplianceTests {
         // be it an unexpected error, an expected error that wasn't there, or some other expectation
         // mismatch.
         print("\t🧬 executing \(tc.testDescription)")
-        let result = try await ComplianceTesting.runTest(config: ComplianceTests.testConfig, tc, expandedComplianceRegistry)
+        let result = try await ComplianceTesting.runTest(
+            config: ComplianceTests.testConfig, tc, expandedComplianceRegistry)
         if testConfig.traceLevel != .none && result.trace != nil {
             result.trace!.prettyPrint(to: .standardOutput)
         }
@@ -123,7 +124,7 @@ struct ComplianceTests {
         }
         return
     }
-    
+
     private static func addTestBuiltins(to registry: BuiltinRegistry) -> BuiltinRegistry {
         guard !registry.hasBuiltin("test.sleep") else {
             return registry
@@ -131,7 +132,7 @@ struct ComplianceTests {
 
         let newRegistry = BuiltinRegistry(
             builtins: registry.builtins.merging(
-                ["test.sleep" : TestBuiltins.test_sleep],
+                ["test.sleep": TestBuiltins.testSleep],
                 uniquingKeysWith: { (current, _) in current })
         )
         return newRegistry
@@ -143,7 +144,7 @@ extension ComplianceTesting.IRTestCase: CustomTestStringConvertible {
 }
 
 struct TestBuiltins {
-    static func test_sleep(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func testSleep(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -178,7 +179,7 @@ struct TestBuiltins {
     ///        milliseconds (ms), seconds (s), minutes (m), and hours (h).
     static func parseDurationNanoseconds(_ duration: String) throws -> Int64 {
         var isNegative = false
-        var durationValue = duration
+        var durationValue = duration.trimmingCharacters(in: .whitespaces)
 
         // Check for negative sign at the start
         if duration.hasPrefix("-") {
@@ -186,24 +187,25 @@ struct TestBuiltins {
             durationValue = String(duration.dropFirst())
         }
 
-        let pattern = "(\\d+)(ns|us|µs|ms|s|m|h)"
-        let regex = try! NSRegularExpression(pattern: pattern, options: [])
-        let results = regex.matches(in: durationValue, options: [], range: NSRange(location: 0, length: durationValue.count))
+        let regex = /(?<value>\d+)(?<unit>ns|us|µs|ms|s|m|h)/
+        let results = durationValue.matches(of: regex)
 
+        guard !results.isEmpty else {
+            throw DurationParseError.invalidFormat
+        }
         var totalNanoseconds: Int64 = 0
 
         // Keep matching the string accumulating nanoseconds
+        var expectedIndex = durationValue.startIndex
         for match in results {
-            let matchValueRange = match.range(at: 1)
-            let matchUnitRange = match.range(at: 2)
-
-            guard let valueRange = Range(matchValueRange, in: durationValue),
-                  let unitRange = Range(matchUnitRange, in: durationValue) else {
+            // We want to make sure the match starts where we expect it to start
+            // If it does not, we skipped over some parts of the string that
+            // did not match the regex, and we have to fail
+            guard match.range.lowerBound == expectedIndex else {
                 throw DurationParseError.invalidFormat
             }
-
-            let valuePart = String(durationValue[valueRange])
-            let unitPart = String(durationValue[unitRange])
+            let valuePart = match.value
+            let unitPart = match.unit
 
             guard let value = Int64(valuePart) else {
                 throw DurationParseError.invalidFormat
@@ -225,6 +227,13 @@ struct TestBuiltins {
             default:
                 throw DurationParseError.invalidFormat
             }
+            // The next match is expected to start right after this match ends
+            expectedIndex = match.range.upperBound
+        }
+        // Now, we MUST reach the end of the string
+        // if we didn't it means that there are other parts that don't match our regex
+        guard expectedIndex == durationValue.endIndex else {
+            throw DurationParseError.invalidFormat
         }
 
         // Adjust for negative

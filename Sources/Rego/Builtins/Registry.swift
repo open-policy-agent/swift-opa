@@ -6,16 +6,16 @@ typealias Builtin = (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoVa
 struct BuiltinContext {
     public let location: OPA.Trace.Location
     public var tracer: OPA.Trace.QueryTracer?
-    /// Time of Context creation since epoch, in nanoseconds
-    public let timeNanos: UInt64
+    /// Date and Time of Context creation
+    public let timestamp: Date
     internal let cache: Ptr<BuiltinsCache>
 
     init(
-        
+
         location: OPA.Trace.Location = .init(),
         tracer: OPA.Trace.QueryTracer? = nil,
         cache: Ptr<BuiltinsCache>? = nil,
-        timeNanos: UInt64? = nil
+        timestamp: Date? = nil
     ) {
         self.location = location
         self.tracer = tracer
@@ -23,7 +23,11 @@ struct BuiltinContext {
         // some builtin evaluations (e.g. UUID) expect the cache.
         // In most/all? cases, we expect a shared cache to be passed in here from EvaluationContext
         self.cache = cache ?? Ptr<BuiltinsCache>(toCopyOf: BuiltinsCache())
-        self.timeNanos = timeNanos ?? UInt64(Date().timeIntervalSince1970 * 1_000_000_000)
+        self.timestamp = timestamp ?? Date()
+    }
+
+    public func timeNanos() -> UInt64 {
+        return UInt64(timestamp.timeIntervalSince1970 * 1_000_000_000)
     }
 }
 

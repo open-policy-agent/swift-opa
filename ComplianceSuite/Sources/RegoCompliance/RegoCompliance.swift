@@ -202,7 +202,9 @@ public struct ComplianceTesting {
         public var knownIssue: String?
     }
 
-    public static func runTest(config: TestConfig, _ tc: IRTestCase, _ builtins: BuiltinRegistry? = nil) async -> IRTestResult {
+    public static func runTest(config: TestConfig, _ tc: IRTestCase, _ builtins: BuiltinRegistry? = nil) async
+        -> IRTestResult
+    {
         var testResult = IRTestResult(testCase: tc)
 
         for knownIssue in config.knownIssues {

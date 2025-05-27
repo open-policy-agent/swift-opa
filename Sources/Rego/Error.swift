@@ -23,6 +23,7 @@ public struct RegoError: Sendable, Swift.Error {
             case invalidDataType
             case invalidOperand
             case maxCallDepthExceeded
+            case noPlansFoundError
             case objectInsertOnceError
             case unknownDynamicFunction
             case unknownQuery
@@ -58,6 +59,7 @@ public struct RegoError: Sendable, Swift.Error {
         public static let invalidDataType = Code(.invalidDataType)
         public static let invalidOperand = Code(.invalidOperand)
         public static let maxCallDepthExceeded = Code(.maxCallDepthExceeded)
+        public static let noPlansFoundError = Code(.noPlansFoundError)
         public static let objectInsertOnceError = Code(.objectInsertOnceError)
         public static let unknownDynamicFunction = Code(.unknownDynamicFunction)
         public static let unknownQuery = Code(.unknownQuery)

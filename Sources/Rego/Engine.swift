@@ -20,7 +20,7 @@ extension OPA {
 }
 
 extension OPA.Engine {
-    public init(bundlePaths: [BundlePath]) throws {
+    public init(bundlePaths: [BundlePath]) {
         self.bundlePaths = bundlePaths
     }
     public init(bundles: [String: OPA.Bundle]) {

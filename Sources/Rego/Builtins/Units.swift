@@ -49,7 +49,7 @@ extension BuiltinFuncs {
     ///   - msgNoAmount: The error message to use if no amount is provided.
     ///   - msgInvalidAmount: The error message to use if the amount string cannot be parsed as a number.
     ///   - msgInvalidUnit: The error message to use if the unit is invalid.
-    ///   - msgNoSpacesAllowed: The error message to use if the input string contains spaces (backwards compatibility with complance tests)
+    ///   - msgNoSpacesAllowed: The error message to use if the input string contains spaces (backwards compatibility with compliance tests)
     private static func doParse(
         ctx: BuiltinContext, args: [AST.RegoValue], allowedUnits: [String: ConversionUnit],
         unitNormalizer: (String) -> String,

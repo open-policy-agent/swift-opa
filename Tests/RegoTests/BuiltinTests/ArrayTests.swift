@@ -63,7 +63,7 @@ extension BuiltinTests.ArrayTests {
                 .null,
                 ["c", "d"],
             ],
-            expected: .failure(argumentTypeMismatch(arg: "x"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "x", got: "null", want: "array"))
         ),
     ]
 

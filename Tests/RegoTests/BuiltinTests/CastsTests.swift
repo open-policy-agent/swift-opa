@@ -121,7 +121,7 @@ extension BuiltinTests.CastsTests {
             args: [.string("-+123")],
             expected: .failure(
                 BuiltinError.evalError(
-                    msg: "operand 0 must be valid number string NOT starting with + sign, got -+123"))
+                    msg: "operand 0 must be valid number string, got -+123"))
         ),
         BuiltinTests.TestCase(
             description: "leading plus with non-digit is not allowed",
@@ -137,7 +137,7 @@ extension BuiltinTests.CastsTests {
         [
             BuiltinTests.generateFailureTests(
                 builtinName: "to_number", sampleArgs: ["0"], argIndex: 0, argName: "x",
-                allowedArgTypes: ["number", "string", "boolean", "null"],
+                allowedArgTypes: ["boolean", "null", "number", "string"],
                 generateNumberOfArgsTest: true),
             toNumberTests,
         ].flatMap { $0 }

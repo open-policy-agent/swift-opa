@@ -32,7 +32,7 @@ extension BuiltinTests.UnitsTests {
             name: "units.parse",
             args: ["foo"],
             expected: .failure(
-                BuiltinError.evalError(msg: "could not parse amount to a number"))
+                BuiltinError.evalError(msg: "no amount provided"))
         ),
         BuiltinTests.TestCase(
             description: "invalid number causes units.parse: could not parse amount to a number",
@@ -386,7 +386,7 @@ extension BuiltinTests.UnitsTests {
             args: ["foo"],
             expected: .failure(
                 BuiltinError.evalError(
-                    msg: "could not parse byte amount to a number"))
+                    msg: "no byte amount provided"))
         ),
         BuiltinTests.TestCase(
             description: "invalid number causes units.parse: could not parse byte amount to a number",

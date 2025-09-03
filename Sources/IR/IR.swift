@@ -1,7 +1,7 @@
 import AST
 import Foundation
 
-public struct Policy: Codable, Equatable, Sendable {
+public struct Policy: Codable, Hashable, Sendable {
     public var staticData: Static? = nil
     public var plans: Plans? = nil
     public var funcs: Funcs? = nil
@@ -19,7 +19,7 @@ public struct Policy: Codable, Equatable, Sendable {
     }
 }
 
-public struct Static: Codable, Equatable, Sendable {
+public struct Static: Codable, Hashable, Sendable {
     public var strings: [ConstString]?
     public var builtinFuncs: [BuiltinFunc]?
     public var files: [ConstString]?
@@ -37,12 +37,12 @@ public struct Static: Codable, Equatable, Sendable {
     }
 }
 
-public struct BuiltinFunc: Codable, Equatable, Sendable {
-    var name: String
-    var decl: AST.FunctionTypeDecl
+public struct BuiltinFunc: Codable, Hashable, Sendable {
+    package var name: String
+    package var decl: AST.FunctionTypeDecl
 }
 
-public struct ConstString: Codable, Equatable, Sendable {
+public struct ConstString: Codable, Hashable, Sendable {
     public var value: String
 
     public init(value: String) {
@@ -50,7 +50,7 @@ public struct ConstString: Codable, Equatable, Sendable {
     }
 }
 
-public struct Plans: Codable, Equatable, Sendable {
+public struct Plans: Codable, Hashable, Sendable {
     public var plans: [Plan] = []
 
     public init(plans: [Plan]) {
@@ -58,7 +58,7 @@ public struct Plans: Codable, Equatable, Sendable {
     }
 }
 
-public struct Plan: Codable, Equatable, Sendable {
+public struct Plan: Codable, Hashable, Sendable {
     public var name: String
     public var blocks: [Block]
 
@@ -68,7 +68,7 @@ public struct Plan: Codable, Equatable, Sendable {
     }
 }
 
-public struct Block: Equatable, Sendable {
+public struct Block: Hashable, Sendable {
     public var statements: [AnyStatement]
 
     public init(statements: [any Statement]) {
@@ -79,7 +79,7 @@ public struct Block: Equatable, Sendable {
         self.statements.append(AnyStatement(stmt))
     }
 
-    // Equatable, we need a custom implementation for dynamic dispatch
+    // Hashable, we need a custom implementation for dynamic dispatch
     // to our heterogenous extistential type instances (statements)
     public static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs.statements.count == rhs.statements.count else {
@@ -201,7 +201,7 @@ extension Block: Codable {
 // PartialStatement represents the generic parts of a statement - its type and location.
 // This is used for partial decoding of polymorphic statements preceding the concrete
 // statement decoding.
-struct PartialStatement: Codable, Equatable {
+struct PartialStatement: Codable, Hashable {
     // KnownStatements are all allowed values for the "type" field of
     // serialized IR Statements (https://www.openpolicyagent.org/docs/latest/ir/#statements)
     // NOTE: This must be kept in sync with the corresponding cases in AnyStatement.
@@ -250,7 +250,7 @@ struct PartialStatement: Codable, Equatable {
 }
 
 // AnyStatement is an enum over all supported statements
-public enum AnyStatement: Sendable, Equatable {
+public enum AnyStatement: Sendable, Hashable {
     case arrayAppendStmt(ArrayAppendStatement)
     case assignIntStmt(AssignIntStatement)
     case assignVarOnceStmt(AssignVarOnceStatement)
@@ -452,7 +452,7 @@ public enum AnyStatement: Sendable, Equatable {
 }
 
 // AnyInnerStatement represents the generic stmt field, which should always contain location fields.
-public struct AnyInnerStatement: Codable, Equatable {
+public struct AnyInnerStatement: Codable, Hashable {
     public var row: Int = 0
     public var col: Int = 0
     public var file: Int = 0
@@ -462,7 +462,7 @@ public struct AnyInnerStatement: Codable, Equatable {
     }
 }
 
-public struct Location: Codable, Equatable, Sendable {
+public struct Location: Codable, Hashable, Sendable {
     public var row: Int
     public var col: Int
     public var file: Int
@@ -494,7 +494,7 @@ extension Statement {
     }
 }
 
-public struct Funcs: Codable, Equatable, Sendable {
+public struct Funcs: Codable, Hashable, Sendable {
     public var funcs: [Func]? = []
 
     public init(funcs: [Func]) {
@@ -502,7 +502,7 @@ public struct Funcs: Codable, Equatable, Sendable {
     }
 }
 
-public struct Func: Codable, Equatable, Sendable {
+public struct Func: Codable, Hashable, Sendable {
     public var name: String
     public var path: [String]
     public var params: [Local]
@@ -528,14 +528,14 @@ public struct Func: Codable, Equatable, Sendable {
 
 public typealias Local = UInt32
 
-public struct Operand: Equatable, Sendable {
-    public enum OpType: String, Codable, Equatable, Sendable {
+public struct Operand: Hashable, Sendable {
+    public enum OpType: String, Codable, Hashable, Sendable {
         case local = "local"
         case bool = "bool"
         case stringIndex = "string_index"
     }
 
-    public enum Value: Codable, Equatable, Sendable {
+    public enum Value: Codable, Hashable, Sendable {
         case localIndex(Int)
         case bool(Bool)
         case stringIndex(Int)
@@ -576,4 +576,21 @@ extension Operand: Codable {
             self.value = Value.stringIndex(v)
         }
     }
+}
+
+/// Represents an OPA capabilities definition, see https://www.openpolicyagent.org/docs/deployments#capabilities
+///
+/// Capabilities restrict which built-in functions and language features a policy
+/// is allowed to use. When a policy depends on a builtin not listed in the
+/// capabilities, `opa check` or `opa build` will fail. This enables reproducible
+/// builds across OPA versions and allows programs embedding OPA to enforce a
+/// controlled feature set.
+public struct Capabilities: Codable, Hashable, Sendable {
+    public let builtins: [BuiltinFunc]
+    // properties below are not actually used for validation by swift-opa (yet)
+    public let allowNet: Bool?
+    public let features: [String]?
+    public let futureKeywords: [String]?
+    public let wasmABIVersions: [Int]?
+    public let opaVersion: String?
 }

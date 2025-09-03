@@ -1,0 +1,13 @@
+{
+  "builtins": [
+    {
+      "name": "count",
+      "decl": {
+        "type": "function",
+        "args": [ { "type": "array" } ],
+        "result": { "type": "number" }
+      }
+    }
+  ],
+  "opaVersion": "0.63.0"
+}

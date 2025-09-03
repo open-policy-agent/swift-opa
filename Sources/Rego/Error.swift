@@ -33,6 +33,9 @@ public struct RegoError: Sendable, Swift.Error {
             case storePathNotFound
 
             // Builtin errors
+            case builtinUndefinedError
+            case ambiguousBuiltinError
+            case capabilitiesMissingBuiltin
             case argumentCountMismatch
             case argumentTypeMismatch
             case halt
@@ -69,6 +72,9 @@ public struct RegoError: Sendable, Swift.Error {
         public static let storePathNotFound = Code(.storePathNotFound)
 
         // Builtin errors
+        public static let builtinUndefinedError = Code(.builtinUndefinedError)
+        public static let ambiguousBuiltinError = Code(.ambiguousBuiltinError)
+        public static let capabilitiesMissingBuiltin = Code(.capabilitiesMissingBuiltin)
         public static let argumentCountMismatch = Code(.argumentCountMismatch)
         public static let argumentTypeMismatch = Code(.argumentTypeMismatch)
         public static let halt = Code(.halt)
@@ -105,7 +111,7 @@ public enum BuiltinError {
     public static func evalError(msg: String) -> RegoError {
         return RegoError(
             code: .argumentCountMismatch,
-            message: "builtin evalutation error: \(msg)"
+            message: "builtin evaluation error: \(msg)"
         )
     }
 

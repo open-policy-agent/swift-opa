@@ -1,0 +1,13 @@
+{
+  "builtins": [
+    {
+      "name": "my.slugify",
+      "decl": {
+        "type": "function",
+        "args": [ { "type": "array" } ],
+        "result": { "type": "string" }
+      }
+    }
+  ],
+  "opaVersion": "0.63.0"
+}

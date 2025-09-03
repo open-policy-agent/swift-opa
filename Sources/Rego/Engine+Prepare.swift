@@ -26,6 +26,19 @@ extension OPA.Engine {
     }
 }
 
+extension OPA.Engine {
+    enum CapabilitiesInput: Sendable {
+        case path(URL)
+        case data(Capabilities)
+    }
+    
+    static let capabilitiesDecoder: JSONDecoder = {
+        var decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return decoder
+    }()
+}
+
 // mergeTrie is a helper to merge an existing trie with the roots defined from a bundle.
 // Roots are '/' delimited paths representing a logical part of the data tree,
 // e.g. 'app/rbac' or 'user_roles'.

@@ -5,7 +5,7 @@ extension OPA {
     /// A collection of policy and data, along with related metadata.
     ///
     /// See: https://www.openpolicyagent.org/docs/latest/management-bundles/#bundle-file-format
-    public struct Bundle: Equatable, Sendable {
+    public struct Bundle: Hashable, Sendable {
         public var manifest: OPA.Manifest = OPA.Manifest()
         public var planFiles: [BundleFile] = []
         public var regoFiles: [BundleFile] = []
@@ -16,7 +16,7 @@ extension OPA {
     }
 
     /// Metadata describing an ``OPA/Bundle``.
-    public struct Manifest: Equatable, Sendable {
+    public struct Manifest: Hashable, Sendable {
         /// The revision of the bundle.
         public var revision: String = ""
         /// The list of path prefixes declaring the scope of the data managed in the bundle.

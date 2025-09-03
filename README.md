@@ -3,7 +3,7 @@
 Swift-OPA is a Swift package for evaluating [OPA IR
 Plans](https://www.openpolicyagent.org/docs/latest/ir/) compiled from
 [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/#what-is-rego)
-declarative policy.
+policies.
 
 Rego is a declarative language for expressing policy over structured data. A
 common use of Rego is for defining authorization policy.

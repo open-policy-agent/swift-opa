@@ -586,11 +586,28 @@ extension Operand: Codable {
 /// builds across OPA versions and allows programs embedding OPA to enforce a
 /// controlled feature set.
 public struct Capabilities: Codable, Hashable, Sendable {
+    public struct WasmABIVersion: Codable, Hashable, Sendable {
+        public let version: Int
+        public let minorVersion: Int
+
+        enum CodingKeys: String, CodingKey {
+            case version
+            case minorVersion = "minor_version"
+        }
+    }
+
     public let builtins: [BuiltinFunc]
     // properties below are not actually used for validation by swift-opa (yet)
-    public let allowNet: Bool?
+    public let allowNet: [String]?
     public let features: [String]?
     public let futureKeywords: [String]?
-    public let wasmABIVersions: [Int]?
-    public let opaVersion: String?
+    public let wasmABIVersions: [WasmABIVersion]?
+
+    enum CodingKeys: String, CodingKey {
+        case builtins
+        case allowNet = "allow_net"
+        case features
+        case futureKeywords = "future_keywords"
+        case wasmABIVersions = "wasm_abi_versions"
+    }
 }

@@ -8,6 +8,5 @@
         "result": { "type": "number" }
       }
     }
-  ],
-  "opaVersion": "0.63.0"
+  ]
 }

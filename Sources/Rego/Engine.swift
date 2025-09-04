@@ -27,26 +27,20 @@ extension OPA.Engine {
     ///
     /// - Parameters:
     ///   - bundlePaths: File system paths to the bundles.
-    ///   - capabilitiesPath: Optional path to a capabilities JSON file. If set,
-    ///     all bundles are validated against it.
-    public init(bundlePaths: [BundlePath], capabilitiesPath: URL? = nil) {
+    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it.
+    public init(bundlePaths: [BundlePath], capabilities: CapabilitiesInput? = nil) {
         self.bundlePaths = bundlePaths
-        if let capabilitiesPath {
-            self.capabilities = .path(capabilitiesPath)
-        }
+        self.capabilities = capabilities
     }
 
     /// Initializes the OPA engine with in-memory bundles.
     ///
     /// - Parameters:
     ///   - bundles: Bundles provided directly in memory, keyed by name.
-    ///   - capabilities: Optional in-memory capabilities. If set, all bundles
-    ///     are validated against it.
-    public init(bundles: [String: OPA.Bundle], capabilities: Capabilities? = nil) {
+    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it.
+    public init(bundles: [String: OPA.Bundle], capabilities: CapabilitiesInput? = nil) {
         self.bundles = bundles
-        if let capabilities {
-            self.capabilities = .data(capabilities)
-        }
+        self.capabilities = capabilities
     }
 
     /// Initializes the OPA engine with raw IR policies and a data store, useful for testing.
@@ -54,14 +48,11 @@ extension OPA.Engine {
     /// - Parameters:
     ///   - policies: IR policies to load into the engine.
     ///   - store: Data store backing policy evaluation.
-    ///   - capabilities: Optional in-memory capabilities. If set, all policies
-    ///     are validated against it.
-    public init(policies: [IR.Policy], store: any OPA.Store, capabilities: Capabilities? = nil) {
+    ///   - capabilities: Optional capabilities. If set, all policies are validated against it.
+    public init(policies: [IR.Policy], store: any OPA.Store, capabilities: CapabilitiesInput? = nil) {
         self.policies = policies
         self.store = store
-        if let capabilities {
-            self.capabilities = .data(capabilities)
-        }
+        self.capabilities = capabilities
     }
 
     /// A PreparedQuery represents a query that has been prepared for evaluation.
@@ -170,49 +161,7 @@ extension OPA.Engine {
             evaluator = try IREvaluator(bundles: loadedBundles)
         }
 
-        // Load the capabilities
-        let capabilities: Capabilities? = switch self.capabilities {
-        case .path(let url): try Self.capabilitiesDecoder.decode(Capabilities.self, from: Data(contentsOf: url))
-        case .data(let capabilities): capabilities
-        case .none: nil
-        }
-
-        for policy in evaluator.policies.map(\.ir) {
-            guard let requiredBuiltInsArray = policy.staticData?.builtinFuncs else {
-                continue
-            }
-
-            // Check if all builtins required by the policy are present in the capabilities
-            if let capabilities {
-                let missingBuiltinsInCapabilities = Set(requiredBuiltInsArray).subtracting(Set(capabilities.builtins))
-                if !missingBuiltinsInCapabilities.isEmpty {
-                    throw RegoError(
-                        code: .capabilitiesMissingBuiltin,
-                        message: """
-                        Missing the following builtins (required by the policies) in the capabilities.json: \
-                        \(missingBuiltinsInCapabilities.description)
-                        """
-                    )
-                }
-            }
-
-            // Check if all builtins required by the policy are present in default + custom builtins specified in the `customBuiltins` parameter.
-            //
-            // We cannot actually verify a matching builtin signature here, since with the current setup
-            // all builtins are defined as closures taking an arbitrary array of `AST.RegoValue`s.
-            // The validity of the passed parameters can only be checked at runtime inside the builtin itself.
-            // Therefore, we just check for matching builtin names.
-            let missingBuiltins = Set(requiredBuiltInsArray.map { $0.name }).subtracting(Set(builtins.map(\.0)))
-            if !missingBuiltins.isEmpty {
-                throw RegoError(
-                    code: .builtinUndefinedError,
-                    message: """
-                    Missing the following builtins (required by the policies) in the specified builtins (default or custom builtins): \
-                    \(missingBuiltins.description)
-                    """
-                )
-            }
-        }
+        try await Self.verifyCapabilitiesAndBuiltIns(capabilities: self.capabilities, builtins: builtins, evaluator: evaluator)
 
         return PreparedQuery(
             query: query,
@@ -222,7 +171,7 @@ extension OPA.Engine {
         )
     }
 
-    /// A named path to an ``OPA.Bundle``.
+    /// A named path to an ``OPA/Bundle``.
     public struct BundlePath: Codable {
         /// The name of the bundle.
         public let name: String
@@ -233,5 +182,17 @@ extension OPA.Engine {
             self.name = name
             self.url = url
         }
+    }
+
+    /// Represents how capabilities are supplied to the evaluator.
+    ///
+    /// This abstraction allows policies to be validated either against a
+    /// capabilities file (e.g. `capabilities.json` from an OPA release) or
+    /// against programmatically constructed capabilities within Swift.
+    public enum CapabilitiesInput: Hashable, Sendable {
+        /// Load capabilities from the `capabilities.json` JSON file at the given `URL`.
+        case path(URL)
+        /// Use an in-memory `Capabilities` object directly.
+        case data(Capabilities)
     }
 }

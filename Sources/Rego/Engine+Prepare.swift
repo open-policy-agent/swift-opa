@@ -53,11 +53,34 @@ extension OPA.Engine {
         builtins: [String : Builtin],
         evaluator: IREvaluator
     ) async throws {
-        let capabilities: Capabilities? = switch capabilities {
-        case .path(let url): try Self.capabilitiesDecoder.decode(Capabilities.self, from: Data(contentsOf: url))
-        case .data(let capabilities): capabilities
-        case .none: nil
-        }
+        let capabilities: Capabilities? = try {
+            switch capabilities {
+            case .path(let url):
+                let data: Data
+                do {
+                    data = try Data(contentsOf: url)
+                } catch {
+                    throw RegoError(
+                        code: .capabilitiesReadError,
+                        message: "failed to read capabilities from \(url)",
+                        cause: error
+                    )
+                }
+                do {
+                    return try Self.capabilitiesDecoder.decode(Capabilities.self, from: data)
+                } catch {
+                    throw RegoError(
+                        code: .capabilitiesDecodeError,
+                        message: "failed to decode capabilities from \(url)",
+                        cause: error
+                    )
+                }
+            case .data(let capabilities):
+                return capabilities
+            case .none:
+                return nil
+            }
+        }()
 
         for policy in evaluator.policies.map(\.ir) {
             guard let requiredBuiltInsArray = policy.staticData?.builtinFuncs else {
@@ -78,7 +101,8 @@ extension OPA.Engine {
                 }
             }
 
-            // Check if all builtins required by the policy are present in default + custom builtins specified in the `customBuiltins` parameter.
+            // Check if all builtins required by the policy are present in the provided builtins
+            // (default + custom builtins supplied at `OPA/Engine` init).
             //
             // We cannot actually verify a matching builtin signature here, since with the current setup
             // all builtins are defined as closures taking an arbitrary array of `AST.RegoValue`s.

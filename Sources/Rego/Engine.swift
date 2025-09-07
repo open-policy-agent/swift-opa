@@ -19,6 +19,9 @@ extension OPA {
 
         // Input of the capabilities file
         private var capabilities: CapabilitiesInput? = nil
+
+        // Custom builtins that are specified along the default builtins
+        private var customBuiltins: [String: Builtin] = [:]
     }
 }
 
@@ -28,9 +31,17 @@ extension OPA.Engine {
     /// - Parameters:
     ///   - bundlePaths: File system paths to the bundles.
     ///   - capabilities: Optional capabilities. If set, all bundles are validated against it.
-    public init(bundlePaths: [BundlePath], capabilities: CapabilitiesInput? = nil) {
+    ///   - customBuiltins: Additional builtins to register alongside the default Rego builtins.
+    ///                     See https://www.openpolicyagent.org/docs/policy-reference/builtins
+    ///                     Conflicts are validated during ``prepareForEvaluation(query:)``.
+    public init(
+        bundlePaths: [BundlePath],
+        capabilities: CapabilitiesInput? = nil,
+        customBuiltins: [String: Builtin] = [:]
+    ) {
         self.bundlePaths = bundlePaths
         self.capabilities = capabilities
+        self.customBuiltins = customBuiltins
     }
 
     /// Initializes the OPA engine with in-memory bundles.
@@ -38,9 +49,17 @@ extension OPA.Engine {
     /// - Parameters:
     ///   - bundles: Bundles provided directly in memory, keyed by name.
     ///   - capabilities: Optional capabilities. If set, all bundles are validated against it.
-    public init(bundles: [String: OPA.Bundle], capabilities: CapabilitiesInput? = nil) {
+    ///   - customBuiltins: Additional builtins to register alongside the default Rego builtins.
+    ///                     See https://www.openpolicyagent.org/docs/policy-reference/builtins
+    ///                     Conflicts are validated during ``prepareForEvaluation(query:)``.
+    public init(
+        bundles: [String: OPA.Bundle],
+        capabilities: CapabilitiesInput? = nil,
+        customBuiltins: [String: Builtin] = [:]
+    ) {
         self.bundles = bundles
         self.capabilities = capabilities
+        self.customBuiltins = customBuiltins
     }
 
     /// Initializes the OPA engine with raw IR policies and a data store, useful for testing.
@@ -49,10 +68,19 @@ extension OPA.Engine {
     ///   - policies: IR policies to load into the engine.
     ///   - store: Data store backing policy evaluation.
     ///   - capabilities: Optional capabilities. If set, all policies are validated against it.
-    public init(policies: [IR.Policy], store: any OPA.Store, capabilities: CapabilitiesInput? = nil) {
+    ///   - customBuiltins: Additional builtins to register alongside the default Rego builtins.
+    ///                     See https://www.openpolicyagent.org/docs/policy-reference/builtins
+    ///                     Conflicts are validated during ``prepareForEvaluation(query:)``.
+    public init(
+        policies: [IR.Policy],
+        store: any OPA.Store,
+        capabilities: CapabilitiesInput? = nil,
+        customBuiltins: [String: Builtin] = [:]
+    ) {
         self.policies = policies
         self.store = store
         self.capabilities = capabilities
+        self.customBuiltins = customBuiltins
     }
 
     /// A PreparedQuery represents a query that has been prepared for evaluation.
@@ -93,30 +121,28 @@ extension OPA.Engine {
     /// Prepares a query for evaluation.
     ///
     /// Loads all bundles, performs internal consistency checks and validations, and prepares
-    /// the provided query for evaluation.
+    /// the provided query for evaluation. Uses default + custom builtins (specified at ``OPA/Engine``
+    /// initialization) to validate and evaluate builtin calls.
     ///
     /// - Parameters:
     ///   - query: The query to prepare evaluation for.
-    ///   - customBuiltins: The custom builtin capabilities for the evaluation, in addition to the default Rego builtins: https://www.openpolicyagent.org/docs/policy-reference/builtins
     /// - Returns: A PreparedQuery that can be used to evaluate the given query.
-    public mutating func prepareForEvaluation(
-        query: String,
-        customBuiltins: [String: Builtin] = [:]
-    ) async throws -> PreparedQuery {
-        let registryBuiltins = BuiltinRegistry.defaultRegistry.builtins
-
+    /// - Throws: `RegoError` if bundles fail to load, collide, or if capabilities/builtins validation fails.
+    public mutating func prepareForEvaluation(query: String) async throws -> PreparedQuery {
         // Merge default and custom builtins, throw appropriate error in case of name conflict
-        let conflictingBuiltins = Set(customBuiltins.keys).intersection(registryBuiltins.keys)
+        let registryBuiltins = BuiltinRegistry.defaultRegistry.builtins
+        let conflictingBuiltins = Set(self.customBuiltins.keys).intersection(registryBuiltins.keys)
         guard conflictingBuiltins.isEmpty else {
             throw RegoError(
                 code: .ambiguousBuiltinError,
                 message: "encountered conflicting builtin names between custom and default builtins: \(conflictingBuiltins)"
             )
         }
-        let builtins = customBuiltins.merging(
+        let builtins = self.customBuiltins.merging(
             registryBuiltins,
-            uniquingKeysWith: { $1 }        // should never happen, see guard above
+            uniquingKeysWith: { $1 }    // should never happen, see guard above
         )
+        let mergedBuiltinRegistry = BuiltinRegistry(builtins: builtins)
 
         // Load all the bundles from disk
         // This includes parsing their data trees, etc.
@@ -161,13 +187,14 @@ extension OPA.Engine {
             evaluator = try IREvaluator(bundles: loadedBundles)
         }
 
+        // Verifies that builtins are available in the OPA capabilities and builtin registry
         try await Self.verifyCapabilitiesAndBuiltIns(capabilities: self.capabilities, builtins: builtins, evaluator: evaluator)
 
         return PreparedQuery(
             query: query,
             evaluator: evaluator,
             store: self.store,
-            builtinRegistry: BuiltinRegistry(builtins: builtins)
+            builtinRegistry: mergedBuiltinRegistry
         )
     }
 

@@ -36,6 +36,8 @@ public struct RegoError: Sendable, Swift.Error {
             case builtinUndefinedError
             case ambiguousBuiltinError
             case capabilitiesMissingBuiltin
+            case capabilitiesReadError
+            case capabilitiesDecodeError
             case argumentCountMismatch
             case argumentTypeMismatch
             case halt
@@ -75,6 +77,8 @@ public struct RegoError: Sendable, Swift.Error {
         public static let builtinUndefinedError = Code(.builtinUndefinedError)
         public static let ambiguousBuiltinError = Code(.ambiguousBuiltinError)
         public static let capabilitiesMissingBuiltin = Code(.capabilitiesMissingBuiltin)
+        public static let capabilitiesReadError = Code(.capabilitiesReadError)
+        public static let capabilitiesDecodeError = Code(.capabilitiesDecodeError)
         public static let argumentCountMismatch = Code(.argumentCountMismatch)
         public static let argumentTypeMismatch = Code(.argumentTypeMismatch)
         public static let halt = Code(.halt)

@@ -103,7 +103,7 @@ extension OPA.Engine {
         query: String,
         customBuiltins: [String: Builtin] = [:]
     ) async throws -> PreparedQuery {
-        let registryBuiltins = BuiltinRegistry.defaultRegistry.builtins()
+        let registryBuiltins = BuiltinRegistry.defaultRegistry.builtins
 
         // Merge default and custom builtins, throw appropriate error in case of name conflict
         let conflictingBuiltins = Set(customBuiltins.keys).intersection(registryBuiltins.keys)

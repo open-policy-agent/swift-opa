@@ -1,8 +1,7 @@
 import AST
 import Foundation
-import Synchronization
 
-public typealias Builtin = (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
+public typealias Builtin = @Sendable (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
 
 public struct BuiltinContext {
     public let location: OPA.Trace.Location
@@ -24,9 +23,7 @@ public struct BuiltinContext {
 }
 
 public struct BuiltinRegistry: Sendable {
-    // protect builtin storage by lock, access via `builtins()`
-    nonisolated(unsafe) private let builtinsStorage: [String: Builtin]
-    private let lock = NSLock()
+    let builtins: [String: Builtin]
 
     // defaultRegistry is the BuiltinRegistry with all capabilities enabled
     public static var defaultRegistry: BuiltinRegistry {
@@ -156,19 +153,11 @@ public struct BuiltinRegistry: Sendable {
     }
 
     public subscript(name: String) -> Builtin? {
-        self.lock.withLock {
-            self.builtinsStorage[name]
-        }
+        self.builtins[name]
     }
 
     init(builtins: [String : Builtin]) {
-        self.builtinsStorage = builtins
-    }
-
-    public func builtins() -> [String: Builtin] {
-        self.lock.withLock {
-            self.builtinsStorage
-        }
+        self.builtins = builtins
     }
 
     func invoke(

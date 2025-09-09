@@ -25,5 +25,5 @@ jobs:
           echo "da4202757bb449ace9354a3dc43c35671fb5d946afd2f4140c01f2093a8d256aaa78c5ea61501e6b0cb85d8177405b566e6d2b6f0629e1175fb780ded1c147d5 /usr/local/bin/make" |
             sha512sum --check -
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - name: make all
-        run: make all
+      - run: make all
+      - run: make test-compliance

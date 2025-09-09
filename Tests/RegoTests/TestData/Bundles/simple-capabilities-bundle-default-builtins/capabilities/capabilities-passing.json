@@ -1,0 +1,12 @@
+{
+  "builtins": [
+    {
+      "name": "count",
+      "decl": {
+        "type": "function",
+        "args": [ { "type": "any" } ],
+        "result": { "type": "number" }
+      }
+    }
+  ]
+}

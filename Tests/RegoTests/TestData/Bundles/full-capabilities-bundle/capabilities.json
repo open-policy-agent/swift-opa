@@ -1,0 +1,23 @@
+{
+  "builtins": [
+    {
+      "name": "count",
+      "decl": {
+        "type": "function",
+        "args": [{ "type": "any" }],
+        "result": { "type": "number" }
+      }
+    }
+  ],
+  "allow_net": ["kubernetesjsonschema.dev"],
+  "features": [
+    "rule_head_ref_string_prefixes",
+    "rule_head_refs",
+    "rego_v1_import"
+  ],
+  "future_keywords": ["in"],
+  "wasm_abi_versions": [
+    { "version": 1, "minor_version": 1 },
+    { "version": 1, "minor_version": 2 }
+  ]
+}

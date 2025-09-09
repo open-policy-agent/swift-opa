@@ -62,7 +62,7 @@ extension BuiltinFuncs {
 
     static func objectKeys(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
-            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
         guard case .object(let x) = args[0] else {

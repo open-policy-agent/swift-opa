@@ -1,0 +1,12 @@
+{
+  "builtins": [
+    {
+      "name": "my.slugify",
+      "decl": {
+        "type": "function",
+        "args": [ { "type": "any" } ],
+        "result": { "type": "number" }
+      }
+    }
+  ]
+}

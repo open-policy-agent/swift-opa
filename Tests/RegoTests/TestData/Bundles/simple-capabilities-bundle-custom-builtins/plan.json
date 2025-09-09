@@ -1,0 +1,25 @@
+{
+  "funcs": { "funcs": [] },
+  "plans": {
+    "plans": [
+      {
+        "name": "policy",
+        "blocks": [ { "stmts": [] } ]
+      }
+    ]
+  },
+  "static": {
+    "builtin_funcs": [
+      {
+        "name": "my.slugify",
+        "decl": {
+          "type": "function",
+          "args": [ { "type": "any" } ],
+          "result": { "type": "number" }
+        }
+      }
+    ],
+    "files": [ { "value": "policy.rego" } ],
+    "strings": [ { "value": "result" } ]
+  }
+}

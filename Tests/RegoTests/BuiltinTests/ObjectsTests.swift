@@ -180,7 +180,7 @@ extension BuiltinTests.ObjectTests {
                 ["c", "d"],
                 "default_value",
             ],
-            expected: .failure(argumentTypeMismatch(arg: "object"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "object", got: "null", want: "object"))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
@@ -394,7 +394,7 @@ extension BuiltinTests.ObjectTests {
             args: [
                 ["c", "d"]
             ],
-            expected: .failure(argumentTypeMismatch(arg: "object"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "object", got: "array", want: "object"))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",

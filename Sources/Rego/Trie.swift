@@ -1,7 +1,7 @@
 import AST
 
 // TrieNode is a node in a trie for comparing roots/paths
-struct TrieNode: Sendable, Equatable {
+struct TrieNode: Sendable, Hashable {
     var value: String
     var isLeaf: Bool = false
     var children: [String: TrieNode] = [:]

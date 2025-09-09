@@ -64,7 +64,7 @@ struct BuiltinTests {
         }
     }
 
-    static func successEquals<T, E>(_ lhs: Result<T, E>, _ rhs: Result<T, E>) -> Bool where T: Hashable {
+    static func successEquals<T, E>(_ lhs: Result<T, E>, _ rhs: Result<T, E>) -> Bool where T: Equatable {
         guard case .success(let lhsValue) = lhs else {
             return false
         }

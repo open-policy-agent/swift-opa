@@ -30,7 +30,8 @@ extension OPA.Engine {
     ///
     /// - Parameters:
     ///   - bundlePaths: File system paths to the bundles.
-    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it.
+    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it during ``prepareForEvaluation(query:)``.
+    ///                   See https://www.openpolicyagent.org/docs/deployments#capabilities
     ///   - customBuiltins: Additional builtins to register alongside the default Rego builtins.
     ///                     See https://www.openpolicyagent.org/docs/policy-reference/builtins
     ///                     Conflicts are validated during ``prepareForEvaluation(query:)``.
@@ -48,7 +49,8 @@ extension OPA.Engine {
     ///
     /// - Parameters:
     ///   - bundles: Bundles provided directly in memory, keyed by name.
-    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it.
+    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it during ``prepareForEvaluation(query:)``.
+    ///                   See https://www.openpolicyagent.org/docs/deployments#capabilities
     ///   - customBuiltins: Additional builtins to register alongside the default Rego builtins.
     ///                     See https://www.openpolicyagent.org/docs/policy-reference/builtins
     ///                     Conflicts are validated during ``prepareForEvaluation(query:)``.
@@ -67,7 +69,8 @@ extension OPA.Engine {
     /// - Parameters:
     ///   - policies: IR policies to load into the engine.
     ///   - store: Data store backing policy evaluation.
-    ///   - capabilities: Optional capabilities. If set, all policies are validated against it.
+    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it during ``prepareForEvaluation(query:)``.
+    ///                   See https://www.openpolicyagent.org/docs/deployments#capabilities
     ///   - customBuiltins: Additional builtins to register alongside the default Rego builtins.
     ///                     See https://www.openpolicyagent.org/docs/policy-reference/builtins
     ///                     Conflicts are validated during ``prepareForEvaluation(query:)``.
@@ -120,9 +123,9 @@ extension OPA.Engine {
 
     /// Prepares a query for evaluation.
     ///
-    /// Loads all bundles, performs internal consistency checks and validations, and prepares
-    /// the provided query for evaluation. Uses default + custom builtins (specified at ``OPA/Engine``
-    /// initialization) to validate and evaluate builtin calls.
+    /// Loads all bundles, performs internal consistency checks and validations via the specified capabilities,
+    /// and prepares the provided query for evaluation.
+    /// Uses default + custom builtins (specified at ``OPA/Engine`` initialization) to validate and evaluate builtin calls.
     ///
     /// - Parameters:
     ///   - query: The query to prepare evaluation for.

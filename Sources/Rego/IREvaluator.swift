@@ -6,7 +6,7 @@ let localIdxInput = Local(0)
 let localIdxData = Local(1)
 
 internal struct IREvaluator {
-    private let policies: [IndexedIRPolicy]
+    let policies: [IndexedIRPolicy]
 
     init(bundles: [String: OPA.Bundle]) throws {
         var policies: [IndexedIRPolicy] = []
@@ -19,7 +19,7 @@ internal struct IREvaluator {
                     throw RegoError(
                         code: .bundleInitializationError,
                         message: """
-                            intialization failed for bundle \(bundleName), \
+                            initialization failed for bundle \(bundleName), \
                             parsing failed in file: \(planFile.url)
                             """,
                         cause: error

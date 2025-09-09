@@ -12,7 +12,7 @@ public enum RegoTypeLabels: String, Codable, Sendable {
     case string = "string"
 }
 
-public struct AnyTypeDecl: Encodable, Equatable, Sendable {
+public struct AnyTypeDecl: Encodable, Hashable, Sendable {
     public let type = RegoTypeLabels.any
     public let name: String?
     public let description: String?
@@ -39,7 +39,7 @@ public struct AnyTypeDecl: Encodable, Equatable, Sendable {
     }
 }
 
-public struct ArrayTypeDecl: Encodable, Equatable, Sendable {
+public struct ArrayTypeDecl: Encodable, Hashable, Sendable {
     public let type = RegoTypeLabels.array
     public let name: String?
     public let description: String?
@@ -75,7 +75,7 @@ public struct ArrayTypeDecl: Encodable, Equatable, Sendable {
     }
 }
 
-public struct BooleanTypeDecl: Codable, Equatable, Sendable {
+public struct BooleanTypeDecl: Codable, Hashable, Sendable {
     public let type = RegoTypeLabels.boolean
     public let name: String?
     public let description: String?
@@ -87,7 +87,7 @@ public struct BooleanTypeDecl: Codable, Equatable, Sendable {
     }
 }
 
-public struct FunctionTypeDecl: Encodable, Equatable, Sendable {
+public struct FunctionTypeDecl: Encodable, Hashable, Sendable {
     public let type = RegoTypeLabels.function
     public let name: String?
     public let description: String?
@@ -120,7 +120,7 @@ public struct FunctionTypeDecl: Encodable, Equatable, Sendable {
     }
 }
 
-public struct NullTypeDecl: Codable, Equatable, Sendable {
+public struct NullTypeDecl: Codable, Hashable, Sendable {
     public let type = RegoTypeLabels.null
     public let name: String?
     public let description: String?
@@ -137,7 +137,7 @@ public struct NullTypeDecl: Codable, Equatable, Sendable {
     }
 }
 
-public struct NumberTypeDecl: Codable, Equatable, Sendable {
+public struct NumberTypeDecl: Codable, Hashable, Sendable {
     public let type = RegoTypeLabels.number
     public let name: String?
     public let description: String?
@@ -154,7 +154,7 @@ public struct NumberTypeDecl: Codable, Equatable, Sendable {
     }
 }
 
-public struct ObjectTypeDecl: Codable, Equatable, Sendable {
+public struct ObjectTypeDecl: Codable, Hashable, Sendable {
     public let type = RegoTypeLabels.object
     public let name: String?
     public let description: String?
@@ -182,7 +182,7 @@ public struct ObjectTypeDecl: Codable, Equatable, Sendable {
     }
 }
 
-public struct StaticPropertyDecl: Encodable, Equatable, Sendable {
+public struct StaticPropertyDecl: Encodable, Hashable, Sendable {
     public let key: String
     public let value: RegoTypeDecl
 
@@ -197,7 +197,7 @@ public struct StaticPropertyDecl: Encodable, Equatable, Sendable {
     }
 }
 
-public struct DynamicPropertyDecl: Encodable, Equatable, Sendable {
+public struct DynamicPropertyDecl: Encodable, Hashable, Sendable {
     public let key: RegoTypeDecl
     public let value: RegoTypeDecl
 
@@ -212,7 +212,7 @@ public struct DynamicPropertyDecl: Encodable, Equatable, Sendable {
     }
 }
 
-public struct SetTypeDecl: Encodable, Equatable, Sendable {
+public struct SetTypeDecl: Encodable, Hashable, Sendable {
     public let type = RegoTypeLabels.set
     public let name: String?
     public let description: String?
@@ -232,7 +232,7 @@ public struct SetTypeDecl: Encodable, Equatable, Sendable {
     }
 }
 
-public struct StringTypeDecl: Codable, Equatable, Sendable {
+public struct StringTypeDecl: Codable, Hashable, Sendable {
     public let type = RegoTypeLabels.string
     public let name: String?
     public let description: String?
@@ -255,7 +255,7 @@ public struct StringTypeDecl: Codable, Equatable, Sendable {
     }
 }
 
-public indirect enum RegoTypeDecl: Equatable, Sendable {
+public indirect enum RegoTypeDecl: Hashable, Sendable {
     case any(AnyTypeDecl)
     case array(ArrayTypeDecl)
     case boolean(BooleanTypeDecl)

@@ -22,7 +22,7 @@ extension OPA {
 ///
 /// The segments represent an ordered path of traversals within the virtual document,
 /// culminating with the leaf key whose value is being pointed at.
-public struct StoreKeyPath: Equatable, Hashable, Sendable {
+public struct StoreKeyPath: Hashable, Sendable {
     let segments: [String]
 
     public init(_ segments: [String]) {

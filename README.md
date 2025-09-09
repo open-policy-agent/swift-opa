@@ -37,9 +37,7 @@ An `OPA.Engine` can be initialized with an on-disk bundle using its constructor:
 import Rego
 import Foundation
 
-// ...
-
-let path = "some/local/path"
+let path = "path/to/bundle"
 let bundlePath = OPA.Engine.BundlePath(name: "policyBundle", url: URL(fileURLWithPath: path))
 var regoEngine = OPA.Engine(bundlePaths: [bundlePath])
 
@@ -61,7 +59,7 @@ let rawInput = #"{"favorite_fruit": "apple"}"#.data(using: .utf8)!
 let inputDocument = try AST.RegoValue(jsonData: rawInput)
 ```
 
-Evaluation is performed with the prepared query. We used `data.policy.main.is_valid` above, which makes sense given our policy source:
+Evaluation is performed with the prepared query. We used `data.policy.main.is_valid` above, which matches this simple policy:
 
 ```rego
 package policy.main
@@ -80,4 +78,42 @@ let resultSet = try await preparedQuery.evaluate(
 )
 
 print(try resultSet.jsonString)
+```
+
+### Capabilities and Builtins
+
+- [Builtins](https://www.openpolicyagent.org/docs/policy-reference/builtins) are the standard and custom functions available to Rego (e.g. `count`, `concat`, etc.). The engine comes with the default OPA builtins enabled.
+- You can optionally supply an OPA [`capabilities.json`](https://www.openpolicyagent.org/docs/deployments#capabilities) (from an OPA release) upon the `OPA.Engine` init via `capabilities: .path(...)`. During `prepareForEvaluation`, the engine checks that all builtins required by your compiled policies are present in the capabilities file (including matching signatures). If no capabilities are specified, validation is skipped and execution proceeds normally.
+- The engine also checks that every required builtin by the compiled policy is present in the Swift implementation, matched by its name (default or custom builtin). This check runs independently of capabilities validation. Signature correctness is enforced by OPA’s capabilities (if specified); Swift builtin closures validate arguments only at runtime. 
+
+### Adding Custom Builtins
+
+One can also [register custom builtins](https://www.openpolicyagent.org/docs/extensions) when creating the `OPA.Engine`, in addition to the default OPA builtins provided by `swift-opa`.
+Conflicts with default builtin names are validated during `prepareForEvaluation(query:)`. 
+If capabilities are provided, the custom builtins are validated against the specified capabilities file.
+
+```swift
+import AST
+
+let customBuiltins: [String: Builtin] = [
+    "my.slugify": { ctx, args in
+        // Example: expect a single string argument and return a slug
+        guard args.count == 1, case let .string(s) = args[0] else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+        let slug = s.lowercased().replacingOccurrences(of: " ", with: "-")
+        return .string(slug)
+    }
+]
+
+var engine = OPA.Engine(
+    bundlePaths: [bundlePath],
+    // To enable builtin validation, provide a `capabilities.json`. Without it, builtins are not checked against capabilities.
+    // capabilities: .path(capabilitiesURL),
+    customBuiltins: customBuiltins
+)
+
+// Throws if a custom builtin name conflicts with a default or a builtin required by the compiled policy is not present.
+// If capabilities are specified, this throws if a capabilities validation error against the builtins occurs.
+let preparedQuery = try await engine.prepareForEvaluation(query: "<some_query>")
 ```

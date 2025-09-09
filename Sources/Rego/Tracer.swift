@@ -9,7 +9,7 @@ extension OPA {
 
 extension OPA.Trace {
     /// Specifies the tracing verbosity
-    public enum Level: String, Codable, Equatable, Sendable {
+    public enum Level: String, Codable, Hashable, Sendable {
         // Subset of the standard OPA "explain" levels, add more as needed
         case none
         case full
@@ -17,7 +17,7 @@ extension OPA.Trace {
     }
 
     /// Describes the type of traceable operation that occured
-    public enum Operation: String, Codable, Equatable, Sendable {
+    public enum Operation: String, Codable, Hashable, Sendable {
         // Subset of the Go OPA topdown trace op's, add more as needed
         case enter
         case eval
@@ -27,7 +27,7 @@ extension OPA.Trace {
     }
 
     /// Describes the source location at which a trace event occured
-    public struct Location: Codable, Equatable, Sendable {
+    public struct Location: Codable, Hashable, Sendable {
         public var row: Int = 0
         public var col: Int = 0
         public var file: String = "<unknown>"

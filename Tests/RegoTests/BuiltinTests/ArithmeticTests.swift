@@ -54,13 +54,13 @@ extension BuiltinTests.ArithmeticTests {
             description: "wrong lhs arg type",
             name: "plus",
             args: ["1", 1],
-            expected: .failure(argumentTypeMismatch(arg: "x"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "x", got: "string", want: "number"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
             name: "plus",
             args: [1, "1"],
-            expected: .failure(argumentTypeMismatch(arg: "y"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "y", got: "string", want: "number"))
         ),
     ]
 
@@ -99,13 +99,13 @@ extension BuiltinTests.ArithmeticTests {
             description: "wrong lhs arg type",
             name: "minus",
             args: ["1", 1],
-            expected: .failure(argumentTypeMismatch(arg: "x"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "x", got: "string", want: "number|set"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
             name: "minus",
             args: [1, "1"],
-            expected: .failure(argumentTypeMismatch(arg: "y"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "y", got: "string", want: "number"))
         ),
     ]
 
@@ -138,13 +138,13 @@ extension BuiltinTests.ArithmeticTests {
             description: "mixed set and number lhs",
             name: "minus",
             args: [1, .set([1])],
-            expected: .failure(argumentTypeMismatch(arg: "x"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "y", got: "set", want: "number"))
         ),
         BuiltinTests.TestCase(
             description: "mixed set and number rhs",
             name: "minus",
             args: [.set([1]), 1],
-            expected: .failure(argumentTypeMismatch(arg: "y"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "y", got: "number", want: "set"))
         ),
     ]
 
@@ -192,13 +192,13 @@ extension BuiltinTests.ArithmeticTests {
             description: "wrong lhs arg type",
             name: "mul",
             args: ["1", 1],
-            expected: .failure(argumentTypeMismatch(arg: "x"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "x", got: "string", want: "number"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
             name: "mul",
             args: [1, "1"],
-            expected: .failure(argumentTypeMismatch(arg: "y"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "y", got: "string", want: "number"))
         ),
     ]
 
@@ -227,7 +227,7 @@ extension BuiltinTests.ArithmeticTests {
             description: "divide by 0",
             name: "div",
             args: [3, 0],
-            expected: .failure(BuiltinError.evalError(msg: "divide by zero"))
+            expected: .failure(BuiltinError.evalError(msg: "division by zero"))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
@@ -245,13 +245,13 @@ extension BuiltinTests.ArithmeticTests {
             description: "wrong lhs arg type",
             name: "div",
             args: ["1", 1],
-            expected: .failure(argumentTypeMismatch(arg: "x"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "x", got: "string", want: "number"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
             name: "div",
             args: [1, "1"],
-            expected: .failure(argumentTypeMismatch(arg: "y"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "y", got: "string", want: "number"))
         ),
     ]
 
@@ -302,7 +302,7 @@ extension BuiltinTests.ArithmeticTests {
             description: "wrong arg type",
             name: "round",
             args: ["1"],
-            expected: .failure(argumentTypeMismatch(arg: "x"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "x", got: "string", want: "number"))
         ),
     ]
 
@@ -353,7 +353,7 @@ extension BuiltinTests.ArithmeticTests {
             description: "wrong arg type",
             name: "ceil",
             args: ["1"],
-            expected: .failure(argumentTypeMismatch(arg: "x"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "x", got: "string", want: "number"))
         ),
     ]
 
@@ -404,7 +404,7 @@ extension BuiltinTests.ArithmeticTests {
             description: "wrong arg type",
             name: "floor",
             args: ["1"],
-            expected: .failure(argumentTypeMismatch(arg: "x"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "x", got: "string", want: "number"))
         ),
     ]
 
@@ -425,7 +425,7 @@ extension BuiltinTests.ArithmeticTests {
             description: "divide by 0",
             name: "rem",
             args: [3, 0],
-            expected: .failure(BuiltinError.evalError(msg: "rem by zero"))
+            expected: .failure(BuiltinError.evalError(msg: "modulo by zero"))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
@@ -455,13 +455,13 @@ extension BuiltinTests.ArithmeticTests {
             description: "wrong lhs arg type",
             name: "rem",
             args: ["1", 1],
-            expected: .failure(argumentTypeMismatch(arg: "x"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "x", got: "string", want: "number"))
         ),
         BuiltinTests.TestCase(
             description: "wrong rhs arg type",
             name: "rem",
             args: [1, "1"],
-            expected: .failure(argumentTypeMismatch(arg: "y"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "y", got: "string", want: "number"))
         ),
     ]
 

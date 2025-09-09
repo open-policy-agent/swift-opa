@@ -1,9 +1,9 @@
 import AST
 import Foundation
 
-typealias Builtin = (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
+public typealias Builtin = @Sendable (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
 
-struct BuiltinContext {
+public struct BuiltinContext {
     public let location: OPA.Trace.Location
     public var tracer: OPA.Trace.QueryTracer?
     internal let cache: Ptr<BuiltinsCache>
@@ -22,8 +22,8 @@ struct BuiltinContext {
     }
 }
 
-public struct BuiltinRegistry {
-    var builtins: [String: Builtin]
+public struct BuiltinRegistry: Sendable {
+    let builtins: [String: Builtin]
 
     // defaultRegistry is the BuiltinRegistry with all capabilities enabled
     public static var defaultRegistry: BuiltinRegistry {
@@ -156,13 +156,21 @@ public struct BuiltinRegistry {
         ]
     }
 
+    public subscript(name: String) -> Builtin? {
+        self.builtins[name]
+    }
+
+    init(builtins: [String : Builtin]) {
+        self.builtins = builtins
+    }
+
     func invoke(
         withContext ctx: BuiltinContext,
         name: String,
         args: [AST.RegoValue],
         strict: Bool = false
     ) async throws -> AST.RegoValue {
-        guard let builtin = builtins[name] else {
+        guard let builtin = self[name] else {
             throw RegistryError.builtinNotFound(name: name)
         }
         do {
@@ -180,10 +188,6 @@ public struct BuiltinRegistry {
             }
             return .undefined
         }
-    }
-
-    func hasBuiltin(_ name: String) -> Bool {
-        return builtins[name] != nil
     }
 }
 

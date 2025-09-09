@@ -46,7 +46,7 @@ extension BuiltinFuncs {
         }
 
         guard case .string(let y) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "mac2", got: args[0].typeName, want: "string")
+            throw BuiltinError.argumentTypeMismatch(arg: "mac2", got: args[1].typeName, want: "string")
         }
 
         return .boolean(x.constantTimeCompare(to: y))
@@ -65,7 +65,7 @@ extension BuiltinFuncs {
         }
 
         guard case .string(let key) = args[1] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "key", got: args[0].typeName, want: "string")
+            throw BuiltinError.argumentTypeMismatch(arg: "key", got: args[1].typeName, want: "string")
         }
 
         let sk = SymmetricKey(data: Data(key.utf8))

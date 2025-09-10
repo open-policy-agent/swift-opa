@@ -17,7 +17,9 @@ test-compliance:
 	OPA_COMPLIANCE_TESTS="$(OPA_COMPLIANCE_TESTS)" \
 		swift test \
 		--filter ComplianceTests.ComplianceTests \
-		--xunit-output .build/test-results/junit.xml
+		--xunit-output .build/test-results/junit.xml || true
+	pwd
+	ls .build/test-results/junit.xml
 
 .PHONY: test-failed
 test-failed:

@@ -346,7 +346,7 @@ private func evalPlan(
         ]
     )
 
-    let caller = IR.AnyStatement(BlockStatement(blocks: plan.blocks))
+    let caller = IR.AnyStatement.blockStmt(BlockStatement(blocks: plan.blocks))
 
     let pFrame = Ptr(toCopyOf: frame)
     return try await evalPlanFrame(withContext: ctx, framePtr: pFrame, blocks: plan.blocks, caller: caller)
@@ -1110,7 +1110,7 @@ private func evalScanBlock(
     let rs = try await evalBlock(
         withContext: ctx,
         framePtr: frame,
-        caller: IR.AnyStatement(stmt),
+        caller: IR.AnyStatement.scanStmt(stmt),
         block: stmt.block
     )
 

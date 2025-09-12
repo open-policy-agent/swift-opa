@@ -55,11 +55,11 @@ jobs:
       - name: summary diff
         run: |
           (
-            echo '## diff passed'
+            echo '## passed (main vs PR)'
             echo '```diff'
             diff main-passed pr-passed || true
             echo '```'
-            echo '## diff failed'
+            echo '## failed (main vs PR)'
             echo '```diff'
             diff main-failed pr-failed || true
             echo '```'

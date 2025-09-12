@@ -23,6 +23,7 @@ jobs:
       - name: make fmt lint (ComplianceSuite)
         run: make fmt lint
         working-directory: ComplianceSuite
+      - run: make test-compliance || true
   diff:
     name: diff compliance tests (vs main)
     runs-on: macos-latest

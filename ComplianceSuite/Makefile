@@ -25,16 +25,14 @@ test-compliance:
 test-failed:
 	@OPA_COMPLIANCE_TESTS="$(OPA_COMPLIANCE_TESTS)" \
 		swift test --filter ComplianceTests.ComplianceTests \
-		| rg '❌' | rg -v builtinNotFound \
-		| gsed -nre 's/.*❌ (.*) ->.*/\1/p' \
+		| sed -n '/❌/ { /builtinUndefinedError/! s/.*❌ \(.*\) ->.*/\1/p; }' \
 		| sort | uniq
 
 .PHONY: test-passed
 test-passed:
 	@OPA_COMPLIANCE_TESTS="$(OPA_COMPLIANCE_TESTS)" \
 		swift test --filter ComplianceTests.ComplianceTests \
-		| rg '✅' \
-		| gsed -nre 's/.*✅ (.*) ->.*/\1/p' \
+		| sed -n '/✅/ { s/.*✅ \(.*\) ->.*/\1/p; }' \
 		| sort | uniq
 
 .PHONY: clean

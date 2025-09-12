@@ -110,83 +110,117 @@ extension Block: Codable {
             let partial = try peek.decode(PartialStatement.self)
             let inner = try iter.nestedContainer(keyedBy: InnerCodingKeys.self)
 
-            var outStmt: any Statement
+            var wrapped: AnyStatement
 
             switch partial.type {
             case .arrayAppendStmt:
-                outStmt = try inner.decode(ArrayAppendStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ArrayAppendStatement.self, forKey: .innerStatement)
+                wrapped = .arrayAppendStmt(stmt)
             case .assignIntStmt:
-                outStmt = try inner.decode(AssignIntStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(AssignIntStatement.self, forKey: .innerStatement)
+                wrapped = .assignIntStmt(stmt)
             case .assignVarOnceStmt:
-                outStmt = try inner.decode(AssignVarOnceStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(AssignVarOnceStatement.self, forKey: .innerStatement)
+                wrapped = .assignVarOnceStmt(stmt)
             case .assignVarStmt:
-                outStmt = try inner.decode(AssignVarStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(AssignVarStatement.self, forKey: .innerStatement)
+                wrapped = .assignVarStmt(stmt)
             case .blockStmt:
-                outStmt = try inner.decode(BlockStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(BlockStatement.self, forKey: .innerStatement)
+                wrapped = .blockStmt(stmt)
             case .breakStmt:
-                outStmt = try inner.decode(BreakStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(BreakStatement.self, forKey: .innerStatement)
+                wrapped = .breakStmt(stmt)
             case .callStmt:
-                outStmt = try inner.decode(CallStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(CallStatement.self, forKey: .innerStatement)
+                wrapped = .callStmt(stmt)
             case .callDynamicStmt:
-                outStmt = try inner.decode(CallDynamicStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(CallDynamicStatement.self, forKey: .innerStatement)
+                wrapped = .callDynamicStmt(stmt)
             case .dotStmt:
-                outStmt = try inner.decode(DotStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(DotStatement.self, forKey: .innerStatement)
+                wrapped = .dotStmt(stmt)
             case .equalStmt:
-                outStmt = try inner.decode(EqualStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(EqualStatement.self, forKey: .innerStatement)
+                wrapped = .equalStmt(stmt)
             case .isArrayStmt:
-                outStmt = try inner.decode(IsArrayStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(IsArrayStatement.self, forKey: .innerStatement)
+                wrapped = .isArrayStmt(stmt)
             case .isDefinedStmt:
-                outStmt = try inner.decode(IsDefinedStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(IsDefinedStatement.self, forKey: .innerStatement)
+                wrapped = .isDefinedStmt(stmt)
             case .isObjectStmt:
-                outStmt = try inner.decode(IsObjectStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(IsObjectStatement.self, forKey: .innerStatement)
+                wrapped = .isObjectStmt(stmt)
             case .isSetStmt:
-                outStmt = try inner.decode(IsSetStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(IsSetStatement.self, forKey: .innerStatement)
+                wrapped = .isSetStmt(stmt)
             case .isUndefinedStmt:
-                outStmt = try inner.decode(IsUndefinedStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(IsUndefinedStatement.self, forKey: .innerStatement)
+                wrapped = .isUndefinedStmt(stmt)
             case .lenStmt:
-                outStmt = try inner.decode(LenStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(LenStatement.self, forKey: .innerStatement)
+                wrapped = .lenStmt(stmt)
             case .makeArrayStmt:
-                outStmt = try inner.decode(MakeArrayStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(MakeArrayStatement.self, forKey: .innerStatement)
+                wrapped = .makeArrayStmt(stmt)
             case .makeNullStmt:
-                outStmt = try inner.decode(MakeNullStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(MakeNullStatement.self, forKey: .innerStatement)
+                wrapped = .makeNullStmt(stmt)
             case .makeNumberIntStmt:
-                outStmt = try inner.decode(MakeNumberIntStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(MakeNumberIntStatement.self, forKey: .innerStatement)
+                wrapped = .makeNumberIntStmt(stmt)
             case .makeNumberRefStmt:
-                outStmt = try inner.decode(MakeNumberRefStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(MakeNumberRefStatement.self, forKey: .innerStatement)
+                wrapped = .makeNumberRefStmt(stmt)
             case .makeObjectStmt:
-                outStmt = try inner.decode(MakeObjectStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(MakeObjectStatement.self, forKey: .innerStatement)
+                wrapped = .makeObjectStmt(stmt)
             case .makeSetStmt:
-                outStmt = try inner.decode(MakeSetStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(MakeSetStatement.self, forKey: .innerStatement)
+                wrapped = .makeSetStmt(stmt)
             case .nopStmt:
-                outStmt = try inner.decode(NopStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(NopStatement.self, forKey: .innerStatement)
+                wrapped = .nopStmt(stmt)
             case .notEqualStmt:
-                outStmt = try inner.decode(NotEqualStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(NotEqualStatement.self, forKey: .innerStatement)
+                wrapped = .notEqualStmt(stmt)
             case .notStmt:
-                outStmt = try inner.decode(NotStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(NotStatement.self, forKey: .innerStatement)
+                wrapped = .notStmt(stmt)
             case .objectInsertOnceStmt:
-                outStmt = try inner.decode(ObjectInsertOnceStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ObjectInsertOnceStatement.self, forKey: .innerStatement)
+                wrapped = .objectInsertOnceStmt(stmt)
             case .objectInsertStmt:
-                outStmt = try inner.decode(ObjectInsertStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ObjectInsertStatement.self, forKey: .innerStatement)
+                wrapped = .objectInsertStmt(stmt)
             case .objectMergeStmt:
-                outStmt = try inner.decode(ObjectMergeStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ObjectMergeStatement.self, forKey: .innerStatement)
+                wrapped = .objectMergeStmt(stmt)
             case .resetLocalStmt:
-                outStmt = try inner.decode(ResetLocalStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ResetLocalStatement.self, forKey: .innerStatement)
+                wrapped = .resetLocalStmt(stmt)
             case .resultSetAddStmt:
-                outStmt = try inner.decode(ResultSetAddStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ResultSetAddStatement.self, forKey: .innerStatement)
+                wrapped = .resultSetAddStmt(stmt)
             case .returnLocalStmt:
-                outStmt = try inner.decode(ReturnLocalStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ReturnLocalStatement.self, forKey: .innerStatement)
+                wrapped = .returnLocalStmt(stmt)
             case .scanStmt:
-                outStmt = try inner.decode(ScanStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ScanStatement.self, forKey: .innerStatement)
+                wrapped = .scanStmt(stmt)
             case .setAddStmt:
-                outStmt = try inner.decode(SetAddStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(SetAddStatement.self, forKey: .innerStatement)
+                wrapped = .setAddStmt(stmt)
             case .withStmt:
-                outStmt = try inner.decode(WithStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(WithStatement.self, forKey: .innerStatement)
+                wrapped = .withStmt(stmt)
             }
 
-            // Set location properties shared by any statement type
-            outStmt.location = partial.inner.location
+            // Set location properties shared by any statement type using the setter
+            wrapped.location = partial.inner.location
 
-            out.append(AnyStatement(outStmt))
+            out.append(wrapped)
         }
 
         self.statements = out
@@ -439,14 +473,187 @@ public enum AnyStatement: Sendable, Hashable {
     }
 
     public var location: Location {
-        switch self {
-        case .unknown(let loc):
-            return loc
-        default:
-            if let stmt = self as? Statement {
-                return stmt.location
+        get {
+            switch self {
+            case .arrayAppendStmt(let s):
+                return s.location
+            case .assignIntStmt(let s):
+                return s.location
+            case .assignVarOnceStmt(let s):
+                return s.location
+            case .assignVarStmt(let s):
+                return s.location
+            case .blockStmt(let s):
+                return s.location
+            case .breakStmt(let s):
+                return s.location
+            case .callDynamicStmt(let s):
+                return s.location
+            case .callStmt(let s):
+                return s.location
+            case .dotStmt(let s):
+                return s.location
+            case .equalStmt(let s):
+                return s.location
+            case .isArrayStmt(let s):
+                return s.location
+            case .isDefinedStmt(let s):
+                return s.location
+            case .isObjectStmt(let s):
+                return s.location
+            case .isSetStmt(let s):
+                return s.location
+            case .isUndefinedStmt(let s):
+                return s.location
+            case .lenStmt(let s):
+                return s.location
+            case .makeArrayStmt(let s):
+                return s.location
+            case .makeNullStmt(let s):
+                return s.location
+            case .makeNumberIntStmt(let s):
+                return s.location
+            case .makeNumberRefStmt(let s):
+                return s.location
+            case .makeObjectStmt(let s):
+                return s.location
+            case .makeSetStmt(let s):
+                return s.location
+            case .nopStmt(let s):
+                return s.location
+            case .notEqualStmt(let s):
+                return s.location
+            case .notStmt(let s):
+                return s.location
+            case .objectInsertOnceStmt(let s):
+                return s.location
+            case .objectInsertStmt(let s):
+                return s.location
+            case .objectMergeStmt(let s):
+                return s.location
+            case .resetLocalStmt(let s):
+                return s.location
+            case .resultSetAddStmt(let s):
+                return s.location
+            case .returnLocalStmt(let s):
+                return s.location
+            case .scanStmt(let s):
+                return s.location
+            case .setAddStmt(let s):
+                return s.location
+            case .withStmt(let s):
+                return s.location
+            case .unknown(let loc):
+                return loc
             }
-            return Location()
+        }
+        set {
+            switch self {
+            case .arrayAppendStmt(var s):
+                s.location = newValue
+                self = .arrayAppendStmt(s)
+            case .assignIntStmt(var s):
+                s.location = newValue
+                self = .assignIntStmt(s)
+            case .assignVarOnceStmt(var s):
+                s.location = newValue
+                self = .assignVarOnceStmt(s)
+            case .assignVarStmt(var s):
+                s.location = newValue
+                self = .assignVarStmt(s)
+            case .blockStmt(var s):
+                s.location = newValue
+                self = .blockStmt(s)
+            case .breakStmt(var s):
+                s.location = newValue
+                self = .breakStmt(s)
+            case .callDynamicStmt(var s):
+                s.location = newValue
+                self = .callDynamicStmt(s)
+            case .callStmt(var s):
+                s.location = newValue
+                self = .callStmt(s)
+            case .dotStmt(var s):
+                s.location = newValue
+                self = .dotStmt(s)
+            case .equalStmt(var s):
+                s.location = newValue
+                self = .equalStmt(s)
+            case .isArrayStmt(var s):
+                s.location = newValue
+                self = .isArrayStmt(s)
+            case .isDefinedStmt(var s):
+                s.location = newValue
+                self = .isDefinedStmt(s)
+            case .isObjectStmt(var s):
+                s.location = newValue
+                self = .isObjectStmt(s)
+            case .isSetStmt(var s):
+                s.location = newValue
+                self = .isSetStmt(s)
+            case .isUndefinedStmt(var s):
+                s.location = newValue
+                self = .isUndefinedStmt(s)
+            case .lenStmt(var s):
+                s.location = newValue
+                self = .lenStmt(s)
+            case .makeArrayStmt(var s):
+                s.location = newValue
+                self = .makeArrayStmt(s)
+            case .makeNullStmt(var s):
+                s.location = newValue
+                self = .makeNullStmt(s)
+            case .makeNumberIntStmt(var s):
+                s.location = newValue
+                self = .makeNumberIntStmt(s)
+            case .makeNumberRefStmt(var s):
+                s.location = newValue
+                self = .makeNumberRefStmt(s)
+            case .makeObjectStmt(var s):
+                s.location = newValue
+                self = .makeObjectStmt(s)
+            case .makeSetStmt(var s):
+                s.location = newValue
+                self = .makeSetStmt(s)
+            case .nopStmt(var s):
+                s.location = newValue
+                self = .nopStmt(s)
+            case .notEqualStmt(var s):
+                s.location = newValue
+                self = .notEqualStmt(s)
+            case .notStmt(var s):
+                s.location = newValue
+                self = .notStmt(s)
+            case .objectInsertOnceStmt(var s):
+                s.location = newValue
+                self = .objectInsertOnceStmt(s)
+            case .objectInsertStmt(var s):
+                s.location = newValue
+                self = .objectInsertStmt(s)
+            case .objectMergeStmt(var s):
+                s.location = newValue
+                self = .objectMergeStmt(s)
+            case .resetLocalStmt(var s):
+                s.location = newValue
+                self = .resetLocalStmt(s)
+            case .resultSetAddStmt(var s):
+                s.location = newValue
+                self = .resultSetAddStmt(s)
+            case .returnLocalStmt(var s):
+                s.location = newValue
+                self = .returnLocalStmt(s)
+            case .scanStmt(var s):
+                s.location = newValue
+                self = .scanStmt(s)
+            case .setAddStmt(var s):
+                s.location = newValue
+                self = .setAddStmt(s)
+            case .withStmt(var s):
+                s.location = newValue
+                self = .withStmt(s)
+            case .unknown:
+                self = .unknown(newValue)
+            }
         }
     }
 }

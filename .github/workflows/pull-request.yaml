@@ -35,12 +35,11 @@ jobs:
           path: pr/swift-opa
           fetch-depth: 0 # fetch all history for all branches and tags
       - name: checkout main
-        run: |
-          mkdir ../../main
-          git worktree add --checkout ../../main/swift-opa origin/main
-          cd ../../main/swift-opa
-          git log -1
-        working-directory: pr/swift-opa
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: open-policy-agent/swift-opa
+          ref: main
+          path: main/swift-opa
       - uses: swift-actions/setup-swift@682457186b71c25a884c45c06f859febbe259240 # v2.3.0
       - name: compliance tests (main)
         run: |

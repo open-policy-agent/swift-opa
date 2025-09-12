@@ -54,13 +54,17 @@ jobs:
         working-directory: pr/swift-opa/ComplianceSuite
       - name: summary diff
         run: |
-          (
-            echo '## passed (main vs PR)'
-            echo '```diff'
-            diff main-passed pr-passed || true
-            echo '```'
-            echo '## failed (main vs PR)'
-            echo '```diff'
-            diff main-failed pr-failed || true
-            echo '```'
-          ) >> $GITHUB_STEP_SUMMARY
+          diff_and_print() {
+            local file1="$1"
+            local file2="$2"
+            local header="$3"
+
+            if ! diff -q "$file1" "$file2" > /dev/null 2>&1; then
+              echo "## $header"
+              echo '```diff'
+              diff "$file1" "$file2" || true
+              echo '```'
+            fi
+          }
+          diff_and_print main-passed pr-passed 'passed (main vs PR)' >> $GITHUB_STEP_SUMMARY
+          diff_and_print main-failed pr-failed 'failed (main vs PR)' >> $GITHUB_STEP_SUMMARY

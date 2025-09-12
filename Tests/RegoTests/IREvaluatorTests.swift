@@ -1039,7 +1039,7 @@ struct IRStatementTests {
         )
         let block = IR.Block(statements: [tc.stmt])
 
-        let caller = IR.AnyStatement(IR.BlockStatement(blocks: [block]))
+        let caller = IR.AnyStatement.blockStmt(IR.BlockStatement(blocks: [block]))
         let result = await Result {
             try await evalBlock(withContext: ctx, framePtr: frame, caller: caller, block: block)
         }

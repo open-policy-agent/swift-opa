@@ -16,20 +16,50 @@ jobs:
     runs-on: macos-latest
     permissions:
       contents: read
-      checks: write  # Permission to create a Check Run (ikepenz/action-junit-report)
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: swift-actions/setup-swift@682457186b71c25a884c45c06f859febbe259240 # v2.3.0
-        # with:
-        #   swift-version: "6.1"
-      # - run: make all
-      # - name: make fmt lint (ComplianceSuite)
-      #   run: make fmt lint
-      #   working-directory: ComplianceSuite
-      - run: make test-compliance || true
-      - run: ls -al .build/test-results/junit.xml ComplianceSuite/.build/test-results/junit.xml || true
-      - name: Publish Test Report
-        uses: mikepenz/action-junit-report@3585e9575db828022551b4231f165eb59a0e74e3 # v5.6.2
-        if: always()
+      - run: make all
+      - name: make fmt lint (ComplianceSuite)
+        run: make fmt lint
+        working-directory: ComplianceSuite
+  diff:
+    name: diff compliance tests (vs main)
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - name: checkout main
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          report_paths: ComplianceSuite/.build/test-results/junit.xml
+          ref: main
+          path: main/swift-opa
+          fetch-depth: 0 # fetch all history for all branches and tags
+      - name: checkout PR
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          path: pr/swift-opa
+      - uses: swift-actions/setup-swift@682457186b71c25a884c45c06f859febbe259240 # v2.3.0
+      - name: compliance tests (main)
+        run: |
+          cp ../../../pr/swift-opa/ComplianceSuite/Makefile .
+          make test-passed > ../../../main-passed
+          make test-failed > ../../../main-failed
+        working-directory: main/swift-opa/ComplianceSuite
+      - name: compliance tests (pr)
+        run: |
+          make test-passed > ../../../pr-passed
+          make test-failed > ../../../pr-failed
+        working-directory: pr/swift-opa/ComplianceSuite
+      - name: summary diff
+        run: |
+          (
+            echo '## diff passed'
+            echo '```diff'
+            diff main-passed pr-passed || true
+            echo '```'
+            echo '## diff failed'
+            echo '```diff'
+            diff main-failed pr-failed || true
+            echo '```'
+          ) >> $GITHUB_STEP_SUMMARY

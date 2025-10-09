@@ -17,10 +17,10 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "k", got: args[0].typeName, want: "string")
         }
 
-        let existing: RegoValue? = ctx.cache.v[key, .namespace(uuidNamespace)]
+        let existing: RegoValue? = ctx.cache[key, .namespace(uuidNamespace)]
         guard let existing else {
             let newUUID = RegoValue.string(UUID().uuidString)
-            ctx.cache.v[key, .namespace(uuidNamespace)] = newUUID
+            ctx.cache[key, .namespace(uuidNamespace)] = newUUID
 
             return newUUID
         }

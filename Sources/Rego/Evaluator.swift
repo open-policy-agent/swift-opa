@@ -13,6 +13,10 @@ internal struct EvaluationContext {
     public var store: OPA.Store
     public var builtins: BuiltinRegistry
     public var tracer: OPA.Trace.QueryTracer?
+    /// Per-evaluation builtin cache.
+    ///
+    /// Shared by all builtin invocations within a single top-down policy evaluation.
+    public let cache: BuiltinsCache
     public var strictBuiltins: Bool = false
 
     init(
@@ -21,6 +25,7 @@ internal struct EvaluationContext {
         store: OPA.Store = NullStore(),
         builtins: BuiltinRegistry = .defaultRegistry,
         tracer: OPA.Trace.QueryTracer? = nil,
+        cache: BuiltinsCache = .init(),
         strictBuiltins: Bool = false
     ) {
         self.query = query
@@ -28,6 +33,7 @@ internal struct EvaluationContext {
         self.store = store
         self.builtins = builtins
         self.tracer = tracer
+        self.cache = cache
         self.strictBuiltins = strictBuiltins
     }
 }

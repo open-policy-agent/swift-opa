@@ -101,11 +101,13 @@ extension OPA.Engine {
         /// - Parameters:
         ///   - input: The input data to evaluate the query against.
         ///   - tracer: (optional) The tracer to use for this evaluation.
+        ///   - cache: (optional) Per-evaluation builtin cache, shared by all builtin invocations within a single top-down policy evaluation. Defaults to an empty new cache.
         ///   - strictBuiltins: (optional) Whether to run in strict builtin evaluation mode.
         ///                     In strict mode, builtin errors abort evaluation, rather than returning undefined.
         public func evaluate(
             input: AST.RegoValue = .undefined,
             tracer: OPA.Trace.QueryTracer? = nil,
+            cache: BuiltinsCache = .init(),
             strictBuiltins: Bool = false
         ) async throws -> ResultSet {
             let ctx = EvaluationContext(
@@ -114,6 +116,7 @@ extension OPA.Engine {
                 store: self.store,
                 builtins: self.builtinRegistry,
                 tracer: tracer,
+                cache: cache,
                 strictBuiltins: strictBuiltins
             )
 

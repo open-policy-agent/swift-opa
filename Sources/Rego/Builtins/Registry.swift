@@ -1,24 +1,38 @@
 import AST
 import Foundation
 
-public typealias Builtin = @Sendable (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
+/// The OPA builtin signature.
+///
+/// Called by the evaluator with the per-evaluation `BuiltinContext` and the
+/// positional, already-evaluated Rego arguments.
+///
+/// - Parameters:
+///   - context: Evaluation context (e.g., cache, tracer).
+///   - args: Positional arguments of the builtin as `AST.RegoValue`.
+/// - Returns: The returned value of the builtin as `AST.RegoValue`.
+/// - Throws: If the builtin logic throws.
+public typealias Builtin = @Sendable (_ context: BuiltinContext, _ args: [AST.RegoValue]) async throws -> AST.RegoValue
 
+/// Context available within builtin evaluation.
 public struct BuiltinContext {
+    /// Source location at which the builtin invocation occurred.
     public let location: OPA.Trace.Location
-    public var tracer: OPA.Trace.QueryTracer?
-    internal let cache: Ptr<BuiltinsCache>
+    /// Tracer that records events during evaluation.
+    public let tracer: OPA.Trace.QueryTracer?
+    /// Per-evaluation builtin cache.
+    ///
+    /// Shared by all builtin invocations within a single top-down policy evaluation.
+    public let cache: BuiltinsCache
 
     init(
         location: OPA.Trace.Location = .init(),
         tracer: OPA.Trace.QueryTracer? = nil,
-        cache: Ptr<BuiltinsCache>? = nil
+        cache: BuiltinsCache = .init()
     ) {
         self.location = location
         self.tracer = tracer
-        // Note that we will create a new cache if one hasn't been provided -
-        // some builtin evaluations (e.g. UUID) expect the cache.
-        // In most/all? cases, we expect a shared cache to be passed in here from EvaluationContext
-        self.cache = cache ?? Ptr<BuiltinsCache>(toCopyOf: BuiltinsCache())
+        // Shared cache to be passed from `EvaluationContext` or created on the fly
+        self.cache = cache
     }
 }
 

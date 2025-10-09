@@ -16,7 +16,7 @@ extension OPA.Trace {
         case note
     }
 
-    /// Describes the type of traceable operation that occured
+    /// Describes the type of traceable operation that occurred
     public enum Operation: String, Codable, Hashable, Sendable {
         // Subset of the Go OPA topdown trace op's, add more as needed
         case enter
@@ -26,7 +26,7 @@ extension OPA.Trace {
         case note
     }
 
-    /// Describes the source location at which a trace event occured
+    /// Describes the source location at which a trace event occurred
     public struct Location: Codable, Hashable, Sendable {
         public var row: Int = 0
         public var col: Int = 0

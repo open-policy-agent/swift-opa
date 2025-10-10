@@ -4,7 +4,7 @@ import Foundation
 /// The OPA builtin signature.
 ///
 /// Called by the evaluator with the per-evaluation `BuiltinContext` and the
-/// positional, already-evaluated Rego arguments.
+/// positional, already-resolved Rego arguments.
 ///
 /// - Parameters:
 ///   - context: Evaluation context (e.g., cache, tracer).

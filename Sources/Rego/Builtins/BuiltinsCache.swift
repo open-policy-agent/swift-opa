@@ -44,23 +44,36 @@ public final class BuiltinsCache {
 
     private var cache: [CompositeKey: RegoValue]
 
-    /// Create a new empty builtin cache.
+    /// Creates a new, empty builtin cache.
+    ///
+    /// The cache stores `RegoValue` entries keyed by a combination of a string and a namespace.
+    /// It is designed for use within a single top-down policy evaluation, but you can also
+    /// provide your own cache instance to reuse results between **sequential** evaluations
+    /// (for example, to avoid redundant costly network-bound builtin calls).
+    ///
+    /// - Important: ``BuiltinsCache`` is **not concurrency-safe**,
+    ///   do not share the same cache instance across parallel evaluations.
     public init() {
         self.cache = [CompositeKey: RegoValue]()
     }
 
-    /// Access a cached value scoped by a key and namespace.
+    /// Accesses or updates a cached value scoped by a key and optional namespace.
+    ///
+    /// Use this subscript to read or write entries in the builtin cache.
+    /// Setting a value to `nil` removes the corresponding cache entry.
+    ///
+    /// - Parameters:
+    ///   - key: The cache key used to identify the entry within the given namespace.
+    ///   - namespace: The namespace to scope the key under to avoid collisions between different builtins.. Defaults to ``Namespace/global``.
+    ///
+    /// - Note: Writing to the same key multiple times simply overwrites the previous value,
+    ///         the cache does not enforce immutability or write-once semantics.
     public subscript(key: String, namespace: Namespace = .global) -> RegoValue? {
         get {
             self.cache[CompositeKey(key, namespace: namespace)]
         }
-        set(newValue) {
+        set {
             let k = CompositeKey(key, namespace: namespace)
-
-            guard let newValue else {
-                self.cache[k] = nil
-                return
-            }
             self.cache[k] = newValue
         }
     }
@@ -70,7 +83,7 @@ public final class BuiltinsCache {
         self.cache.removeAll()
     }
 
-    /// Current number of entries in cache,
+    /// Current number of entries in cache.
     public var count: Int {
         self.cache.count
     }

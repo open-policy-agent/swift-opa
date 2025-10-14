@@ -19,6 +19,8 @@ jobs:
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: swift-actions/setup-swift@682457186b71c25a884c45c06f859febbe259240 # v2.3.0
+        with:
+          swift-version: '6.2'
       - run: make all
       - name: make fmt lint (ComplianceSuite)
         run: make fmt lint
@@ -43,6 +45,8 @@ jobs:
           ref: main
           path: main/swift-opa
       - uses: swift-actions/setup-swift@682457186b71c25a884c45c06f859febbe259240 # v2.3.0
+        with:
+          swift-version: '6.2'
       - name: compliance tests (main)
         run: |
           cp ../../../pr/swift-opa/ComplianceSuite/Makefile .

@@ -47,7 +47,6 @@ jobs:
           path: main/swift-opa
       - name: compliance tests (main)
         run: |
-          cp ../../../pr/swift-opa/ComplianceSuite/Makefile .
           (make test-compliance || true) > results
           ../../../pr/swift-opa/ComplianceSuite/tools/passed.sh < results > ../../../main-passed
           ../../../pr/swift-opa/ComplianceSuite/tools/failed.sh < results > ../../../main-failed

@@ -84,7 +84,7 @@ extension BuiltinTests.BuiltinsCacheTests {
 
     @Test("Shared cache across builtin evals")
     func test() async throws {
-        // One builtin cache that is handed to both builtins (sequential evaluation, as the cache is not concurrency-safe)
+        // One builtin cache that is handed to both builtins
         let cache = BuiltinsCache()
         // Dummy value in cache
         let testCacheValue: RegoValue = .string("test_value")

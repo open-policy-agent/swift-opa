@@ -102,8 +102,7 @@ extension OPA.Engine {
         ///   - input: The input data to evaluate the query against.
         ///   - tracer: (optional) The tracer to use for this evaluation.
         ///   - cache: (optional) Per-evaluation builtin cache shared across all builtin invocations within a single top-down policy evaluation.
-        ///            You can provide a custom cache instance to reuse results between **sequential** evaluations.
-        ///            However, ``BuiltinsCache`` is **not concurrency-safe**, do not share the same cache instance across parallel evaluations.
+        ///            You can provide a custom cache instance to reuse results between evaluations.
         ///            By default, a new, empty cache is created for each evaluation.
         ///   - strictBuiltins: (optional) Whether to run in strict builtin evaluation mode.
         ///                     In strict mode, builtin errors abort evaluation, rather than returning undefined.

@@ -7,12 +7,10 @@ import Foundation
 /// Stores `RegoValue` entries under namespaced string keys to avoid
 /// collisions between different builtins or key spaces.
 ///
-/// ### Single-evaluation only
-///
-/// The cache is not concurrency-safe.
-/// Use one instance per top-down policy evaluation at a time (which is performed synchronously) and do not
-/// share it across concurrent evaluations.
-public final class BuiltinsCache {
+/// It is designed for use within a single top-down policy evaluation, but you can also
+/// provide your own cache instance to reuse results between evaluations
+/// (for example, to avoid redundant costly network-bound builtin calls).
+public final class BuiltinsCache: Sendable {
     /// Key namespace for isolating builtin domains.
     public struct Namespace: Hashable, Sendable {
         let ns: String
@@ -42,19 +40,17 @@ public final class BuiltinsCache {
         }
     }
 
-    private var cache: [CompositeKey: RegoValue]
+    private let lock = NSLock()
+    private nonisolated(unsafe) var _cache: [CompositeKey: RegoValue]
 
     /// Creates a new, empty builtin cache.
     ///
     /// The cache stores `RegoValue` entries keyed by a combination of a string and a namespace.
     /// It is designed for use within a single top-down policy evaluation, but you can also
-    /// provide your own cache instance to reuse results between **sequential** evaluations
+    /// provide your own cache instance to reuse results between evaluations
     /// (for example, to avoid redundant costly network-bound builtin calls).
-    ///
-    /// - Important: ``BuiltinsCache`` is **not concurrency-safe**,
-    ///   do not share the same cache instance across parallel evaluations.
     public init() {
-        self.cache = [CompositeKey: RegoValue]()
+        self._cache = [CompositeKey: RegoValue]()
     }
 
     /// Accesses or updates a cached value scoped by a key and optional namespace.
@@ -70,21 +66,37 @@ public final class BuiltinsCache {
     ///         the cache does not enforce immutability or write-once semantics.
     public subscript(key: String, namespace: Namespace = .global) -> RegoValue? {
         get {
-            self.cache[CompositeKey(key, namespace: namespace)]
+            self.lock.withLock {
+                self._cache[CompositeKey(key, namespace: namespace)]
+            }
         }
-        set {
+        set(newValue) {
             let k = CompositeKey(key, namespace: namespace)
-            self.cache[k] = newValue
+
+            guard let newValue else {
+                self.lock.withLock {
+                    self._cache[k] = nil
+                }
+                return
+            }
+            self.lock.withLock {
+                self._cache[k] = newValue
+            }
         }
     }
 
     /// Remove all cached entries.
     public func removeAll() {
-        self.cache.removeAll()
+        self.lock.withLock {
+            self._cache.removeAll()
+        }
     }
 
     /// Current number of entries in cache.
     public var count: Int {
-        self.cache.count
+        self.lock.withLock {
+            self._cache.count
+        }
     }
 }
+

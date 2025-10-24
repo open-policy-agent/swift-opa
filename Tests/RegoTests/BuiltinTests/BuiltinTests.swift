@@ -97,11 +97,13 @@ struct BuiltinTests {
         argIndex: Int,
         argName: String,
         allowedArgTypes: [String],
+        wantArgs: String? = nil,
         generateNumberOfArgsTest: Bool = false,
-        numberAsInteger: Bool = false
+        numberAsInteger: Bool = false,
     ) -> [BuiltinTests.TestCase] {
         let argValues: [String: RegoValue] = [
-            "array": [1, 2, 3], "boolean": false, "null": .null, (numberAsInteger ? "number[integer]" : "number") : 123, "object": ["a": 1], "set": .set([0]),
+            "array": [1, 2, 3], "boolean": false, "null": .null, (numberAsInteger ? "number[integer]" : "number"): 123,
+            "object": ["a": 1], "set": .set([0]),
             "string": "hello", "undefined": .undefined,
         ]
         var tests: [BuiltinTests.TestCase] = []
@@ -118,7 +120,7 @@ struct BuiltinTests {
                     )
                 )
             }
-            // too many agrs case
+            // too many args case
             var tooManyArgs = sampleArgs  // copy
             tooManyArgs.append(.null)
             tests.append(
@@ -133,11 +135,14 @@ struct BuiltinTests {
                 )
             )
         }
-        var want = allowedArgTypes.joined(separator: "|")
-        if allowedArgTypes.count == 1 {
+        // Formulating "want" part of the error message:
+        // when passed explicitly, we will use the expression passed in
+        // otherwise we generate it based on the sorted list of allowed argument types
+        var want = wantArgs ?? "any<\(allowedArgTypes.sorted().joined(separator: ", "))>"
+        if wantArgs == nil && allowedArgTypes.count == 1 {
             want = allowedArgTypes[0]
         }
-        // for all the WRONG types, generate a specific test case
+        // For all the WRONG types, generate a specific test case
         for testType in argValues.keys.filter({ !allowedArgTypes.contains($0) }) {
             var wrongArgs = sampleArgs  // copy
             wrongArgs[argIndex] = argValues[testType]!  // insert the wrong argument at the expected index

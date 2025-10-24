@@ -9,6 +9,10 @@ let _floor = floor
 
 extension BuiltinFuncs {
     static func plus(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        return try doPlus(args: args)
+    }
+
+    static func doPlus(args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -48,6 +52,10 @@ extension BuiltinFuncs {
     // Multiplies two numbers.
     // Returns: the product of `x` and `y`
     static func mul(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        return try doMul(args: args)
+    }
+
+    static func doMul(args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }

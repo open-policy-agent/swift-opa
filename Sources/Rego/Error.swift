@@ -23,6 +23,7 @@ public struct RegoError: Sendable, Swift.Error {
             case invalidDataType
             case invalidOperand
             case maxCallDepthExceeded
+            case noPlansFoundError
             case objectInsertOnceError
             case unknownDynamicFunction
             case unknownQuery
@@ -32,6 +33,11 @@ public struct RegoError: Sendable, Swift.Error {
             case storePathNotFound
 
             // Builtin errors
+            case builtinUndefinedError
+            case ambiguousBuiltinError
+            case capabilitiesMissingBuiltin
+            case capabilitiesReadError
+            case capabilitiesDecodeError
             case argumentCountMismatch
             case argumentTypeMismatch
             case halt
@@ -58,6 +64,7 @@ public struct RegoError: Sendable, Swift.Error {
         public static let invalidDataType = Code(.invalidDataType)
         public static let invalidOperand = Code(.invalidOperand)
         public static let maxCallDepthExceeded = Code(.maxCallDepthExceeded)
+        public static let noPlansFoundError = Code(.noPlansFoundError)
         public static let objectInsertOnceError = Code(.objectInsertOnceError)
         public static let unknownDynamicFunction = Code(.unknownDynamicFunction)
         public static let unknownQuery = Code(.unknownQuery)
@@ -67,6 +74,11 @@ public struct RegoError: Sendable, Swift.Error {
         public static let storePathNotFound = Code(.storePathNotFound)
 
         // Builtin errors
+        public static let builtinUndefinedError = Code(.builtinUndefinedError)
+        public static let ambiguousBuiltinError = Code(.ambiguousBuiltinError)
+        public static let capabilitiesMissingBuiltin = Code(.capabilitiesMissingBuiltin)
+        public static let capabilitiesReadError = Code(.capabilitiesReadError)
+        public static let capabilitiesDecodeError = Code(.capabilitiesDecodeError)
         public static let argumentCountMismatch = Code(.argumentCountMismatch)
         public static let argumentTypeMismatch = Code(.argumentTypeMismatch)
         public static let halt = Code(.halt)
@@ -103,7 +115,7 @@ public enum BuiltinError {
     public static func evalError(msg: String) -> RegoError {
         return RegoError(
             code: .argumentCountMismatch,
-            message: "builtin evalutation error: \(msg)"
+            message: "builtin evaluation error: \(msg)"
         )
     }
 

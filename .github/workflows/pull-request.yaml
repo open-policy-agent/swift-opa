@@ -1,0 +1,75 @@
+name: Check
+
+on:
+  workflow_dispatch: {}
+  pull_request: {}
+
+# When a new revision is pushed to a PR, cancel all in-progress CI runs for that
+# PR. See https://docs.github.com/en/actions/using-jobs/using-concurrency
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: 'make all'
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - run: sudo xcode-select -s /Applications/Xcode_26.0.app
+      - run: swift --version
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - run: make all
+      - name: make fmt lint (ComplianceSuite)
+        run: make fmt lint
+        working-directory: ComplianceSuite
+      - run: make test-compliance || true # NB: This doesn't succeed yet!
+
+  diff:
+    name: diff compliance tests (vs main)
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - run: sudo xcode-select -s /Applications/Xcode_26.0.app
+      - run: swift --version
+      - name: checkout PR
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          path: pr/swift-opa
+          fetch-depth: 0 # fetch all history for all branches and tags
+      - name: checkout main
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: open-policy-agent/swift-opa
+          ref: main
+          path: main/swift-opa
+      - name: compliance tests (main)
+        run: |
+          (make test-compliance || true) > results
+          ../../../pr/swift-opa/ComplianceSuite/tools/passed.sh < results > ../../../main-passed
+          ../../../pr/swift-opa/ComplianceSuite/tools/failed.sh < results > ../../../main-failed
+        working-directory: main/swift-opa/ComplianceSuite
+      - name: compliance tests (pr)
+        run: |
+          (make test-compliance || true) > results
+          ./tools/passed.sh < results > ../../../pr-passed
+          ./tools/failed.sh < results > ../../../pr-failed
+        working-directory: pr/swift-opa/ComplianceSuite
+      - name: summary diff
+        run: |
+          diff_and_print() {
+            local file1="$1"
+            local file2="$2"
+            local header="$3"
+
+            if ! diff -q "$file1" "$file2" > /dev/null 2>&1; then
+              echo "## $header"
+              echo '```diff'
+              diff "$file1" "$file2" || true
+              echo '```'
+            fi
+          }
+          diff_and_print main-passed pr-passed 'passed (main vs PR)' >> $GITHUB_STEP_SUMMARY
+          diff_and_print main-failed pr-failed 'failed (main vs PR)' >> $GITHUB_STEP_SUMMARY

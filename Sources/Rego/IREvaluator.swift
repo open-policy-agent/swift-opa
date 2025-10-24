@@ -6,19 +6,20 @@ let localIdxInput = Local(0)
 let localIdxData = Local(1)
 
 internal struct IREvaluator {
-    private var policies: [IndexedIRPolicy] = []
+    let policies: [IndexedIRPolicy]
 
     init(bundles: [String: OPA.Bundle]) throws {
+        var policies: [IndexedIRPolicy] = []
         for (bundleName, bundle) in bundles {
             for planFile in bundle.planFiles {
                 do {
                     let parsed = try IR.Policy(jsonData: planFile.data)
-                    self.policies.append(IndexedIRPolicy(policy: parsed))
+                    policies.append(IndexedIRPolicy(policy: parsed))
                 } catch {
                     throw RegoError(
                         code: .bundleInitializationError,
                         message: """
-                            intialization failed for bundle \(bundleName), \
+                            initialization failed for bundle \(bundleName), \
                             parsing failed in file: \(planFile.url)
                             """,
                         cause: error
@@ -26,6 +27,10 @@ internal struct IREvaluator {
                 }
             }
         }
+        guard !policies.isEmpty else {
+            throw RegoError(code: .noPlansFoundError, message: "no IR plans were found in any of the provided bundles")
+        }
+        self.policies = policies
     }
 
     // Initialize directly with parsed policies - useful for testing
@@ -341,7 +346,7 @@ private func evalPlan(
         ]
     )
 
-    let caller = IR.AnyStatement(BlockStatement(blocks: plan.blocks))
+    let caller = IR.AnyStatement.blockStmt(BlockStatement(blocks: plan.blocks))
 
     let pFrame = Ptr(toCopyOf: frame)
     return try await evalPlanFrame(withContext: ctx, framePtr: pFrame, blocks: plan.blocks, caller: caller)
@@ -1105,7 +1110,7 @@ private func evalScanBlock(
     let rs = try await evalBlock(
         withContext: ctx,
         framePtr: frame,
-        caller: IR.AnyStatement(stmt),
+        caller: IR.AnyStatement.scanStmt(stmt),
         block: stmt.block
     )
 

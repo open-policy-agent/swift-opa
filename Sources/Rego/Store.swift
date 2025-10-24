@@ -2,7 +2,7 @@ import AST
 
 extension OPA {
     /// An abstraction over a store providing keyed access to data used in policy evaluation.
-    public protocol Store {
+    public protocol Store: Sendable {
         /// Returns the value at the specified key path.
         /// - Parameter from: The path from which to return the value.
         /// - Throws: an error if the path is not found in the store.
@@ -22,7 +22,7 @@ extension OPA {
 ///
 /// The segments represent an ordered path of traversals within the virtual document,
 /// culminating with the leaf key whose value is being pointed at.
-public struct StoreKeyPath: Equatable, Hashable, Sendable {
+public struct StoreKeyPath: Hashable, Sendable {
     let segments: [String]
 
     public init(_ segments: [String]) {

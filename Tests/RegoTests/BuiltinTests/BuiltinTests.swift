@@ -15,6 +15,21 @@ struct BuiltinTests {
         let name: String
         let args: [AST.RegoValue]
         var expected: Result<AST.RegoValue, Error>
+        let builtinRegistry: BuiltinRegistry
+
+        init(
+            description: String,
+            name: String,
+            args: [AST.RegoValue],
+            expected: Result<AST.RegoValue, Error>,
+            builtinRegistry: BuiltinRegistry = .defaultRegistry
+        ) {
+            self.description = description
+            self.name = name
+            self.args = args
+            self.expected = expected
+            self.builtinRegistry = builtinRegistry
+        }
 
         func withPrefix(_ prefix: String) -> TestCase {
             return TestCase(
@@ -26,11 +41,10 @@ struct BuiltinTests {
         }
     }
 
-    static func testBuiltin(tc: TestCase) async throws {
-        let reg = BuiltinRegistry.defaultRegistry
+    static func testBuiltin(tc: TestCase, builtinRegistry: BuiltinRegistry = .defaultRegistry) async throws {
         let bctx = BuiltinContext()
         let result = await Result {
-            try await reg.invoke(
+            try await builtinRegistry.invoke(
                 withContext: bctx,
                 name: tc.name,
                 args: tc.args,
@@ -40,10 +54,13 @@ struct BuiltinTests {
         switch tc.expected {
         case .success:
             #expect(successEquals(result, tc.expected))
-        case .failure:
-            #expect(throws: (any Error).self) {
+        case .failure(let expectedError):
+            let error = try #require(throws: (any Error).self, "Expect an error to be thrown") {
                 try result.get()
             }
+
+            #expect(type(of: expectedError) == type(of: error))
+            #expect(String(reflecting: expectedError) == String(reflecting: error))
         }
     }
 
@@ -69,13 +86,22 @@ struct BuiltinTests {
     ///   - argIndex: The index of the argument to check.
     ///   - argName: The name of the argument to expect.
     ///   - allowedArgTypes: The list of allowed argument types for the argument (could be more than one).
+    ///   - generateNumberOfArgsTest: If `true`, also generate tests ensuring the builtin
+    ///     rejects calls with too few or too many arguments. Use this only once per builtin.
+    ///   - numberAsInteger: If `true`, numbers are treated as integers (`number[integer]`)
+    ///     instead of generic numbers (`number`).
+    /// - Returns: The generated test case.
     static func generateFailureTests(
         builtinName: String,
-        sampleArgs: [RegoValue], argIndex: Int, argName: String,
-        allowedArgTypes: [String], generateNumberOfArgsTest: Bool = false
+        sampleArgs: [RegoValue],
+        argIndex: Int,
+        argName: String,
+        allowedArgTypes: [String],
+        generateNumberOfArgsTest: Bool = false,
+        numberAsInteger: Bool = false
     ) -> [BuiltinTests.TestCase] {
         let argValues: [String: RegoValue] = [
-            "array": [1, 2, 3], "boolean": false, "null": .null, "number": 123, "object": ["a": 1], "set": .set([0]),
+            "array": [1, 2, 3], "boolean": false, "null": .null, (numberAsInteger ? "number[integer]" : "number") : 123, "object": ["a": 1], "set": .set([0]),
             "string": "hello", "undefined": .undefined,
         ]
         var tests: [BuiltinTests.TestCase] = []
@@ -121,7 +147,8 @@ struct BuiltinTests {
                     name: builtinName,
                     args: wrongArgs,
                     expected: .failure(
-                        BuiltinError.argumentTypeMismatch(arg: argName, got: testType, want: want))
+                        BuiltinError.argumentTypeMismatch(arg: argName, got: testType, want: want)
+                    )
                 )
             )
         }

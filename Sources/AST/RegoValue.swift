@@ -16,7 +16,7 @@ public enum RegoValue: Sendable, Hashable {
     case undefined
 }
 
-// Related erorrs
+// Related errors
 extension RegoValue {
     package enum ValueError: Error {
         case unsupportedArrayElement
@@ -73,7 +73,7 @@ extension RegoValue {
 
     /// The (long) integer value of a RegoValue, if it is a .number and contained value is in fact a whole number.
     /// Note that Decimals and Floats are treated as integers when they don't have fractional reminders.
-    /// This does not do rounding or truncation and instead (for float types) relies on Decimal implementaion
+    /// This does not do rounding or truncation and instead (for float types) relies on Decimal implementation
     /// to detect whether or not a decimal is a whole number or not.
     /// In all other cases, including different types of RegoValue, nil is returned.
     package var integerValue: Int64? {

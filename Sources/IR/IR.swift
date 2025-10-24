@@ -1,7 +1,7 @@
 import AST
 import Foundation
 
-public struct Policy: Codable, Equatable, Sendable {
+public struct Policy: Codable, Hashable, Sendable {
     public var staticData: Static? = nil
     public var plans: Plans? = nil
     public var funcs: Funcs? = nil
@@ -19,7 +19,7 @@ public struct Policy: Codable, Equatable, Sendable {
     }
 }
 
-public struct Static: Codable, Equatable, Sendable {
+public struct Static: Codable, Hashable, Sendable {
     public var strings: [ConstString]?
     public var builtinFuncs: [BuiltinFunc]?
     public var files: [ConstString]?
@@ -37,12 +37,12 @@ public struct Static: Codable, Equatable, Sendable {
     }
 }
 
-public struct BuiltinFunc: Codable, Equatable, Sendable {
-    var name: String
-    var decl: AST.FunctionTypeDecl
+public struct BuiltinFunc: Codable, Hashable, Sendable {
+    package var name: String
+    package var decl: AST.FunctionTypeDecl
 }
 
-public struct ConstString: Codable, Equatable, Sendable {
+public struct ConstString: Codable, Hashable, Sendable {
     public var value: String
 
     public init(value: String) {
@@ -50,7 +50,7 @@ public struct ConstString: Codable, Equatable, Sendable {
     }
 }
 
-public struct Plans: Codable, Equatable, Sendable {
+public struct Plans: Codable, Hashable, Sendable {
     public var plans: [Plan] = []
 
     public init(plans: [Plan]) {
@@ -58,7 +58,7 @@ public struct Plans: Codable, Equatable, Sendable {
     }
 }
 
-public struct Plan: Codable, Equatable, Sendable {
+public struct Plan: Codable, Hashable, Sendable {
     public var name: String
     public var blocks: [Block]
 
@@ -68,7 +68,7 @@ public struct Plan: Codable, Equatable, Sendable {
     }
 }
 
-public struct Block: Equatable, Sendable {
+public struct Block: Hashable, Sendable {
     public var statements: [AnyStatement]
 
     public init(statements: [any Statement]) {
@@ -79,7 +79,7 @@ public struct Block: Equatable, Sendable {
         self.statements.append(AnyStatement(stmt))
     }
 
-    // Equatable, we need a custom implementation for dynamic dispatch
+    // Hashable, we need a custom implementation for dynamic dispatch
     // to our heterogenous extistential type instances (statements)
     public static func == (lhs: Self, rhs: Self) -> Bool {
         guard lhs.statements.count == rhs.statements.count else {
@@ -110,83 +110,117 @@ extension Block: Codable {
             let partial = try peek.decode(PartialStatement.self)
             let inner = try iter.nestedContainer(keyedBy: InnerCodingKeys.self)
 
-            var outStmt: any Statement
+            var wrapped: AnyStatement
 
             switch partial.type {
             case .arrayAppendStmt:
-                outStmt = try inner.decode(ArrayAppendStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ArrayAppendStatement.self, forKey: .innerStatement)
+                wrapped = .arrayAppendStmt(stmt)
             case .assignIntStmt:
-                outStmt = try inner.decode(AssignIntStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(AssignIntStatement.self, forKey: .innerStatement)
+                wrapped = .assignIntStmt(stmt)
             case .assignVarOnceStmt:
-                outStmt = try inner.decode(AssignVarOnceStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(AssignVarOnceStatement.self, forKey: .innerStatement)
+                wrapped = .assignVarOnceStmt(stmt)
             case .assignVarStmt:
-                outStmt = try inner.decode(AssignVarStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(AssignVarStatement.self, forKey: .innerStatement)
+                wrapped = .assignVarStmt(stmt)
             case .blockStmt:
-                outStmt = try inner.decode(BlockStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(BlockStatement.self, forKey: .innerStatement)
+                wrapped = .blockStmt(stmt)
             case .breakStmt:
-                outStmt = try inner.decode(BreakStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(BreakStatement.self, forKey: .innerStatement)
+                wrapped = .breakStmt(stmt)
             case .callStmt:
-                outStmt = try inner.decode(CallStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(CallStatement.self, forKey: .innerStatement)
+                wrapped = .callStmt(stmt)
             case .callDynamicStmt:
-                outStmt = try inner.decode(CallDynamicStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(CallDynamicStatement.self, forKey: .innerStatement)
+                wrapped = .callDynamicStmt(stmt)
             case .dotStmt:
-                outStmt = try inner.decode(DotStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(DotStatement.self, forKey: .innerStatement)
+                wrapped = .dotStmt(stmt)
             case .equalStmt:
-                outStmt = try inner.decode(EqualStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(EqualStatement.self, forKey: .innerStatement)
+                wrapped = .equalStmt(stmt)
             case .isArrayStmt:
-                outStmt = try inner.decode(IsArrayStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(IsArrayStatement.self, forKey: .innerStatement)
+                wrapped = .isArrayStmt(stmt)
             case .isDefinedStmt:
-                outStmt = try inner.decode(IsDefinedStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(IsDefinedStatement.self, forKey: .innerStatement)
+                wrapped = .isDefinedStmt(stmt)
             case .isObjectStmt:
-                outStmt = try inner.decode(IsObjectStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(IsObjectStatement.self, forKey: .innerStatement)
+                wrapped = .isObjectStmt(stmt)
             case .isSetStmt:
-                outStmt = try inner.decode(IsSetStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(IsSetStatement.self, forKey: .innerStatement)
+                wrapped = .isSetStmt(stmt)
             case .isUndefinedStmt:
-                outStmt = try inner.decode(IsUndefinedStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(IsUndefinedStatement.self, forKey: .innerStatement)
+                wrapped = .isUndefinedStmt(stmt)
             case .lenStmt:
-                outStmt = try inner.decode(LenStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(LenStatement.self, forKey: .innerStatement)
+                wrapped = .lenStmt(stmt)
             case .makeArrayStmt:
-                outStmt = try inner.decode(MakeArrayStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(MakeArrayStatement.self, forKey: .innerStatement)
+                wrapped = .makeArrayStmt(stmt)
             case .makeNullStmt:
-                outStmt = try inner.decode(MakeNullStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(MakeNullStatement.self, forKey: .innerStatement)
+                wrapped = .makeNullStmt(stmt)
             case .makeNumberIntStmt:
-                outStmt = try inner.decode(MakeNumberIntStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(MakeNumberIntStatement.self, forKey: .innerStatement)
+                wrapped = .makeNumberIntStmt(stmt)
             case .makeNumberRefStmt:
-                outStmt = try inner.decode(MakeNumberRefStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(MakeNumberRefStatement.self, forKey: .innerStatement)
+                wrapped = .makeNumberRefStmt(stmt)
             case .makeObjectStmt:
-                outStmt = try inner.decode(MakeObjectStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(MakeObjectStatement.self, forKey: .innerStatement)
+                wrapped = .makeObjectStmt(stmt)
             case .makeSetStmt:
-                outStmt = try inner.decode(MakeSetStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(MakeSetStatement.self, forKey: .innerStatement)
+                wrapped = .makeSetStmt(stmt)
             case .nopStmt:
-                outStmt = try inner.decode(NopStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(NopStatement.self, forKey: .innerStatement)
+                wrapped = .nopStmt(stmt)
             case .notEqualStmt:
-                outStmt = try inner.decode(NotEqualStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(NotEqualStatement.self, forKey: .innerStatement)
+                wrapped = .notEqualStmt(stmt)
             case .notStmt:
-                outStmt = try inner.decode(NotStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(NotStatement.self, forKey: .innerStatement)
+                wrapped = .notStmt(stmt)
             case .objectInsertOnceStmt:
-                outStmt = try inner.decode(ObjectInsertOnceStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ObjectInsertOnceStatement.self, forKey: .innerStatement)
+                wrapped = .objectInsertOnceStmt(stmt)
             case .objectInsertStmt:
-                outStmt = try inner.decode(ObjectInsertStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ObjectInsertStatement.self, forKey: .innerStatement)
+                wrapped = .objectInsertStmt(stmt)
             case .objectMergeStmt:
-                outStmt = try inner.decode(ObjectMergeStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ObjectMergeStatement.self, forKey: .innerStatement)
+                wrapped = .objectMergeStmt(stmt)
             case .resetLocalStmt:
-                outStmt = try inner.decode(ResetLocalStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ResetLocalStatement.self, forKey: .innerStatement)
+                wrapped = .resetLocalStmt(stmt)
             case .resultSetAddStmt:
-                outStmt = try inner.decode(ResultSetAddStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ResultSetAddStatement.self, forKey: .innerStatement)
+                wrapped = .resultSetAddStmt(stmt)
             case .returnLocalStmt:
-                outStmt = try inner.decode(ReturnLocalStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ReturnLocalStatement.self, forKey: .innerStatement)
+                wrapped = .returnLocalStmt(stmt)
             case .scanStmt:
-                outStmt = try inner.decode(ScanStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(ScanStatement.self, forKey: .innerStatement)
+                wrapped = .scanStmt(stmt)
             case .setAddStmt:
-                outStmt = try inner.decode(SetAddStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(SetAddStatement.self, forKey: .innerStatement)
+                wrapped = .setAddStmt(stmt)
             case .withStmt:
-                outStmt = try inner.decode(WithStatement.self, forKey: .innerStatement)
+                let stmt = try inner.decode(WithStatement.self, forKey: .innerStatement)
+                wrapped = .withStmt(stmt)
             }
 
-            // Set location properties shared by any statement type
-            outStmt.location = partial.inner.location
+            // Set location properties shared by any statement type using the setter
+            wrapped.location = partial.inner.location
 
-            out.append(AnyStatement(outStmt))
+            out.append(wrapped)
         }
 
         self.statements = out
@@ -201,7 +235,7 @@ extension Block: Codable {
 // PartialStatement represents the generic parts of a statement - its type and location.
 // This is used for partial decoding of polymorphic statements preceding the concrete
 // statement decoding.
-struct PartialStatement: Codable, Equatable {
+struct PartialStatement: Codable, Hashable {
     // KnownStatements are all allowed values for the "type" field of
     // serialized IR Statements (https://www.openpolicyagent.org/docs/latest/ir/#statements)
     // NOTE: This must be kept in sync with the corresponding cases in AnyStatement.
@@ -250,7 +284,7 @@ struct PartialStatement: Codable, Equatable {
 }
 
 // AnyStatement is an enum over all supported statements
-public enum AnyStatement: Sendable, Equatable {
+public enum AnyStatement: Sendable, Hashable {
     case arrayAppendStmt(ArrayAppendStatement)
     case assignIntStmt(AssignIntStatement)
     case assignVarOnceStmt(AssignVarOnceStatement)
@@ -439,20 +473,193 @@ public enum AnyStatement: Sendable, Equatable {
     }
 
     public var location: Location {
-        switch self {
-        case .unknown(let loc):
-            return loc
-        default:
-            if let stmt = self as? Statement {
-                return stmt.location
+        get {
+            switch self {
+            case .arrayAppendStmt(let s):
+                return s.location
+            case .assignIntStmt(let s):
+                return s.location
+            case .assignVarOnceStmt(let s):
+                return s.location
+            case .assignVarStmt(let s):
+                return s.location
+            case .blockStmt(let s):
+                return s.location
+            case .breakStmt(let s):
+                return s.location
+            case .callDynamicStmt(let s):
+                return s.location
+            case .callStmt(let s):
+                return s.location
+            case .dotStmt(let s):
+                return s.location
+            case .equalStmt(let s):
+                return s.location
+            case .isArrayStmt(let s):
+                return s.location
+            case .isDefinedStmt(let s):
+                return s.location
+            case .isObjectStmt(let s):
+                return s.location
+            case .isSetStmt(let s):
+                return s.location
+            case .isUndefinedStmt(let s):
+                return s.location
+            case .lenStmt(let s):
+                return s.location
+            case .makeArrayStmt(let s):
+                return s.location
+            case .makeNullStmt(let s):
+                return s.location
+            case .makeNumberIntStmt(let s):
+                return s.location
+            case .makeNumberRefStmt(let s):
+                return s.location
+            case .makeObjectStmt(let s):
+                return s.location
+            case .makeSetStmt(let s):
+                return s.location
+            case .nopStmt(let s):
+                return s.location
+            case .notEqualStmt(let s):
+                return s.location
+            case .notStmt(let s):
+                return s.location
+            case .objectInsertOnceStmt(let s):
+                return s.location
+            case .objectInsertStmt(let s):
+                return s.location
+            case .objectMergeStmt(let s):
+                return s.location
+            case .resetLocalStmt(let s):
+                return s.location
+            case .resultSetAddStmt(let s):
+                return s.location
+            case .returnLocalStmt(let s):
+                return s.location
+            case .scanStmt(let s):
+                return s.location
+            case .setAddStmt(let s):
+                return s.location
+            case .withStmt(let s):
+                return s.location
+            case .unknown(let loc):
+                return loc
             }
-            return Location()
+        }
+        set {
+            switch self {
+            case .arrayAppendStmt(var s):
+                s.location = newValue
+                self = .arrayAppendStmt(s)
+            case .assignIntStmt(var s):
+                s.location = newValue
+                self = .assignIntStmt(s)
+            case .assignVarOnceStmt(var s):
+                s.location = newValue
+                self = .assignVarOnceStmt(s)
+            case .assignVarStmt(var s):
+                s.location = newValue
+                self = .assignVarStmt(s)
+            case .blockStmt(var s):
+                s.location = newValue
+                self = .blockStmt(s)
+            case .breakStmt(var s):
+                s.location = newValue
+                self = .breakStmt(s)
+            case .callDynamicStmt(var s):
+                s.location = newValue
+                self = .callDynamicStmt(s)
+            case .callStmt(var s):
+                s.location = newValue
+                self = .callStmt(s)
+            case .dotStmt(var s):
+                s.location = newValue
+                self = .dotStmt(s)
+            case .equalStmt(var s):
+                s.location = newValue
+                self = .equalStmt(s)
+            case .isArrayStmt(var s):
+                s.location = newValue
+                self = .isArrayStmt(s)
+            case .isDefinedStmt(var s):
+                s.location = newValue
+                self = .isDefinedStmt(s)
+            case .isObjectStmt(var s):
+                s.location = newValue
+                self = .isObjectStmt(s)
+            case .isSetStmt(var s):
+                s.location = newValue
+                self = .isSetStmt(s)
+            case .isUndefinedStmt(var s):
+                s.location = newValue
+                self = .isUndefinedStmt(s)
+            case .lenStmt(var s):
+                s.location = newValue
+                self = .lenStmt(s)
+            case .makeArrayStmt(var s):
+                s.location = newValue
+                self = .makeArrayStmt(s)
+            case .makeNullStmt(var s):
+                s.location = newValue
+                self = .makeNullStmt(s)
+            case .makeNumberIntStmt(var s):
+                s.location = newValue
+                self = .makeNumberIntStmt(s)
+            case .makeNumberRefStmt(var s):
+                s.location = newValue
+                self = .makeNumberRefStmt(s)
+            case .makeObjectStmt(var s):
+                s.location = newValue
+                self = .makeObjectStmt(s)
+            case .makeSetStmt(var s):
+                s.location = newValue
+                self = .makeSetStmt(s)
+            case .nopStmt(var s):
+                s.location = newValue
+                self = .nopStmt(s)
+            case .notEqualStmt(var s):
+                s.location = newValue
+                self = .notEqualStmt(s)
+            case .notStmt(var s):
+                s.location = newValue
+                self = .notStmt(s)
+            case .objectInsertOnceStmt(var s):
+                s.location = newValue
+                self = .objectInsertOnceStmt(s)
+            case .objectInsertStmt(var s):
+                s.location = newValue
+                self = .objectInsertStmt(s)
+            case .objectMergeStmt(var s):
+                s.location = newValue
+                self = .objectMergeStmt(s)
+            case .resetLocalStmt(var s):
+                s.location = newValue
+                self = .resetLocalStmt(s)
+            case .resultSetAddStmt(var s):
+                s.location = newValue
+                self = .resultSetAddStmt(s)
+            case .returnLocalStmt(var s):
+                s.location = newValue
+                self = .returnLocalStmt(s)
+            case .scanStmt(var s):
+                s.location = newValue
+                self = .scanStmt(s)
+            case .setAddStmt(var s):
+                s.location = newValue
+                self = .setAddStmt(s)
+            case .withStmt(var s):
+                s.location = newValue
+                self = .withStmt(s)
+            case .unknown:
+                self = .unknown(newValue)
+            }
         }
     }
 }
 
 // AnyInnerStatement represents the generic stmt field, which should always contain location fields.
-public struct AnyInnerStatement: Codable, Equatable {
+public struct AnyInnerStatement: Codable, Hashable {
     public var row: Int = 0
     public var col: Int = 0
     public var file: Int = 0
@@ -462,7 +669,7 @@ public struct AnyInnerStatement: Codable, Equatable {
     }
 }
 
-public struct Location: Codable, Equatable, Sendable {
+public struct Location: Codable, Hashable, Sendable {
     public var row: Int
     public var col: Int
     public var file: Int
@@ -494,7 +701,7 @@ extension Statement {
     }
 }
 
-public struct Funcs: Codable, Equatable, Sendable {
+public struct Funcs: Codable, Hashable, Sendable {
     public var funcs: [Func]? = []
 
     public init(funcs: [Func]) {
@@ -502,7 +709,7 @@ public struct Funcs: Codable, Equatable, Sendable {
     }
 }
 
-public struct Func: Codable, Equatable, Sendable {
+public struct Func: Codable, Hashable, Sendable {
     public var name: String
     public var path: [String]
     public var params: [Local]
@@ -528,14 +735,14 @@ public struct Func: Codable, Equatable, Sendable {
 
 public typealias Local = UInt32
 
-public struct Operand: Equatable, Sendable {
-    public enum OpType: String, Codable, Equatable, Sendable {
+public struct Operand: Hashable, Sendable {
+    public enum OpType: String, Codable, Hashable, Sendable {
         case local = "local"
         case bool = "bool"
         case stringIndex = "string_index"
     }
 
-    public enum Value: Codable, Equatable, Sendable {
+    public enum Value: Codable, Hashable, Sendable {
         case localIndex(Int)
         case bool(Bool)
         case stringIndex(Int)
@@ -575,5 +782,39 @@ extension Operand: Codable {
             let v = try container.decode(Int.self, forKey: .value)
             self.value = Value.stringIndex(v)
         }
+    }
+}
+
+/// Represents an OPA capabilities definition, see https://www.openpolicyagent.org/docs/deployments#capabilities
+///
+/// Capabilities restrict which built-in functions and language features a policy
+/// is allowed to use. When a policy depends on a builtin not listed in the
+/// capabilities, `opa check` or `opa build` will fail. This enables reproducible
+/// builds across OPA versions and allows programs embedding OPA to enforce a
+/// controlled feature set.
+public struct Capabilities: Codable, Hashable, Sendable {
+    public struct WasmABIVersion: Codable, Hashable, Sendable {
+        public let version: Int
+        public let minorVersion: Int
+
+        enum CodingKeys: String, CodingKey {
+            case version
+            case minorVersion = "minor_version"
+        }
+    }
+
+    public let builtins: [BuiltinFunc]
+    // properties below are not actually used for validation by swift-opa (yet)
+    public let allowNet: [String]?
+    public let features: [String]?
+    public let futureKeywords: [String]?
+    public let wasmABIVersions: [WasmABIVersion]?
+
+    enum CodingKeys: String, CodingKey {
+        case builtins
+        case allowNet = "allow_net"
+        case features
+        case futureKeywords = "future_keywords"
+        case wasmABIVersions = "wasm_abi_versions"
     }
 }

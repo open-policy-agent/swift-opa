@@ -296,7 +296,7 @@ extension BuiltinTests.AggregatesTests {
             args: [[1, "a"]],
             expected: .failure(
                 BuiltinError.argumentTypeMismatch(
-                    arg: "collection", got: "array<number, string>", want: "any<array[number], set[number]>"))
+                    arg: "collection", got: "array[any<number, string>]", want: "any<array[number], set[number]>"))
         ),
         BuiltinTests.TestCase(
             description: "empty set",
@@ -316,7 +316,7 @@ extension BuiltinTests.AggregatesTests {
             args: [.set([1, "a"])],
             expected: .failure(
                 BuiltinError.argumentTypeMismatch(
-                    arg: "collection", got: "set<number, string>", want: "any<array[number], set[number]>"))
+                    arg: "collection", got: "set[any<number, string>]", want: "any<array[number], set[number]>"))
         ),
     ]
 
@@ -413,6 +413,7 @@ extension BuiltinTests.AggregatesTests {
                 builtinName: "max", sampleArgs: [[]],
                 argIndex: 0, argName: "collection",
                 allowedArgTypes: ["array", "set"],
+                wantArgs: "any<array[any], set[any]>",
                 generateNumberOfArgsTest: true),
             maxTests,
 
@@ -420,6 +421,7 @@ extension BuiltinTests.AggregatesTests {
                 builtinName: "min", sampleArgs: [[]],
                 argIndex: 0, argName: "collection",
                 allowedArgTypes: ["array", "set"],
+                wantArgs: "any<array[any], set[any]>",
                 generateNumberOfArgsTest: true),
             minTests,
 
@@ -427,6 +429,7 @@ extension BuiltinTests.AggregatesTests {
                 builtinName: "sum", sampleArgs: [[]],
                 argIndex: 0, argName: "collection",
                 allowedArgTypes: ["array", "set"],
+                wantArgs: "any<array[number], set[number]>",
                 generateNumberOfArgsTest: true),
             sumTests,
 
@@ -434,6 +437,7 @@ extension BuiltinTests.AggregatesTests {
                 builtinName: "product", sampleArgs: [[]],
                 argIndex: 0, argName: "collection",
                 allowedArgTypes: ["array", "set"],
+                wantArgs: "any<array[number], set[number]>",
                 generateNumberOfArgsTest: true),
             productTests,
 
@@ -441,6 +445,7 @@ extension BuiltinTests.AggregatesTests {
                 builtinName: "sort", sampleArgs: [[]],
                 argIndex: 0, argName: "collection",
                 allowedArgTypes: ["array", "set"],
+                wantArgs: "any<array[any], set[any]>",
                 generateNumberOfArgsTest: true),
             sortTests,
 

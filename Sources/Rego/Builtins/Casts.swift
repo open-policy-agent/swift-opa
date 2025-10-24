@@ -34,7 +34,7 @@ extension BuiltinFuncs {
             return .number(NSNumber(value: x))
         default:
             throw BuiltinError.argumentTypeMismatch(
-                arg: "x", got: args[0].typeName, want: "boolean|null|number|string")
+                arg: "x", got: args[0].typeName, want: "any<boolean, null, number, string>")
         }
     }
 

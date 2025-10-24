@@ -9,7 +9,7 @@ extension BuiltinFuncs {
 
         guard let len = args[0].count else {
             throw BuiltinError.argumentTypeMismatch(
-                arg: "collection", got: args[0].typeName, want: "string|array|object|set")
+                arg: "collection", got: args[0].typeName, want: "any<array, object, set, string>")
         }
 
         return .number(NSNumber(value: len))
@@ -27,7 +27,7 @@ extension BuiltinFuncs {
             return s.max() ?? .undefined
         default:
             throw BuiltinError.argumentTypeMismatch(
-                arg: "collection", got: args[0].typeName, want: "array|set")
+                arg: "collection", got: args[0].typeName, want: "any<array[any], set[any]>")
         }
     }
 
@@ -43,7 +43,7 @@ extension BuiltinFuncs {
             return s.min() ?? .undefined
         default:
             throw BuiltinError.argumentTypeMismatch(
-                arg: "collection", got: args[0].typeName, want: "array|set")
+                arg: "collection", got: args[0].typeName, want: "any<array[any], set[any]>")
         }
     }
 
@@ -107,7 +107,7 @@ extension BuiltinFuncs {
             }
             return result
         } catch is RegoError {
-            let receivedTypes = Set(sequence.map({ $0.typeName })).joined(separator: ", ")
+            let receivedTypes = Set(sequence.map({ $0.typeName })).sorted().joined(separator: ", ")
             throw BuiltinError.argumentTypeMismatch(
                 arg: "collection", got: "\(args[0].typeName)[any<\(receivedTypes)>]",
                 want: "any<array[number], set[number]>")

@@ -124,6 +124,12 @@ internal struct IREvaluationContext {
     var policy: IndexedIRPolicy
     var maxCallDepth: Int = 16_384
     var callDepth: Int = 0
+    var callMemo = MemoStack()  // shared stack of memoCache structs
+
+    init(ctx: EvaluationContext, policy: IndexedIRPolicy) {
+        self.ctx = ctx
+        self.policy = policy
+    }
 
     func withIncrementedCallDepth() -> IREvaluationContext {
         var ctx = self
@@ -911,13 +917,16 @@ func evalBlock(
             var newLocals = currentScopePtr.v.locals
             newLocals[stmt.local] = patched
             currentScopePtr = framePtr.v.pushScope(locals: newLocals)
-            // Start executing the block on the new scope we just pushed
-            let blockResult = try await evalBlock(
-                withContext: ctx,
-                framePtr: framePtr,
-                caller: statement,
-                block: stmt.block
-            )
+
+            let blockResult = try await ctx.callMemo.withPush {
+                // Start executing the block on the new scope we just pushed
+                return try await evalBlock(
+                    withContext: ctx,
+                    framePtr: framePtr,
+                    caller: statement,
+                    block: stmt.block
+                )
+            }
 
             // Squash locals from the child frame back into the current frame.
             // Overlay the original (non-patched) value, keep the other side-effects.
@@ -957,6 +966,13 @@ private func evalCall(
     args: [IR.Operand],
     isDynamic: Bool = false
 ) async throws -> AST.RegoValue {
+    // Check memo cache if applicable to save repeated evaluation time for rules
+    let shouldMemoize = args.count == 2  // Currently support _rules_, not _functions_
+    let sig = InvocationKey(funcName: funcName, args: args)
+    if shouldMemoize, let cachedResult = ctx.callMemo[sig] {
+        return cachedResult
+    }
+
     var argValues: [AST.RegoValue] = []
     for arg in args {
         // Note: we do not enforce that args are defined here, it appears
@@ -974,24 +990,35 @@ private func evalCall(
             return .undefined
         }
 
-        return try await callPlanFunc(
+        let result = try await callPlanFunc(
             ctx: ctx,
             frame: frame,
             caller: caller,
             funcName: funcName,
             args: argValues
         )
+
+        if shouldMemoize {
+            ctx.callMemo[sig] = result
+        }
+        return result
     }
 
     // Handle plan-defined functions first
     if ctx.policy.funcs[funcName] != nil {
-        return try await callPlanFunc(
+        let result = try await callPlanFunc(
             ctx: ctx,
             frame: frame,
             caller: caller,
             funcName: funcName,
             args: argValues
         )
+
+        if shouldMemoize {
+            ctx.callMemo[sig] = result
+        }
+
+        return result
     }
 
     // Handle built-in functions last

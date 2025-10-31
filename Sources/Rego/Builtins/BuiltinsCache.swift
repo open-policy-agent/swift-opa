@@ -1,22 +1,29 @@
 import AST
 import Foundation
 
-/// BuiltinsCache defines the caching strategy used by the top-down evaluation.
-/// Note that Golang implementation uses `type FooCachingKey string` approach to redefine string keys as distinct types.
-/// For Swift implementation, type aliasing does not create a new type, so we will have to use namespaces to separate keys.
-/// This implementation wraps a simple dictionary with composite keys made of namespace + key and values being RegoValues.
-/// Since Dictionary is not concurrency-safe, neither is BuiltinsCache, but since its intent is to be used within a single evaluation,
-/// we do not concurrency support.
-internal struct BuiltinsCache {
-    struct Namespace: Hashable, Sendable {
+/// Per-evaluation cache for OPA builtins.
+///
+/// Lightweight cache for (custom) OPA builtins.
+/// Stores `RegoValue` entries under namespaced string keys to avoid
+/// collisions between different builtins or key spaces.
+///
+/// It is designed for use within a single top-down policy evaluation, but you can also
+/// provide your own cache instance to reuse results between evaluations
+/// (for example, to avoid redundant costly network-bound builtin calls).
+public final class BuiltinsCache: Sendable {
+    /// Key namespace for isolating builtin domains.
+    public struct Namespace: Hashable, Sendable {
         let ns: String
         init(_ ns: String) {
             self.ns = ns
         }
 
+        /// Default namespace.
         public static let global: Namespace = Namespace("__global__")
 
-        // Helper for .namespace syntax within BuiltinsCache.subscript.
+        /// Create a custom namespace.
+        ///
+        /// - Parameter ns: The namespace name.
         public static func namespace(_ ns: String) -> Namespace {
             return Namespace(ns)
         }
@@ -33,32 +40,63 @@ internal struct BuiltinsCache {
         }
     }
 
-    private var cache: [CompositeKey: RegoValue]
+    private let lock = NSLock()
+    private nonisolated(unsafe) var _cache: [CompositeKey: RegoValue]
 
-    internal init() {
-        self.cache = [CompositeKey: RegoValue]()
+    /// Creates a new, empty builtin cache.
+    ///
+    /// The cache stores `RegoValue` entries keyed by a combination of a string and a namespace.
+    /// It is designed for use within a single top-down policy evaluation, but you can also
+    /// provide your own cache instance to reuse results between evaluations
+    /// (for example, to avoid redundant costly network-bound builtin calls).
+    public init() {
+        self._cache = [CompositeKey: RegoValue]()
     }
 
-    internal subscript(key: String, namespace: Namespace = .global) -> RegoValue? {
+    /// Accesses or updates a cached value scoped by a key and optional namespace.
+    ///
+    /// Use this subscript to read or write entries in the builtin cache.
+    /// Setting a value to `nil` removes the corresponding cache entry.
+    ///
+    /// - Parameters:
+    ///   - key: The cache key used to identify the entry within the given namespace.
+    ///   - namespace: The namespace to scope the key under to avoid collisions between different builtins.. Defaults to ``Namespace/global``.
+    ///
+    /// - Note: Writing to the same key multiple times simply overwrites the previous value,
+    ///         the cache does not enforce immutability or write-once semantics.
+    public subscript(key: String, namespace: Namespace = .global) -> RegoValue? {
         get {
-            return self.cache[CompositeKey(key, namespace: namespace)]
+            self.lock.withLock {
+                self._cache[CompositeKey(key, namespace: namespace)]
+            }
         }
         set(newValue) {
             let k = CompositeKey(key, namespace: namespace)
 
             guard let newValue else {
-                self.cache[k] = nil
+                self.lock.withLock {
+                    self._cache[k] = nil
+                }
                 return
             }
-            self.cache[k] = newValue
+            self.lock.withLock {
+                self._cache[k] = newValue
+            }
         }
     }
 
-    internal mutating func removeAll() {
-        self.cache.removeAll()
+    /// Remove all cached entries.
+    public func removeAll() {
+        self.lock.withLock {
+            self._cache.removeAll()
+        }
     }
 
-    internal var count: Int {
-        return self.cache.count
+    /// Current number of entries in cache.
+    public var count: Int {
+        self.lock.withLock {
+            self._cache.count
+        }
     }
 }
+

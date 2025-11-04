@@ -9,13 +9,15 @@ public struct BuiltinContext {
     /// Date and Time of Context creation
     public let timestamp: Date
     internal let cache: Ptr<BuiltinsCache>
+    internal let rand: Ptr<RandomNumberGenerator>
 
     init(
 
         location: OPA.Trace.Location = .init(),
         tracer: OPA.Trace.QueryTracer? = nil,
         cache: Ptr<BuiltinsCache>? = nil,
-        timestamp: Date? = nil
+        timestamp: Date? = nil,
+        rand: Ptr<RandomNumberGenerator>? = nil
     ) {
         self.location = location
         self.tracer = tracer
@@ -24,6 +26,12 @@ public struct BuiltinContext {
         // In most/all? cases, we expect a shared cache to be passed in here from EvaluationContext
         self.cache = cache ?? Ptr<BuiltinsCache>(toCopyOf: BuiltinsCache())
         self.timestamp = timestamp ?? Date()
+        // Unless Random Number Generator is provided, we will use a new System one.
+        // Note that SystemRandomNumberGenerator is automatically seeded,
+        // safe to use in multiple threads, and uses a cryptographically secure
+        // algorithm whenever possible.
+        // See https://developer.apple.com/documentation/swift/systemrandomnumbergenerator/
+        self.rand = rand ?? Ptr<RandomNumberGenerator>(toCopyOf: SystemRandomNumberGenerator())
     }
 }
 
@@ -115,6 +123,9 @@ public struct BuiltinRegistry: Sendable {
             "object.keys": BuiltinFuncs.objectKeys,
             "object.union": BuiltinFuncs.objectUnion,
 
+            // Rand
+            "rand.intn": BuiltinFuncs.numbersRandIntN,
+
             // Sets
             "and": BuiltinFuncs.and,
             "intersection": BuiltinFuncs.intersection,
@@ -172,6 +183,10 @@ public struct BuiltinRegistry: Sendable {
 
     public subscript(name: String) -> Builtin? {
         self.builtins[name]
+    }
+
+    init(builtins: [String: Builtin]) {
+        self.builtins = builtins
     }
 
     func invoke(

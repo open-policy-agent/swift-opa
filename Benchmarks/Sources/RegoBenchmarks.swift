@@ -4,19 +4,86 @@ import Foundation
 internal import Rego
 
 let benchmarks: @Sendable () -> Void = {
+    // Benchmark runs from the Benchmarks directory, so paths are relative to parent
+    let simpleBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/simple-directory-bundle")
+    let arrayIterationBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/array-iteration-bundle")
+
     Benchmark(
         "Simple Policy Evaluation",
         configuration: .init(metrics: [.wallClock, .mallocCountTotal])
     ) { benchmark in
         // Setup OPA engine
         var engine = OPA.Engine(
-            bundlePaths: [OPA.Engine.BundlePath(name: "simple", url: URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/simple-directory-bundle"))])
+            bundlePaths: [OPA.Engine.BundlePath(name: "simple", url: simpleBundleURL)])
         let preparedQuery = try! await engine.prepareForEvaluation(query: "data.app.rbac.allow")
 
         let input: AST.RegoValue = [
             "user": "alice",
             "action": "read",
             "resource": "document123",
+        ]
+
+        benchmark.startMeasurement()
+        for _ in benchmark.scaledIterations {
+            let result = try! await preparedQuery.evaluate(input: input)
+            blackHole(result)
+        }
+    }
+
+    Benchmark(
+        "Array Iteration - Small (10 items)",
+        configuration: .init(metrics: [.wallClock, .mallocCountTotal])
+    ) { benchmark in
+        // Setup OPA engine
+        var engine = OPA.Engine(
+            bundlePaths: [OPA.Engine.BundlePath(name: "iteration", url: arrayIterationBundleURL)])
+        let preparedQuery = try! await engine.prepareForEvaluation(query: "data.benchmark.iteration")
+
+        let input: AST.RegoValue = [
+            "items": .array((1...10).map { .number($0 as NSNumber) }),
+            "threshold": 5,
+        ]
+
+        benchmark.startMeasurement()
+        for _ in benchmark.scaledIterations {
+            let result = try! await preparedQuery.evaluate(input: input)
+            blackHole(result)
+        }
+    }
+
+    Benchmark(
+        "Array Iteration - Medium (100 items)",
+        configuration: .init(metrics: [.wallClock, .mallocCountTotal])
+    ) { benchmark in
+        // Setup OPA engine
+        var engine = OPA.Engine(
+            bundlePaths: [OPA.Engine.BundlePath(name: "iteration", url: arrayIterationBundleURL)])
+        let preparedQuery = try! await engine.prepareForEvaluation(query: "data.benchmark.iteration")
+
+        let input: AST.RegoValue = [
+            "items": .array((1...100).map { .number($0 as NSNumber) }),
+            "threshold": 50,
+        ]
+
+        benchmark.startMeasurement()
+        for _ in benchmark.scaledIterations {
+            let result = try! await preparedQuery.evaluate(input: input)
+            blackHole(result)
+        }
+    }
+
+    Benchmark(
+        "Array Iteration - Large (1000 items)",
+        configuration: .init(metrics: [.wallClock, .mallocCountTotal])
+    ) { benchmark in
+        // Setup OPA engine
+        var engine = OPA.Engine(
+            bundlePaths: [OPA.Engine.BundlePath(name: "iteration", url: arrayIterationBundleURL)])
+        let preparedQuery = try! await engine.prepareForEvaluation(query: "data.benchmark.iteration")
+
+        let input: AST.RegoValue = [
+            "items": .array((1...1000).map { .number($0 as NSNumber) }),
+            "threshold": 500,
         ]
 
         benchmark.startMeasurement()

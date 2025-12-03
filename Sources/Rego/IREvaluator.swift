@@ -138,41 +138,14 @@ internal struct IREvaluationContext {
     }
 }
 
-internal typealias Locals = [IR.Local: AST.RegoValue]
-
 // Frame represents a stack frame used during Rego IR evaluation. Each function call
 // will prompt creation of a new stack frame.
 internal struct Frame {
-    var scopeStack: [Ptr<Scope>] = []
+    var locals: Locals = Locals()
     var results: ResultSet = ResultSet()
 
-    init(locals: Locals = [:]) {
-        _ = self.pushScope(locals: locals)
-    }
-
-    // Create a new Scope, seed with some locals, push it to the stack, and return it.
-    mutating func pushScope(
-        locals: Locals = [:]
-    ) -> Ptr<Scope> {
-        let scopePtr = Ptr(toCopyOf: Scope(locals: locals))
-        self.scopeStack.append(scopePtr)
-        return scopePtr
-    }
-
-    // popScope discards the current scope, and returns its parent scope if there is one.
-    mutating func popScope() -> Ptr<Scope>? {
-        guard self.scopeStack.last != nil else {
-            return nil
-        }
-        self.scopeStack.removeLast()
-        return self.scopeStack.last
-    }
-
-    func currentScope() throws -> Ptr<Scope> {
-        guard !self.scopeStack.isEmpty else {
-            throw RegoError(code: .internalError, message: "no scopes remain on the frame")
-        }
-        return self.scopeStack.last!
+    init(locals: Locals = Locals()) {
+        self.locals = locals
     }
 
     func currentLocation(withContext ctx: IREvaluationContext, stmt: IR.AnyStatement) throws -> OPA.Trace.Location {
@@ -184,26 +157,11 @@ internal struct Frame {
     }
 
     func resolveLocal(idx: IR.Local) -> AST.RegoValue {
-        // walk the scope stack backwards looking for the first hit
-        // stride sequence is empty if we gave an impossible range (-1..0 with -1 stride)
-        // so we correctly don't enter the loop with an empty scopeStack.
-        for i in stride(from: self.scopeStack.count - 1, through: 0, by: -1) {
-            if let localValue = self.scopeStack[i].v.locals[idx] {
-                return localValue
-            }
-        }
-
-        return .undefined
+        return self.locals[idx] ?? .undefined
     }
 
-    mutating func assignLocal(idx: IR.Local, value: AST.RegoValue) throws {
-        guard !self.scopeStack.isEmpty else {
-            throw RegoError(
-                code: .internalError,
-                message: "attempted to assign local with no scope on the frame"
-            )
-        }
-        self.scopeStack.last!.v.locals[idx] = value
+    mutating func assignLocal(idx: IR.Local, value: AST.RegoValue) {
+        self.locals[idx] = value
     }
 
     // TODO, should we throw or return optional on lookup failures?
@@ -311,18 +269,6 @@ internal struct Frame {
     }
 }
 
-// Scopes are children of a Frame, representing a logical Rego scope. Each time
-// a statement has nested blocks a new Scope is pushed. These are primarily used
-// for further protecting locals and tracking "with" value overrides.
-internal struct Scope: Encodable {
-    var locals: Locals
-
-    // Initialize a fresh scope with its own copy of locals
-    init(locals: Locals = [:]) {
-        self.locals = locals
-    }
-}
-
 private struct IRTraceEvent: OPA.Trace.TraceableEvent {
     var operation: OPA.Trace.Operation
     var message: String
@@ -340,17 +286,16 @@ private func evalPlan(
     plan: IR.Plan
 ) async throws -> ResultSet {
     // Initialize the starting Frame+Scope from the top level Plan blocks and kick off evaluation.
-    let frame = Frame(
-        locals: [
-            // TODO: ?? are we going to hide stuff under special roots like OPA does?
-            // TODO: We don't resolve refs with more complex paths very much... maybe we should
-            // instead special case the DotStmt for local 0 and do a smaller read on the store?
-            // ¯\_(ツ)_/¯ for now we'll just drop the whole thang in here as it simplifies the
-            // other statments. We can refactor that part later to optimize.
-            localIdxInput: ctx.ctx.input,
-            localIdxData: try await ctx.ctx.store.read(from: StoreKeyPath(["data"])),
-        ]
-    )
+    // Create initial locals array with input at index 0 and data at index 1
+    let frame = Frame(locals: Locals([
+        // TODO: ?? are we going to hide stuff under special roots like OPA does?
+        // TODO: We don't resolve refs with more complex paths very much... maybe we should
+        // instead special case the DotStmt for local 0 and do a smaller read on the store?
+        // ¯\_(ツ)_/¯ for now we'll just drop the whole thang in here as it simplifies the
+        // other statments. We can refactor that part later to optimize.
+        ctx.ctx.input,  // localIdxInput = 0
+        try await ctx.ctx.store.read(from: StoreKeyPath(["data"]))  // localIdxData = 1
+    ]))
 
     let caller = IR.AnyStatement.blockStmt(BlockStatement(blocks: plan.blocks))
 
@@ -493,7 +438,6 @@ func evalBlock(
     caller: IR.AnyStatement,
     block: Block
 ) async throws -> BlockResult {
-    var currentScopePtr = try framePtr.v.currentScope()
     var results = ResultSet.empty
 
     framePtr.v.traceEvent(withContext: ctx, op: .enter, anyStmt: caller)
@@ -515,10 +459,10 @@ func evalBlock(
                 return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
             }
             arrayValue.append(value)
-            try framePtr.v.assignLocal(idx: stmt.array, value: .array(arrayValue))
+            framePtr.v.assignLocal(idx: stmt.array, value: .array(arrayValue))
 
         case .assignIntStmt(let stmt):
-            try framePtr.v.assignLocal(
+            framePtr.v.assignLocal(
                 idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
 
         case .assignVarOnceStmt(let stmt):
@@ -528,7 +472,7 @@ func evalBlock(
 
             // If it's the first time setting target, assign unconditionally
             if targetValue == .undefined {
-                try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
+                framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
                 break
             }
 
@@ -541,7 +485,7 @@ func evalBlock(
             // 'undefined' source value doesn't propagate: allow
             // assiging undefined to target, and don't affect control flow.
             let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
-            try framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
+            framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
 
         case .blockStmt(let stmt):
             guard let blocks = stmt.blocks else {
@@ -604,7 +548,7 @@ func evalBlock(
                 return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
             }
 
-            try framePtr.v.assignLocal(idx: stmt.result, value: result)
+            framePtr.v.assignLocal(idx: stmt.result, value: result)
 
         case .callStmt(let stmt):
             let result = try await evalCall(
@@ -619,7 +563,7 @@ func evalBlock(
                 return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
             }
 
-            try framePtr.v.assignLocal(idx: stmt.result, value: result)
+            framePtr.v.assignLocal(idx: stmt.result, value: result)
 
         case .dotStmt(let stmt):
             let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
@@ -656,7 +600,7 @@ func evalBlock(
                 // undefined
                 return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
             }
-            try framePtr.v.assignLocal(idx: stmt.target, value: targetValue)
+            framePtr.v.assignLocal(idx: stmt.target, value: targetValue)
 
         case .equalStmt(let stmt):
             // This statement is undefined if a is not equal to b.
@@ -709,18 +653,18 @@ func evalBlock(
                 )
             }
 
-            try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: len)))
+            framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: len)))
 
         case .makeArrayStmt(let stmt):
             var arr: [AST.RegoValue] = []
             arr.reserveCapacity(Int(stmt.capacity))
-            try framePtr.v.assignLocal(idx: stmt.target, value: .array(arr))
+            framePtr.v.assignLocal(idx: stmt.target, value: .array(arr))
 
         case .makeNullStmt(let stmt):
-            try framePtr.v.assignLocal(idx: stmt.target, value: .null)
+            framePtr.v.assignLocal(idx: stmt.target, value: .null)
 
         case .makeNumberIntStmt(let stmt):
-            try framePtr.v.assignLocal(
+            framePtr.v.assignLocal(
                 idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
 
         case .makeNumberRefStmt(let stmt):
@@ -731,13 +675,13 @@ func evalBlock(
             guard let n = formatter.number(from: sourceStringValue) else {
                 throw RegoError(code: .invalidDataType, message: "invalid number literal with MakeNumberRefStatement")
             }
-            try framePtr.v.assignLocal(idx: stmt.target, value: .number(n))
+            framePtr.v.assignLocal(idx: stmt.target, value: .number(n))
 
         case .makeObjectStmt(let stmt):
-            try framePtr.v.assignLocal(idx: stmt.target, value: .object([:]))
+            framePtr.v.assignLocal(idx: stmt.target, value: .object([:]))
 
         case .makeSetStmt(let stmt):
-            try framePtr.v.assignLocal(idx: stmt.target, value: .set([]))
+            framePtr.v.assignLocal(idx: stmt.target, value: .set([]))
 
         case .nopStmt:
             break
@@ -792,7 +736,7 @@ func evalBlock(
                 )
             }
             targetObjectValue[key] = targetValue
-            try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
+            framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
 
         case .objectInsertStmt(let stmt):
             let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
@@ -808,7 +752,7 @@ func evalBlock(
                 )
             }
             targetObjectValue[key] = value
-            try framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
+            framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
 
         case .objectMergeStmt(let stmt):
             let a = framePtr.v.resolveLocal(idx: stmt.a)
@@ -829,10 +773,10 @@ func evalBlock(
             // - https://github.com/open-policy-agent/opa/issues/2926
             // - https://github.com/open-policy-agent/opa/pull/3017
             let merged = objectValueB.merge(with: objectValueA)
-            try framePtr.v.assignLocal(idx: stmt.target, value: .object(merged))
+            framePtr.v.assignLocal(idx: stmt.target, value: .object(merged))
 
         case .resetLocalStmt(let stmt):
-            try framePtr.v.assignLocal(idx: stmt.target, value: .undefined)
+            framePtr.v.assignLocal(idx: stmt.target, value: .undefined)
 
         case .resultSetAddStmt(let stmt):
             guard i == block.statements.count - 1 else {
@@ -890,7 +834,7 @@ func evalBlock(
                 )
             }
             targetSetValue.insert(value)
-            try framePtr.v.assignLocal(idx: stmt.set, value: .set(targetSetValue))
+            framePtr.v.assignLocal(idx: stmt.set, value: .set(targetSetValue))
 
         case .withStmt(let stmt):
             // First we need to resolve the value that will be upserted
@@ -913,14 +857,14 @@ func evalBlock(
 
             let patched = toPatch.patch(with: overlayValue, at: path)
 
-            // Push a new scope that includes that patched local (likely shadowing a previous
-            // scopes values) and start evaluating the new block
-            var newLocals = currentScopePtr.v.locals
-            newLocals[stmt.local] = patched
-            currentScopePtr = framePtr.v.pushScope(locals: newLocals)
+            // Set patched value and ensure restoration on exit
+            framePtr.v.assignLocal(idx: stmt.local, value: patched)
+            defer {
+                framePtr.v.assignLocal(idx: stmt.local, value: toPatch)
+            }
 
             let blockResult = try await ctx.callMemo.withPush {
-                // Start executing the block on the new scope we just pushed
+                // Execute the block with the patched value
                 return try await evalBlock(
                     withContext: ctx,
                     framePtr: framePtr,
@@ -928,11 +872,6 @@ func evalBlock(
                     block: stmt.block
                 )
             }
-
-            // Squash locals from the child frame back into the current frame.
-            // Overlay the original (non-patched) value, keep the other side-effects.
-            let _ = try popAndSquash(frame: framePtr)
-            try framePtr.v.assignLocal(idx: stmt.local, value: toPatch)
 
             // Respect the break index from a sub block
             if blockResult.shouldBreak {
@@ -1067,11 +1006,15 @@ private func callPlanFunc(
     // Match source arguments to target params
     // to construct the locals map for the callee.
     // args are the resolved values to pass.
-    // fn.params are the Local indecies to pass them in to
+    // fn.params are the Local indices to pass them in to
     // in the new frame.
-    var callLocals: [IR.Local: AST.RegoValue] = zip(args, fn.params).reduce(into: [:]) {
-        out, pair in
-        out[pair.1] = pair.0
+
+    // Build locals array to accommodate all parameters plus input/data
+    var callLocals = Locals(accommodating: fn.params, minimumSize: 2)
+
+    // Assign parameters
+    for (argValue, paramIdx) in zip(args, fn.params) {
+        callLocals[paramIdx] = argValue
     }
 
     // Add in implicit input + data locals
@@ -1134,12 +1077,11 @@ private func evalScanBlock(
     key: AST.RegoValue,
     value: AST.RegoValue
 ) async throws -> ResultSet {
-    var currentScopePtr = try frame.v.currentScope()
-    var newLocals = currentScopePtr.v.locals
-    newLocals[stmt.key] = key
-    newLocals[stmt.value] = value
-    currentScopePtr = frame.v.pushScope(locals: newLocals)
-    // Start executing the block on the new scope we just pushed
+    // Set scan variables directly in current scope
+    frame.v.assignLocal(idx: stmt.key, value: key)
+    frame.v.assignLocal(idx: stmt.value, value: value)
+
+    // Execute the block
     let rs = try await evalBlock(
         withContext: ctx,
         framePtr: frame,
@@ -1147,26 +1089,5 @@ private func evalScanBlock(
         block: stmt.block
     )
 
-    // Copy out any locals set on the nested block and put the scope back
-    let updatedLocals = currentScopePtr.v.locals
-    guard let parentScope = frame.v.popScope() else {
-        throw RegoError(code: .internalError, message: "scope stack exhausted")
-    }
-    parentScope.v.locals = updatedLocals
     return rs.results
-}
-
-// popAndSquash pops the current scope off the stack, and squashes its locals into its parent
-// Returns the new current scope.
-private func popAndSquash(frame: Ptr<Frame>) throws -> Ptr<Scope> {
-    let scope = try frame.v.currentScope()
-    let currentLocals = scope.v.locals
-
-    guard let parentScope = frame.v.popScope() else {
-        throw RegoError(code: .internalError, message: "scope stack exhausted")
-    }
-
-    // Propagate any modified locals from the scope we just popped off
-    parentScope.v.locals = currentLocals
-    return parentScope
 }

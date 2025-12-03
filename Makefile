@@ -20,6 +20,10 @@ test:
 test-compliance:
 	$(MAKE) -C ComplianceSuite test-compliance
 
+.PHONY: perf
+perf:
+	cd Benchmarks && swift package benchmark
+
 .PHONY: build
 build:
 	swift build

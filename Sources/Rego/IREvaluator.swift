@@ -5,6 +5,13 @@ import IR
 let localIdxInput = Local(0)
 let localIdxData = Local(1)
 
+// Singleton NumberFormatter for parsing number literals - avoids expensive per-call initialization
+private let numberFormatter: NumberFormatter = {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .decimal
+    return formatter
+}()
+
 internal struct IREvaluator {
     let policies: [IndexedIRPolicy]
 
@@ -659,9 +666,7 @@ func evalBlock(
         case .makeNumberRefStmt(let stmt):
             let sourceStringValue = try framePtr.v.resolveStaticString(
                 ctx: ctx, Int(stmt.index))
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            guard let n = formatter.number(from: sourceStringValue) else {
+            guard let n = numberFormatter.number(from: sourceStringValue) else {
                 throw RegoError(code: .invalidDataType, message: "invalid number literal with MakeNumberRefStatement")
             }
             framePtr.v.assignLocal(idx: stmt.target, value: .number(n))

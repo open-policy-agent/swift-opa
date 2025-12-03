@@ -10,6 +10,7 @@ let benchmarks: @Sendable () -> Void = {
     let simpleBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/simple-directory-bundle")
     let dynamicCallBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/dynamic-call-bundle")
     let arrayIterationBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/array-iteration-bundle")
+    let numericLiteralsBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/numeric-literals-bundle")
 
     Benchmark(
         "Simple Policy Evaluation",
@@ -129,6 +130,28 @@ let benchmarks: @Sendable () -> Void = {
         let input: AST.RegoValue = [
             "items": .array((1...1000).map { .number($0 as NSNumber) }),
             "threshold": 500,
+        ]
+
+        benchmark.startMeasurement()
+        for _ in benchmark.scaledIterations {
+            let result = try! await preparedQuery.evaluate(input: input)
+            blackHole(result)
+        }
+    }
+
+    Benchmark(
+        "Numeric Literals",
+        configuration: .init(metrics: [.wallClock, .mallocCountTotal])
+    ) { benchmark in
+        // Setup OPA engine
+        var engine = OPA.Engine(
+            bundlePaths: [OPA.Engine.BundlePath(name: "numeric", url: numericLiteralsBundleURL)])
+        let preparedQuery = try! await engine.prepareForEvaluation(query: "data.benchmark.numeric")
+
+        let input: AST.RegoValue = [
+            "value": 10,
+            "bonus": 5.5,
+            "multiplier": 2.0,
         ]
 
         benchmark.startMeasurement()

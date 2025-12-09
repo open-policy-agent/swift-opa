@@ -142,6 +142,7 @@ public struct BuiltinRegistry: Sendable {
             "trim_space": BuiltinFuncs.trimSpace,
             "trim_suffix": BuiltinFuncs.trimSuffix,
             "upper": BuiltinFuncs.upper,
+            "internal.template_string": BuiltinFuncs.templateString,
 
             // Time
             "time.now_ns": BuiltinFuncs.timeNowNanos,

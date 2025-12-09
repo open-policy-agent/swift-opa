@@ -433,6 +433,42 @@ extension BuiltinFuncs {
 
         return .string(x.uppercased())
     }
+
+    static func templateString(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+
+        guard case .array(let parts) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "parts", got: args[0].typeName, want: "array")
+        }
+
+        return try .string(
+            parts.map {
+                switch $0 {
+                case .string:
+                    fallthrough
+                case .number:
+                    fallthrough
+                case .boolean:
+                    fallthrough
+                case .null:
+                    return try String($0)
+                case .set(let s):
+                    if s.isEmpty {
+                        return "<undefined>"
+                    }
+
+                    if s.count > 1 {
+                        throw BuiltinError.halt(reason: "template-strings must not produce multiple outputs")
+                    }
+
+                    return try String(s.first!)
+                default:
+                    throw BuiltinError.halt(reason: "illegal argument type: " + $0.typeName)
+                }
+            }.joined())
+    }
 }
 
 extension String {

@@ -1024,6 +1024,68 @@ extension BuiltinTests.StringsTests {
         ),
     ]
 
+    static let interpolationTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "empty",
+            name: "internal.template_string",
+            args: [.array([])],
+            expected: .success("")
+        ),
+        BuiltinTests.TestCase(
+            description: "undefined optional",
+            name: "internal.template_string",
+            args: [.array([.set([])])],
+            expected: .success("<undefined>")
+        ),
+        BuiltinTests.TestCase(
+            description: "primitives",
+            name: "internal.template_string",
+            args: [.array(["foo ", 42, " ", 4.2, " ", false, " ", .null])],
+            expected: .success("foo 42 4.2 false null")
+        ),
+        BuiltinTests.TestCase(
+            description: "primitives, optional",
+            name: "internal.template_string",
+            args: [.array([.set(["foo"]), " ", .set([42]), " ", .set([4.2]), " ", .set([false]), " ", .set([.null])])],
+            expected: .success("foo 42 4.2 false null")
+        ),
+        BuiltinTests.TestCase(
+            description: "collections, optional",
+            name: "internal.template_string",
+            args: [.array([
+                .set([.array([])]), " ",
+                .set([.array(["a", "b"])]), " ",
+                .set([.set([])]), " ",
+                .set([.set(["c"])]), " ",
+                .set([.object([:])]), " ",
+                .set([.object(["d": "e"])]),
+            ])],
+            expected: .success("""
+                [] ["a","b"] [] ["c"] {} {"d":"e"}
+                """)
+        ),
+        BuiltinTests.TestCase(
+            description: "multiple outputs",
+            name: "internal.template_string",
+            args: [.array([
+                .set(["foo", "bar"])
+            ])],
+            expected: .failure(
+                BuiltinError.halt(
+                    reason: "template-strings must not produce multiple outputs"))
+        ),
+        BuiltinTests.TestCase(
+            description: "illegal argument type",
+            name: "internal.template_string",
+            args: [.array([
+                .array(["foo", "bar"])
+            ])],
+            expected: .failure(
+                BuiltinError.halt(
+                    reason: "illegal argument type: array"))
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
             concatTests,
@@ -1035,6 +1097,7 @@ extension BuiltinTests.StringsTests {
             sprintfBasicTests,
             trimTests,
             upperTests,
+            interpolationTests,
 
             BuiltinTests.generateFailureTests(
                 builtinName: "startswith", sampleArgs: ["a", "b"], argIndex: 0, argName: "search",

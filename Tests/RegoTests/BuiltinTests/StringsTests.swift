@@ -1061,8 +1061,16 @@ extension BuiltinTests.StringsTests {
                 .set([.object(["d": "e"])]),
             ])],
             expected: .success("""
-                [] ["a","b"] [] ["c"] {} {"d":"e"}
+                [] ["a", "b"] set() {"c"} {} {"d": "e"}
                 """)
+        ),
+        BuiltinTests.TestCase(
+            description: "nested set",
+            name: "internal.template_string",
+            args: [.array([
+                .set([.set([.set([])])]),
+            ])],
+            expected: .success("{set()}")
         ),
         BuiltinTests.TestCase(
             description: "multiple outputs",

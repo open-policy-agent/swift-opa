@@ -446,13 +446,7 @@ extension BuiltinFuncs {
         return try .string(
             parts.map {
                 switch $0 {
-                case .string:
-                    fallthrough
-                case .number:
-                    fallthrough
-                case .boolean:
-                    fallthrough
-                case .null:
+                case .string, .number, .boolean, .null:
                     return try String($0)
                 case .set(let s):
                     if s.isEmpty {

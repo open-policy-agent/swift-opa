@@ -96,6 +96,16 @@ extension BuiltinFuncs {
         // Note that if result *looks like an int*, we will just return an integer
         // even though we maintain our computations as Decimals
         let result = NSNumber(value: NSDecimalNumber(decimal: u.apply(to: x)).doubleValue)
+
+        // Handle infinite values that would crash in toNumberRegoValue
+        if !result.doubleValue.isFinite {
+            if returnInts {
+                return .number(NSNumber(value: result.doubleValue > 0 ? Int64.max : Int64.min))
+            } else {
+                return .number(NSNumber(value: result.doubleValue))
+            }
+        }
+
         return result.toNumberRegoValue(asInt: returnInts)
     }
 

@@ -48,6 +48,12 @@ extension BuiltinTests.BitsTests {
             expected: .success(.number(NSNumber(value: 0)))
         ),
         BuiltinTests.TestCase(
+            description: "-1 << 70 (shift >= 64 returns 0)",
+            name: "bits.lsh",
+            args: [-1, 70],
+            expected: .success(.number(NSNumber(value: 0)))
+        ),
+        BuiltinTests.TestCase(
             description: "-255 << 2",
             name: "bits.lsh",
             args: [-255, 2],
@@ -103,6 +109,24 @@ extension BuiltinTests.BitsTests {
             name: "bits.rsh",
             args: [5, 33],
             expected: .success(.number(NSNumber(value: Int(5 >> 33))))
+        ),
+        BuiltinTests.TestCase(
+            description: "100 >> 64 (positive shift >= 64 returns 0)",
+            name: "bits.rsh",
+            args: [100, 64],
+            expected: .success(.number(NSNumber(value: 0)))
+        ),
+        BuiltinTests.TestCase(
+            description: "-100 >> 64 (negative shift >= 64 returns -1)",
+            name: "bits.rsh",
+            args: [-100, 64],
+            expected: .success(.number(NSNumber(value: -1)))
+        ),
+        BuiltinTests.TestCase(
+            description: "-100 >> 70 (negative shift >= 64 returns -1)",
+            name: "bits.rsh",
+            args: [-100, 70],
+            expected: .success(.number(NSNumber(value: -1)))
         ),
         BuiltinTests.TestCase(
             description: "-1020 >> 2",

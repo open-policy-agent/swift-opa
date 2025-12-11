@@ -136,16 +136,27 @@ extension UUID {
 
         switch version {
         case 6:
-            let time = bigEndianUInt64([uuid.0, uuid.1, uuid.2, uuid.3, uuid.4, uuid.5, uuid.6, uuid.7])
-            t = Int64(time)
+            // UUID v6 has 60-bit timestamp, need to mask out version bits from time_low_and_version
+            let timeHigh = UInt64(bigEndianUInt32([uuid.0, uuid.1, uuid.2, uuid.3]))
+            let timeMid = UInt64(bigEndianUInt16([uuid.4, uuid.5]))
+            let timeLowAndVersion = bigEndianUInt16([uuid.6, uuid.7])
+            let timeLow = UInt64(timeLowAndVersion & 0x0FFF) // Mask out version bits (most significant 4 bits)
+
+            t = Int64((timeHigh << 28) | (timeMid << 12) | timeLow)
         case 7:
-            let time = bigEndianUInt64([uuid.0, uuid.1, uuid.2, uuid.3, uuid.4, uuid.5, uuid.6, uuid.7])
-            t = Int64(Int64((time >> 16)) * 10000 + g1582ns100)
+            // UUID v7 has 48-bit unix_ts_ms spanning bytes 0-5
+            let timeHigh = UInt64(bigEndianUInt32([uuid.0, uuid.1, uuid.2, uuid.3]))
+            let timeLow = UInt64(bigEndianUInt16([uuid.4, uuid.5]))
+
+            t = Int64((timeHigh << 16) | timeLow) * 10000 + g1582ns100
         default:
-            var time = Int64(bigEndianUInt32([uuid.0, uuid.1, uuid.2, uuid.3]))
-            time |= Int64(bigEndianUInt16([uuid.4, uuid.5])) << 32
-            time |= Int64(bigEndianUInt16([uuid.6, uuid.7]) & 0xfff) << 48
-            t = Int64(time)
+            // UUID v1/v2: timestamp is time_hi(12) || time_mid(16) || time_low(32)
+            let timeLow = Int64(bigEndianUInt32([uuid.0, uuid.1, uuid.2, uuid.3]))
+            let timeMid = Int64(bigEndianUInt16([uuid.4, uuid.5]))
+            let timeHiAndVersion = bigEndianUInt16([uuid.6, uuid.7])
+            let timeHi = Int64(timeHiAndVersion & 0x0FFF) // Mask out version bits
+
+            t = (timeHi << 48) | (timeMid << 32) | timeLow
         }
 
         // Now we convert time to the number of seconds and nanoseconds using the Unix

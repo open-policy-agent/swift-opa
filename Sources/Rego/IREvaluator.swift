@@ -519,7 +519,7 @@ func evalBlock(
 
         case .assignIntStmt(let stmt):
             try framePtr.v.assignLocal(
-                idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
+                idx: stmt.target, value: .number(RegoNumber.int(Int64(stmt.value))))
 
         case .assignVarOnceStmt(let stmt):
             // 'undefined' source value doesn't propagate aka don't break out of the block
@@ -709,7 +709,7 @@ func evalBlock(
                 )
             }
 
-            try framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: len)))
+            try framePtr.v.assignLocal(idx: stmt.target, value: .number(RegoNumber.int(Int64(len))))
 
         case .makeArrayStmt(let stmt):
             var arr: [AST.RegoValue] = []
@@ -721,17 +721,18 @@ func evalBlock(
 
         case .makeNumberIntStmt(let stmt):
             try framePtr.v.assignLocal(
-                idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
+                idx: stmt.target, value: .number(RegoNumber.int(Int64(stmt.value))))
 
         case .makeNumberRefStmt(let stmt):
             let sourceStringValue = try framePtr.v.resolveStaticString(
                 ctx: ctx, Int(stmt.index))
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            guard let n = formatter.number(from: sourceStringValue) else {
+
+            guard let decimal = Decimal(string: sourceStringValue) else {
                 throw RegoError(code: .invalidDataType, message: "invalid number literal with MakeNumberRefStatement")
             }
-            try framePtr.v.assignLocal(idx: stmt.target, value: .number(n))
+
+            let regoNumber = RegoNumber(decimal)
+            try framePtr.v.assignLocal(idx: stmt.target, value: .number(regoNumber))
 
         case .makeObjectStmt(let stmt):
             try framePtr.v.assignLocal(idx: stmt.target, value: .object([:]))
@@ -1104,7 +1105,7 @@ private func evalScan(
     case .array(let arr):
         results.reserveCapacity(arr.count)
         for i in 0..<arr.count {
-            let k: AST.RegoValue = .number(NSNumber(value: i))
+            let k: AST.RegoValue = .number(RegoNumber.int(Int64(i)))
             let v = arr[i] as AST.RegoValue
             let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
             results.formUnion(rs)

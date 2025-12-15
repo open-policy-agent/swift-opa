@@ -1,6 +1,15 @@
 import CoreFoundation
 import Foundation
 
+// Helper for differentiating between an NSNumber which a boolean vs. a number.
+// We're trying to avoid confusing NSNumber(0) from false and NSNumber(1) from true.
+private let boolLiteral = NSNumber(booleanLiteral: true)
+private extension NSNumber {
+    var isBool: Bool {
+        return type(of: self) == type(of: boolLiteral)
+    }
+}
+
 extension RegoValue: Codable {
     // Constructor for use with JSONSerialization
     package init(from: Any) throws(ValueError) {
@@ -29,7 +38,7 @@ extension RegoValue: Codable {
             if v.isBool {
                 self = .boolean(v.boolValue)
             } else {
-                self = .number(v)
+                self = .number(RegoNumber(v))
             }
         case _ as NSNull:
             self = .null
@@ -80,12 +89,13 @@ extension RegoValue: Codable {
                 self = .string(stringValue)
                 return
             }
-            if let doubleValue = try? container.decode(Double.self) {
-                self = .number(NSNumber(value: doubleValue))
+
+            if let intValue = try? container.decode(Int.self) {
+                self = .number(RegoNumber.int(Int64(intValue)))
                 return
             }
-            if let intValue = try? container.decode(Int.self) {
-                self = .number(NSNumber(value: intValue))
+            if let decimalValue = try? container.decode(Decimal.self) {
+                self = .number(RegoNumber(decimalValue))
                 return
             }
             if let boolValue = try? container.decode(Bool.self) {
@@ -188,5 +198,25 @@ struct AnyKey: CodingKey {
 
     init?(stringValue: String) {
         self.stringValue = stringValue
+    }
+}
+
+// Private extension for JSON deserialization
+private extension RegoNumber {
+    /// Create RegoNumber from NSNumber (for JSON deserialization - assumes non-boolean NSNumber)
+    init(_ nsNumber: NSNumber) {
+        let nsNumberIsFloatType = CFNumberIsFloatType(nsNumber as CFNumber)
+
+        if !nsNumberIsFloatType {
+            let nsInt64Value = nsNumber.int64Value
+            let decimalValue = nsNumber.decimalValue
+            if decimalValue == Decimal(nsInt64Value) {
+                self = RegoNumber.int(nsInt64Value)
+            } else {
+                self = RegoNumber(decimalValue)
+            }
+        } else {
+            self = RegoNumber(nsNumber.decimalValue)
+        }
     }
 }

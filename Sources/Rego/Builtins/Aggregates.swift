@@ -12,7 +12,7 @@ extension BuiltinFuncs {
                 arg: "collection", got: args[0].typeName, want: "any<array, object, set, string>")
         }
 
-        return .number(NSNumber(value: len))
+        return .number(RegoNumber(value: len))
     }
 
     static func max(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -105,6 +105,7 @@ extension BuiltinFuncs {
                 { x, y in
                     try op([x, y])
                 })
+
             return result
         } catch is RegoError {
             let receivedTypes = Set(sequence.map({ $0.typeName })).sorted().joined(separator: ", ")

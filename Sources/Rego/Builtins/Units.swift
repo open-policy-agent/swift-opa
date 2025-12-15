@@ -95,18 +95,8 @@ extension BuiltinFuncs {
         // Compute and return the result
         // Note that if result *looks like an int*, we will just return an integer
         // even though we maintain our computations as Decimals
-        let result = NSNumber(value: NSDecimalNumber(decimal: u.apply(to: x)).doubleValue)
-
-        // Handle infinite values that would crash in toNumberRegoValue
-        guard result.doubleValue.isFinite else {
-            let infiniteValue =
-                returnInts
-                ? NSNumber(value: result.doubleValue > 0 ? Int64.max : Int64.min)
-                : NSNumber(value: result.doubleValue)
-            return .number(infiniteValue)
-        }
-
-        return result.toNumberRegoValue(asInt: returnInts)
+        let resultDecimal = u.apply(to: x)
+        return decimalToRegoValue(resultDecimal, asInt: returnInts)
     }
 
     /// See https://github.com/open-policy-agent/opa/blob/ce23f71acaabb3b2a9e1438db29047c483a5f009/v1/topdown/parse_bytes.go#L118
@@ -226,28 +216,19 @@ extension ConversionUnit {
     }
 }
 
-extension NSNumber {
-    /// Returns .number RegoValue that best represents a given NSNumber.
-    /// If the number *looks like an int*, we will just return an integer.
-    /// When asInt=true is passed, we will *ALWAYS* return an integer.
-    /// Positive integers will be returned as unsigned int64.
-    /// Booleans will also be converted to .number RegoValue.
-    /// - Parameter asInt: forces truncation to integer even when the number if fractional
-    func toNumberRegoValue(asInt: Bool = false) -> RegoValue {
+extension BuiltinFuncs {
+    /// Converts a Decimal to RegoValue, optionally forcing integer conversion
+    private static func decimalToRegoValue(_ decimal: Decimal, asInt: Bool) -> AST.RegoValue {
         if asInt {
-            if self.decimalValue > Decimal(0) {
-                return .number(NSNumber(value: self.uint64Value))
+            if decimal < Self.minInt64Decimal || decimal > Self.maxInt64Decimal {
+                return .number(RegoNumber(decimal))
             }
-            return .number(NSNumber(value: self.int64Value))
+            return .number(RegoNumber(value: decimal.int64Value))
         }
-        let fractionalRemainder = self.decimalValue - Decimal(self.int64Value)
-        guard fractionalRemainder == Decimal(0) else {
-            // It's probably a float
-            return .number(self)
-        }
-        if self.decimalValue > Decimal(0) {
-            return .number(NSNumber(value: self.uint64Value))
-        }
-        return .number(NSNumber(value: self.int64Value))
+
+        return .number(RegoNumber(decimal))
     }
+
+    private static let minInt64Decimal = Decimal(Int64.min)
+    private static let maxInt64Decimal = Decimal(Int64.max)
 }

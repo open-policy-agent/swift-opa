@@ -64,7 +64,7 @@ extension BuiltinFuncs {
 
             var current = intA
             while current <= intB {
-                result.append(.number(NSNumber(value: current)))
+                result.append(.number(RegoNumber(value: current)))
                 current += step
             }
         } else {
@@ -72,7 +72,7 @@ extension BuiltinFuncs {
 
             var current = intA
             while current >= intB {
-                result.append(.number(NSNumber(value: current)))
+                result.append(.number(RegoNumber(value: current)))
                 current -= step
             }
         }

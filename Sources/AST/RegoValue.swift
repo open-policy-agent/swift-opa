@@ -9,7 +9,7 @@ public enum RegoValue: Sendable, Hashable {
     case array([RegoValue])
     case boolean(Bool)
     case null
-    case number(NSNumber)
+    case number(RegoNumber)
     case object([RegoValue: RegoValue])
     case set(Set<RegoValue>)
     case string(String)
@@ -80,19 +80,6 @@ extension RegoValue {
         guard case .number(let number) = self else {
             return nil
         }
-
-        // For very large Int64's, the doubleValue is going to start losing precision
-        // so we use an explicit switch.
-        // We check for fractional remainders only for float types
-        if number.isFloatType {
-            let decimalValue = Decimal(number.doubleValue)
-            let fractionalRemainder = decimalValue - Decimal(number.int64Value)
-            guard fractionalRemainder == Decimal(0) else {
-                // It's probably a float
-                return nil
-            }
-            return number.int64Value
-        }
         return number.int64Value
     }
 
@@ -118,35 +105,5 @@ extension RegoValue {
         case .undefined:
             return "undefined"
         }
-    }
-}
-
-// Helper for differentiating between an NSNumber which a boolean vs. a number.
-// We're trying to avoid confusing NSNumber(0) from false and NSNumber(1) from true.
-private let boolLiteral = NSNumber(booleanLiteral: true)
-extension NSNumber {
-    var asCFNumber: CFNumber? {
-        let cfNumberTypeID = CFNumberGetTypeID()
-        let myCFTypeID = CFGetTypeID(self)
-        guard myCFTypeID == cfNumberTypeID else {
-            return nil
-        }
-        #if os(Linux)
-            // This should be safe after the check above.
-            return unsafeBitCast(self, to: CFNumber.self)
-        #else
-            return self
-        #endif
-    }
-
-    var isBool: Bool {
-        return type(of: self) == type(of: boolLiteral)
-    }
-
-    var isFloatType: Bool {
-        guard let cf = self.asCFNumber else {
-            return false
-        }
-        return CFNumberIsFloatType(cf)
     }
 }

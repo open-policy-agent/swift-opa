@@ -26,7 +26,7 @@ extension BuiltinTests.CustomBuiltinTests {
                         throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "number")
                     }
 
-                    return .number(NSDecimalNumber(decimal: x.decimalValue + y.decimalValue))
+                    return .number(RegoNumber(x.decimalValue + y.decimalValue))
                 }
             ]
         )

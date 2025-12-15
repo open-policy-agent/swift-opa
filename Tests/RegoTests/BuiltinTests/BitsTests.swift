@@ -27,49 +27,49 @@ extension BuiltinTests.BitsTests {
             description: "1 << 7",
             name: "bits.lsh",
             args: [1, 7],
-            expected: .success(.number(NSNumber(value: Int(1 << 7))))
+            expected: .success(.number(RegoNumber(value: Int(1 << 7))))
         ),
         BuiltinTests.TestCase(
             description: "1 << 33",
             name: "bits.lsh",
             args: [1, 33],
-            expected: .success(.number(NSNumber(value: Int(1 << 33))))
+            expected: .success(.number(RegoNumber(value: Int(1 << 33))))
         ),
         BuiltinTests.TestCase(
             description: "1 << 64",
             name: "bits.lsh",
             args: [1, 64],
-            expected: .success(.number(NSNumber(value: Int(1 << 64))))
+            expected: .success(.number(RegoNumber(value: Int(1 << 64))))
         ),
         BuiltinTests.TestCase(
             description: "1 << 65",
             name: "bits.lsh",
             args: [1, 65],
-            expected: .success(.number(NSNumber(value: 0)))
+            expected: .success(.number(RegoNumber(value: 0)))
         ),
         BuiltinTests.TestCase(
             description: "-1 << 70 (shift >= 64 returns 0)",
             name: "bits.lsh",
             args: [-1, 70],
-            expected: .success(.number(NSNumber(value: 0)))
+            expected: .success(.number(0))
         ),
         BuiltinTests.TestCase(
             description: "-255 << 2",
             name: "bits.lsh",
             args: [-255, 2],
-            expected: .success(.number(NSNumber(value: -1020)))
+            expected: .success(.number(RegoNumber(value: -1020)))
         ),
         BuiltinTests.TestCase(
             description: "9_223_372_036_854_775_807 << 1",
             name: "bits.lsh",
             args: [9_223_372_036_854_775_807, 1],
-            expected: .success(.number(NSNumber(value: UInt64(18_446_744_073_709_551_614))))
+            expected: .success(.number(RegoNumber(value: UInt64(18_446_744_073_709_551_614))))
         ),
         BuiltinTests.TestCase(
             description: "1.0 << 2.0",
             name: "bits.lsh",
             args: [1.0, 2.0],
-            expected: .success(.number(NSNumber(value: Int(1 << 2))))
+            expected: .success(.number(RegoNumber(value: Int(1 << 2))))
         ),
         BuiltinTests.TestCase(
             description: "second argument cannot be negative",
@@ -97,49 +97,49 @@ extension BuiltinTests.BitsTests {
             description: "8 >> 3",
             name: "bits.rsh",
             args: [8, 3],
-            expected: .success(.number(NSNumber(value: Int(8 >> 3))))
+            expected: .success(.number(RegoNumber(value: Int(8 >> 3))))
         ),
         BuiltinTests.TestCase(
             description: "7 >> 1",
             name: "bits.rsh",
             args: [7, 1],
-            expected: .success(.number(NSNumber(value: Int(7 >> 1))))
+            expected: .success(.number(RegoNumber(value: Int(7 >> 1))))
         ),
         BuiltinTests.TestCase(
             description: "5 >> 33",
             name: "bits.rsh",
             args: [5, 33],
-            expected: .success(.number(NSNumber(value: Int(5 >> 33))))
+            expected: .success(.number(RegoNumber(value: Int(5 >> 33))))
         ),
         BuiltinTests.TestCase(
             description: "100 >> 64 (positive shift >= 64 returns 0)",
             name: "bits.rsh",
             args: [100, 64],
-            expected: .success(.number(NSNumber(value: 0)))
+            expected: .success(.number(0))
         ),
         BuiltinTests.TestCase(
             description: "-100 >> 64 (negative shift >= 64 returns -1)",
             name: "bits.rsh",
             args: [-100, 64],
-            expected: .success(.number(NSNumber(value: -1)))
+            expected: .success(.number(-1))
         ),
         BuiltinTests.TestCase(
             description: "-100 >> 70 (negative shift >= 64 returns -1)",
             name: "bits.rsh",
             args: [-100, 70],
-            expected: .success(.number(NSNumber(value: -1)))
+            expected: .success(.number(-1))
         ),
         BuiltinTests.TestCase(
             description: "-1020 >> 2",
             name: "bits.rsh",
             args: [-1020, 2],
-            expected: .success(.number(NSNumber(value: -255)))
+            expected: .success(.number(RegoNumber(value: -255)))
         ),
         BuiltinTests.TestCase(
             description: "8.0 >> 2.0",
             name: "bits.rsh",
             args: [8.0, 2.0],
-            expected: .success(.number(NSNumber(value: Int(8 >> 2))))
+            expected: .success(.number(RegoNumber(value: Int(8 >> 2))))
         ),
         BuiltinTests.TestCase(
             description: "second argument cannot be negative",
@@ -161,13 +161,13 @@ extension BuiltinTests.BitsTests {
             description: "42 & 28",
             name: "bits.and",
             args: [42, 28],
-            expected: .success(.number(NSNumber(value: 42 & 28)))
+            expected: .success(.number(RegoNumber(value: 42 & 28)))
         ),
         BuiltinTests.TestCase(
             description: "42.0 & 28.0",
             name: "bits.and",
             args: [42.0, 28.0],
-            expected: .success(.number(NSNumber(value: 42 & 28)))
+            expected: .success(.number(RegoNumber(value: 42 & 28)))
         ),
         BuiltinTests.TestCase(
             description: "a must be an integer",
@@ -190,7 +190,7 @@ extension BuiltinTests.BitsTests {
             description: "42 | 28",
             name: "bits.or",
             args: [42, 28],
-            expected: .success(.number(NSNumber(value: 42 | 28)))
+            expected: .success(.number(RegoNumber(value: 42 | 28)))
         ),
         BuiltinTests.TestCase(
             description: "a must be an integer",
@@ -213,7 +213,7 @@ extension BuiltinTests.BitsTests {
             description: "42 ^ 28",
             name: "bits.xor",
             args: [42, 28],
-            expected: .success(.number(NSNumber(value: 42 ^ 28)))
+            expected: .success(.number(RegoNumber(value: 42 ^ 28)))
         ),
         BuiltinTests.TestCase(
             description: "a must be an integer",
@@ -236,13 +236,13 @@ extension BuiltinTests.BitsTests {
             description: "~42",
             name: "bits.negate",
             args: [42],
-            expected: .success(.number(NSNumber(value: ~42)))
+            expected: .success(.number(RegoNumber(value: ~42)))
         ),
         BuiltinTests.TestCase(
             description: "~9.0",
             name: "bits.negate",
             args: [9.0],
-            expected: .success(.number(NSNumber(value: ~9)))
+            expected: .success(.number(RegoNumber(value: ~9)))
         ),
         BuiltinTests.TestCase(
             description: "a must be an integer",

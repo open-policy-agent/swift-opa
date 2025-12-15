@@ -1057,15 +1057,25 @@ extension BuiltinTests.StringsTests {
                 .set([.array(["a", "b"])]), " ",
                 .set([.set([])]), " ",
                 .set([.set(["c"])]), " ",
+                .set([.set(["d", 42, 4.2, false, .null])]), " ",
                 .set([.object([:])]), " ",
-                .set([.object(["d": "e"])]),
+                .set([.object(["d": "e"])]), " ",
+                .set([.object(["f": "g", "h": "i"])]),
             ])],
             expected: .success("""
-                [] ["a", "b"] set() {"c"} {} {"d": "e"}
+                [] ["a", "b"] set() {"c"} {null, false, 4.2, 42, "d"} {} {"d": "e"} {"f": "g", "h": "i"}
                 """)
         ),
         BuiltinTests.TestCase(
-            description: "nested set",
+            description: "nested empty array",
+            name: "internal.template_string",
+            args: [.array([
+                .set([.array([.array([])])]),
+            ])],
+            expected: .success("[[]]")
+        ),
+        BuiltinTests.TestCase(
+            description: "nested empty set",
             name: "internal.template_string",
             args: [.array([
                 .set([.set([.set([])])]),

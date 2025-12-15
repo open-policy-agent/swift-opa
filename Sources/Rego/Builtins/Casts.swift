@@ -31,7 +31,7 @@ extension BuiltinFuncs {
                 throw BuiltinError.evalError(msg: "operand 0 must be valid number string, got \(s)")
             }
 
-            return .number(NSNumber(value: x))
+            return .number(RegoNumber(value: x))
         default:
             throw BuiltinError.argumentTypeMismatch(
                 arg: "x", got: args[0].typeName, want: "any<boolean, null, number, string>")

@@ -81,7 +81,7 @@ extension BuiltinFuncs {
         }
 
         let occurrences = search.allRanges(of: substring).count
-        return .number(NSNumber(value: occurrences))
+        return .number(RegoNumber(value: occurrences))
     }
 
     static func endsWith(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -154,9 +154,9 @@ extension BuiltinFuncs {
 
         let range = haystack.range(of: needle)
         guard let range = range else {
-            return .number(-1)
+            return .number(RegoNumber(value: -1))
         }
-        return .number(NSNumber(value: haystack.distance(from: haystack.startIndex, to: range.lowerBound)))
+        return .number(RegoNumber(value: haystack.distance(from: haystack.startIndex, to: range.lowerBound)))
     }
 
     static func indexOfN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -179,7 +179,7 @@ extension BuiltinFuncs {
 
         let ranges = haystack.allRanges(of: needle)
         return .array(
-            ranges.map({ .number(NSNumber(value: haystack.distance(from: haystack.startIndex, to: $0.lowerBound))) }))
+            ranges.map({ .number(RegoNumber(value: haystack.distance(from: haystack.startIndex, to: $0.lowerBound))) }))
     }
 
     static func lower(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -1028,7 +1028,7 @@ private struct SimilarToGoFmtPrinter {
             if let intVal = arg.integerValue {
                 self.fmtInt(Int(intVal), verb)
             } else {
-                self.fmtFloat(n, verb)
+                self.fmtFloat(n.doubleValue, verb)
             }
         case .string(let s):
             self.fmtString(s, verb)
@@ -1085,7 +1085,7 @@ private struct SimilarToGoFmtPrinter {
         case "U":
             self.fmtUnicode(n)
         default:
-            self.printBadVerb(verb, .number(NSNumber(value: n)))
+            self.printBadVerb(verb, .number(RegoNumber(value: n)))
         }
     }
 
@@ -1143,7 +1143,7 @@ private struct SimilarToGoFmtPrinter {
         self.result.append(partiallyFormatted)
     }
 
-    mutating func fmtFloat(_ n: NSNumber, _ verb: Character) {
+    mutating func fmtFloat(_ n: Double, _ verb: Character) {
         switch verb {
         case "v":
             self.fmtFloat(n, "g", -1)
@@ -1154,11 +1154,11 @@ private struct SimilarToGoFmtPrinter {
         case "F":
             self.fmtFloat(n, "f", 6)
         default:
-            self.printBadVerb(verb, .number(n))
+            self.printBadVerb(verb, .number(RegoNumber(Decimal(n))))
         }
     }
 
-    mutating func fmtFloat(_ n: NSNumber, _ verb: Character, _ precision: Int) {
+    mutating func fmtFloat(_ n: Double, _ verb: Character, _ precision: Int) {
         // Floats aren't going to match... just like.. basic ones should be OK,
         // but anything complicated, binary format, hex, etc are going to be off
         // since the OPA version is using Strings and arbitrary precision numbers
@@ -1179,7 +1179,7 @@ private struct SimilarToGoFmtPrinter {
         self.result.append(
             String(
                 format: "%\(zeroFlag)\(spaceFlag)\(plusFlag)\(minusFlag)\(sharpFlag)\(widthFlag).\(precision)\(verb)",
-                n.doubleValue))
+                n))
         // nailed it
     }
 

@@ -22,13 +22,13 @@ extension RegoValue: ExpressibleByArrayLiteral {
 
 extension RegoValue: ExpressibleByIntegerLiteral {
     public init(integerLiteral value: Int) {
-        self = .number(NSNumber(value: value))
+        self = .number(RegoNumber(int: Int64(value)))
     }
 }
 
 extension RegoValue: ExpressibleByFloatLiteral {
     public init(floatLiteral value: Double) {
-        self = .number(NSNumber(value: value))
+        self = .number(RegoNumber(floatLiteral: value))
     }
 }
 

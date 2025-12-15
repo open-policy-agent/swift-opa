@@ -174,7 +174,7 @@ extension BuiltinTests.ArithmeticTests {
             // We're cheating on this a little bit, but it seems this is the only way
             // to construct the answer, main goal here is to make sure nothing blows
             // up when we go to values larger than Int can hold
-            expected: .success(.number(NSDecimalNumber(decimal: Decimal(999_999_999_999_999_999) * Decimal(10000))))
+            expected: .success(.number(RegoNumber(Decimal(999_999_999_999_999_999) * Decimal(10000))))
         ),
         BuiltinTests.TestCase(
             description: "not enough args",
@@ -220,8 +220,8 @@ extension BuiltinTests.ArithmeticTests {
             name: "div",
             args: [1, 3],
             // Cheating a little bit, just want to make sure they're resulting in high precision
-            // NSDecimalNumber's from the Decimal division.
-            expected: .success(.number(NSDecimalNumber(decimal: Decimal(1) / Decimal(3))))
+            // RegoNumbers from the Decimal division.
+            expected: .success(.number(RegoNumber(Decimal(1) / Decimal(3))))
         ),
         BuiltinTests.TestCase(
             description: "divide by 0",

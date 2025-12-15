@@ -1,6 +1,15 @@
 import CoreFoundation
 import Foundation
 
+// Helper for differentiating between an NSNumber which a boolean vs. a number.
+// We're trying to avoid confusing NSNumber(0) from false and NSNumber(1) from true.
+private let boolLiteral = NSNumber(booleanLiteral: true)
+extension NSNumber {
+    fileprivate var isBool: Bool {
+        return type(of: self) == type(of: boolLiteral)
+    }
+}
+
 extension RegoValue: Codable {
     // Constructor for use with JSONSerialization
     package init(from: Any) throws(ValueError) {
@@ -30,7 +39,7 @@ extension RegoValue: Codable {
             if v.isBool {
                 self = .boolean(v.boolValue)
             } else {
-                self = .number(v)
+                self = .number(RegoNumber(nsNumber: v))
             }
         case _ as NSNull:
             self = .null
@@ -84,12 +93,17 @@ extension RegoValue: Codable {
                 self = .string(String(decoding: stringValue.utf8, as: UTF8.self))
                 return
             }
-            if let doubleValue = try? container.decode(Double.self) {
-                self = .number(NSNumber(value: doubleValue))
+
+            if let intValue = try? container.decode(Int.self) {
+                self = .number(RegoNumber(value: intValue))
                 return
             }
-            if let intValue = try? container.decode(Int.self) {
-                self = .number(NSNumber(value: intValue))
+            if let uintValue = try? container.decode(UInt.self) {
+                self = .number(RegoNumber(value: uintValue))
+                return
+            }
+            if let decimalValue = try? container.decode(Decimal.self) {
+                self = .number(RegoNumber(decimalValue))
                 return
             }
             if let boolValue = try? container.decode(Bool.self) {

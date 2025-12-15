@@ -95,12 +95,15 @@ struct RegoValueEncodingTests {
     }
 
     static let floatEncodingTests: [TestCase] = [
-        TestCase(description: "nonconforming: NaN", value: .number(NSNumber(value: Float.nan)), expectError: true),
+        TestCase(description: "nonconforming: NaN", value: .number(RegoNumber(value: Float.nan)), expectError: true),
         TestCase(
-            description: "nonconforming: Infinity", value: .number(NSNumber(value: Float.infinity)), expectError: true),
-        TestCase(description: "0.0->0", value: .number(NSNumber(value: 0.0)), expected: "0"),
-        TestCase(description: "3.141592657", value: .number(NSNumber(value: 3.141592657)), expected: "3.141592657"),
-        TestCase(description: "2.998e8->exploded", value: .number(NSNumber(value: 2.998e8)), expected: "299800000"),
+            description: "nonconforming: Infinity",
+            value: .number(RegoNumber(value: Float.infinity)),
+            expectError: true
+        ),
+        TestCase(description: "0.0->0", value: .number(RegoNumber(value: 0.0)), expected: "0"),
+        TestCase(description: "3.141592657", value: .number(RegoNumber(value: 3.141592657)), expected: "3.141592657"),
+        TestCase(description: "2.998e8->exploded", value: .number(RegoNumber(value: 2.998e8)), expected: "299800000"),
     ]
 
     @Test(arguments: floatEncodingTests)

@@ -55,7 +55,7 @@ extension BuiltinTests.RandTests {
         let ctx = BuiltinContext()
         let result = try await reg.invoke(
             withContext: ctx, name: "rand.intn",
-            args: ["foo", .number(n as NSNumber)], strict: true)
+            args: ["foo", .number(RegoNumber(value: n))], strict: true)
         switch result {
         case .number(let value):
             #expect(!result.isFloat, "expect result to be an integer")

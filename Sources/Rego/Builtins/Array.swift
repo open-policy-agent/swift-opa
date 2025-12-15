@@ -49,7 +49,7 @@ extension BuiltinFuncs {
         }
 
         // We expect start and stop to be integers, otherwise undefined should be returned
-        guard start is Int, stop is Int else {
+        guard args[1].integerValue != nil, args[2].integerValue != nil else {
             throw BuiltinError.evalError(msg: "start and stop must be integers")
         }
 

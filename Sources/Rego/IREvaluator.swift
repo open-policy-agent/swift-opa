@@ -576,6 +576,7 @@ func evalBlock(
 
         case .callDynamicStmt(let stmt):
             var path: [String] = []
+            path.reserveCapacity(stmt.path.count)
             for p in stmt.path {
                 let segment = try framePtr.v.resolveOperand(ctx: ctx, p)
                 guard case .string(let stringValue) = segment else {
@@ -974,6 +975,7 @@ private func evalCall(
     }
 
     var argValues: [AST.RegoValue] = []
+    argValues.reserveCapacity(args.count)
     for arg in args {
         // Note: we do not enforce that args are defined here, it appears
         // that the expectation is that statements within the function blocks
@@ -1100,6 +1102,7 @@ private func evalScan(
     var results: ResultSet = []
     switch source {
     case .array(let arr):
+        results.reserveCapacity(arr.count)
         for i in 0..<arr.count {
             let k: AST.RegoValue = .number(NSNumber(value: i))
             let v = arr[i] as AST.RegoValue
@@ -1107,11 +1110,13 @@ private func evalScan(
             results.formUnion(rs)
         }
     case .object(let o):
+        results.reserveCapacity(o.count)
         for (k, v) in o {
             let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
             results.formUnion(rs)
         }
     case .set(let set):
+        results.reserveCapacity(set.count)
         for v in set {
             let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: v, value: v)
             results.formUnion(rs)

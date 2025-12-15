@@ -98,7 +98,17 @@ extension BuiltinFuncs {
             throw BuiltinError.evalError(msg: "operand 2 must be one of {2, 8, 10, 16}")
         }
 
-        let roundedNum = Int64(_floor(num.doubleValue))
+        let flooredValue = _floor(num.doubleValue)
+
+        // Prevent overflow when converting to Int64
+        let roundedNum: Int64
+        if flooredValue > Double(Int64.max) {
+            roundedNum = Int64.max
+        } else if flooredValue < Double(Int64.min) {
+            roundedNum = Int64.min
+        } else {
+            roundedNum = Int64(flooredValue)
+        }
         return .string(String(roundedNum, radix: Int(radix)))
     }
 

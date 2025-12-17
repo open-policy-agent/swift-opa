@@ -20,6 +20,8 @@ jobs:
       - run: sudo xcode-select -s /Applications/Xcode_26.0.app
       - run: swift --version
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Install jemalloc
+        run: brew install jemalloc
       - run: make all
       - name: make fmt lint test (ComplianceSuite)
         run: make fmt lint test

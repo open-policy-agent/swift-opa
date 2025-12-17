@@ -47,25 +47,21 @@ struct NanosecondsDurationStyle: FormatStyle, Sendable {
 }
 
 private let attosecondsPerSecond = Double(1e18)
-private let nanosecondsPerSecond = Double(1e9)
-private let microsecondsPerSecond = Double(1e6)
-private let millisecondsPerSecond = Double(1e3)
-
-private let nanosecondsPerAtto = Double(1e9)
-private let microsecondsPerAtto = Double(1e12)
-private let millisecondsPerAtto = Double(1e15)
+private let attosecondsPerNanosecond = Double(1e9)
+private let attosecondsPerMicrosecond = Double(1e12)
+private let attosecondsPerMillisecond = Double(1e15)
 
 extension Duration {
     var seconds: Double {
         return Double(self.components.attoseconds) / attosecondsPerSecond
     }
     var nanoseconds: Double {
-        return Double(self.components.attoseconds) / nanosecondsPerAtto
+        return Double(self.components.attoseconds) / attosecondsPerNanosecond
     }
     var microseconds: Double {
-        return Double(self.components.attoseconds) / microsecondsPerAtto
+        return Double(self.components.attoseconds) / attosecondsPerMicrosecond
     }
     var milliseconds: Double {
-        return Double(self.components.attoseconds) / millisecondsPerSecond
+        return Double(self.components.attoseconds) / attosecondsPerMillisecond
     }
 }

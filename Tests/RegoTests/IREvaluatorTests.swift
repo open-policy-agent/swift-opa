@@ -5,6 +5,81 @@ import Testing
 
 @testable import Rego
 
+// Test-only extension for Locals
+extension Locals {
+    // For tests only - converts dictionary to Locals array
+    init(from dict: [Int: Any]) {
+        guard let maxKey = dict.keys.max() else {
+            self.init()
+            return
+        }
+
+        var storage = Array<AST.RegoValue?>(repeating: nil, count: maxKey + 1)
+        for (index, value) in dict {
+            // If already a RegoValue, use it directly
+            if let regoValue = value as? AST.RegoValue {
+                storage[index] = regoValue
+            } else {
+                // Use JSON roundtrip to leverage RegoValue's Codable conformance
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: value)
+                    let decoded = try JSONDecoder().decode(AST.RegoValue.self, from: jsonData)
+                    storage[index] = decoded
+                } catch {
+                    storage[index] = .undefined
+                }
+            }
+        }
+        self.init(storage)
+    }
+
+    // Merge another Locals into this one, with rhs values taking precedence
+    // Note: Only non-nil values from rhs overwrite lhs values. A nil value in rhs
+    // will NOT clear/remove a non-nil value from lhs at the same index.
+    func merging(_ rhs: Locals?) -> Locals {
+        guard let rhs else {
+            return self
+        }
+
+        if rhs.isEmpty {
+            return self
+        }
+
+        var result = Locals(self.storage)
+
+        for i in 0..<rhs.count {
+            if let rhsValue = rhs[IR.Local(i)] {
+                result[IR.Local(i)] = rhsValue
+            }
+        }
+
+        return result
+    }
+}
+
+extension Locals: ExpressibleByDictionaryLiteral {
+    public typealias Key = Int
+    public typealias Value = AST.RegoValue
+
+    public init(dictionaryLiteral elements: (Key, Value)...) {
+        guard !elements.isEmpty else {
+            self = Locals()
+            return
+        }
+
+        let maxLocal: Int = elements.reduce(into: 0) { max, elem in
+            max = Swift.max(max, elem.0)
+        }
+
+        var result = Locals(repeating: nil, count: maxLocal + 1)
+
+        for (idx, value) in elements {
+            result[IR.Local(idx)] = value
+        }
+        self = result
+    }
+}
+
 @Suite("IREvaluatorTests")
 struct IREvaluatorTests {
     struct TestCase: Sendable {
@@ -211,13 +286,6 @@ struct IRStatementTests {
         // expectResult - if an explicit value is set, we will compare that to the resultSet.
         var expectResult: ResultSet? = nil
         var expectUndefined: Bool = false
-    }
-
-    func mergeLocals(_ lhs: Locals, _ rhs: Locals?) -> Locals {
-        guard let rhs else {
-            return lhs
-        }
-        return lhs.merging(rhs) { (_, new) in new }
     }
 
     func prepareFrame(
@@ -1057,13 +1125,19 @@ struct IRStatementTests {
         let results = try result.get()
 
         // Check local expectations
-        let expectLocals = mergeLocals(tc.locals, tc.expectLocals)
+        let expectLocals = tc.locals.merging(tc.expectLocals)
 
-        let scope = try frame.v.currentScope()
-        var gotLocals = scope.v.locals
+        var gotLocals = frame.v.locals
+
         for idx in tc.ignoreLocals {
             gotLocals[idx] = nil
         }
+
+        // Use resize for scan statements to chop off the scan block's locals
+        if tc.stmt is IR.ScanStatement {
+            gotLocals.resize(to: expectLocals.count)
+        }
+
         #expect(gotLocals == expectLocals, "comparing locals")
 
         let expectResult = tc.expectResult ?? .empty

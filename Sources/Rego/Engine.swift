@@ -191,6 +191,12 @@ extension OPA.Engine {
             evaluator = try IREvaluator(bundles: loadedBundles)
         }
 
+        // TODO: Future improvement - validate local allocation assumptions (see Locals.swift)
+        // Could add validation to check:
+        // - Local indices are not sparse
+        // - No register collision between function frames
+        // - Maximum local index is reasonable
+
         // Verifies that builtins are available in the OPA capabilities and builtin registry
         try await Self.verifyCapabilitiesAndBuiltIns(
             capabilities: self.capabilities, builtins: builtins, evaluator: evaluator)

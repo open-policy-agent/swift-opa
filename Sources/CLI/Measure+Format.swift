@@ -27,20 +27,21 @@ struct GobenchStyle: FormatStyle, Sendable {
         // Figure out which units are closest
         var value: String = ""
         var unit: String = ""
+        let style: FloatingPointFormatStyle<Double> = .number.precision(.fractionLength(0...4))
         if v.components.seconds >= 1 {
-            value = v.seconds.formatted(.number.precision(.fractionLength(0...4)))
+            value = v.seconds.formatted(style)
             unit = "s/op"
         } else if 1..<1000 ~= v.milliseconds {
-            value = v.milliseconds.formatted(.number.precision(.fractionLength(0...4)))
+            value = v.milliseconds.formatted(style)
             unit = "ms/op"
         } else if 1..<1000 ~= v.microseconds {
-            value = v.microseconds.formatted(.number.precision(.fractionLength(0...4)))
+            value = v.microseconds.formatted(style)
             unit = "μs/op"
         } else if 1..<1000 ~= v.nanoseconds {
-            value = v.nanoseconds.formatted(.number.precision(.fractionLength(0...4)))
+            value = v.nanoseconds.formatted(style)
             unit = "ns/op"
         } else {
-            value = v.components.attoseconds.formatted(.number.precision(.fractionLength(0...4)))
+            value = v.components.attoseconds.formatted(.number.grouping(.automatic))
             unit = "as/op"
         }
         return "Benchmark\t\(report.iterations)\t\(value) \(unit)"

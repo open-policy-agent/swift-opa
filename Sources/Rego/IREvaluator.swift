@@ -505,17 +505,17 @@ func evalBlock(
             return BlockResult(breakCounter: stmt.index)
 
         case .callDynamicStmt(let stmt):
-            var path: [String] = []
-            path.reserveCapacity(stmt.path.count)
-            for p in stmt.path {
+            var funcName = ""
+            for (index, p) in stmt.path.enumerated() {
                 let segment = try framePtr.v.resolveOperand(ctx: ctx, p)
                 guard case .string(let stringValue) = segment else {
                     return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
                 }
-                path.append(stringValue)
+                if index > 0 {
+                    funcName += "."
+                }
+                funcName += stringValue
             }
-
-            let funcName = path.joined(separator: ".")
 
             let result = try await evalCall(
                 ctx: ctx,

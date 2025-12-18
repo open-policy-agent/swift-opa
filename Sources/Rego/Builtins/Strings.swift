@@ -226,7 +226,7 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[0].typeName, want: "string")
         }
 
-        return .string(String(value.reversed()))
+        return .string(String(String.UnicodeScalarView(value.unicodeScalars.reversed())))
     }
 
     static func sprintf(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {

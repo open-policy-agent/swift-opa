@@ -56,17 +56,28 @@ extension BuiltinFuncs {
 
             step = stepValue
         }
-        if intB > intA {
-            return .array(
-                stride(from: intA, to: intB + 1, by: Int64.Stride(step))
-                    .map({ NSNumber(value: $0).toNumberRegoValue(asInt: true) }))
 
+        var result: [RegoValue] = []
+
+        if intB > intA {
+            result.reserveCapacity(Int((intB - intA) / step) + 1)
+
+            var current = intA
+            while current <= intB {
+                result.append(.number(NSNumber(value: current)))
+                current += step
+            }
+        } else {
+            result.reserveCapacity(Int((intA - intB) / step) + 1)
+
+            var current = intA
+            while current >= intB {
+                result.append(.number(NSNumber(value: current)))
+                current -= step
+            }
         }
 
-        return .array(
-            stride(from: intA, to: intB - 1, by: -Int64.Stride(step))
-                .map({ NSNumber(value: $0).toNumberRegoValue(asInt: true) }))
-
+        return .array(result)
     }
 
 }

@@ -48,21 +48,21 @@ extension BuiltinFuncs {
         var p: [RegoValue: RegoValue] = [:]
 
         let version = uuid.version
-        p["version"] = .number(NSNumber(value: version))
+        p["version"] = .number(RegoNumber(value: version))
         p["variant"] = .string(uuid.variant)
 
         if version == 1 || version == 2 {
             let time = uuid.time
             if time > Int64.min {
-                p["time"] = .number(NSNumber(value: time))
+                p["time"] = .number(RegoNumber(value: time))
             }
 
-            p["clocksequence"] = .number(NSNumber(value: uuid.clockSequence))
+            p["clocksequence"] = .number(RegoNumber(value: uuid.clockSequence))
             p["nodeid"] = .string(Data(uuid.nodeId).hexEncodedWithSeparator(separator: "-"))
             p["macvariables"] = .string(uuid.macVars)
 
             if version == 2 {
-                p["id"] = .number(NSNumber(value: uuid.idForV2))
+                p["id"] = .number(RegoNumber(value: uuid.idForV2))
                 p["domain"] = .string(uuid.domain)
             }
         }

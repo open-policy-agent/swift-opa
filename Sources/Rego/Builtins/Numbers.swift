@@ -59,13 +59,13 @@ extension BuiltinFuncs {
         if intB > intA {
             return .array(
                 stride(from: intA, to: intB + 1, by: Int64.Stride(step))
-                    .map({ NSNumber(value: $0).toNumberRegoValue(asInt: true) }))
+                    .map({ .number(RegoNumber.int($0)) }))
 
         }
 
         return .array(
             stride(from: intA, to: intB - 1, by: -Int64.Stride(step))
-                .map({ NSNumber(value: $0).toNumberRegoValue(asInt: true) }))
+                .map({ .number(RegoNumber.int($0)) }))
 
     }
 

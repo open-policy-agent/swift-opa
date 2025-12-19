@@ -951,6 +951,7 @@ private func evalCall(
     let bctx = BuiltinContext(
         location: try frame.v.currentLocation(withContext: ctx, stmt: caller),
         tracer: ctx.ctx.tracer,
+        cache: ctx.ctx.builtinsCache,
         timestamp: ctx.ctx.timestamp
     )
 

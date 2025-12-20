@@ -48,10 +48,8 @@ extension IREvaluator: Evaluator {
         for policy in policies {
             if let plan = policy.plans[entrypoint] {
                 let ctx = IREvaluationContext(ctx: ctx, policy: policy)
-                return try await evalPlan(
-                    withContext: ctx,
-                    plan: plan
-                )
+                try await evalPlan(withContext: ctx, plan: plan)
+                return ctx.results.v
             }
         }
         throw RegoError(code: .unknownQuery, message: "query not found in plan: \(ctx.query)")
@@ -125,10 +123,12 @@ internal struct IREvaluationContext {
     var maxCallDepth: Int = 16_384
     var callDepth: Int = 0
     var callMemo = MemoStack()  // shared stack of memoCache structs
+    var results: Ptr<ResultSet>  // shared result set for the entire evaluation
 
     init(ctx: EvaluationContext, policy: IndexedIRPolicy) {
         self.ctx = ctx
         self.policy = policy
+        self.results = Ptr(toCopyOf: ResultSet.empty)
     }
 
     func withIncrementedCallDepth() -> IREvaluationContext {
@@ -144,7 +144,6 @@ internal typealias Locals = [IR.Local: AST.RegoValue]
 // will prompt creation of a new stack frame.
 internal struct Frame {
     var scopeStack: [Ptr<Scope>] = []
-    var results: ResultSet = ResultSet()
 
     init(locals: Locals = [:]) {
         _ = self.pushScope(locals: locals)
@@ -338,7 +337,7 @@ private struct IRTraceEvent: OPA.Trace.TraceableEvent {
 private func evalPlan(
     withContext ctx: IREvaluationContext,
     plan: IR.Plan
-) async throws -> ResultSet {
+) async throws {
     // Initialize the starting Frame+Scope from the top level Plan blocks and kick off evaluation.
     let frame = Frame(
         locals: [
@@ -355,7 +354,7 @@ private func evalPlan(
     let caller = IR.AnyStatement.blockStmt(BlockStatement(blocks: plan.blocks))
 
     let pFrame = Ptr(toCopyOf: frame)
-    return try await evalPlanFrame(withContext: ctx, framePtr: pFrame, blocks: plan.blocks, caller: caller)
+    try await evalPlanFrame(withContext: ctx, framePtr: pFrame, blocks: plan.blocks, caller: caller)
 }
 
 // Evaluate a plan entrypoint in a Frame from start to finish (respecting Task.isCancelled)
@@ -364,16 +363,13 @@ internal func evalPlanFrame(
     framePtr: Ptr<Frame>,
     blocks: [IR.Block],
     caller: IR.AnyStatement
-) async throws -> ResultSet {
-    var results = ResultSet()
-
+) async throws {
     // To evaluate a Frame we iterate through each block of the current scope, evaluating
     // statements in the block one at a time. We will jump between blocks being executed but
     // never go backwards, only early exit maneuvers jumping "forward" in the plan.
     // ref: https://www.openpolicyagent.org/docs/latest/ir/#execution
 
     blockLoop: for block in blocks {
-        // Evaluate the statements in the block
         let blockResult = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: caller, block: block)
         guard !blockResult.shouldBreak else {
             throw RegoError(code: .internalError, message: "break statement jumped out of frame")
@@ -381,10 +377,7 @@ internal func evalPlanFrame(
         if blockResult.isUndefined {
             continue
         }
-        results.formUnion(blockResult.results)
     }
-
-    return results
 }
 
 internal func evalCallFrame(
@@ -413,7 +406,6 @@ internal func evalCallFrame(
 }
 
 struct CallFrameResult {
-    var results: ResultSet
     var functionReturnValue: AST.RegoValue?
 
     var undefined: Bool {
@@ -421,27 +413,19 @@ struct CallFrameResult {
     }
 
     static var empty: CallFrameResult {
-        return .init(results: .empty, functionReturnValue: nil)
+        return .init(functionReturnValue: nil)
     }
 }
 
 // BlockResult is the result of evaluating a block.
-// In includes any results accumulated in descendent statements of the block,
-// as well as an indicator of whether the calling block evaluation should break.
+// It contains control flow information (break counter and function return value).
 struct BlockResult {
-    var results: ResultSet
     var breakCounter: UInt32?
     var functionReturnValue: AST.RegoValue?
 
-    init(results: ResultSet = .empty, breakCounter: UInt32? = nil, functionReturnValue: AST.RegoValue? = nil) {
-        self.results = results
+    init(breakCounter: UInt32? = nil, functionReturnValue: AST.RegoValue? = nil) {
         self.breakCounter = breakCounter
         self.functionReturnValue = functionReturnValue
-    }
-
-    // Constructs a BlockResult with a single RegoValue in its ResultSet
-    init(withResultValue value: AST.RegoValue) {
-        self.results = ResultSet(value: value)
     }
 
     // undefined initializes an undefined BlockResult
@@ -451,6 +435,10 @@ struct BlockResult {
 
     // empty initializes an empty BlockResult
     static var empty: BlockResult {
+        return .init()
+    }
+
+    static var success: BlockResult {
         return .init()
     }
 
@@ -472,9 +460,9 @@ struct BlockResult {
     // decremented by 1 - this simulates "breaking" one level.
     func breakByOne() -> BlockResult {
         guard let breakCounter = self.breakCounter else {
-            return BlockResult(results: self.results, breakCounter: 0)
+            return BlockResult(breakCounter: 0)
         }
-        return BlockResult(results: self.results, breakCounter: breakCounter - 1)
+        return BlockResult(breakCounter: breakCounter - 1)
     }
 }
 
@@ -494,7 +482,6 @@ func evalBlock(
     block: Block
 ) async throws -> BlockResult {
     var currentScopePtr = try framePtr.v.currentScope()
-    var results = ResultSet.empty
 
     framePtr.v.traceEvent(withContext: ctx, op: .enter, anyStmt: caller)
     defer { framePtr.v.traceEvent(withContext: ctx, op: .exit, anyStmt: caller) }
@@ -562,7 +549,6 @@ func evalBlock(
                 if rs.isUndefined {
                     continue
                 }
-                results.formUnion(rs.results)
             }
 
         case .breakStmt(let stmt):
@@ -572,7 +558,7 @@ func evalBlock(
             //
             // Callers of evalBlock should check BlockResult.shouldBreak and if true,
             // return after calling BlockResult.breakByOne() to decrement the counter.
-            return BlockResult(results: results, breakCounter: stmt.index)
+            return BlockResult(breakCounter: stmt.index)
 
         case .callDynamicStmt(let stmt):
             var path: [String] = []
@@ -764,10 +750,6 @@ func evalBlock(
                 return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
             }
 
-            // Propagate any results from the block's sub frame into the parent frame
-            // TODO is this correct?
-            results.formUnion(rs.results)
-
         case .objectInsertOnceStmt(let stmt):
             let targetValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
             let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
@@ -846,7 +828,8 @@ func evalBlock(
             guard value != .undefined else {
                 return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
             }
-            return BlockResult(withResultValue: value)
+            ctx.results.v.insert(value)
+            return BlockResult.success
 
         case .returnLocalStmt(let stmt):
             return BlockResult(functionReturnValue: framePtr.v.resolveLocal(idx: stmt.source))
@@ -867,15 +850,12 @@ func evalBlock(
                 return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
             }
 
-            let rs = try await evalScan(
+            try await evalScan(
                 ctx: ctx,
                 frame: framePtr,
                 stmt: stmt,
                 source: source
             )
-
-            // Propagate any results from the block's sub frame into the parent frame
-            results.formUnion(rs)
 
         case .setAddStmt(let stmt):
             let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
@@ -944,8 +924,6 @@ func evalBlock(
                 return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
             }
 
-            results.formUnion(blockResult.results)
-
         case .unknown(let location):
             // Included for completeness, but this won't happen in practice as IR.Block's
             // decoder will have already failed to parse any unknown statements.
@@ -955,8 +933,7 @@ func evalBlock(
         // Next statement of current block
     }
 
-    // If no ResultSetAddStmt statements are executed, the implicit result set is empty.
-    return BlockResult(results: results)
+    return BlockResult.success
 }
 
 private func evalCall(
@@ -1098,33 +1075,25 @@ private func evalScan(
     frame: Ptr<Frame>,
     stmt: ScanStatement,
     source: AST.RegoValue
-) async throws -> ResultSet {
-    var results: ResultSet = []
+) async throws {
     switch source {
     case .array(let arr):
-        results.reserveCapacity(arr.count)
         for i in 0..<arr.count {
             let k: AST.RegoValue = .number(NSNumber(value: i))
             let v = arr[i] as AST.RegoValue
-            let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
-            results.formUnion(rs)
+            try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
         }
     case .object(let o):
-        results.reserveCapacity(o.count)
         for (k, v) in o {
-            let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
-            results.formUnion(rs)
+            try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
         }
     case .set(let set):
-        results.reserveCapacity(set.count)
         for v in set {
-            let rs = try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: v, value: v)
-            results.formUnion(rs)
+            try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: v, value: v)
         }
     default:
-        return []
+        break
     }
-    return results
 }
 
 private func evalScanBlock(
@@ -1133,14 +1102,14 @@ private func evalScanBlock(
     stmt: ScanStatement,
     key: AST.RegoValue,
     value: AST.RegoValue
-) async throws -> ResultSet {
+) async throws {
     var currentScopePtr = try frame.v.currentScope()
     var newLocals = currentScopePtr.v.locals
     newLocals[stmt.key] = key
     newLocals[stmt.value] = value
     currentScopePtr = frame.v.pushScope(locals: newLocals)
-    // Start executing the block on the new scope we just pushed
-    let rs = try await evalBlock(
+
+    let _ = try await evalBlock(
         withContext: ctx,
         framePtr: frame,
         caller: IR.AnyStatement.scanStmt(stmt),
@@ -1153,7 +1122,6 @@ private func evalScanBlock(
         throw RegoError(code: .internalError, message: "scope stack exhausted")
     }
     parentScope.v.locals = updatedLocals
-    return rs.results
 }
 
 // popAndSquash pops the current scope off the stack, and squashes its locals into its parent

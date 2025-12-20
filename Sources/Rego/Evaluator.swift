@@ -46,9 +46,4 @@ extension ResultSet {
     public static var empty: ResultSet {
         return []
     }
-
-    /// Constructs a ResultSet containing a single value.
-    public init(value: AST.RegoValue) {
-        self = [value]
-    }
 }

@@ -1141,8 +1141,7 @@ struct IRStatementTests {
         #expect(gotLocals == expectLocals, "comparing locals")
 
         let expectResult = tc.expectResult ?? .empty
-
-        #expect(results.results == expectResult, "comparing results")
+        #expect(ctx.results.v == expectResult, "comparing results")
 
         #expect(results.isUndefined == tc.expectUndefined, "comparing undefined")
     }

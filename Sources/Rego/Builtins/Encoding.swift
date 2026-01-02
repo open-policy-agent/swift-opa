@@ -23,14 +23,11 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
         }
 
-        guard
-            let base64Decoded = Data(base64Encoded: x, options: Data.Base64DecodingOptions(rawValue: 0))
-                .flatMap({ String(data: $0, encoding: .utf8) })
-        else {
+        guard let data = Data(base64Encoded: x, options: Data.Base64DecodingOptions(rawValue: 0)) else {
             throw BuiltinError.evalError(msg: "invalid base64 string")
         }
 
-        return .string(base64Decoded)
+        return .string(String(decoding: data, as: UTF8.self))
     }
 
     static func base64IsValid(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -42,14 +39,7 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
         }
 
-        guard
-            Data(base64Encoded: x, options: Data.Base64DecodingOptions(rawValue: 0))
-                .flatMap({ String(data: $0, encoding: .utf8) }) != nil
-        else {
-            return .boolean(false)
-        }
-
-        return .boolean(true)
+        return .boolean(Data(base64Encoded: x, options: Data.Base64DecodingOptions(rawValue: 0)) != nil)
     }
 
     static func base64UrlEncode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -101,14 +91,11 @@ extension BuiltinFuncs {
             .replacingOccurrences(of: "_", with: "/")
             .padding(toLength: x.count + paddingLength, withPad: "=", startingAt: 0)
 
-        guard
-            let base64Decoded = Data(base64Encoded: x, options: Data.Base64DecodingOptions(rawValue: 0))
-                .flatMap({ String(data: $0, encoding: .utf8) })
-        else {
+        guard let data = Data(base64Encoded: x, options: Data.Base64DecodingOptions(rawValue: 0)) else {
             throw BuiltinError.evalError(msg: "invalid base64 string")
         }
 
-        return .string(base64Decoded)
+        return .string(String(decoding: data, as: UTF8.self))
     }
 
     static func hexEncode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {

@@ -17,6 +17,8 @@ internal struct EvaluationContext {
     public var strictBuiltins: Bool = false
     /// Date and Time of Context creation
     public let timestamp: Date
+    /// Shared cache for builtin function calls
+    public let builtinsCache: Ptr<BuiltinsCache>
 
     init(
         query: String,
@@ -34,6 +36,7 @@ internal struct EvaluationContext {
         self.tracer = tracer
         self.strictBuiltins = strictBuiltins
         self.timestamp = timestamp ?? Date()
+        self.builtinsCache = Ptr<BuiltinsCache>(toCopyOf: BuiltinsCache())
     }
 }
 

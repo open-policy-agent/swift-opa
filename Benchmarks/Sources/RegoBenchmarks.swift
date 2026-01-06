@@ -4,6 +4,8 @@ import Foundation
 internal import Rego
 
 let benchmarks: @Sendable () -> Void = {
+    Benchmark.defaultConfiguration.timeUnits = .nanoseconds
+
     let simpleBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/simple-directory-bundle")
     let dynamicCallBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/dynamic-call-bundle")
 

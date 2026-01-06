@@ -12,6 +12,18 @@ private let numberFormatter: NumberFormatter = {
     return formatter
 }()
 
+/// InvocationKey is a key for memoizing an IR function call invocation.
+/// Note we capture the arguments as unresolved operands and not resolved values,
+/// as hashing the values was proving extremely expensive. We instead rely on the
+/// invariant that the plan / evaluator will not modify a local after it has been initally set.
+struct InvocationKey: Hashable {
+    let funcName: String
+    let args: [IR.Operand]
+}
+
+/// MemoCache is a memoization cache of plan invocations
+typealias MemoCache = [InvocationKey: AST.RegoValue]
+
 internal struct IREvaluator {
     let policies: [IndexedIRPolicy]
 
@@ -56,7 +68,7 @@ extension IREvaluator: Evaluator {
             if let plan = policy.plans[entrypoint] {
                 let ctx = IREvaluationContext(ctx: ctx, policy: policy)
                 try await evalPlan(withContext: ctx, plan: plan)
-                return ctx.results.v
+                return ctx.results
             }
         }
         throw RegoError(code: .unknownQuery, message: "query not found in plan: \(ctx.query)")
@@ -125,37 +137,60 @@ internal struct IndexedIRPolicy {
     }
 }
 
-internal struct IREvaluationContext {
+internal final class IREvaluationContext {
     var ctx: EvaluationContext
     var policy: IndexedIRPolicy
     var maxCallDepth: Int = 16_384
     var callDepth: Int = 0
-    var callMemo = MemoStack()  // shared stack of memoCache structs
-    var results: Ptr<ResultSet>  // shared result set for the entire evaluation
+    var memoStack: [MemoCache] = []
+    var results: ResultSet
+    var locals: Locals = Locals(repeating: nil, count: 2)
 
     init(ctx: EvaluationContext, policy: IndexedIRPolicy) {
         self.ctx = ctx
         self.policy = policy
-        self.results = Ptr(toCopyOf: ResultSet.empty)
+        self.results = ResultSet.empty
     }
 
-    func withIncrementedCallDepth() -> IREvaluationContext {
-        var ctx = self
-        ctx.callDepth += 1
-        return ctx
+    subscript(key: InvocationKey) -> AST.RegoValue? {
+        get {
+            guard !memoStack.isEmpty else {
+                return nil
+            }
+            return memoStack[memoStack.count - 1][key]
+        }
+        set {
+            if memoStack.isEmpty {
+                memoStack.append(MemoCache())
+            }
+            memoStack[memoStack.count - 1][key] = newValue
+        }
     }
-}
 
-// Frame represents a stack frame used during Rego IR evaluation. Each function call
-// will prompt creation of a new stack frame.
-internal struct Frame {
-    var locals: Locals = Locals()
+    func pushMemoCache() {
+        memoStack.append(MemoCache())
+    }
 
-    func currentLocation(withContext ctx: IREvaluationContext, stmt: IR.Statement) throws -> OPA.Trace.Location {
+    func popMemoCache() {
+        guard !memoStack.isEmpty else {
+            return
+        }
+        memoStack.removeLast()
+    }
+
+    func withPushedMemoCache<T>(_ body: () async throws -> T) async rethrows -> T {
+        pushMemoCache()
+        defer {
+            popMemoCache()
+        }
+        return try await body()
+    }
+
+    func currentLocation(stmt: IR.Statement) throws -> OPA.Trace.Location {
         return OPA.Trace.Location(
             row: stmt.location.row,
             col: stmt.location.col,
-            file: ctx.policy.ir.staticData?.files?[stmt.location.file].value ?? "<unknown>"
+            file: policy.ir.staticData?.files?[stmt.location.file].value ?? "<unknown>"
         )
     }
 
@@ -163,24 +198,24 @@ internal struct Frame {
         return self.locals[idx] ?? .undefined
     }
 
-    mutating func assignLocal(idx: IR.Local, value: AST.RegoValue) {
+    func assignLocal(idx: IR.Local, value: AST.RegoValue) {
         self.locals[idx] = value
     }
 
     // TODO, should we throw or return optional on lookup failures?
-    func resolveOperand(ctx: IREvaluationContext, _ op: IR.Operand) throws -> AST.RegoValue {
+    func resolveOperand(_ op: IR.Operand) throws -> AST.RegoValue {
         switch op.value {
         case .localIndex(let idx):
             return resolveLocal(idx: Local(idx))
         case .bool(let boolValue):
             return .boolean(boolValue)
         case .stringIndex(let idx):
-            return try .string(resolveStaticString(ctx: ctx, Int(idx)))
+            return try .string(resolveStaticString(Int(idx)))
         }
     }
 
-    func resolveStaticString(ctx: IREvaluationContext, _ idx: Int) throws -> String {
-        guard let v = ctx.policy.resolveStaticString(idx) else {
+    func resolveStaticString(_ idx: Int) throws -> String {
+        guard let v = policy.resolveStaticString(idx) else {
             throw RegoError(
                 code: .invalidOperand,
                 message: "unable to resolve static string: \(idx)"
@@ -190,12 +225,11 @@ internal struct Frame {
     }
 
     func traceEvent(
-        withContext ctx: IREvaluationContext,
         op: OPA.Trace.Operation,
         anyStmt: IR.Statement,
         _ message: String = ""
     ) {
-        guard let tracer = ctx.ctx.tracer else {
+        guard let tracer = ctx.tracer else {
             // tracing disabled
             return
         }
@@ -213,7 +247,7 @@ internal struct Frame {
                 msg = "function \(stmt.callFunc)"
             case .callDynamicStmt(let stmt):
                 // Resolve dynamic call path
-                let pathStr = resolveDynamicFunctionCallPath(withContext: ctx, path: stmt.path)
+                let pathStr = resolveDynamicFunctionCallPath(path: stmt.path)
                 msg = "dynamic function \(pathStr)"
             default:
                 msg = "\(anyStmt) - \(anyStmt.debugString)"
@@ -225,7 +259,8 @@ internal struct Frame {
             case .callStmt(let stmt):
                 msg = "function call \(stmt.callFunc)"
             case .callDynamicStmt(let stmt):
-                let pathStr = resolveDynamicFunctionCallPath(withContext: ctx, path: stmt.path)
+                // Resolve dynamic call path
+                let pathStr = resolveDynamicFunctionCallPath(path: stmt.path)
                 msg = "dynamic function \(pathStr)"
             default:
                 msg = "\(anyStmt) - \(anyStmt.debugString)"
@@ -241,16 +276,16 @@ internal struct Frame {
                 location: OPA.Trace.Location(
                     row: traceLocation.row,
                     col: traceLocation.col,
-                    file: ctx.policy.ir.staticData?.files?[traceLocation.file].value ?? "<unknown>"
+                    file: policy.ir.staticData?.files?[traceLocation.file].value ?? "<unknown>"
                 )
             )
         )
     }
 
-    // helper for rendering a dynamic call path into a string
-    private func resolveDynamicFunctionCallPath(withContext ctx: IREvaluationContext, path: [IR.Operand]) -> String {
+    // Helper for rendering a dynamic call path into a string
+    private func resolveDynamicFunctionCallPath(path: [IR.Operand]) -> String {
         let path = path.map {
-            let v = (try? self.resolveOperand(ctx: ctx, $0)) ?? "<unknown>"
+            let v = (try? self.resolveOperand($0)) ?? "<unknown>"
             if case .string(let s) = v {
                 return s
             }
@@ -276,40 +311,29 @@ private func evalPlan(
     withContext ctx: IREvaluationContext,
     plan: IR.Plan
 ) async throws {
-    // Initialize the starting Frame+Scope from the top level Plan blocks and kick off evaluation.
-    // Create initial locals array with input at index 0 and data at index 1
+    // Initialize the starting scope from the top level Plan blocks and kick off evaluation.
+    // Create initial locals with input at index 0 and data at index 1
 
     // Pre-allocate locals to exact size needed for this plan (computed via static analysis)
-    let frame = Frame(locals: Locals(repeating: nil, count: max(plan.maxLocal + 1, 2)))
+    ctx.locals = Locals(repeating: nil, count: max(plan.maxLocal + 1, 2))
 
     // TODO: ?? are we going to hide stuff under special roots like OPA does?
     // TODO: We don't resolve refs with more complex paths very much... maybe we should
     // instead special case the DotStmt for local 0 and do a smaller read on the store?
     // ¯\_(ツ)_/¯ for now we'll just drop the whole thang in here as it simplifies the
-    // other statments. We can refactor that part later to optimize.
-    let pFrame = Ptr(toCopyOf: frame)
-    pFrame.v.locals[localIdxInput] = ctx.ctx.input  // localIdxInput = 0
-    pFrame.v.locals[localIdxData] = try await ctx.ctx.store.read(from: StoreKeyPath(["data"]))  // localIdxData = 1
+    // other statements. We can refactor that part later to optimize.
+    ctx.locals[localIdxInput] = ctx.ctx.input  // localIdxInput = 0
+    ctx.locals[localIdxData] = try await ctx.ctx.store.read(from: StoreKeyPath(["data"]))  // localIdxData = 1
 
     let caller = IR.Statement.blockStmt(BlockStatement(blocks: plan.blocks))
 
-    try await evalPlanFrame(withContext: ctx, framePtr: pFrame, blocks: plan.blocks, caller: caller)
-}
-
-// Evaluate a plan entrypoint in a Frame from start to finish (respecting Task.isCancelled)
-internal func evalPlanFrame(
-    withContext ctx: IREvaluationContext,
-    framePtr: Ptr<Frame>,
-    blocks: [IR.Block],
-    caller: IR.Statement
-) async throws {
-    // To evaluate a Frame we iterate through each block of the current scope, evaluating
+    // To evaluate a plan we iterate through each block of the current scope, evaluating
     // statements in the block one at a time. We will jump between blocks being executed but
     // never go backwards, only early exit maneuvers jumping "forward" in the plan.
     // ref: https://www.openpolicyagent.org/docs/latest/ir/#execution
 
-    blockLoop: for block in blocks {
-        let blockResult = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: caller, block: block)
+    blockLoop: for block in plan.blocks {
+        let blockResult = try await evalBlock(withContext: ctx, caller: caller, block: block)
         guard !blockResult.shouldBreak else {
             throw RegoError(code: .internalError, message: "break statement jumped out of frame")
         }
@@ -319,15 +343,14 @@ internal func evalPlanFrame(
     }
 }
 
-internal func evalCallFrame(
+internal func evalBlocks(
     withContext ctx: IREvaluationContext,
-    framePtr: Ptr<Frame>,
     blocks: [IR.Block],
     caller: IR.Statement
-) async throws -> CallFrameResult {
-    var result = CallFrameResult.empty
+) async throws -> CallResult {
+    var result = CallResult.empty
     for block in blocks {
-        let blockResult = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: caller, block: block)
+        let blockResult = try await evalBlock(withContext: ctx, caller: caller, block: block)
         guard !blockResult.shouldBreak else {
             throw RegoError(code: .internalError, message: "break statement jumped out of frame")
         }
@@ -344,14 +367,14 @@ internal func evalCallFrame(
     return result
 }
 
-struct CallFrameResult {
+struct CallResult {
     var functionReturnValue: AST.RegoValue?
 
     var undefined: Bool {
         return functionReturnValue == nil
     }
 
-    static var empty: CallFrameResult {
+    static var empty: CallResult {
         return .init(functionReturnValue: nil)
     }
 }
@@ -407,22 +430,20 @@ struct BlockResult {
 
 func failWithUndefined(
     withContext ctx: IREvaluationContext,
-    framePtr: Ptr<Frame>,
     stmt: IR.Statement
 ) -> BlockResult {
-    framePtr.v.traceEvent(withContext: ctx, op: .fail, anyStmt: stmt, "undefined")
+    ctx.traceEvent(op: .fail, anyStmt: stmt, "undefined")
     return .undefined
 }
 
 func evalBlock(
     withContext ctx: IREvaluationContext,
-    framePtr: Ptr<Frame>,
     caller: IR.Statement,
     block: Block
 ) async throws -> BlockResult {
 
-    framePtr.v.traceEvent(withContext: ctx, op: .enter, anyStmt: caller)
-    defer { framePtr.v.traceEvent(withContext: ctx, op: .exit, anyStmt: caller) }
+    ctx.traceEvent(op: .enter, anyStmt: caller)
+    defer { ctx.traceEvent(op: .exit, anyStmt: caller) }
 
     stmtLoop: for i in block.statements.indices {
         let statement = block.statements[i]
@@ -431,30 +452,30 @@ func evalBlock(
             throw RegoError(code: .evaluationCancelled, message: "parent task cancelled")
         }
 
-        framePtr.v.traceEvent(withContext: ctx, op: .eval, anyStmt: statement)
+        ctx.traceEvent(op: .eval, anyStmt: statement)
 
         switch statement {
         case .arrayAppendStmt(let stmt):
-            let array = framePtr.v.resolveLocal(idx: stmt.array)
-            let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
+            let array = ctx.resolveLocal(idx: stmt.array)
+            let value = try ctx.resolveOperand(stmt.value)
             guard case .array(var arrayValue) = array, value != .undefined else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
             arrayValue.append(value)
-            framePtr.v.assignLocal(idx: stmt.array, value: .array(arrayValue))
+            ctx.assignLocal(idx: stmt.array, value: .array(arrayValue))
 
         case .assignIntStmt(let stmt):
-            framePtr.v.assignLocal(
+            ctx.assignLocal(
                 idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
 
         case .assignVarOnceStmt(let stmt):
             // 'undefined' source value doesn't propagate aka don't break out of the block
-            let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
-            let targetValue = framePtr.v.resolveLocal(idx: stmt.target)
+            let sourceValue = try ctx.resolveOperand(stmt.source)
+            let targetValue = ctx.resolveLocal(idx: stmt.target)
 
             // If it's the first time setting target, assign unconditionally
             if targetValue == .undefined {
-                framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
+                ctx.assignLocal(idx: stmt.target, value: sourceValue)
                 break
             }
 
@@ -466,8 +487,8 @@ func evalBlock(
         case .assignVarStmt(let stmt):
             // 'undefined' source value doesn't propagate: allow
             // assiging undefined to target, and don't affect control flow.
-            let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
-            framePtr.v.assignLocal(idx: stmt.target, value: sourceValue)
+            let sourceValue = try ctx.resolveOperand(stmt.source)
+            ctx.assignLocal(idx: stmt.target, value: sourceValue)
 
         case .blockStmt(let stmt):
             guard let blocks = stmt.blocks else {
@@ -477,7 +498,7 @@ func evalBlock(
             }
 
             for block in blocks {
-                let rs = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: statement, block: block)
+                let rs = try await evalBlock(withContext: ctx, caller: statement, block: block)
                 if rs.shouldBreak {
                     return rs.breakByOne()
                 }
@@ -503,9 +524,9 @@ func evalBlock(
             var funcName = ""
             for i in stmt.path.indices {
                 let p = stmt.path[i]
-                let segment = try framePtr.v.resolveOperand(ctx: ctx, p)
+                let segment = try ctx.resolveOperand(p)
                 guard case .string(let stringValue) = segment else {
-                    return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                    return failWithUndefined(withContext: ctx, stmt: statement)
                 }
                 if i > 0 {
                     funcName += "."
@@ -515,7 +536,6 @@ func evalBlock(
 
             let result = try await evalCall(
                 ctx: ctx,
-                frame: framePtr,
                 caller: statement,
                 funcName: funcName,
                 args: stmt.args.map {  // (╯°□°)╯︵ ┻━┻
@@ -526,34 +546,33 @@ func evalBlock(
                 isDynamic: true
             )
 
-            guard result != .undefined else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+            guard result != AST.RegoValue.undefined else {
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
-            framePtr.v.assignLocal(idx: stmt.result, value: result)
+            ctx.assignLocal(idx: stmt.result, value: result)
 
         case .callStmt(let stmt):
             let result = try await evalCall(
                 ctx: ctx,
-                frame: framePtr,
                 caller: statement,
                 funcName: stmt.callFunc,
                 args: stmt.args ?? []
             )
 
-            guard result != .undefined else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+            guard result != AST.RegoValue.undefined else {
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
-            framePtr.v.assignLocal(idx: stmt.result, value: result)
+            ctx.assignLocal(idx: stmt.result, value: result)
 
         case .dotStmt(let stmt):
-            let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
-            let keyValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
+            let sourceValue = try ctx.resolveOperand(stmt.source)
+            let keyValue = try ctx.resolveOperand(stmt.key)
 
             // If any input parameter is undefined then the statement is undefined
             guard sourceValue != .undefined, keyValue != .undefined else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
             var targetValue: AST.RegoValue?
@@ -580,49 +599,49 @@ func evalBlock(
             // This statement is undefined if the key does not exist in the source value.
             guard let targetValue else {
                 // undefined
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
-            framePtr.v.assignLocal(idx: stmt.target, value: targetValue)
+            ctx.assignLocal(idx: stmt.target, value: targetValue)
 
         case .equalStmt(let stmt):
             // This statement is undefined if a is not equal to b.
-            let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
-            let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
+            let a = try ctx.resolveOperand(stmt.a)
+            let b = try ctx.resolveOperand(stmt.b)
             if a == .undefined || b == .undefined || a != b {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
         case .isArrayStmt(let stmt):
-            guard case .array = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+            guard case .array = try ctx.resolveOperand(stmt.source) else {
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
         case .isDefinedStmt(let stmt):
             // This statement is undefined if source is undefined.
-            if case .undefined = framePtr.v.resolveLocal(idx: stmt.source) {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+            if case .undefined = ctx.resolveLocal(idx: stmt.source) {
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
         case .isObjectStmt(let stmt):
-            guard case .object = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+            guard case .object = try ctx.resolveOperand(stmt.source) else {
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
         case .isSetStmt(let stmt):
-            guard case .set = try framePtr.v.resolveOperand(ctx: ctx, stmt.source) else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+            guard case .set = try ctx.resolveOperand(stmt.source) else {
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
         case .isUndefinedStmt(let stmt):
             // This statement is undefined if source is not undefined.
-            guard case .undefined = framePtr.v.resolveLocal(idx: stmt.source) else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+            guard case .undefined = ctx.resolveLocal(idx: stmt.source) else {
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
         case .lenStmt(let stmt):
-            let sourceValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.source)
+            let sourceValue = try ctx.resolveOperand(stmt.source)
             guard sourceValue != .undefined else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
             guard let len = sourceValue.count else {
@@ -635,49 +654,49 @@ func evalBlock(
                 )
             }
 
-            framePtr.v.assignLocal(idx: stmt.target, value: .number(NSNumber(value: len)))
+            ctx.assignLocal(idx: stmt.target, value: .number(NSNumber(value: len)))
 
         case .makeArrayStmt(let stmt):
             var arr: [AST.RegoValue] = []
             arr.reserveCapacity(Int(stmt.capacity))
-            framePtr.v.assignLocal(idx: stmt.target, value: .array(arr))
+            ctx.assignLocal(idx: stmt.target, value: .array(arr))
 
         case .makeNullStmt(let stmt):
-            framePtr.v.assignLocal(idx: stmt.target, value: .null)
+            ctx.assignLocal(idx: stmt.target, value: .null)
 
         case .makeNumberIntStmt(let stmt):
-            framePtr.v.assignLocal(
+            ctx.assignLocal(
                 idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
 
         case .makeNumberRefStmt(let stmt):
-            let sourceStringValue = try framePtr.v.resolveStaticString(
-                ctx: ctx, Int(stmt.index))
+            let sourceStringValue = try ctx.resolveStaticString(
+                Int(stmt.index))
             guard let n = numberFormatter.number(from: sourceStringValue) else {
                 throw RegoError(code: .invalidDataType, message: "invalid number literal with MakeNumberRefStatement")
             }
-            framePtr.v.assignLocal(idx: stmt.target, value: .number(n))
+            ctx.assignLocal(idx: stmt.target, value: .number(n))
 
         case .makeObjectStmt(let stmt):
-            framePtr.v.assignLocal(idx: stmt.target, value: .object([:]))
+            ctx.assignLocal(idx: stmt.target, value: .object([:]))
 
         case .makeSetStmt(let stmt):
-            framePtr.v.assignLocal(idx: stmt.target, value: .set([]))
+            ctx.assignLocal(idx: stmt.target, value: .set([]))
 
         case .nopStmt:
             break
 
         case .notEqualStmt(let stmt):
             // This statement is undefined if a is equal to b.
-            let a = try framePtr.v.resolveOperand(ctx: ctx, stmt.a)
-            let b = try framePtr.v.resolveOperand(ctx: ctx, stmt.b)
+            let a = try ctx.resolveOperand(stmt.a)
+            let b = try ctx.resolveOperand(stmt.b)
             if a == .undefined || b == .undefined || a == b {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
         case .notStmt(let stmt):
             // We're going to evalaute the block in an isolated frame, propagating
             // local state, so that we can more easily see whether it succeeded.
-            let rs = try await evalBlock(withContext: ctx, framePtr: framePtr, caller: statement, block: stmt.block)
+            let rs = try await evalBlock(withContext: ctx, caller: statement, block: stmt.block)
 
             if rs.shouldBreak {
                 return rs.breakByOne()
@@ -685,15 +704,15 @@ func evalBlock(
 
             // This statement is undefined if the contained block is defined.
             guard rs.isUndefined else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
         case .objectInsertOnceStmt(let stmt):
-            let targetValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
-            let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
-            let target = framePtr.v.resolveLocal(idx: stmt.object)
+            let targetValue = try ctx.resolveOperand(stmt.value)
+            let key = try ctx.resolveOperand(stmt.key)
+            let target = ctx.resolveLocal(idx: stmt.object)
             guard targetValue != .undefined && key != .undefined && target != .undefined else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
             guard case .object(var targetObjectValue) = target else {
                 throw RegoError(
@@ -712,14 +731,14 @@ func evalBlock(
                 )
             }
             targetObjectValue[key] = targetValue
-            framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
+            ctx.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
 
         case .objectInsertStmt(let stmt):
-            let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
-            let key = try framePtr.v.resolveOperand(ctx: ctx, stmt.key)
-            let target = framePtr.v.resolveLocal(idx: stmt.object)
+            let value = try ctx.resolveOperand(stmt.value)
+            let key = try ctx.resolveOperand(stmt.key)
+            let target = ctx.resolveLocal(idx: stmt.object)
             guard value != .undefined && key != .undefined && target != .undefined else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
             guard case .object(var targetObjectValue) = target else {
                 throw RegoError(
@@ -728,13 +747,13 @@ func evalBlock(
                 )
             }
             targetObjectValue[key] = value
-            framePtr.v.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
+            ctx.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
 
         case .objectMergeStmt(let stmt):
-            let a = framePtr.v.resolveLocal(idx: stmt.a)
-            let b = framePtr.v.resolveLocal(idx: stmt.b)
+            let a = ctx.resolveLocal(idx: stmt.a)
+            let b = ctx.resolveLocal(idx: stmt.b)
             if a == .undefined || b == .undefined {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
             guard case .object(let objectValueA) = a, case .object(let objectValueB) = b else {
                 throw RegoError(
@@ -749,10 +768,10 @@ func evalBlock(
             // - https://github.com/open-policy-agent/opa/issues/2926
             // - https://github.com/open-policy-agent/opa/pull/3017
             let merged = objectValueB.merge(with: objectValueA)
-            framePtr.v.assignLocal(idx: stmt.target, value: .object(merged))
+            ctx.assignLocal(idx: stmt.target, value: .object(merged))
 
         case .resetLocalStmt(let stmt):
-            framePtr.v.assignLocal(idx: stmt.target, value: .undefined)
+            ctx.assignLocal(idx: stmt.target, value: .undefined)
 
         case .resultSetAddStmt(let stmt):
             guard i == block.statements.count - 1 else {
@@ -762,15 +781,15 @@ func evalBlock(
                     message: "ResultSetAddStatement can only be used in the last statement of a block"
                 )
             }
-            let value = framePtr.v.resolveLocal(idx: stmt.value)
+            let value = ctx.resolveLocal(idx: stmt.value)
             guard value != .undefined else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
-            ctx.results.v.insert(value)
+            ctx.results.insert(value)
             return BlockResult.success
 
         case .returnLocalStmt(let stmt):
-            return BlockResult(functionReturnValue: framePtr.v.resolveLocal(idx: stmt.source))
+            return BlockResult(functionReturnValue: ctx.resolveLocal(idx: stmt.source))
 
         case .scanStmt(let stmt):
             // From the spec: "This statement is undefined if source is a scalar value or empty collection."
@@ -781,25 +800,24 @@ func evalBlock(
             //  ref: https://www.openpolicyagent.org/docs/latest/policy-language/#every-keyword
             // After clarification, the correct behavior should be: "This statement is undefined if the source is a scalar or undefined.",
             // i.e. we need to ensure it is a collection type, but empty is allowed.
-            let source = framePtr.v.resolveLocal(idx: stmt.source)
+            let source = ctx.resolveLocal(idx: stmt.source)
 
             // Ensure the source is defined and not a scalar type
             guard source != .undefined, source.isCollection else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
             try await evalScan(
                 ctx: ctx,
-                frame: framePtr,
                 stmt: stmt,
                 source: source
             )
 
         case .setAddStmt(let stmt):
-            let value = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
-            let target = framePtr.v.resolveLocal(idx: stmt.set)
+            let value = try ctx.resolveOperand(stmt.value)
+            let target = ctx.resolveLocal(idx: stmt.set)
             guard value != .undefined && target != .undefined else {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
             guard case .set(var targetSetValue) = target else {
                 throw RegoError(
@@ -808,14 +826,14 @@ func evalBlock(
                 )
             }
             targetSetValue.insert(value)
-            framePtr.v.assignLocal(idx: stmt.set, value: .set(targetSetValue))
+            ctx.assignLocal(idx: stmt.set, value: .set(targetSetValue))
 
         case .withStmt(let stmt):
             // First we need to resolve the value that will be upserted
-            let overlayValue = try framePtr.v.resolveOperand(ctx: ctx, stmt.value)
+            let overlayValue = try ctx.resolveOperand(stmt.value)
 
             // Next look up the object we'll be upserting into
-            let toPatch = framePtr.v.resolveLocal(idx: stmt.local)
+            let toPatch = ctx.resolveLocal(idx: stmt.local)
 
             // Resolve the patching path elements (composed of references to static strings
             let pathOfInts = stmt.path ?? []
@@ -832,16 +850,15 @@ func evalBlock(
             let patched = toPatch.patch(with: overlayValue, at: path)
 
             // Set patched value and ensure restoration on exit
-            framePtr.v.assignLocal(idx: stmt.local, value: patched)
+            ctx.assignLocal(idx: stmt.local, value: patched)
             defer {
-                framePtr.v.assignLocal(idx: stmt.local, value: toPatch)
+                ctx.assignLocal(idx: stmt.local, value: toPatch)
             }
 
-            let blockResult = try await ctx.callMemo.withPush {
+            let blockResult = try await ctx.withPushedMemoCache {
                 // Execute the block with the patched value
                 return try await evalBlock(
                     withContext: ctx,
-                    framePtr: framePtr,
                     caller: statement,
                     block: stmt.block
                 )
@@ -854,7 +871,7 @@ func evalBlock(
 
             // Propagate undefined
             if blockResult.isUndefined {
-                return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
+                return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
         case .unknown(let location):
@@ -871,7 +888,6 @@ func evalBlock(
 
 private func evalCall(
     ctx: IREvaluationContext,
-    frame: Ptr<Frame>,
     caller: IR.Statement,
     funcName: String,
     args: [IR.Operand],
@@ -880,7 +896,7 @@ private func evalCall(
     // Check memo cache if applicable to save repeated evaluation time for rules
     let shouldMemoize = args.count == 2  // Currently support _rules_, not _functions_
     let sig = InvocationKey(funcName: funcName, args: args)
-    if shouldMemoize, let cachedResult = ctx.callMemo[sig] {
+    if shouldMemoize, let cachedResult = ctx[sig] {
         return cachedResult
     }
 
@@ -890,7 +906,7 @@ private func evalCall(
         // Note: we do not enforce that args are defined here, it appears
         // that the expectation is that statements within the function blocks
         // (for non-builtins) handle it.
-        argValues.append(try frame.v.resolveOperand(ctx: ctx, arg))
+        argValues.append(try ctx.resolveOperand(arg))
     }
 
     if isDynamic {
@@ -904,14 +920,13 @@ private func evalCall(
 
         let result = try await callPlanFunc(
             ctx: ctx,
-            frame: frame,
             caller: caller,
             funcName: funcName,
             args: argValues
         )
 
         if shouldMemoize {
-            ctx.callMemo[sig] = result
+            ctx[sig] = result
         }
         return result
     }
@@ -920,14 +935,13 @@ private func evalCall(
     if ctx.policy.funcs[funcName] != nil {
         let result = try await callPlanFunc(
             ctx: ctx,
-            frame: frame,
             caller: caller,
             funcName: funcName,
             args: argValues
         )
 
         if shouldMemoize {
-            ctx.callMemo[sig] = result
+            ctx[sig] = result
         }
 
         return result
@@ -943,7 +957,7 @@ private func evalCall(
     }
 
     let bctx = BuiltinContext(
-        location: try frame.v.currentLocation(withContext: ctx, stmt: caller),
+        location: try ctx.currentLocation(stmt: caller),
         tracer: ctx.ctx.tracer,
         cache: ctx.ctx.builtinsCache,
         timestamp: ctx.ctx.timestamp
@@ -960,7 +974,6 @@ private func evalCall(
 // callPlanFunc will evaluate calling a function defined on the plan
 private func callPlanFunc(
     ctx: IREvaluationContext,
-    frame: Ptr<Frame>,
     caller: IR.Statement,
     funcName: String,
     args: [AST.RegoValue]
@@ -990,17 +1003,23 @@ private func callPlanFunc(
     }
 
     // Add in implicit input + data locals
-    callLocals[localIdxInput] = frame.v.resolveLocal(idx: localIdxInput)
-    callLocals[localIdxData] = frame.v.resolveLocal(idx: localIdxData)
+    callLocals[localIdxInput] = ctx.resolveLocal(idx: localIdxInput)
+    callLocals[localIdxData] = ctx.resolveLocal(idx: localIdxData)
 
-    // Setup a new frame for the function call
-    let callFrame = Frame(
-        locals: callLocals
-    )
-    let callFramePtr = Ptr(toCopyOf: callFrame)
-    let result = try await evalCallFrame(
-        withContext: ctx.withIncrementedCallDepth(),
-        framePtr: callFramePtr,
+    // Save current locals and install call locals
+    let savedLocals = ctx.locals
+    ctx.locals = callLocals
+
+    // Increment call depth and ensure it's decremented on exit
+    ctx.callDepth += 1
+    defer {
+        ctx.callDepth -= 1
+        ctx.locals = savedLocals
+    }
+
+    // Execute the function blocks with fresh locals
+    let result = try await evalBlocks(
+        withContext: ctx,
         blocks: fn.blocks,
         caller: caller
     )
@@ -1010,7 +1029,6 @@ private func callPlanFunc(
 
 private func evalScan(
     ctx: IREvaluationContext,
-    frame: Ptr<Frame>,
     stmt: ScanStatement,
     source: AST.RegoValue
 ) async throws {
@@ -1019,15 +1037,15 @@ private func evalScan(
         for i in 0..<arr.count {
             let k: AST.RegoValue = .number(NSNumber(value: i))
             let v = arr[i] as AST.RegoValue
-            try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
+            try await evalScanBlock(ctx: ctx, stmt: stmt, key: k, value: v)
         }
     case .object(let o):
         for (k, v) in o {
-            try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: k, value: v)
+            try await evalScanBlock(ctx: ctx, stmt: stmt, key: k, value: v)
         }
     case .set(let set):
         for v in set {
-            try await evalScanBlock(ctx: ctx, frame: frame, stmt: stmt, key: v, value: v)
+            try await evalScanBlock(ctx: ctx, stmt: stmt, key: v, value: v)
         }
     default:
         break
@@ -1036,19 +1054,17 @@ private func evalScan(
 
 private func evalScanBlock(
     ctx: IREvaluationContext,
-    frame: Ptr<Frame>,
     stmt: ScanStatement,
     key: AST.RegoValue,
     value: AST.RegoValue
 ) async throws {
-    // Set scan variables directly in frame locals
-    frame.v.assignLocal(idx: stmt.key, value: key)
-    frame.v.assignLocal(idx: stmt.value, value: value)
+    // Set scan variables directly in ctx locals
+    ctx.assignLocal(idx: stmt.key, value: key)
+    ctx.assignLocal(idx: stmt.value, value: value)
 
     // Execute the block
     let _ = try await evalBlock(
         withContext: ctx,
-        framePtr: frame,
         caller: IR.Statement.scanStmt(stmt),
         block: stmt.block
     )

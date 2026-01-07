@@ -287,19 +287,21 @@ private func evalPlan(
 ) async throws {
     // Initialize the starting Frame+Scope from the top level Plan blocks and kick off evaluation.
     // Create initial locals array with input at index 0 and data at index 1
-    let frame = Frame(locals: Locals([
-        // TODO: ?? are we going to hide stuff under special roots like OPA does?
-        // TODO: We don't resolve refs with more complex paths very much... maybe we should
-        // instead special case the DotStmt for local 0 and do a smaller read on the store?
-        // ¯\_(ツ)_/¯ for now we'll just drop the whole thang in here as it simplifies the
-        // other statments. We can refactor that part later to optimize.
-        ctx.ctx.input,  // localIdxInput = 0
-        try await ctx.ctx.store.read(from: StoreKeyPath(["data"]))  // localIdxData = 1
-    ]))
+
+    // Pre-allocate locals to exact size needed for this plan (computed via static analysis)
+    let frame = Frame(locals: Locals(repeating: nil, count: max(plan.maxLocal + 1, 2)))
+
+    // TODO: ?? are we going to hide stuff under special roots like OPA does?
+    // TODO: We don't resolve refs with more complex paths very much... maybe we should
+    // instead special case the DotStmt for local 0 and do a smaller read on the store?
+    // ¯\_(ツ)_/¯ for now we'll just drop the whole thang in here as it simplifies the
+    // other statments. We can refactor that part later to optimize.
+    let pFrame = Ptr(toCopyOf: frame)
+    pFrame.v.locals[localIdxInput] = ctx.ctx.input  // localIdxInput = 0
+    pFrame.v.locals[localIdxData] = try await ctx.ctx.store.read(from: StoreKeyPath(["data"]))  // localIdxData = 1
 
     let caller = IR.AnyStatement.blockStmt(BlockStatement(blocks: plan.blocks))
 
-    let pFrame = Ptr(toCopyOf: frame)
     try await evalPlanFrame(withContext: ctx, framePtr: pFrame, blocks: plan.blocks, caller: caller)
 }
 
@@ -988,8 +990,8 @@ private func callPlanFunc(
     // fn.params are the Local indices to pass them in to
     // in the new frame.
 
-    // Build locals array to accommodate all parameters plus input/data
-    var callLocals = Locals(accommodating: fn.params, minimumSize: 2)
+    // Build locals array pre-sized to exact maximum needed for this function (computed via static analysis)
+    var callLocals = Locals(repeating: nil, count: max(fn.maxLocal + 1, 2))
 
     // Assign parameters
     for (argValue, paramIdx) in zip(args, fn.params) {

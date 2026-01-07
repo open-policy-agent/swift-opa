@@ -59,25 +59,24 @@ internal struct Locals: Equatable, Sendable, Encodable {
 
     subscript(index: IR.Local) -> AST.RegoValue? {
         get {
-            guard let intIndex = Int(exactly: index) else {
+            let idx = Int(index)
+            // Return nil if out of bounds. This happens when:
+            // - The local hasn't been written to yet (treated as undefined)
+            // - In tests that don't go through evalPlan pre-allocation
+            guard idx < storage.count else {
                 return nil
             }
-            guard intIndex >= 0, intIndex < storage.count else {
-                return nil
-            }
-            return storage[intIndex]
+            return storage[idx]
         }
         set {
-            guard let intIndex = Int(exactly: index) else {
-                return
+            let idx = Int(index)
+            // Grow array if needed to accommodate the index.
+            // After pre-allocation this should rarely trigger, but is needed
+            // for tests and as a safety net.
+            if idx >= storage.count {
+                storage.append(contentsOf: repeatElement(nil, count: idx - storage.count + 1))
             }
-            guard intIndex >= 0 else {
-                return
-            }
-            if intIndex >= storage.count {
-                storage.append(contentsOf: repeatElement(nil, count: intIndex - storage.count + 1))
-            }
-            storage[intIndex] = newValue
+            storage[idx] = newValue
         }
     }
 

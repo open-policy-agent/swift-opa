@@ -151,7 +151,7 @@ internal struct IREvaluationContext {
 internal struct Frame {
     var locals: Locals = Locals()
 
-    func currentLocation(withContext ctx: IREvaluationContext, stmt: IR.AnyStatement) throws -> OPA.Trace.Location {
+    func currentLocation(withContext ctx: IREvaluationContext, stmt: IR.Statement) throws -> OPA.Trace.Location {
         return OPA.Trace.Location(
             row: stmt.location.row,
             col: stmt.location.col,
@@ -192,7 +192,7 @@ internal struct Frame {
     func traceEvent(
         withContext ctx: IREvaluationContext,
         op: OPA.Trace.Operation,
-        anyStmt: IR.AnyStatement,
+        anyStmt: IR.Statement,
         _ message: String = ""
     ) {
         guard let tracer = ctx.ctx.tracer else {
@@ -208,7 +208,7 @@ internal struct Frame {
             case .blockStmt(let stmt):
                 let count = stmt.blocks?.count ?? 0
 
-                msg = "block (stmt_count=\(count)): \(stmt.debugString)"
+                msg = "block (stmt_count=\(count)): \(anyStmt.debugString)"
             case .callStmt(let stmt):
                 msg = "function \(stmt.callFunc)"
             case .callDynamicStmt(let stmt):
@@ -216,34 +216,22 @@ internal struct Frame {
                 let pathStr = resolveDynamicFunctionCallPath(withContext: ctx, path: stmt.path)
                 msg = "dynamic function \(pathStr)"
             default:
-                if let stmt = anyStmt.statement {
-                    msg = "\(type(of: stmt)) - \(stmt.debugString)"
-                } else {
-                    msg = "<unknown>"
-                }
+                msg = "\(anyStmt) - \(anyStmt.debugString)"
             }
         case .exit:
             switch anyStmt {
-            case .blockStmt(let stmt):
-                msg = "block \(stmt.debugString)"
+            case .blockStmt:
+                msg = "block \(anyStmt.debugString)"
             case .callStmt(let stmt):
                 msg = "function call \(stmt.callFunc)"
             case .callDynamicStmt(let stmt):
                 let pathStr = resolveDynamicFunctionCallPath(withContext: ctx, path: stmt.path)
                 msg = "dynamic function \(pathStr)"
             default:
-                if let stmt = anyStmt.statement {
-                    msg = "\(type(of: stmt)) - \(stmt.debugString)"
-                } else {
-                    msg = "<unknown>"
-                }
+                msg = "\(anyStmt) - \(anyStmt.debugString)"
             }
         default:
-            if let stmt = anyStmt.statement {
-                msg = "\(type(of: stmt)) \(formattedMessage) -> \(stmt.debugString)"
-            } else {
-                msg = "<unknown>"
-            }
+            msg = "\(anyStmt) \(formattedMessage) -> \(anyStmt.debugString)"
         }
         let traceLocation = anyStmt.location
         tracer.traceEvent(
@@ -303,7 +291,7 @@ private func evalPlan(
     pFrame.v.locals[localIdxInput] = ctx.ctx.input  // localIdxInput = 0
     pFrame.v.locals[localIdxData] = try await ctx.ctx.store.read(from: StoreKeyPath(["data"]))  // localIdxData = 1
 
-    let caller = IR.AnyStatement.blockStmt(BlockStatement(blocks: plan.blocks))
+    let caller = IR.Statement.blockStmt(BlockStatement(blocks: plan.blocks))
 
     try await evalPlanFrame(withContext: ctx, framePtr: pFrame, blocks: plan.blocks, caller: caller)
 }
@@ -313,7 +301,7 @@ internal func evalPlanFrame(
     withContext ctx: IREvaluationContext,
     framePtr: Ptr<Frame>,
     blocks: [IR.Block],
-    caller: IR.AnyStatement
+    caller: IR.Statement
 ) async throws {
     // To evaluate a Frame we iterate through each block of the current scope, evaluating
     // statements in the block one at a time. We will jump between blocks being executed but
@@ -335,7 +323,7 @@ internal func evalCallFrame(
     withContext ctx: IREvaluationContext,
     framePtr: Ptr<Frame>,
     blocks: [IR.Block],
-    caller: IR.AnyStatement
+    caller: IR.Statement
 ) async throws -> CallFrameResult {
     var result = CallFrameResult.empty
     for block in blocks {
@@ -420,7 +408,7 @@ struct BlockResult {
 func failWithUndefined(
     withContext ctx: IREvaluationContext,
     framePtr: Ptr<Frame>,
-    stmt: IR.AnyStatement
+    stmt: IR.Statement
 ) -> BlockResult {
     framePtr.v.traceEvent(withContext: ctx, op: .fail, anyStmt: stmt, "undefined")
     return .undefined
@@ -429,7 +417,7 @@ func failWithUndefined(
 func evalBlock(
     withContext ctx: IREvaluationContext,
     framePtr: Ptr<Frame>,
-    caller: IR.AnyStatement,
+    caller: IR.Statement,
     block: Block
 ) async throws -> BlockResult {
 
@@ -884,7 +872,7 @@ func evalBlock(
 private func evalCall(
     ctx: IREvaluationContext,
     frame: Ptr<Frame>,
-    caller: IR.AnyStatement,
+    caller: IR.Statement,
     funcName: String,
     args: [IR.Operand],
     isDynamic: Bool = false
@@ -973,7 +961,7 @@ private func evalCall(
 private func callPlanFunc(
     ctx: IREvaluationContext,
     frame: Ptr<Frame>,
-    caller: IR.AnyStatement,
+    caller: IR.Statement,
     funcName: String,
     args: [AST.RegoValue]
 ) async throws -> AST.RegoValue {
@@ -1061,7 +1049,7 @@ private func evalScanBlock(
     let _ = try await evalBlock(
         withContext: ctx,
         framePtr: frame,
-        caller: IR.AnyStatement.scanStmt(stmt),
+        caller: IR.Statement.scanStmt(stmt),
         block: stmt.block
     )
 }

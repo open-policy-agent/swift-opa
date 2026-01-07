@@ -80,14 +80,14 @@ public struct Plan: Codable, Hashable, Sendable {
 }
 
 public struct Block: Hashable, Sendable {
-    public var statements: [AnyStatement]
+    public var statements: [Statement]
 
-    public init(statements: [any Statement]) {
-        self.statements = statements.map { AnyStatement($0) }
+    public init(statements: [Statement]) {
+        self.statements = statements
     }
 
-    public mutating func appendStatement(_ stmt: any Statement) {
-        self.statements.append(AnyStatement(stmt))
+    public mutating func appendStatement(_ stmt: Statement) {
+        self.statements.append(stmt)
     }
 
     // Hashable, we need a custom implementation for dynamic dispatch
@@ -116,12 +116,12 @@ extension Block: Codable {
         var iter = try container.nestedUnkeyedContainer(forKey: .statements)
         var peek = iter
 
-        var out: [AnyStatement] = []
+        var out: [Statement] = []
         while !peek.isAtEnd {
             let partial = try peek.decode(PartialStatement.self)
             let inner = try iter.nestedContainer(keyedBy: InnerCodingKeys.self)
 
-            var wrapped: AnyStatement
+            var wrapped: Statement
 
             switch partial.type {
             case .arrayAppendStmt:
@@ -249,7 +249,7 @@ extension Block: Codable {
 struct PartialStatement: Codable, Hashable {
     // KnownStatements are all allowed values for the "type" field of
     // serialized IR Statements (https://www.openpolicyagent.org/docs/latest/ir/#statements)
-    // NOTE: This must be kept in sync with the corresponding cases in AnyStatement.
+    // NOTE: This must be kept in sync with the corresponding cases in Statement.
     enum KnownStatements: String, Codable {
         case arrayAppendStmt = "ArrayAppendStmt"
         case assignIntStmt = "AssignIntStmt"
@@ -294,8 +294,8 @@ struct PartialStatement: Codable, Hashable {
     var inner: AnyInnerStatement
 }
 
-// AnyStatement is an enum over all supported statements
-public enum AnyStatement: Sendable, Hashable {
+// Statement is an enum over all supported statements
+public enum Statement: Sendable, Hashable {
     case arrayAppendStmt(ArrayAppendStatement)
     case assignIntStmt(AssignIntStatement)
     case assignVarOnceStmt(AssignVarOnceStatement)
@@ -332,156 +332,6 @@ public enum AnyStatement: Sendable, Hashable {
     case withStmt(WithStatement)
 
     case unknown(Location)
-
-    // Constructor to wrap any concrete statement in an AnyStatment
-    // NOTE: This is O(N) where N is the number of possible statements
-    public init(_ v: any Statement) {
-        switch v {
-        case let stmt as IR.ArrayAppendStatement:
-            self = .arrayAppendStmt(stmt)
-        case let stmt as IR.AssignIntStatement:
-            self = .assignIntStmt(stmt)
-        case let stmt as IR.AssignVarOnceStatement:
-            self = .assignVarOnceStmt(stmt)
-        case let stmt as IR.AssignVarStatement:
-            self = .assignVarStmt(stmt)
-        case let stmt as IR.BlockStatement:
-            self = .blockStmt(stmt)
-        case let stmt as IR.BreakStatement:
-            self = .breakStmt(stmt)
-        case let stmt as IR.CallDynamicStatement:
-            self = .callDynamicStmt(stmt)
-        case let stmt as IR.CallStatement:
-            self = .callStmt(stmt)
-        case let stmt as IR.DotStatement:
-            self = .dotStmt(stmt)
-        case let stmt as IR.EqualStatement:
-            self = .equalStmt(stmt)
-        case let stmt as IR.IsArrayStatement:
-            self = .isArrayStmt(stmt)
-        case let stmt as IR.IsDefinedStatement:
-            self = .isDefinedStmt(stmt)
-        case let stmt as IR.IsObjectStatement:
-            self = .isObjectStmt(stmt)
-        case let stmt as IR.IsSetStatement:
-            self = .isSetStmt(stmt)
-        case let stmt as IR.IsUndefinedStatement:
-            self = .isUndefinedStmt(stmt)
-        case let stmt as IR.LenStatement:
-            self = .lenStmt(stmt)
-        case let stmt as IR.MakeArrayStatement:
-            self = .makeArrayStmt(stmt)
-        case let stmt as IR.MakeNullStatement:
-            self = .makeNullStmt(stmt)
-        case let stmt as IR.MakeNumberIntStatement:
-            self = .makeNumberIntStmt(stmt)
-        case let stmt as IR.MakeNumberRefStatement:
-            self = .makeNumberRefStmt(stmt)
-        case let stmt as IR.MakeObjectStatement:
-            self = .makeObjectStmt(stmt)
-        case let stmt as IR.MakeSetStatement:
-            self = .makeSetStmt(stmt)
-        case let stmt as IR.NotEqualStatement:
-            self = .notEqualStmt(stmt)
-        case let stmt as IR.NotStatement:
-            self = .notStmt(stmt)
-        case let stmt as IR.ObjectInsertOnceStatement:
-            self = .objectInsertOnceStmt(stmt)
-        case let stmt as IR.ObjectInsertStatement:
-            self = .objectInsertStmt(stmt)
-        case let stmt as IR.ObjectMergeStatement:
-            self = .objectMergeStmt(stmt)
-        case let stmt as IR.ResetLocalStatement:
-            self = .resetLocalStmt(stmt)
-        case let stmt as IR.ResultSetAddStatement:
-            self = .resultSetAddStmt(stmt)
-        case let stmt as IR.ReturnLocalStatement:
-            self = .returnLocalStmt(stmt)
-        case let stmt as IR.ScanStatement:
-            self = .scanStmt(stmt)
-        case let stmt as IR.SetAddStatement:
-            self = .setAddStmt(stmt)
-        case let stmt as IR.WithStatement:
-            self = .withStmt(stmt)
-        default:
-            self = .unknown(v.location)
-        }
-    }
-
-    public var statement: Statement? {
-        switch self {
-        case .arrayAppendStmt(let s):
-            return s
-        case .assignIntStmt(let s):
-            return s
-        case .assignVarOnceStmt(let s):
-            return s
-        case .assignVarStmt(let s):
-            return s
-        case .blockStmt(let s):
-            return s
-        case .breakStmt(let s):
-            return s
-        case .callDynamicStmt(let s):
-            return s
-        case .callStmt(let s):
-            return s
-        case .dotStmt(let s):
-            return s
-        case .equalStmt(let s):
-            return s
-        case .isArrayStmt(let s):
-            return s
-        case .isDefinedStmt(let s):
-            return s
-        case .isObjectStmt(let s):
-            return s
-        case .isSetStmt(let s):
-            return s
-        case .isUndefinedStmt(let s):
-            return s
-        case .lenStmt(let s):
-            return s
-        case .makeArrayStmt(let s):
-            return s
-        case .makeNullStmt(let s):
-            return s
-        case .makeNumberIntStmt(let s):
-            return s
-        case .makeNumberRefStmt(let s):
-            return s
-        case .makeObjectStmt(let s):
-            return s
-        case .makeSetStmt(let s):
-            return s
-        case .nopStmt(let s):
-            return s
-        case .notEqualStmt(let s):
-            return s
-        case .notStmt(let s):
-            return s
-        case .objectInsertOnceStmt(let s):
-            return s
-        case .objectInsertStmt(let s):
-            return s
-        case .objectMergeStmt(let s):
-            return s
-        case .resetLocalStmt(let s):
-            return s
-        case .resultSetAddStmt(let s):
-            return s
-        case .returnLocalStmt(let s):
-            return s
-        case .scanStmt(let s):
-            return s
-        case .setAddStmt(let s):
-            return s
-        case .withStmt(let s):
-            return s
-        case .unknown:
-            return nil
-        }
-    }
 
     public var location: Location {
         get {
@@ -669,6 +519,59 @@ public enum AnyStatement: Sendable, Hashable {
     }
 }
 
+extension Statement {
+    // called while serializing trace events
+    public var debugString: String {
+        do {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.sortedKeys]
+            let data: Data
+
+            switch self {
+            case .arrayAppendStmt(let s): data = try encoder.encode(s)
+            case .assignIntStmt(let s): data = try encoder.encode(s)
+            case .assignVarOnceStmt(let s): data = try encoder.encode(s)
+            case .assignVarStmt(let s): data = try encoder.encode(s)
+            case .blockStmt(let s): data = try encoder.encode(s)
+            case .breakStmt(let s): data = try encoder.encode(s)
+            case .callDynamicStmt(let s): data = try encoder.encode(s)
+            case .callStmt(let s): data = try encoder.encode(s)
+            case .dotStmt(let s): data = try encoder.encode(s)
+            case .equalStmt(let s): data = try encoder.encode(s)
+            case .isArrayStmt(let s): data = try encoder.encode(s)
+            case .isDefinedStmt(let s): data = try encoder.encode(s)
+            case .isObjectStmt(let s): data = try encoder.encode(s)
+            case .isSetStmt(let s): data = try encoder.encode(s)
+            case .isUndefinedStmt(let s): data = try encoder.encode(s)
+            case .lenStmt(let s): data = try encoder.encode(s)
+            case .makeArrayStmt(let s): data = try encoder.encode(s)
+            case .makeNullStmt(let s): data = try encoder.encode(s)
+            case .makeNumberIntStmt(let s): data = try encoder.encode(s)
+            case .makeNumberRefStmt(let s): data = try encoder.encode(s)
+            case .makeObjectStmt(let s): data = try encoder.encode(s)
+            case .makeSetStmt(let s): data = try encoder.encode(s)
+            case .nopStmt(let s): data = try encoder.encode(s)
+            case .notEqualStmt(let s): data = try encoder.encode(s)
+            case .notStmt(let s): data = try encoder.encode(s)
+            case .objectInsertOnceStmt(let s): data = try encoder.encode(s)
+            case .objectInsertStmt(let s): data = try encoder.encode(s)
+            case .objectMergeStmt(let s): data = try encoder.encode(s)
+            case .resetLocalStmt(let s): data = try encoder.encode(s)
+            case .resultSetAddStmt(let s): data = try encoder.encode(s)
+            case .returnLocalStmt(let s): data = try encoder.encode(s)
+            case .scanStmt(let s): data = try encoder.encode(s)
+            case .setAddStmt(let s): data = try encoder.encode(s)
+            case .withStmt(let s): data = try encoder.encode(s)
+            case .unknown: return "<unknown>"
+            }
+
+            return String(data: data, encoding: .utf8) ?? "<invalid>"
+        } catch {
+            return "statement encoding failed: \(error)"
+        }
+    }
+}
+
 // AnyInnerStatement represents the generic stmt field, which should always contain location fields.
 public struct AnyInnerStatement: Codable, Hashable {
     public var row: Int = 0
@@ -689,26 +592,6 @@ public struct Location: Codable, Hashable, Sendable {
         self.row = row
         self.col = col
         self.file = file
-    }
-}
-
-// Statement is implemented by each conctete statement type
-public protocol Statement: Sendable, Codable {
-    // Location coordinates, shared by all concrete statement
-    var location: Location { get set }
-}
-
-extension Statement {
-    // called while serializing trace events
-    public var debugString: String {
-        do {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = [.sortedKeys]
-            let data = try encoder.encode(self)
-            return String(data: data, encoding: .utf8) ?? "<invalid>"
-        } catch {
-            return "\(type(of: self)) statement encoding failed: \(error)"
-        }
     }
 }
 

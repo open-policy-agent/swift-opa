@@ -532,7 +532,7 @@ extension BuiltinTests.ObjectTests {
                 [],
                 ["a": 1],
             ],
-            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "object1", got: "array", want: "object"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "a", got: "array", want: "object"))
         ),
         BuiltinTests.TestCase(
             description: "wrong right type",
@@ -541,7 +541,7 @@ extension BuiltinTests.ObjectTests {
                 ["a": 1],
                 [],
             ],
-            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "object2", got: "array", want: "object"))
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "b", got: "array", want: "object"))
         ),
     ]
 

@@ -62,9 +62,20 @@ public struct Plan: Codable, Hashable, Sendable {
     public var name: String
     public var blocks: [Block]
 
+    /// Maximum local index used in this plan (computed via static analysis).
+    /// Used to pre-allocate locals arrays to avoid runtime growth.
+    public var maxLocal: Int = -1
+
     public init(name: String, blocks: [Block]) {
         self.name = name
         self.blocks = blocks
+        self.maxLocal = -1
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case name
+        case blocks
+        // maxLocal is computed, not decoded
     }
 }
 
@@ -716,12 +727,18 @@ public struct Func: Codable, Hashable, Sendable {
     public var returnVar: Local
     public var blocks: [Block]
 
+    /// Maximum local index used in this function (computed via static analysis).
+    /// Includes params, return var, and all locals used in blocks.
+    /// Used to pre-allocate locals arrays to avoid runtime growth.
+    public var maxLocal: Int = -1
+
     public init(name: String, path: [String], params: [Local], returnVar: Local, blocks: [Block]) {
         self.name = name
         self.path = path
         self.params = params
         self.returnVar = returnVar
         self.blocks = blocks
+        self.maxLocal = -1
     }
 
     enum CodingKeys: String, CodingKey {
@@ -730,6 +747,7 @@ public struct Func: Codable, Hashable, Sendable {
         case params
         case returnVar = "return"
         case blocks
+        // maxLocal is computed, not decoded
     }
 }
 

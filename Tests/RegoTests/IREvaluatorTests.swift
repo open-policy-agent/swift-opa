@@ -271,7 +271,7 @@ struct IRStatementTests {
     struct TestCase {
         var description: String
         // stmt is the statement to evaluation
-        var stmt: any Statement
+        var stmt: Statement
         // locals are the input locals state
         var locals: Locals
         // If provided, expectLocals will be overlaid over locals and compared to the
@@ -289,7 +289,7 @@ struct IRStatementTests {
     }
 
     func prepareFrame(
-        forStatement stmt: any Statement,
+        forStatement stmt: Statement,
         withLocals locals: Locals,
         withFuncs funcs: [IR.Func] = [],
         withStaticStrings staticStrings: [String] = []
@@ -333,10 +333,11 @@ struct IRStatementTests {
     static let assignVarStmtTests: [TestCase] = [
         TestCase(
             description: "assign local",
-            stmt: IR.AssignVarStatement(
-                source: Operand(type: .local, value: .localIndex(0)),
-                target: Local(1)
-            ),
+            stmt: .assignVarStmt(
+                IR.AssignVarStatement(
+                    source: Operand(type: .local, value: .localIndex(0)),
+                    target: Local(1)
+                )),
             locals: [
                 0: ["some": "local"]
             ],
@@ -346,10 +347,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "assign local - source undefined",
-            stmt: IR.AssignVarStatement(
-                source: Operand(type: .local, value: .localIndex(42)),
-                target: Local(1)
-            ),
+            stmt: .assignVarStmt(
+                IR.AssignVarStatement(
+                    source: Operand(type: .local, value: .localIndex(42)),
+                    target: Local(1)
+                )),
             locals: [
                 0: "unrelated",
                 1: "will be overwritten",
@@ -360,10 +362,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "assign local - overwrite",
-            stmt: IR.AssignVarStatement(
-                source: Operand(type: .local, value: .localIndex(0)),
-                target: Local(1)
-            ),
+            stmt: .assignVarStmt(
+                IR.AssignVarStatement(
+                    source: Operand(type: .local, value: .localIndex(0)),
+                    target: Local(1)
+                )),
             locals: [
                 0: ["a", "b", "c"],
                 1: "will be overwritten",
@@ -374,10 +377,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "assign local - constant",
-            stmt: IR.AssignVarStatement(
-                source: Operand(type: .bool, value: .bool(true)),
-                target: Local(0)
-            ),
+            stmt: .assignVarStmt(
+                IR.AssignVarStatement(
+                    source: Operand(type: .bool, value: .bool(true)),
+                    target: Local(0)
+                )),
             locals: [:],
             expectLocals: [
                 0: true
@@ -385,10 +389,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "assign local - string ref",
-            stmt: IR.AssignVarStatement(
-                source: Operand(type: .stringIndex, value: .stringIndex(0)),
-                target: Local(0)
-            ),
+            stmt: .assignVarStmt(
+                IR.AssignVarStatement(
+                    source: Operand(type: .stringIndex, value: .stringIndex(0)),
+                    target: Local(0)
+                )),
             locals: [:],
             staticStrings: ["hello, world"],
             expectLocals: [
@@ -400,10 +405,11 @@ struct IRStatementTests {
     static let assignVarOnceStmtTests: [TestCase] = [
         TestCase(
             description: "initial assign local",
-            stmt: IR.AssignVarOnceStatement(
-                source: Operand(type: .local, value: .localIndex(0)),
-                target: Local(1)
-            ),
+            stmt: .assignVarOnceStmt(
+                IR.AssignVarOnceStatement(
+                    source: Operand(type: .local, value: .localIndex(0)),
+                    target: Local(1)
+                )),
             locals: [
                 0: "target value"
             ],
@@ -413,10 +419,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "assign local - source undefined",
-            stmt: IR.AssignVarOnceStatement(
-                source: Operand(type: .local, value: .localIndex(42)),
-                target: Local(1)
-            ),
+            stmt: .assignVarOnceStmt(
+                IR.AssignVarOnceStatement(
+                    source: Operand(type: .local, value: .localIndex(42)),
+                    target: Local(1)
+                )),
             locals: [
                 0: "unrelated"
             ],
@@ -426,10 +433,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "reassign string ref - same value allowed",
-            stmt: IR.AssignVarOnceStatement(
-                source: Operand(type: .stringIndex, value: .stringIndex(0)),
-                target: Local(1)
-            ),
+            stmt: .assignVarOnceStmt(
+                IR.AssignVarOnceStatement(
+                    source: Operand(type: .stringIndex, value: .stringIndex(0)),
+                    target: Local(1)
+                )),
             locals: [
                 1: "will be overwritten"
             ],
@@ -440,10 +448,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "reassign string ref - different value is an error",
-            stmt: IR.AssignVarOnceStatement(
-                source: Operand(type: .stringIndex, value: .stringIndex(0)),
-                target: Local(1)
-            ),
+            stmt: .assignVarOnceStmt(
+                IR.AssignVarOnceStatement(
+                    source: Operand(type: .stringIndex, value: .stringIndex(0)),
+                    target: Local(1)
+                )),
             locals: [
                 1: "initial value"
             ],
@@ -455,20 +464,21 @@ struct IRStatementTests {
     static let breakStmtTests: [TestCase] = [
         TestCase(
             description: "break makes the block undefined",
-            stmt: IR.BreakStatement(index: 0),
+            stmt: .breakStmt(IR.BreakStatement(index: 0)),
             locals: [:],
             expectUndefined: true
         ),
         TestCase(
             description: "breaking out of call frame is an error",
-            stmt: IR.CallStatement(
-                callFunc: "g0.f",
-                args: [
-                    Operand(type: .local, value: .localIndex(0)),
-                    Operand(type: .local, value: .localIndex(1)),
-                ],
-                result: Local(2)
-            ),
+            stmt: .callStmt(
+                IR.CallStatement(
+                    callFunc: "g0.f",
+                    args: [
+                        Operand(type: .local, value: .localIndex(0)),
+                        Operand(type: .local, value: .localIndex(1)),
+                    ],
+                    result: Local(2)
+                )),
             locals: [:],
             funcs: [
                 IR.Func(
@@ -481,7 +491,7 @@ struct IRStatementTests {
                     returnVar: Local(2),
                     blocks: [
                         IR.Block(statements: [
-                            IR.BreakStatement(index: 2)
+                            .breakStmt(IR.BreakStatement(index: 2))
                         ])
                     ]
                 )
@@ -493,14 +503,15 @@ struct IRStatementTests {
     static let callStmtTests: [TestCase] = [
         TestCase(
             description: "infinite recursion",
-            stmt: IR.CallStatement(
-                callFunc: "g0.f",
-                args: [
-                    Operand(type: .local, value: .localIndex(0)),
-                    Operand(type: .local, value: .localIndex(1)),
-                ],
-                result: Local(2)
-            ),
+            stmt: .callStmt(
+                IR.CallStatement(
+                    callFunc: "g0.f",
+                    args: [
+                        Operand(type: .local, value: .localIndex(0)),
+                        Operand(type: .local, value: .localIndex(1)),
+                    ],
+                    result: Local(2)
+                )),
             locals: [
                 0: [:],
                 1: [:],
@@ -516,14 +527,15 @@ struct IRStatementTests {
                     returnVar: Local(2),
                     blocks: [
                         IR.Block(statements: [
-                            IR.CallStatement(
-                                callFunc: "g0.f",
-                                args: [
-                                    Operand(type: .local, value: .localIndex(0)),
-                                    Operand(type: .local, value: .localIndex(1)),
-                                ],
-                                result: Local(2)
-                            )
+                            .callStmt(
+                                IR.CallStatement(
+                                    callFunc: "g0.f",
+                                    args: [
+                                        Operand(type: .local, value: .localIndex(0)),
+                                        Operand(type: .local, value: .localIndex(1)),
+                                    ],
+                                    result: Local(2)
+                                ))
                         ])
                     ]
                 )
@@ -535,10 +547,11 @@ struct IRStatementTests {
     static let lenStmtTests: [TestCase] = [
         TestCase(
             description: "len of empty array is 0",
-            stmt: IR.LenStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                target: Local(3)
-            ),
+            stmt: .lenStmt(
+                IR.LenStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    target: Local(3)
+                )),
             locals: [
                 2: []
             ],
@@ -548,10 +561,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "len of non-empty array",
-            stmt: IR.LenStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                target: Local(3)
-            ),
+            stmt: .lenStmt(
+                IR.LenStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    target: Local(3)
+                )),
             locals: [
                 2: [1, 2, 3, 4, 5]
             ],
@@ -561,10 +575,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "len of empty set",
-            stmt: IR.LenStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                target: Local(3)
-            ),
+            stmt: .lenStmt(
+                IR.LenStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    target: Local(3)
+                )),
             locals: [
                 2: .set([])
             ],
@@ -574,10 +589,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "len of non-empty set",
-            stmt: IR.LenStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                target: Local(3)
-            ),
+            stmt: .lenStmt(
+                IR.LenStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    target: Local(3)
+                )),
             locals: [
                 2: .set([1, 2])
             ],
@@ -587,10 +603,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "len of empty string",
-            stmt: IR.LenStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                target: Local(3)
-            ),
+            stmt: .lenStmt(
+                IR.LenStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    target: Local(3)
+                )),
             locals: [
                 2: ""
             ],
@@ -600,10 +617,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "len of non-empty string",
-            stmt: IR.LenStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                target: Local(3)
-            ),
+            stmt: .lenStmt(
+                IR.LenStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    target: Local(3)
+                )),
             locals: [
                 2: "hello, world"
             ],
@@ -613,10 +631,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "len of empty object",
-            stmt: IR.LenStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                target: Local(3)
-            ),
+            stmt: .lenStmt(
+                IR.LenStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    target: Local(3)
+                )),
             locals: [
                 2: [:]
             ],
@@ -626,10 +645,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "len of non-empty object",
-            stmt: IR.LenStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                target: Local(3)
-            ),
+            stmt: .lenStmt(
+                IR.LenStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    target: Local(3)
+                )),
             locals: [
                 2: ["foo": "bar", "baz": "qux"]
             ],
@@ -639,10 +659,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "len of unsupported type - integer",
-            stmt: IR.LenStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                target: Local(3)
-            ),
+            stmt: .lenStmt(
+                IR.LenStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    target: Local(3)
+                )),
             locals: [
                 2: 42
             ],
@@ -650,10 +671,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "len of unsupported type - null",
-            stmt: IR.LenStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                target: Local(3)
-            ),
+            stmt: .lenStmt(
+                IR.LenStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    target: Local(3)
+                )),
             locals: [
                 2: .null
             ],
@@ -661,10 +683,11 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "len of undefined is undefined",
-            stmt: IR.LenStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                target: Local(3)
-            ),
+            stmt: .lenStmt(
+                IR.LenStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    target: Local(3)
+                )),
             locals: [
                 2: .undefined
             ],
@@ -676,11 +699,12 @@ struct IRStatementTests {
     static let objectInsertOnceStmtTests: [TestCase] = [
         TestCase(
             description: "first insert succeeds",
-            stmt: IR.ObjectInsertOnceStatement(
-                key: IR.Operand(type: .local, value: .localIndex(2)),
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                object: IR.Local(4)
-            ),
+            stmt: .objectInsertOnceStmt(
+                IR.ObjectInsertOnceStatement(
+                    key: IR.Operand(type: .local, value: .localIndex(2)),
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    object: IR.Local(4)
+                )),
             locals: [
                 2: "key",
                 3: "value",
@@ -692,11 +716,12 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "second insert with equal value succeeds",
-            stmt: IR.ObjectInsertOnceStatement(
-                key: IR.Operand(type: .local, value: .localIndex(2)),
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                object: IR.Local(4)
-            ),
+            stmt: .objectInsertOnceStmt(
+                IR.ObjectInsertOnceStatement(
+                    key: IR.Operand(type: .local, value: .localIndex(2)),
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    object: IR.Local(4)
+                )),
             locals: [
                 2: "key",
                 3: "prev_value",
@@ -708,11 +733,12 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "second insert with different values fails",
-            stmt: IR.ObjectInsertOnceStatement(
-                key: IR.Operand(type: .local, value: .localIndex(2)),
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                object: IR.Local(4)
-            ),
+            stmt: .objectInsertOnceStmt(
+                IR.ObjectInsertOnceStatement(
+                    key: IR.Operand(type: .local, value: .localIndex(2)),
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    object: IR.Local(4)
+                )),
             locals: [
                 2: "key",
                 3: "new_value",
@@ -722,11 +748,12 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "target is not an object",
-            stmt: IR.ObjectInsertOnceStatement(
-                key: IR.Operand(type: .local, value: .localIndex(2)),
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                object: IR.Local(4)
-            ),
+            stmt: .objectInsertOnceStmt(
+                IR.ObjectInsertOnceStatement(
+                    key: IR.Operand(type: .local, value: .localIndex(2)),
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    object: IR.Local(4)
+                )),
             locals: [
                 2: "key",
                 3: "new_value",
@@ -736,11 +763,12 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "key is undefined",
-            stmt: IR.ObjectInsertOnceStatement(
-                key: IR.Operand(type: .local, value: .localIndex(2)),
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                object: IR.Local(4)
-            ),
+            stmt: .objectInsertOnceStmt(
+                IR.ObjectInsertOnceStatement(
+                    key: IR.Operand(type: .local, value: .localIndex(2)),
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    object: IR.Local(4)
+                )),
             locals: [
                 3: "new_value",
                 4: [:],
@@ -751,11 +779,12 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "value is undefined",
-            stmt: IR.ObjectInsertOnceStatement(
-                key: IR.Operand(type: .local, value: .localIndex(2)),
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                object: IR.Local(4)
-            ),
+            stmt: .objectInsertOnceStmt(
+                IR.ObjectInsertOnceStatement(
+                    key: IR.Operand(type: .local, value: .localIndex(2)),
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    object: IR.Local(4)
+                )),
             locals: [
                 2: "key",
                 4: [:],
@@ -768,11 +797,12 @@ struct IRStatementTests {
     static let dotStmtTests: [TestCase] = [
         TestCase(
             description: "in-bounds array lookup",
-            stmt: IR.DotStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                key: IR.Operand(type: .local, value: .localIndex(3)),
-                target: Local(4)
-            ),
+            stmt: .dotStmt(
+                IR.DotStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    key: IR.Operand(type: .local, value: .localIndex(3)),
+                    target: Local(4)
+                )),
             locals: [
                 2: ["a", "b", "c"],
                 3: 1,
@@ -783,11 +813,12 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "out-of-bounds array lookup is undefined",
-            stmt: IR.DotStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                key: IR.Operand(type: .local, value: .localIndex(3)),
-                target: Local(4)
-            ),
+            stmt: .dotStmt(
+                IR.DotStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    key: IR.Operand(type: .local, value: .localIndex(3)),
+                    target: Local(4)
+                )),
             locals: [
                 2: [0, 1, 2],
                 3: 3,
@@ -798,11 +829,12 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "negative out-of-bounds array lookup is undefined",
-            stmt: IR.DotStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                key: IR.Operand(type: .local, value: .localIndex(3)),
-                target: Local(4)
-            ),
+            stmt: .dotStmt(
+                IR.DotStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    key: IR.Operand(type: .local, value: .localIndex(3)),
+                    target: Local(4)
+                )),
             locals: [
                 2: [0, 1, 2],
                 3: -1,
@@ -813,11 +845,12 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "object lookup",
-            stmt: IR.DotStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                key: IR.Operand(type: .local, value: .localIndex(3)),
-                target: Local(4)
-            ),
+            stmt: .dotStmt(
+                IR.DotStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    key: IR.Operand(type: .local, value: .localIndex(3)),
+                    target: Local(4)
+                )),
             locals: [
                 2: ["a": "z"],
                 3: "a",
@@ -828,11 +861,12 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "object lookup - key not found",
-            stmt: IR.DotStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                key: IR.Operand(type: .local, value: .localIndex(3)),
-                target: Local(4)
-            ),
+            stmt: .dotStmt(
+                IR.DotStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    key: IR.Operand(type: .local, value: .localIndex(3)),
+                    target: Local(4)
+                )),
             locals: [
                 2: ["a": "z"],
                 3: "b",
@@ -843,11 +877,12 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "set lookup",
-            stmt: IR.DotStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                key: IR.Operand(type: .local, value: .localIndex(3)),
-                target: Local(4)
-            ),
+            stmt: .dotStmt(
+                IR.DotStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    key: IR.Operand(type: .local, value: .localIndex(3)),
+                    target: Local(4)
+                )),
             locals: [
                 2: .set(["x", "y"]),
                 3: "x",
@@ -858,11 +893,12 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "set lookup - not found",
-            stmt: IR.DotStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                key: IR.Operand(type: .local, value: .localIndex(3)),
-                target: Local(4)
-            ),
+            stmt: .dotStmt(
+                IR.DotStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    key: IR.Operand(type: .local, value: .localIndex(3)),
+                    target: Local(4)
+                )),
             locals: [
                 2: .set(["x", "y"]),
                 3: "z",
@@ -873,11 +909,12 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "unsupported type lookup - undefined",
-            stmt: IR.DotStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                key: IR.Operand(type: .local, value: .localIndex(3)),
-                target: Local(4)
-            ),
+            stmt: .dotStmt(
+                IR.DotStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    key: IR.Operand(type: .local, value: .localIndex(3)),
+                    target: Local(4)
+                )),
             locals: [
                 2: "double rainbow",
                 3: "what does it mean??",
@@ -891,12 +928,13 @@ struct IRStatementTests {
     static let scanStmtTests: [TestCase] = [
         TestCase(
             description: "source undefined",
-            stmt: IR.ScanStatement(
-                source: Local(2),
-                key: Local(3),
-                value: Local(4),
-                block: Block(statements: [])
-            ),
+            stmt: .scanStmt(
+                IR.ScanStatement(
+                    source: Local(2),
+                    key: Local(3),
+                    value: Local(4),
+                    block: Block(statements: [])
+                )),
             locals: [
                 2: .undefined
             ],
@@ -906,15 +944,16 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "scalar - undefined",
-            stmt: IR.ScanStatement(
-                source: Local(2),
-                key: Local(3),
-                value: Local(4),
-                block: Block(statements: [
-                    // Copy value into resultset
-                    ResultSetAddStatement(value: Local(4))
-                ])
-            ),
+            stmt: .scanStmt(
+                IR.ScanStatement(
+                    source: Local(2),
+                    key: Local(3),
+                    value: Local(4),
+                    block: Block(statements: [
+                        // Copy value into resultset
+                        .resultSetAddStmt(ResultSetAddStatement(value: Local(4)))
+                    ])
+                )),
             locals: [
                 // Can only scan collections
                 2: "not a collection"
@@ -925,22 +964,25 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "empty array",
-            stmt: IR.ScanStatement(
-                source: Local(2),
-                key: Local(3),
-                value: Local(4),
-                block: Block(statements: [
-                    // if any (key == value)
-                    EqualStatement(
-                        a: IR.Operand(type: .local, value: .localIndex(3)),
-                        b: IR.Operand(type: .local, value: .localIndex(4))
-                    ),
-                    AssignVarStatement(
-                        source: IR.Operand(type: .bool, value: .bool(true)),
-                        target: Local(5)
-                    ),
-                ])
-            ),
+            stmt: .scanStmt(
+                IR.ScanStatement(
+                    source: Local(2),
+                    key: Local(3),
+                    value: Local(4),
+                    block: Block(statements: [
+                        // if any (key == value)
+                        .equalStmt(
+                            EqualStatement(
+                                a: IR.Operand(type: .local, value: .localIndex(3)),
+                                b: IR.Operand(type: .local, value: .localIndex(4))
+                            )),
+                        .assignVarStmt(
+                            AssignVarStatement(
+                                source: IR.Operand(type: .bool, value: .bool(true)),
+                                target: Local(5)
+                            )),
+                    ])
+                )),
             locals: [
                 2: []
             ],
@@ -948,22 +990,25 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "array - some iterations were truthy",
-            stmt: IR.ScanStatement(
-                source: Local(2),
-                key: Local(3),
-                value: Local(4),
-                block: Block(statements: [
-                    // if any (key == value)
-                    EqualStatement(
-                        a: IR.Operand(type: .local, value: .localIndex(3)),
-                        b: IR.Operand(type: .local, value: .localIndex(4))
-                    ),
-                    AssignVarStatement(
-                        source: IR.Operand(type: .bool, value: .bool(true)),
-                        target: Local(5)
-                    ),
-                ])
-            ),
+            stmt: .scanStmt(
+                IR.ScanStatement(
+                    source: Local(2),
+                    key: Local(3),
+                    value: Local(4),
+                    block: Block(statements: [
+                        // if any (key == value)
+                        .equalStmt(
+                            EqualStatement(
+                                a: IR.Operand(type: .local, value: .localIndex(3)),
+                                b: IR.Operand(type: .local, value: .localIndex(4))
+                            )),
+                        .assignVarStmt(
+                            AssignVarStatement(
+                                source: IR.Operand(type: .bool, value: .bool(true)),
+                                target: Local(5)
+                            )),
+                    ])
+                )),
             locals: [
                 2: [9, 1, 8]
             ],
@@ -977,22 +1022,25 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "array - none were truthy",
-            stmt: IR.ScanStatement(
-                source: Local(2),
-                key: Local(3),
-                value: Local(4),
-                block: Block(statements: [
-                    // if any (key == value)
-                    EqualStatement(
-                        a: IR.Operand(type: .local, value: .localIndex(3)),
-                        b: IR.Operand(type: .local, value: .localIndex(4))
-                    ),
-                    AssignVarStatement(
-                        source: IR.Operand(type: .bool, value: .bool(true)),
-                        target: Local(5)
-                    ),
-                ])
-            ),
+            stmt: .scanStmt(
+                IR.ScanStatement(
+                    source: Local(2),
+                    key: Local(3),
+                    value: Local(4),
+                    block: Block(statements: [
+                        // if any (key == value)
+                        .equalStmt(
+                            EqualStatement(
+                                a: IR.Operand(type: .local, value: .localIndex(3)),
+                                b: IR.Operand(type: .local, value: .localIndex(4))
+                            )),
+                        .assignVarStmt(
+                            AssignVarStatement(
+                                source: IR.Operand(type: .bool, value: .bool(true)),
+                                target: Local(5)
+                            )),
+                    ])
+                )),
             locals: [
                 2: [9, 9, 9]
             ],
@@ -1005,23 +1053,25 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "object - copy key/values into results",
-            stmt: IR.ScanStatement(
-                source: Local(2),
-                key: Local(3),
-                value: Local(4),
-                block: Block(statements: [
-                    BlockStatement(blocks: [
-                        Block(statements: [
-                            // Copy key into resultset
-                            ResultSetAddStatement(value: Local(3))
-                        ]),
-                        Block(statements: [
-                            // Copy value into resultset
-                            ResultSetAddStatement(value: Local(4))
-                        ]),
+            stmt: .scanStmt(
+                IR.ScanStatement(
+                    source: Local(2),
+                    key: Local(3),
+                    value: Local(4),
+                    block: Block(statements: [
+                        .blockStmt(
+                            BlockStatement(blocks: [
+                                Block(statements: [
+                                    // Copy key into resultset
+                                    .resultSetAddStmt(ResultSetAddStatement(value: Local(3)))
+                                ]),
+                                Block(statements: [
+                                    // Copy value into resultset
+                                    .resultSetAddStmt(ResultSetAddStatement(value: Local(4)))
+                                ]),
+                            ]))
                     ])
-                ])
-            ),
+                )),
             locals: [
                 2: [
                     "a": 1,
@@ -1035,23 +1085,25 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "object - empty",
-            stmt: IR.ScanStatement(
-                source: Local(2),
-                key: Local(3),
-                value: Local(4),
-                block: Block(statements: [
-                    BlockStatement(blocks: [
-                        Block(statements: [
-                            // Copy key into resultset
-                            ResultSetAddStatement(value: Local(3))
-                        ]),
-                        Block(statements: [
-                            // Copy value into resultset
-                            ResultSetAddStatement(value: Local(4))
-                        ]),
+            stmt: .scanStmt(
+                IR.ScanStatement(
+                    source: Local(2),
+                    key: Local(3),
+                    value: Local(4),
+                    block: Block(statements: [
+                        .blockStmt(
+                            BlockStatement(blocks: [
+                                Block(statements: [
+                                    // Copy key into resultset
+                                    .resultSetAddStmt(ResultSetAddStatement(value: Local(3)))
+                                ]),
+                                Block(statements: [
+                                    // Copy value into resultset
+                                    .resultSetAddStmt(ResultSetAddStatement(value: Local(4)))
+                                ]),
+                            ]))
                     ])
-                ])
-            ),
+                )),
             locals: [
                 // Empty object, so no iterations
                 2: [:]
@@ -1061,15 +1113,16 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "set - copy values into result",
-            stmt: IR.ScanStatement(
-                source: Local(2),
-                key: Local(3),
-                value: Local(4),
-                block: Block(statements: [
-                    // Copy value into resultset
-                    ResultSetAddStatement(value: Local(4))
-                ])
-            ),
+            stmt: .scanStmt(
+                IR.ScanStatement(
+                    source: Local(2),
+                    key: Local(3),
+                    value: Local(4),
+                    block: Block(statements: [
+                        // Copy value into resultset
+                        .resultSetAddStmt(ResultSetAddStatement(value: Local(4)))
+                    ])
+                )),
             locals: [
                 // Empty set, so no iterations
                 2: .set(["a", "b", "c"])
@@ -1080,15 +1133,16 @@ struct IRStatementTests {
         ),
         TestCase(
             description: "set - empty",
-            stmt: IR.ScanStatement(
-                source: Local(2),
-                key: Local(3),
-                value: Local(4),
-                block: Block(statements: [
-                    // Copy value into resultset
-                    ResultSetAddStatement(value: Local(4))
-                ])
-            ),
+            stmt: .scanStmt(
+                IR.ScanStatement(
+                    source: Local(2),
+                    key: Local(3),
+                    value: Local(4),
+                    block: Block(statements: [
+                        // Copy value into resultset
+                        .resultSetAddStmt(ResultSetAddStatement(value: Local(4)))
+                    ])
+                )),
             locals: [
                 // Empty set, so no iterations
                 2: .set([])
@@ -1109,7 +1163,7 @@ struct IRStatementTests {
         )
         let block = IR.Block(statements: [tc.stmt])
 
-        let caller = IR.AnyStatement.blockStmt(IR.BlockStatement(blocks: [block]))
+        let caller = IR.Statement.blockStmt(IR.BlockStatement(blocks: [block]))
         let result = await Result {
             try await evalBlock(withContext: ctx, framePtr: frame, caller: caller, block: block)
         }
@@ -1134,7 +1188,7 @@ struct IRStatementTests {
         }
 
         // Use resize for scan statements to chop off the scan block's locals
-        if tc.stmt is IR.ScanStatement {
+        if case .scanStmt = tc.stmt {
             gotLocals.resize(to: expectLocals.count)
         }
 

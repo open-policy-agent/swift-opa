@@ -71,48 +71,53 @@ func decodeIRStatements() throws {
                             blocks: [
                                 Block(
                                     statements: [
-                                        CallStatement(
-                                            location: Location(row: 0, col: 8, file: 9),
-                                            callFunc: "g0.data.policy.hello",
-                                            args: [
-                                                Operand(
+                                        .callStmt(
+                                            CallStatement(
+                                                location: Location(row: 0, col: 8, file: 9),
+                                                callFunc: "g0.data.policy.hello",
+                                                args: [
+                                                    Operand(
+                                                        type: .local,
+                                                        value: .localIndex(0)
+                                                    ),
+                                                    Operand(
+                                                        type: .local,
+                                                        value: .localIndex(1)
+                                                    ),
+                                                ],
+                                                result: 2
+                                            )),
+                                        .assignVarStmt(
+                                            AssignVarStatement(
+                                                location: Location(row: 1, col: 2, file: 3),
+                                                source: Operand(
                                                     type: .local,
-                                                    value: .localIndex(0)
+                                                    value: .localIndex(2)
                                                 ),
-                                                Operand(
+                                                target: Local(3)
+                                            )),
+                                        .makeObjectStmt(
+                                            MakeObjectStatement(
+                                                location: Location(row: 0, col: 0, file: 0),
+                                                target: Local(4)
+                                            )),
+                                        .objectInsertStmt(
+                                            ObjectInsertStatement(
+                                                location: Location(row: 0, col: 0, file: 0),
+                                                key: Operand(
+                                                    type: .stringIndex,
+                                                    value: .stringIndex(0)
+                                                ),
+                                                value: Operand(
                                                     type: .local,
-                                                    value: .localIndex(1)
+                                                    value: .localIndex(3)
                                                 ),
-                                            ],
-                                            result: 2
-                                        ),
-                                        AssignVarStatement(
-                                            location: Location(row: 1, col: 2, file: 3),
-                                            source: Operand(
-                                                type: .local,
-                                                value: .localIndex(2)
-                                            ),
-                                            target: Local(3)
-                                        ),
-                                        MakeObjectStatement(
-                                            location: Location(row: 0, col: 0, file: 0),
-                                            target: Local(4)
-                                        ),
-                                        ObjectInsertStatement(
-                                            location: Location(row: 0, col: 0, file: 0),
-                                            key: Operand(
-                                                type: .stringIndex,
-                                                value: .stringIndex(0)
-                                            ),
-                                            value: Operand(
-                                                type: .local,
-                                                value: .localIndex(3)
-                                            ),
-                                            object: Local(4)
-                                        ),
-                                        ResultSetAddStatement(
-                                            value: Local(4)
-                                        ),
+                                                object: Local(4)
+                                            )),
+                                        .resultSetAddStmt(
+                                            ResultSetAddStatement(
+                                                value: Local(4)
+                                            )),
                                     ]
                                 )
                             ]
@@ -242,46 +247,50 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
         name: "equal",
         lhs: Block(
             statements: [
-                CallStatement(
-                    location: Location(row: 0, col: 1, file: 2),
-                    callFunc: "myfunc",
-                    args: [
-                        Operand(
+                .callStmt(
+                    CallStatement(
+                        location: Location(row: 0, col: 1, file: 2),
+                        callFunc: "myfunc",
+                        args: [
+                            Operand(
+                                type: .local,
+                                value: .localIndex(789)
+                            )
+                        ],
+                        result: Local(7)
+                    )),
+                .assignVarStmt(
+                    AssignVarStatement(
+                        source: Operand(
                             type: .local,
-                            value: .localIndex(789)
-                        )
-                    ],
-                    result: Local(7)
-                ),
-                AssignVarStatement(
-                    source: Operand(
-                        type: .local,
-                        value: .localIndex(123)
-                    ),
-                    target: 456
-                ),
+                            value: .localIndex(123)
+                        ),
+                        target: 456
+                    )),
             ]
         ),
         rhs: Block(
             statements: [
-                CallStatement(
-                    location: Location(row: 0, col: 1, file: 2),
-                    callFunc: "myfunc",
-                    args: [
-                        Operand(
+                .callStmt(
+                    CallStatement(
+                        location: Location(row: 0, col: 1, file: 2),
+                        callFunc: "myfunc",
+                        args: [
+                            Operand(
+                                type: .local,
+                                value: .localIndex(789)
+                            )
+                        ],
+                        result: Local(7)
+                    )),
+                .assignVarStmt(
+                    AssignVarStatement(
+                        source: Operand(
                             type: .local,
-                            value: .localIndex(789)
-                        )
-                    ],
-                    result: Local(7)
-                ),
-                AssignVarStatement(
-                    source: Operand(
-                        type: .local,
-                        value: .localIndex(123)
-                    ),
-                    target: 456
-                ),
+                            value: .localIndex(123)
+                        ),
+                        target: 456
+                    )),
             ]
         ),
         expected: true
@@ -290,46 +299,50 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
         name: "swapped not equal",
         lhs: Block(
             statements: [
-                AssignVarStatement(
-                    source: Operand(
-                        type: .local,
-                        value: .localIndex(123)
-                    ),
-                    target: 456
-                ),
-                CallStatement(
-                    location: Location(row: 0, col: 1, file: 2),
-                    callFunc: "myfunc",
-                    args: [
-                        Operand(
+                .assignVarStmt(
+                    AssignVarStatement(
+                        source: Operand(
                             type: .local,
-                            value: .localIndex(789)
-                        )
-                    ],
-                    result: Local(7)
-                ),
+                            value: .localIndex(123)
+                        ),
+                        target: 456
+                    )),
+                .callStmt(
+                    CallStatement(
+                        location: Location(row: 0, col: 1, file: 2),
+                        callFunc: "myfunc",
+                        args: [
+                            Operand(
+                                type: .local,
+                                value: .localIndex(789)
+                            )
+                        ],
+                        result: Local(7)
+                    )),
             ]
         ),
         rhs: Block(
             statements: [
-                CallStatement(
-                    location: Location(row: 0, col: 1, file: 2),
-                    callFunc: "myfunc",
-                    args: [
-                        Operand(
+                .callStmt(
+                    CallStatement(
+                        location: Location(row: 0, col: 1, file: 2),
+                        callFunc: "myfunc",
+                        args: [
+                            Operand(
+                                type: .local,
+                                value: .localIndex(789)
+                            )
+                        ],
+                        result: Local(7)
+                    )),
+                .assignVarStmt(
+                    AssignVarStatement(
+                        source: Operand(
                             type: .local,
-                            value: .localIndex(789)
-                        )
-                    ],
-                    result: Local(7)
-                ),
-                AssignVarStatement(
-                    source: Operand(
-                        type: .local,
-                        value: .localIndex(123)
-                    ),
-                    target: 456
-                ),
+                            value: .localIndex(123)
+                        ),
+                        target: 456
+                    )),
             ]
         ),
         expected: false
@@ -338,46 +351,50 @@ extension TestCaseCompareBlocks: CustomTestStringConvertible {
         name: "slightly different",
         lhs: Block(
             statements: [
-                CallStatement(
-                    location: Location(row: 0, col: 1, file: 2),
-                    callFunc: "myfunc",
-                    args: [
-                        Operand(
+                .callStmt(
+                    CallStatement(
+                        location: Location(row: 0, col: 1, file: 2),
+                        callFunc: "myfunc",
+                        args: [
+                            Operand(
+                                type: .local,
+                                value: .localIndex(789)
+                            )
+                        ],
+                        result: Local(7)
+                    )),
+                .assignVarStmt(
+                    AssignVarStatement(
+                        source: Operand(
                             type: .local,
-                            value: .localIndex(789)
-                        )
-                    ],
-                    result: Local(7)
-                ),
-                AssignVarStatement(
-                    source: Operand(
-                        type: .local,
-                        value: .localIndex(123)
-                    ),
-                    target: 456
-                ),
+                            value: .localIndex(123)
+                        ),
+                        target: 456
+                    )),
             ]
         ),
         rhs: Block(
             statements: [
-                CallStatement(
-                    location: Location(row: 0, col: 1, file: 2),
-                    callFunc: "myfunc",
-                    args: [
-                        Operand(
+                .callStmt(
+                    CallStatement(
+                        location: Location(row: 0, col: 1, file: 2),
+                        callFunc: "myfunc",
+                        args: [
+                            Operand(
+                                type: .local,
+                                value: .localIndex(790)
+                            )
+                        ],
+                        result: Local(7)
+                    )),
+                .assignVarStmt(
+                    AssignVarStatement(
+                        source: Operand(
                             type: .local,
-                            value: .localIndex(790)
-                        )
-                    ],
-                    result: Local(7)
-                ),
-                AssignVarStatement(
-                    source: Operand(
-                        type: .local,
-                        value: .localIndex(123)
-                    ),
-                    target: 456
-                ),
+                            value: .localIndex(123)
+                        ),
+                        target: 456
+                    )),
             ]
         ),
         expected: false

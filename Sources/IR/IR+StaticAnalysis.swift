@@ -54,7 +54,7 @@ extension Block {
     }
 }
 
-extension AnyStatement {
+extension Statement {
     func computeMaxLocal() -> Int {
         var maxLocal = -1
 

@@ -1,4 +1,4 @@
-public struct ArrayAppendStatement: Statement, Codable, Hashable {
+public struct ArrayAppendStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -10,7 +10,7 @@ public struct ArrayAppendStatement: Statement, Codable, Hashable {
     public var value: Operand
 }
 
-public struct AssignIntStatement: Statement, Codable, Hashable {
+public struct AssignIntStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -22,7 +22,7 @@ public struct AssignIntStatement: Statement, Codable, Hashable {
     public var target: Local
 }
 
-public struct AssignVarOnceStatement: Statement, Codable, Hashable {
+public struct AssignVarOnceStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -44,7 +44,7 @@ public struct AssignVarOnceStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct AssignVarStatement: Statement, Codable, Hashable {
+public struct AssignVarStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -66,7 +66,7 @@ public struct AssignVarStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct BlockStatement: Statement, Codable, Hashable {
+public struct BlockStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -80,7 +80,7 @@ public struct BlockStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct BreakStatement: Statement, Codable, Hashable {
+public struct BreakStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -94,7 +94,7 @@ public struct BreakStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct CallDynamicStatement: Statement, Codable, Hashable {
+public struct CallDynamicStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -108,7 +108,7 @@ public struct CallDynamicStatement: Statement, Codable, Hashable {
     public var result: Local
 }
 
-public struct CallStatement: Statement, Codable, Hashable {
+public struct CallStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     public var callFunc: String = ""
@@ -129,7 +129,7 @@ public struct CallStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct DotStatement: Statement, Codable, Hashable {
+public struct DotStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -149,7 +149,7 @@ public struct DotStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct EqualStatement: Statement, Codable, Hashable {
+public struct EqualStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -166,7 +166,7 @@ public struct EqualStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct IsArrayStatement: Statement, Codable, Hashable {
+public struct IsArrayStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -176,7 +176,7 @@ public struct IsArrayStatement: Statement, Codable, Hashable {
     public var source: Operand
 }
 
-public struct IsDefinedStatement: Statement, Codable, Hashable {
+public struct IsDefinedStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -187,7 +187,7 @@ public struct IsDefinedStatement: Statement, Codable, Hashable {
     public var source: Local
 }
 
-public struct IsObjectStatement: Statement, Codable, Hashable {
+public struct IsObjectStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -197,7 +197,7 @@ public struct IsObjectStatement: Statement, Codable, Hashable {
     public var source: Operand
 }
 
-public struct IsSetStatement: Statement, Codable, Hashable {
+public struct IsSetStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -207,7 +207,7 @@ public struct IsSetStatement: Statement, Codable, Hashable {
     public var source: Operand
 }
 
-public struct IsUndefinedStatement: Statement, Codable, Hashable {
+public struct IsUndefinedStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -222,7 +222,7 @@ public struct IsUndefinedStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct LenStatement: Statement, Codable, Hashable {
+public struct LenStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -239,7 +239,7 @@ public struct LenStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct MakeArrayStatement: Statement, Codable, Hashable {
+public struct MakeArrayStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -251,7 +251,7 @@ public struct MakeArrayStatement: Statement, Codable, Hashable {
     public var target: Local
 }
 
-public struct MakeNullStatement: Statement, Codable, Hashable {
+public struct MakeNullStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -261,7 +261,7 @@ public struct MakeNullStatement: Statement, Codable, Hashable {
     public var target: Local
 }
 
-public struct MakeNumberIntStatement: Statement, Codable, Hashable {
+public struct MakeNumberIntStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -273,7 +273,7 @@ public struct MakeNumberIntStatement: Statement, Codable, Hashable {
     public var target: Local
 }
 
-public struct MakeNumberRefStatement: Statement, Codable, Hashable {
+public struct MakeNumberRefStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -286,7 +286,7 @@ public struct MakeNumberRefStatement: Statement, Codable, Hashable {
     public var target: Local
 }
 
-public struct MakeObjectStatement: Statement, Codable, Hashable {
+public struct MakeObjectStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -303,7 +303,7 @@ public struct MakeObjectStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct MakeSetStatement: Statement, Codable, Hashable {
+public struct MakeSetStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -313,7 +313,7 @@ public struct MakeSetStatement: Statement, Codable, Hashable {
     public var target: Local
 }
 
-public struct NopStatement: Statement, Codable, Hashable {
+public struct NopStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     // Workaround - NopStatement has no fields aside from the Location fields, which
@@ -325,7 +325,7 @@ public struct NopStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct NotStatement: Statement, Codable, Hashable {
+public struct NotStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -335,7 +335,7 @@ public struct NotStatement: Statement, Codable, Hashable {
     public var block: Block
 }
 
-public struct NotEqualStatement: Statement, Codable, Hashable {
+public struct NotEqualStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -352,7 +352,7 @@ public struct NotEqualStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct ObjectInsertOnceStatement: Statement, Codable, Hashable {
+public struct ObjectInsertOnceStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -372,7 +372,7 @@ public struct ObjectInsertOnceStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct ObjectInsertStatement: Statement, Codable, Hashable {
+public struct ObjectInsertStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -395,7 +395,7 @@ public struct ObjectInsertStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct ObjectMergeStatement: Statement, Codable, Hashable {
+public struct ObjectMergeStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -409,7 +409,7 @@ public struct ObjectMergeStatement: Statement, Codable, Hashable {
     public var target: Local
 }
 
-public struct ResetLocalStatement: Statement, Codable, Hashable {
+public struct ResetLocalStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -419,7 +419,7 @@ public struct ResetLocalStatement: Statement, Codable, Hashable {
     public var target: Local
 }
 
-public struct ResultSetAddStatement: Statement, Codable, Hashable {
+public struct ResultSetAddStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -433,7 +433,7 @@ public struct ResultSetAddStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct ReturnLocalStatement: Statement, Codable, Hashable {
+public struct ReturnLocalStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -443,7 +443,7 @@ public struct ReturnLocalStatement: Statement, Codable, Hashable {
     public var source: Local
 }
 
-public struct ScanStatement: Statement, Codable, Hashable {
+public struct ScanStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -466,7 +466,7 @@ public struct ScanStatement: Statement, Codable, Hashable {
     }
 }
 
-public struct SetAddStatement: Statement, Codable, Hashable {
+public struct SetAddStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {
@@ -478,7 +478,7 @@ public struct SetAddStatement: Statement, Codable, Hashable {
     public var set: Local
 }
 
-public struct WithStatement: Statement, Codable, Hashable {
+public struct WithStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 
     enum CodingKeys: String, CodingKey {

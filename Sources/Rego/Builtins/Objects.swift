@@ -71,4 +71,31 @@ extension BuiltinFuncs {
 
         return .set(Set(x.keys))
     }
+
+    // union returns the merged result of the given input objects, the values from the second argument take precedence
+    // args - object1, object2
+    // returns: the merged result of object1 and object2
+    static func objectUnion(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
+        }
+
+        guard case .object(let object1) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "object1", got: args[0].typeName, want: "object")
+        }
+
+        guard case .object(let object2) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "object2", got: args[1].typeName, want: "object")
+        }
+
+        guard !object1.isEmpty else {
+            return .object(object2)
+        }
+
+        guard !object2.isEmpty else {
+            return .object(object1)
+        }
+
+        return .object(object1.merging(object2) { (_, new) in new })
+    }
 }

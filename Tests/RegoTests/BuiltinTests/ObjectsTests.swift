@@ -419,10 +419,137 @@ extension BuiltinTests.ObjectTests {
         ),
     ]
 
+    static let objectUnionTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "not enough args",
+            name: "object.union",
+            args: [],
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "too many args",
+            name: "object.union",
+            args: [
+                [
+                    "a": 1,
+                    "b": 2,
+                ],
+                [
+                    "b": 1,
+                    "c": 2,
+                ],
+                [
+                    "b": 1,
+                    "c": 2,
+                ],
+            ],
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "simple",
+            name: "object.union",
+            args: [
+                [
+                    "a": 1
+                ],
+                [
+                    "b": 1
+                ],
+            ],
+            expected: .success(.object(["a": 1, "b": 1]))
+        ),
+        BuiltinTests.TestCase(
+            description: "conflict resolution",
+            name: "object.union",
+            args: [
+                [
+                    "a": 1
+                ],
+                [
+                    "a": 2
+                ],
+            ],
+            expected: .success(.object(["a": 2]))
+        ),
+        BuiltinTests.TestCase(
+            description: "nested",
+            name: "object.union",
+            args: [
+                [
+                    "a": 1
+                ],
+                [
+                    "a": [
+                        "b": [
+                            "c": 1
+                        ]
+                    ],
+                    "d": 7,
+                ],
+            ],
+            expected: .success(.object(["a": ["b": ["c": 1]], "d": 7]))
+        ),
+        BuiltinTests.TestCase(
+            description: "both empty",
+            name: "object.union",
+            args: [
+                [:],
+                [:],
+            ],
+            expected: .success(.object([:]))
+        ),
+        BuiltinTests.TestCase(
+            description: "left empty",
+            name: "object.union",
+            args: [
+                [:],
+                ["a": 1],
+            ],
+            expected: .success(.object(["a": 1]))
+        ),
+        BuiltinTests.TestCase(
+            description: "right empty",
+            name: "object.union",
+            args: [
+                ["a": 1],
+                [:],
+            ],
+            expected: .success(.object(["a": 1]))
+        ),
+        BuiltinTests.TestCase(
+            description: "conflict multiple",
+            name: "object.union",
+            args: [
+                ["a": ["b": ["c": 1]], "e": 1],
+                ["a": ["b": "foo", "b1": "bar"], "d": 7, "e": 17],
+            ],
+            expected: .success(.object(["a": ["b": "foo", "b1": "bar"], "d": 7, "e": 17]))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong left type",
+            name: "object.union",
+            args: [
+                [],
+                ["a": 1],
+            ],
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "a", got: "array", want: "object"))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong right type",
+            name: "object.union",
+            args: [
+                ["a": 1],
+                [],
+            ],
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "b", got: "array", want: "object"))
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
             objectGetTests,
             objectKeysTests,
+            objectUnionTests,
         ].flatMap { $0 }
     }
 

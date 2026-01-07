@@ -113,6 +113,7 @@ public struct BuiltinRegistry: Sendable {
             // Objects
             "object.get": BuiltinFuncs.objectGet,
             "object.keys": BuiltinFuncs.objectKeys,
+            "object.union": BuiltinFuncs.objectUnion,
 
             // Sets
             "and": BuiltinFuncs.and,

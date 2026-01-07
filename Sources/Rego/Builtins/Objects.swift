@@ -71,4 +71,36 @@ extension BuiltinFuncs {
 
         return .set(Set(x.keys))
     }
+
+    // union creates a new object of the asymmetric union of two objects.
+    // args
+    // a (object[any: any])
+    // left-hand object
+    // b (object[any: any])
+    // right-hand object
+    // returns: output (any) a new object which is the result of an asymmetric recursive union of two objects where conflicts 
+    // are resolved by choosing the key from the right-hand object b
+    static func objectUnion(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
+        }
+
+        guard case .object(let a) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "a", got: args[0].typeName, want: "object")
+        }
+
+        guard case .object(let b) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "b", got: args[1].typeName, want: "object")
+        }
+
+        guard !a.isEmpty else {
+            return .object(b)
+        }
+
+        guard !b.isEmpty else {
+            return .object(a)
+        }
+
+        return .object(a.merging(b) { (_, new) in new })
+    }
 }

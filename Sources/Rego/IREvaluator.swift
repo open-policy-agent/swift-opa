@@ -440,7 +440,8 @@ func evalBlock(
     framePtr.v.traceEvent(withContext: ctx, op: .enter, anyStmt: caller)
     defer { framePtr.v.traceEvent(withContext: ctx, op: .exit, anyStmt: caller) }
 
-    stmtLoop: for (i, statement) in block.statements.enumerated() {
+    stmtLoop: for i in block.statements.indices {
+        let statement = block.statements[i]
 
         if Task.isCancelled {
             throw RegoError(code: .evaluationCancelled, message: "parent task cancelled")
@@ -516,12 +517,13 @@ func evalBlock(
 
         case .callDynamicStmt(let stmt):
             var funcName = ""
-            for (index, p) in stmt.path.enumerated() {
+            for i in stmt.path.indices {
+                let p = stmt.path[i]
                 let segment = try framePtr.v.resolveOperand(ctx: ctx, p)
                 guard case .string(let stringValue) = segment else {
                     return failWithUndefined(withContext: ctx, framePtr: framePtr, stmt: statement)
                 }
-                if index > 0 {
+                if i > 0 {
                     funcName += "."
                 }
                 funcName += stringValue

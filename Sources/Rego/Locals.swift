@@ -31,7 +31,7 @@ import IR
 /// These assumptions could be validated during the `prepare` phase if violations lead
 /// to incorrect behavior or excessive memory usage.
 internal struct Locals: Equatable, Sendable, Encodable {
-    var storage: Array<AST.RegoValue?>
+    var storage: [AST.RegoValue?]
 
     // Create empty Locals array
     init() {

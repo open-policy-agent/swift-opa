@@ -21,9 +21,8 @@ struct CapabilityEvaluatorTests {
         _ = try await engine.prepareForEvaluation(query: "policy")
     }
 
-
     // Default builtins
-    
+
     @Test("Passing capabilities with default builtins")
     func testCapabilitiesPassingDefaultBuiltins() async throws {
         var engine = OPA.Engine(
@@ -33,7 +32,10 @@ struct CapabilityEvaluatorTests {
                     url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
                 )
             ],
-            capabilities: .path(IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-passing.json"))
+            capabilities: .path(
+                IREvaluatorTests.relPath(
+                    "TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-passing.json"
+                ))
         )
         _ = try await engine.prepareForEvaluation(query: "policy")
     }
@@ -47,14 +49,17 @@ struct CapabilityEvaluatorTests {
                     url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
                 )
             ],
-            capabilities: .path(IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-rejected-missing.json"))
+            capabilities: .path(
+                IREvaluatorTests.relPath(
+                    "TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-rejected-missing.json"
+                ))
         )
 
         let error = try await #require(throws: RegoError.self, "Missing builtin must raise error") {
             _ = try await engine.prepareForEvaluation(query: "policy")
         }
         #expect(error.code == .capabilitiesMissingBuiltin)
-        #expect(error.message.contains("count"))        // count builtin signature missing
+        #expect(error.message.contains("count"))  // count builtin signature missing
     }
 
     @Test("Failing capabilities when default builtin signature mismatches")
@@ -66,14 +71,17 @@ struct CapabilityEvaluatorTests {
                     url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
                 )
             ],
-            capabilities: .path(IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-rejected-signature-mismatch.json"))
+            capabilities: .path(
+                IREvaluatorTests.relPath(
+                    "TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-rejected-signature-mismatch.json"
+                ))
         )
 
         let error = try await #require(throws: RegoError.self, "Mismatch builtin signature must fail") {
             _ = try await engine.prepareForEvaluation(query: "policy")
         }
         #expect(error.code == .capabilitiesMissingBuiltin)
-        #expect(error.message.contains("count"))        // count builtin signature mismatch
+        #expect(error.message.contains("count"))  // count builtin signature mismatch
     }
 
     // Custom builtins
@@ -87,7 +95,10 @@ struct CapabilityEvaluatorTests {
                     url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins")
                 )
             ],
-            capabilities: .path(IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins/capabilities/capabilities-passing.json")),
+            capabilities: .path(
+                IREvaluatorTests.relPath(
+                    "TestData/Bundles/simple-capabilities-bundle-custom-builtins/capabilities/capabilities-passing.json"
+                )),
             customBuiltins: [
                 "my.slugify": { _, _ in .number(1) }
             ]
@@ -106,7 +117,10 @@ struct CapabilityEvaluatorTests {
                     url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins")
                 )
             ],
-            capabilities: .path(IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins/capabilities/capabilities-rejected-missing.json")),
+            capabilities: .path(
+                IREvaluatorTests.relPath(
+                    "TestData/Bundles/simple-capabilities-bundle-custom-builtins/capabilities/capabilities-rejected-missing.json"
+                )),
             customBuiltins: [
                 "my.slugify": { _, _ in .number(1) }
             ]
@@ -129,7 +143,10 @@ struct CapabilityEvaluatorTests {
                     url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins")
                 )
             ],
-            capabilities: .path(IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins/capabilities/capabilities-rejected-signature-mismatch.json")),
+            capabilities: .path(
+                IREvaluatorTests.relPath(
+                    "TestData/Bundles/simple-capabilities-bundle-custom-builtins/capabilities/capabilities-rejected-signature-mismatch.json"
+                )),
             customBuiltins: [
                 "my.slugify": { _, _ in .number(1) }
             ]
@@ -153,8 +170,11 @@ struct CapabilityEvaluatorTests {
                     url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins")
                 )
             ],
-            capabilities: .path(IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins/capabilities/capabilities-passing.json")),
-            customBuiltins: [:]     // not specifying the builtin
+            capabilities: .path(
+                IREvaluatorTests.relPath(
+                    "TestData/Bundles/simple-capabilities-bundle-custom-builtins/capabilities/capabilities-passing.json"
+                )),
+            customBuiltins: [:]  // not specifying the builtin
         )
         let error = try await #require(throws: RegoError.self, "Required builtin not provided must fail") {
             _ = try await engine.prepareForEvaluation(
@@ -213,7 +233,10 @@ struct CapabilityEvaluatorTests {
                 )
             ],
             // Capabilities are unrelated to the name conflict; any passing file works
-            capabilities: .path(IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-passing.json")),
+            capabilities: .path(
+                IREvaluatorTests.relPath(
+                    "TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-passing.json"
+                )),
             customBuiltins: [
                 // 'count' is a default builtin; this should trigger ambiguousBuiltinError during prepare
                 "count": { _, _ in .number(0) }

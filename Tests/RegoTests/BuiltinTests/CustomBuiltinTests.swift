@@ -76,7 +76,7 @@ extension BuiltinTests.CustomBuiltinTests {
         ),
         BuiltinTests.TestCase(
             description: "Custom Builtin - not existent",
-            name: "custom_plus2",   // does not exist
+            name: "custom_plus2",  // does not exist
             args: [1, 1],
             expected: .failure(BuiltinRegistry.RegistryError.builtinNotFound(name: "custom_plus2")),
             builtinRegistry: Self.customPlusBuiltinRegistry

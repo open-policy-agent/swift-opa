@@ -151,10 +151,6 @@ internal struct IREvaluationContext {
 internal struct Frame {
     var locals: Locals = Locals()
 
-    init(locals: Locals = Locals()) {
-        self.locals = locals
-    }
-
     func currentLocation(withContext ctx: IREvaluationContext, stmt: IR.AnyStatement) throws -> OPA.Trace.Location {
         return OPA.Trace.Location(
             row: stmt.location.row,

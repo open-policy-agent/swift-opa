@@ -50,7 +50,7 @@ extension OPA.Engine {
     ///     implementation for a required builtin.
     static func verifyCapabilitiesAndBuiltIns(
         capabilities: CapabilitiesInput?,
-        builtins: [String : Builtin],
+        builtins: [String: Builtin],
         evaluator: IREvaluator
     ) async throws {
         let capabilities: Capabilities? = try {
@@ -94,9 +94,9 @@ extension OPA.Engine {
                     throw RegoError(
                         code: .capabilitiesMissingBuiltin,
                         message: """
-                        Missing the following builtins (required by the policies) in the capabilities.json: \
-                        \(missingBuiltinsInCapabilities.description)
-                        """
+                            Missing the following builtins (required by the policies) in the capabilities.json: \
+                            \(missingBuiltinsInCapabilities.description)
+                            """
                     )
                 }
             }
@@ -113,9 +113,9 @@ extension OPA.Engine {
                 throw RegoError(
                     code: .builtinUndefinedError,
                     message: """
-                    Missing the following builtins (required by the policies) in the specified builtins (default or custom builtins): \
-                    \(missingBuiltins.description)
-                    """
+                        Missing the following builtins (required by the policies) in the specified builtins (default or custom builtins): \
+                        \(missingBuiltins.description)
+                        """
                 )
             }
         }

@@ -99,13 +99,17 @@ extension BuiltinTests.StringsTests {
             description: "wrong collection element type in array",
             name: "concat",
             args: [",", ["a", 123, "c"]],
-            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "collection element: number(123)", got: "number", want: "string"))
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(arg: "collection element: number(123)", got: "number", want: "string")
+            )
         ),
         BuiltinTests.TestCase(
             description: "wrong collection element type in set",
             name: "concat",
             args: [",", .set(["a", 123, "c"])],
-            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "collection element: number(123)", got: "number", want: "string"))
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(arg: "collection element: number(123)", got: "number", want: "string")
+            )
         ),
     ]
 

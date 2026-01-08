@@ -140,7 +140,7 @@ extension UUID {
             let timeHigh = UInt64(bigEndianUInt32([uuid.0, uuid.1, uuid.2, uuid.3]))
             let timeMid = UInt64(bigEndianUInt16([uuid.4, uuid.5]))
             let timeLowAndVersion = bigEndianUInt16([uuid.6, uuid.7])
-            let timeLow = UInt64(timeLowAndVersion & 0x0FFF) // Mask out version bits (most significant 4 bits)
+            let timeLow = UInt64(timeLowAndVersion & 0x0FFF)  // Mask out version bits (most significant 4 bits)
 
             t = Int64((timeHigh << 28) | (timeMid << 12) | timeLow)
         case 7:
@@ -154,7 +154,7 @@ extension UUID {
             let timeLow = Int64(bigEndianUInt32([uuid.0, uuid.1, uuid.2, uuid.3]))
             let timeMid = Int64(bigEndianUInt16([uuid.4, uuid.5]))
             let timeHiAndVersion = bigEndianUInt16([uuid.6, uuid.7])
-            let timeHi = Int64(timeHiAndVersion & 0x0FFF) // Mask out version bits
+            let timeHi = Int64(timeHiAndVersion & 0x0FFF)  // Mask out version bits
 
             t = (timeHi << 48) | (timeMid << 32) | timeLow
         }

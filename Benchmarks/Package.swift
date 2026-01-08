@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "swift-opa-benchmarks",
     platforms: [
-        .macOS(.v13),
+        .macOS(.v13)
     ],
     dependencies: [
         .package(name: "swift-opa", path: ".."),
@@ -25,6 +25,6 @@ let package = Package(
             plugins: [
                 .plugin(name: "BenchmarkPlugin", package: "package-benchmark")
             ]
-        ),
+        )
     ]
 )

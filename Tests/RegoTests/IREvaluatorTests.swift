@@ -14,7 +14,7 @@ extension Locals {
             return
         }
 
-        var storage = Array<AST.RegoValue?>(repeating: nil, count: maxKey + 1)
+        var storage = [AST.RegoValue?](repeating: nil, count: maxKey + 1)
         for (index, value) in dict {
             // If already a RegoValue, use it directly
             if let regoValue = value as? AST.RegoValue {

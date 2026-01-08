@@ -78,7 +78,7 @@ extension BuiltinFuncs {
     // left-hand object
     // b (object[any: any])
     // right-hand object
-    // returns: output (any) a new object which is the result of an asymmetric recursive union of two objects where conflicts 
+    // returns: output (any) a new object which is the result of an asymmetric recursive union of two objects where conflicts
     // are resolved by choosing the key from the right-hand object b
     static func objectUnion(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {

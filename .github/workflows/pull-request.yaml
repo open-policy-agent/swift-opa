@@ -23,7 +23,8 @@ jobs:
       - name: Install jemalloc
         run: brew install jemalloc
       - run: make lint
-      - run: make all
+      - run: make test
+      - run: make build
       - name: make fmt lint test (ComplianceSuite)
         run: make fmt lint test
         working-directory: ComplianceSuite

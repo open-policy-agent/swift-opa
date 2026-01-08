@@ -75,7 +75,8 @@ extension BuiltinTests.BitsTests {
             description: "second argument cannot be negative",
             name: "bits.lsh",
             args: [1, -1],
-            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "b", got: "negative integer", want: "unsigned integer"))
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(arg: "b", got: "negative integer", want: "unsigned integer"))
         ),
         BuiltinTests.TestCase(
             description: "second argument cannot be non-integer",
@@ -144,7 +145,8 @@ extension BuiltinTests.BitsTests {
             description: "second argument cannot be negative",
             name: "bits.rsh",
             args: [1, -1],
-            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "b", got: "negative integer", want: "unsigned integer"))
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(arg: "b", got: "negative integer", want: "unsigned integer"))
         ),
         BuiltinTests.TestCase(
             description: "second argument cannot be non-integer",
@@ -254,47 +256,58 @@ extension BuiltinTests.BitsTests {
     static var allTests: [BuiltinTests.TestCase] {
         [
             BuiltinTests.generateFailureTests(
-                builtinName: "bits.lsh", sampleArgs: [1, 1], argIndex: 0, argName: "a", allowedArgTypes: ["number[integer]"],
+                builtinName: "bits.lsh", sampleArgs: [1, 1], argIndex: 0, argName: "a",
+                allowedArgTypes: ["number[integer]"],
                 generateNumberOfArgsTest: true, numberAsInteger: true),
             BuiltinTests.generateFailureTests(
-                builtinName: "bits.lsh", sampleArgs: [1, 1], argIndex: 1, argName: "b", allowedArgTypes: ["number[integer]"],
+                builtinName: "bits.lsh", sampleArgs: [1, 1], argIndex: 1, argName: "b",
+                allowedArgTypes: ["number[integer]"],
                 generateNumberOfArgsTest: false, numberAsInteger: true),
             bitsShiftLeftTests,
 
             BuiltinTests.generateFailureTests(
-                builtinName: "bits.rsh", sampleArgs: [1, 1], argIndex: 0, argName: "a", allowedArgTypes: ["number[integer]"],
+                builtinName: "bits.rsh", sampleArgs: [1, 1], argIndex: 0, argName: "a",
+                allowedArgTypes: ["number[integer]"],
                 generateNumberOfArgsTest: true, numberAsInteger: true),
             BuiltinTests.generateFailureTests(
-                builtinName: "bits.rsh", sampleArgs: [1, 1], argIndex: 1, argName: "b", allowedArgTypes: ["number[integer]"],
+                builtinName: "bits.rsh", sampleArgs: [1, 1], argIndex: 1, argName: "b",
+                allowedArgTypes: ["number[integer]"],
                 generateNumberOfArgsTest: false, numberAsInteger: true),
             bitsShiftRightTests,
 
             BuiltinTests.generateFailureTests(
-                builtinName: "bits.and", sampleArgs: [1, 1], argIndex: 0, argName: "a", allowedArgTypes: ["number[integer]"],
+                builtinName: "bits.and", sampleArgs: [1, 1], argIndex: 0, argName: "a",
+                allowedArgTypes: ["number[integer]"],
                 generateNumberOfArgsTest: true, numberAsInteger: true),
             BuiltinTests.generateFailureTests(
-                builtinName: "bits.and", sampleArgs: [1, 1], argIndex: 1, argName: "b", allowedArgTypes: ["number[integer]"],
+                builtinName: "bits.and", sampleArgs: [1, 1], argIndex: 1, argName: "b",
+                allowedArgTypes: ["number[integer]"],
                 generateNumberOfArgsTest: false, numberAsInteger: true),
             bitsAndTests,
 
             BuiltinTests.generateFailureTests(
-                builtinName: "bits.or", sampleArgs: [1, 1], argIndex: 0, argName: "a", allowedArgTypes: ["number[integer]"],
+                builtinName: "bits.or", sampleArgs: [1, 1], argIndex: 0, argName: "a",
+                allowedArgTypes: ["number[integer]"],
                 generateNumberOfArgsTest: true, numberAsInteger: true),
             BuiltinTests.generateFailureTests(
-                builtinName: "bits.or", sampleArgs: [1, 1], argIndex: 1, argName: "b", allowedArgTypes: ["number[integer]"],
+                builtinName: "bits.or", sampleArgs: [1, 1], argIndex: 1, argName: "b",
+                allowedArgTypes: ["number[integer]"],
                 generateNumberOfArgsTest: false, numberAsInteger: true),
             bitsOrTests,
 
             BuiltinTests.generateFailureTests(
-                builtinName: "bits.xor", sampleArgs: [1, 1], argIndex: 0, argName: "a", allowedArgTypes: ["number[integer]"],
+                builtinName: "bits.xor", sampleArgs: [1, 1], argIndex: 0, argName: "a",
+                allowedArgTypes: ["number[integer]"],
                 generateNumberOfArgsTest: true, numberAsInteger: true),
             BuiltinTests.generateFailureTests(
-                builtinName: "bits.xor", sampleArgs: [1, 1], argIndex: 1, argName: "b", allowedArgTypes: ["number[integer]"],
+                builtinName: "bits.xor", sampleArgs: [1, 1], argIndex: 1, argName: "b",
+                allowedArgTypes: ["number[integer]"],
                 generateNumberOfArgsTest: false, numberAsInteger: true),
             bitsXorTests,
 
             BuiltinTests.generateFailureTests(
-                builtinName: "bits.negate", sampleArgs: [1], argIndex: 0, argName: "a", allowedArgTypes: ["number[integer]"],
+                builtinName: "bits.negate", sampleArgs: [1], argIndex: 0, argName: "a",
+                allowedArgTypes: ["number[integer]"],
                 generateNumberOfArgsTest: true, numberAsInteger: true),
             bitsNegateTests,
         ].flatMap { $0 }

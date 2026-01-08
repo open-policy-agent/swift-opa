@@ -6,7 +6,8 @@ extension RegoValue: Codable {
     package init(from: Any) throws(ValueError) {
         switch from {
         case let v as String:
-            self = .string(v)
+            // Normalize to contiguous UTF-8 for faster comparisons
+            self = .string(String(decoding: v.utf8, as: UTF8.self))
         case let v as [Any]:
             do {
                 let values: [RegoValue] = try v.map { try RegoValue(from: $0) }
@@ -51,7 +52,9 @@ extension RegoValue: Codable {
         do {
             let container = try decoder.container(keyedBy: AnyKey.self)
             let obj: [RegoValue: RegoValue] = try container.allKeys.reduce(into: [:]) { out, key in
-                out[.string(key.stringValue)] = try container.decode(RegoValue.self, forKey: key)
+                // Normalize string keys to contiguous UTF-8 for faster comparisons
+                let normalizedKey = String(decoding: key.stringValue.utf8, as: UTF8.self)
+                out[.string(normalizedKey)] = try container.decode(RegoValue.self, forKey: key)
             }
             self = .object(obj)
             return
@@ -77,7 +80,8 @@ extension RegoValue: Codable {
             let container = try decoder.singleValueContainer()
 
             if let stringValue = try? container.decode(String.self) {
-                self = .string(stringValue)
+                // Normalize string to contiguous UTF-8 for faster comparisons
+                self = .string(String(decoding: stringValue.utf8, as: UTF8.self))
                 return
             }
             if let doubleValue = try? container.decode(Double.self) {

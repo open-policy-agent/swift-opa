@@ -19,8 +19,9 @@ let benchmarks: @Sendable () -> Void = {
         // Setup OPA engine
         var engine = OPA.Engine(
             bundlePaths: [OPA.Engine.BundlePath(name: "simple", url: simpleBundleURL)])
+        var preparedQuery: OPA.Engine.PreparedQuery?
         do {
-            let preparedQuery = try await engine.prepareForEvaluation(query: "data.app.rbac.allow")
+            preparedQuery = try await engine.prepareForEvaluation(query: "data.app.rbac.allow")
         } catch {}
 
         let input: AST.RegoValue = [
@@ -32,7 +33,7 @@ let benchmarks: @Sendable () -> Void = {
         benchmark.startMeasurement()
         for _ in benchmark.scaledIterations {
             do {
-                let result = try await preparedQuery.evaluate(input: input)
+                let result = try await preparedQuery?.evaluate(input: input)
                 blackHole(result)
             } catch {}
         }
@@ -45,8 +46,9 @@ let benchmarks: @Sendable () -> Void = {
         // Setup OPA engine
         var engine = OPA.Engine(
             bundlePaths: [OPA.Engine.BundlePath(name: "dynamic", url: dynamicCallBundleURL)])
+        var preparedQuery: OPA.Engine.PreparedQuery?
         do {
-            let preparedQuery = try await engine.prepareForEvaluation(query: "data.test")
+            preparedQuery = try await engine.prepareForEvaluation(query: "data.test")
         } catch {}
 
         let input: AST.RegoValue = [
@@ -57,7 +59,7 @@ let benchmarks: @Sendable () -> Void = {
         benchmark.startMeasurement()
         for _ in benchmark.scaledIterations {
             do {
-                let result = try await preparedQuery.evaluate(input: input)
+                let result = try await preparedQuery?.evaluate(input: input)
                 blackHole(result)
             } catch {}
         }
@@ -70,8 +72,9 @@ let benchmarks: @Sendable () -> Void = {
         // Setup OPA engine
         var engine = OPA.Engine(
             bundlePaths: [OPA.Engine.BundlePath(name: "dynamic", url: dynamicCallBundleURL)])
+        var preparedQuery: OPA.Engine.PreparedQuery?
         do {
-            let preparedQuery = try await engine.prepareForEvaluation(query: "data.test")
+            preparedQuery = try await engine.prepareForEvaluation(query: "data.test")
         } catch {}
 
         let input: AST.RegoValue = [
@@ -82,7 +85,7 @@ let benchmarks: @Sendable () -> Void = {
         benchmark.startMeasurement()
         for _ in benchmark.scaledIterations {
             do {
-                let result = try await preparedQuery.evaluate(input: input)
+                let result = try await preparedQuery?.evaluate(input: input)
                 blackHole(result)
             } catch {}
         }
@@ -95,8 +98,9 @@ let benchmarks: @Sendable () -> Void = {
         // Setup OPA engine
         var engine = OPA.Engine(
             bundlePaths: [OPA.Engine.BundlePath(name: "iteration", url: arrayIterationBundleURL)])
+        var preparedQuery: OPA.Engine.PreparedQuery?
         do {
-            let preparedQuery = try await engine.prepareForEvaluation(query: "data.benchmark.iteration")
+            preparedQuery = try await engine.prepareForEvaluation(query: "data.benchmark.iteration")
         } catch {}
 
         let input: AST.RegoValue = [
@@ -107,7 +111,7 @@ let benchmarks: @Sendable () -> Void = {
         benchmark.startMeasurement()
         for _ in benchmark.scaledIterations {
             do {
-                let result = try await preparedQuery.evaluate(input: input)
+                let result = try await preparedQuery?.evaluate(input: input)
                 blackHole(result)
             } catch {}
         }
@@ -120,8 +124,9 @@ let benchmarks: @Sendable () -> Void = {
         // Setup OPA engine
         var engine = OPA.Engine(
             bundlePaths: [OPA.Engine.BundlePath(name: "iteration", url: arrayIterationBundleURL)])
+        var preparedQuery: OPA.Engine.PreparedQuery?
         do {
-            let preparedQuery = try await engine.prepareForEvaluation(query: "data.benchmark.iteration")
+            preparedQuery = try await engine.prepareForEvaluation(query: "data.benchmark.iteration")
         } catch {}
 
         let input: AST.RegoValue = [
@@ -132,7 +137,7 @@ let benchmarks: @Sendable () -> Void = {
         benchmark.startMeasurement()
         for _ in benchmark.scaledIterations {
             do {
-                let result = try await preparedQuery.evaluate(input: input)
+                let result = try await preparedQuery?.evaluate(input: input)
                 blackHole(result)
             } catch {}
         }
@@ -145,8 +150,9 @@ let benchmarks: @Sendable () -> Void = {
         // Setup OPA engine
         var engine = OPA.Engine(
             bundlePaths: [OPA.Engine.BundlePath(name: "iteration", url: arrayIterationBundleURL)])
+        var preparedQuery: OPA.Engine.PreparedQuery?
         do {
-            let preparedQuery = try await engine.prepareForEvaluation(query: "data.benchmark.iteration")
+            preparedQuery = try await engine.prepareForEvaluation(query: "data.benchmark.iteration")
         } catch {}
 
         let input: AST.RegoValue = [
@@ -157,7 +163,7 @@ let benchmarks: @Sendable () -> Void = {
         benchmark.startMeasurement()
         for _ in benchmark.scaledIterations {
             do {
-                let result = try await preparedQuery.evaluate(input: input)
+                let result = try await preparedQuery?.evaluate(input: input)
                 blackHole(result)
             } catch {}
         }
@@ -170,8 +176,9 @@ let benchmarks: @Sendable () -> Void = {
         // Setup OPA engine
         var engine = OPA.Engine(
             bundlePaths: [OPA.Engine.BundlePath(name: "numeric", url: numericLiteralsBundleURL)])
+        var preparedQuery: OPA.Engine.PreparedQuery?
         do {
-            let preparedQuery = try await engine.prepareForEvaluation(query: "data.benchmark.numeric")
+            preparedQuery = try await engine.prepareForEvaluation(query: "data.benchmark.numeric")
         } catch {}
 
         let input: AST.RegoValue = [
@@ -183,7 +190,7 @@ let benchmarks: @Sendable () -> Void = {
         benchmark.startMeasurement()
         for _ in benchmark.scaledIterations {
             do {
-                let result = try await preparedQuery.evaluate(input: input)
+                let result = try await preparedQuery?.evaluate(input: input)
                 blackHole(result)
             } catch {}
         }

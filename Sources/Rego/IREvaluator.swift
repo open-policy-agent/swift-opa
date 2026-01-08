@@ -103,7 +103,8 @@ internal struct IndexedIRPolicy {
             }
         }
         for string in policy.staticData?.strings ?? [] {
-            self.staticStrings.append(string.value)
+            // Normalize to contiguous UTF-8 for faster string comparisons
+            self.staticStrings.append(String(decoding: string.value.utf8, as: UTF8.self))
         }
     }
 

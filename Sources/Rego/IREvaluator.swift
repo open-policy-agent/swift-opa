@@ -148,8 +148,9 @@ internal struct IndexedIRPolicy {
 }
 
 internal final class IREvaluationContext {
-    var ctx: EvaluationContext
-    var policy: IndexedIRPolicy
+    let ctx: EvaluationContext
+    let policy: IndexedIRPolicy
+    let tracingEnabled: Bool  // Cached flag to avoid repeated existential checks
     var maxCallDepth: Int = 16_384
     var callDepth: Int = 0
     var memoStack: [MemoCache] = []
@@ -159,6 +160,7 @@ internal final class IREvaluationContext {
     init(ctx: EvaluationContext, policy: IndexedIRPolicy) {
         self.ctx = ctx
         self.policy = policy
+        self.tracingEnabled = ctx.tracer != nil
         self.results = ResultSet.empty
     }
 
@@ -233,10 +235,7 @@ internal final class IREvaluationContext {
         anyStmt: IR.Statement,
         _ message: String = ""
     ) {
-        guard let tracer = ctx.tracer else {
-            // tracing disabled
-            return
-        }
+        let tracer = ctx.tracer!
         let formattedMessage = message.isEmpty ? "" : "message='\(message)'"
 
         let msg: String
@@ -436,7 +435,9 @@ func failWithUndefined(
     withContext ctx: IREvaluationContext,
     stmt: IR.Statement
 ) -> BlockResult {
-    ctx.traceEvent(op: .fail, anyStmt: stmt, "undefined")
+    if ctx.tracingEnabled {
+        ctx.traceEvent(op: .fail, anyStmt: stmt, "undefined")
+    }
     return .undefined
 }
 
@@ -446,8 +447,14 @@ func evalBlock(
     block: Block
 ) async throws -> BlockResult {
 
-    ctx.traceEvent(op: .enter, anyStmt: caller)
-    defer { ctx.traceEvent(op: .exit, anyStmt: caller) }
+    if ctx.tracingEnabled {
+        ctx.traceEvent(op: .enter, anyStmt: caller)
+    }
+    defer {
+        if ctx.tracingEnabled {
+            ctx.traceEvent(op: .exit, anyStmt: caller)
+        }
+    }
 
     stmtLoop: for i in block.statements.indices {
         let statement = block.statements[i]
@@ -456,7 +463,9 @@ func evalBlock(
             throw RegoError(code: .evaluationCancelled, message: "parent task cancelled")
         }
 
-        ctx.traceEvent(op: .eval, anyStmt: statement)
+        if ctx.tracingEnabled {
+            ctx.traceEvent(op: .eval, anyStmt: statement)
+        }
 
         switch statement {
         case .arrayAppendStmt(let stmt):

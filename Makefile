@@ -9,7 +9,7 @@ fmt:
 
 .PHONY: lint
 lint:
-	swift format lint --parallel --recursive .
+	swift format lint --strict --parallel --recursive .
 
 .PHONY: test
 test:

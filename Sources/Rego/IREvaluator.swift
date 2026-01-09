@@ -107,21 +107,24 @@ internal struct IndexedIRPolicy {
     // On init() we'll pre-process some of the raw parsed IR.Policy to structure it in
     // more convienent (and optimized) structures to evaluate queries.
     init(policy: IR.Policy) {
-        self.ir = policy
-        for plan in policy.plans?.plans ?? [] {
+        var preparedPolicy = policy
+        preparedPolicy.prepareForExecution()
+
+        self.ir = preparedPolicy
+        for plan in preparedPolicy.plans?.plans ?? [] {
             // TODO: is plan.name actually the right string format to
             // match a query string? If no, convert it here.
             // TODO: validator should ensure these names were unique
             self.plans[plan.name] = plan
         }
-        for funcDecl in policy.funcs?.funcs ?? [] {
+        for funcDecl in preparedPolicy.funcs?.funcs ?? [] {
             // TODO: validator should ensure these names were unique
             self.funcs[funcDecl.name] = funcDecl
             if !funcDecl.path.isEmpty {
                 self.funcsPathToName[funcDecl.path.joined(separator: ".")] = funcDecl.name
             }
         }
-        for string in policy.staticData?.strings ?? [] {
+        for string in preparedPolicy.staticData?.strings ?? [] {
             // Normalize to contiguous UTF-8 for faster string comparisons
             self.staticStrings.append(String(decoding: string.value.utf8, as: UTF8.self))
         }

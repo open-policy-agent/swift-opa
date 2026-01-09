@@ -294,7 +294,7 @@ struct IRStatementTests {
         withFuncs funcs: [IR.Func] = [],
         withStaticStrings staticStrings: [String] = []
     )
-        -> (IREvaluationContext, Ptr<Frame>)
+        -> IREvaluationContext
     {
         let block = Block(statements: [stmt])
 
@@ -313,10 +313,9 @@ struct IRStatementTests {
         let ctx = EvaluationContext(query: "", input: .undefined)
         let irCtx = IREvaluationContext(ctx: ctx, policy: policy)
 
-        return (
-            irCtx,
-            Ptr(toCopyOf: Frame(locals: locals))
-        )
+        irCtx.locals = locals
+
+        return irCtx
     }
 
     static let allTests: [TestCase] = [
@@ -1155,7 +1154,7 @@ struct IRStatementTests {
 
     @Test(arguments: allTests)
     func testStatementEvaluation(tc: TestCase) async throws {
-        let (ctx, frame) = prepareFrame(
+        let ctx = prepareFrame(
             forStatement: tc.stmt,
             withLocals: tc.locals,
             withFuncs: tc.funcs,
@@ -1165,7 +1164,7 @@ struct IRStatementTests {
 
         let caller = IR.Statement.blockStmt(IR.BlockStatement(blocks: [block]))
         let result = await Result {
-            try await evalBlock(withContext: ctx, framePtr: frame, caller: caller, block: block)
+            try await evalBlock(withContext: ctx, caller: caller, block: block)
         }
 
         guard !tc.expectError else {
@@ -1181,7 +1180,7 @@ struct IRStatementTests {
         // Check local expectations
         let expectLocals = tc.locals.merging(tc.expectLocals)
 
-        var gotLocals = frame.v.locals
+        var gotLocals = ctx.locals
 
         for idx in tc.ignoreLocals {
             gotLocals[idx] = nil
@@ -1195,7 +1194,7 @@ struct IRStatementTests {
         #expect(gotLocals == expectLocals, "comparing locals")
 
         let expectResult = tc.expectResult ?? .empty
-        #expect(ctx.results.v == expectResult, "comparing results")
+        #expect(ctx.results == expectResult, "comparing results")
 
         #expect(results.isUndefined == tc.expectUndefined, "comparing undefined")
     }

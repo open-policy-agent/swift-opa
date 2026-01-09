@@ -1,31 +1,83 @@
 import Foundation
 
+// MARK: - IR Errors
+
+public struct IRValidationError: Error {
+    public let message: String
+
+    public init(_ message: String) {
+        self.message = message
+    }
+}
+
 // MARK: - Static Analysis
 //
 // This file contains static analysis passes that run after IR decoding to compute
 // properties used for optimization during evaluation.
 
-extension Plan {
-    /// Compute the maximum local index used in this plan.
-    /// This is used to pre-allocate locals arrays to avoid runtime growth.
-    mutating func computeMaxLocal() {
-        self.maxLocal = Self.computeMaxLocal(blocks: blocks)
-    }
+// MARK: - IR Walker
 
-    static func computeMaxLocal(blocks: [Block]) -> Int {
-        var maxLocal = -1
-        for block in blocks {
-            maxLocal = max(maxLocal, block.computeMaxLocal())
+extension Block {
+    mutating func walk(_ visitStatement: (inout Statement) throws -> Void) rethrows {
+        for i in statements.indices {
+            try statements[i].walk(visitStatement)
         }
-        return maxLocal
+    }
+}
+
+extension Statement {
+    mutating func walk(_ visitStatement: (inout Statement) throws -> Void) rethrows {
+        try visitStatement(&self)
+
+        switch self {
+        case .blockStmt(var stmt):
+            if var blocks = stmt.blocks {
+                for i in blocks.indices {
+                    try blocks[i].walk(visitStatement)
+                }
+                stmt.blocks = blocks
+            }
+            self = .blockStmt(stmt)
+
+        case .notStmt(var stmt):
+            try stmt.block.walk(visitStatement)
+            self = .notStmt(stmt)
+
+        case .scanStmt(var stmt):
+            try stmt.block.walk(visitStatement)
+            self = .scanStmt(stmt)
+
+        case .withStmt(var stmt):
+            try stmt.block.walk(visitStatement)
+            self = .withStmt(stmt)
+
+        default:
+            break
+        }
+    }
+}
+
+extension Plan {
+    mutating func computeMaxLocal() {
+        var maxLocal = -1
+        for i in blocks.indices {
+            blocks[i].walk { statement in
+                maxLocal = max(maxLocal, statement.maxLocalUsed())
+            }
+        }
+        self.maxLocal = maxLocal
     }
 }
 
 extension Func {
-    /// Compute the maximum local index used in this function.
-    /// Includes params, return var, and all locals used in blocks.
     mutating func computeMaxLocal() {
-        var maxLocal = Self.computeMaxLocal(blocks: blocks)
+        var maxLocal = -1
+
+        for i in blocks.indices {
+            blocks[i].walk { statement in
+                maxLocal = max(maxLocal, statement.maxLocalUsed())
+            }
+        }
 
         for param in params {
             maxLocal = max(maxLocal, Int(param))
@@ -34,28 +86,10 @@ extension Func {
 
         self.maxLocal = maxLocal
     }
-
-    static func computeMaxLocal(blocks: [Block]) -> Int {
-        var maxLocal = -1
-        for block in blocks {
-            maxLocal = max(maxLocal, block.computeMaxLocal())
-        }
-        return maxLocal
-    }
-}
-
-extension Block {
-    func computeMaxLocal() -> Int {
-        var maxLocal = -1
-        for statement in statements {
-            maxLocal = max(maxLocal, statement.computeMaxLocal())
-        }
-        return maxLocal
-    }
 }
 
 extension Statement {
-    func computeMaxLocal() -> Int {
+    func maxLocalUsed() -> Int {
         var maxLocal = -1
 
         switch self {
@@ -70,14 +104,6 @@ extension Statement {
         case .assignVarOnceStmt(let stmt):
             maxLocal = max(maxLocal, Int(stmt.target))
             maxLocal = max(maxLocal, extractMaxFromOperand(stmt.source))
-        case .blockStmt(let stmt):
-            if let blocks = stmt.blocks {
-                for block in blocks {
-                    maxLocal = max(maxLocal, block.computeMaxLocal())
-                }
-            }
-        case .breakStmt:
-            break
         case .callStmt(let stmt):
             maxLocal = max(maxLocal, Int(stmt.result))
             if let args = stmt.args {
@@ -125,10 +151,6 @@ extension Statement {
             maxLocal = max(maxLocal, Int(stmt.target))
         case .makeSetStmt(let stmt):
             maxLocal = max(maxLocal, Int(stmt.target))
-        case .nopStmt:
-            break
-        case .notStmt(let stmt):
-            maxLocal = max(maxLocal, stmt.block.computeMaxLocal())
         case .notEqualStmt(let stmt):
             maxLocal = max(maxLocal, extractMaxFromOperand(stmt.a))
             maxLocal = max(maxLocal, extractMaxFromOperand(stmt.b))
@@ -154,15 +176,13 @@ extension Statement {
             maxLocal = max(maxLocal, Int(stmt.source))
             maxLocal = max(maxLocal, Int(stmt.key))
             maxLocal = max(maxLocal, Int(stmt.value))
-            maxLocal = max(maxLocal, stmt.block.computeMaxLocal())
         case .setAddStmt(let stmt):
             maxLocal = max(maxLocal, Int(stmt.set))
             maxLocal = max(maxLocal, extractMaxFromOperand(stmt.value))
         case .withStmt(let stmt):
             maxLocal = max(maxLocal, Int(stmt.local))
             maxLocal = max(maxLocal, extractMaxFromOperand(stmt.value))
-            maxLocal = max(maxLocal, stmt.block.computeMaxLocal())
-        case .unknown:
+        case .breakStmt, .nopStmt, .blockStmt, .notStmt, .unknown:
             break
         }
 
@@ -175,6 +195,154 @@ extension Statement {
             return idx
         default:
             return -1
+        }
+    }
+}
+
+// MARK: - Static String Resolution
+
+extension Policy {
+    func verifyStaticStrings() throws {
+        if let plans = self.plans {
+            for plan in plans.plans {
+                try plan.verifyStaticStrings(staticData: self.staticData)
+            }
+        }
+
+        if let funcList = self.funcs?.funcs {
+            for function in funcList {
+                try function.verifyStaticStrings(staticData: self.staticData)
+            }
+        }
+    }
+}
+
+extension Plan {
+    func verifyStaticStrings(staticData: Static?) throws {
+        for var block in blocks {
+            try block.walk { statement in
+                try statement.verifyStaticStrings(staticData: staticData)
+            }
+        }
+    }
+}
+
+extension Func {
+    func verifyStaticStrings(staticData: Static?) throws {
+        for var block in blocks {
+            try block.walk { statement in
+                try statement.verifyStaticStrings(staticData: staticData)
+            }
+        }
+    }
+}
+
+extension Statement {
+    func verifyStaticStrings(staticData: Static?) throws {
+        switch self {
+        case .arrayAppendStmt(let stmt):
+            try stmt.value.verifyStaticString(staticData: staticData)
+        case .assignVarStmt(let stmt):
+            try stmt.source.verifyStaticString(staticData: staticData)
+        case .assignVarOnceStmt(let stmt):
+            try stmt.source.verifyStaticString(staticData: staticData)
+        case .callStmt(let stmt):
+            if let args = stmt.args {
+                for arg in args {
+                    try arg.verifyStaticString(staticData: staticData)
+                }
+            }
+        case .dotStmt(let stmt):
+            try stmt.source.verifyStaticString(staticData: staticData)
+            try stmt.key.verifyStaticString(staticData: staticData)
+        case .equalStmt(let stmt):
+            try stmt.a.verifyStaticString(staticData: staticData)
+            try stmt.b.verifyStaticString(staticData: staticData)
+        case .lenStmt(let stmt):
+            try stmt.source.verifyStaticString(staticData: staticData)
+        case .makeNumberRefStmt(let stmt):
+            guard let strings = staticData?.strings else {
+                throw IRValidationError("missing static strings data")
+            }
+            let idx = Int(stmt.index)
+            guard idx >= 0 && idx < strings.count else {
+                throw IRValidationError(
+                    "invalid string index in MakeNumberRefStmt: \(idx) (valid range: 0..<\(strings.count))"
+                )
+            }
+        case .notEqualStmt(let stmt):
+            try stmt.a.verifyStaticString(staticData: staticData)
+            try stmt.b.verifyStaticString(staticData: staticData)
+        case .objectInsertOnceStmt(let stmt):
+            try stmt.key.verifyStaticString(staticData: staticData)
+            try stmt.value.verifyStaticString(staticData: staticData)
+        case .objectInsertStmt(let stmt):
+            try stmt.key.verifyStaticString(staticData: staticData)
+            try stmt.value.verifyStaticString(staticData: staticData)
+        case .setAddStmt(let stmt):
+            try stmt.value.verifyStaticString(staticData: staticData)
+        case .withStmt(let stmt):
+            if let pathIndices = stmt.path {
+                guard let strings = staticData?.strings else {
+                    throw IRValidationError("missing static strings data")
+                }
+                for idx in pathIndices {
+                    let index = Int(idx)
+                    guard index >= 0 && index < strings.count else {
+                        throw IRValidationError(
+                            "invalid string index in WithStmt path: \(index) (valid range: 0..<\(strings.count))"
+                        )
+                    }
+                }
+            }
+            try stmt.value.verifyStaticString(staticData: staticData)
+        default:
+            break
+        }
+    }
+}
+
+extension Operand {
+    func verifyStaticString(staticData: Static?) throws {
+        if case .stringIndex(let idx) = self.value {
+            guard let strings = staticData?.strings else {
+                throw IRValidationError("missing static strings data")
+            }
+            guard idx >= 0 && idx < strings.count else {
+                throw IRValidationError(
+                    "invalid string index in Operand: \(idx) (valid range: 0..<\(strings.count))"
+                )
+            }
+        }
+    }
+}
+
+// MARK: - Number Index Identification
+
+extension Plan {
+    func identifyStaticStringNumbers(into indices: inout Set<Int>) {
+        for var block in blocks {
+            block.walk { statement in
+                statement.identifyStaticStringNumbers(into: &indices)
+            }
+        }
+    }
+}
+
+extension Func {
+    func identifyStaticStringNumbers(into indices: inout Set<Int>) {
+        for var block in blocks {
+            block.walk { statement in
+                statement.identifyStaticStringNumbers(into: &indices)
+            }
+        }
+    }
+}
+
+extension Statement {
+    func identifyStaticStringNumbers(into indices: inout Set<Int>) {
+        if case .makeNumberRefStmt(let stmt) = self {
+            indices.insert(Int(stmt.index))
         }
     }
 }

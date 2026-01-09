@@ -5,13 +5,6 @@ import IR
 let localIdxInput = Local(0)
 let localIdxData = Local(1)
 
-// Singleton NumberFormatter for parsing number literals - avoids expensive per-call initialization
-private let numberFormatter: NumberFormatter = {
-    let formatter = NumberFormatter()
-    formatter.numberStyle = .decimal
-    return formatter
-}()
-
 /// InvocationKey is a key for memoizing an IR function call invocation.
 /// Note we capture the arguments as unresolved operands and not resolved values,
 /// as hashing the values was proving extremely expensive. We instead rely on the
@@ -33,7 +26,7 @@ internal struct IREvaluator {
             for planFile in bundle.planFiles {
                 do {
                     let parsed = try IR.Policy(jsonData: planFile.data)
-                    policies.append(IndexedIRPolicy(policy: parsed))
+                    policies.append(try IndexedIRPolicy(policy: parsed))
                 } catch {
                     throw RegoError(
                         code: .bundleInitializationError,
@@ -53,8 +46,8 @@ internal struct IREvaluator {
     }
 
     // Initialize directly with parsed policies - useful for testing
-    init(policies: [IR.Policy]) {
-        self.policies = policies.map { IndexedIRPolicy(policy: $0) }
+    init(policies: [IR.Policy]) throws {
+        self.policies = try policies.map { try IndexedIRPolicy(policy: $0) }
     }
 }
 
@@ -103,12 +96,13 @@ internal struct IndexedIRPolicy {
 
     // Policy static values, indexes match original plan array
     var staticStrings: [String] = []
+    var staticStringNumbers: [NSNumber?] = []
 
     // On init() we'll pre-process some of the raw parsed IR.Policy to structure it in
     // more convienent (and optimized) structures to evaluate queries.
-    init(policy: IR.Policy) {
+    init(policy: IR.Policy) throws {
         var preparedPolicy = policy
-        preparedPolicy.prepareForExecution()
+        try preparedPolicy.prepareForExecution()
 
         self.ir = preparedPolicy
         for plan in preparedPolicy.plans?.plans ?? [] {
@@ -124,19 +118,32 @@ internal struct IndexedIRPolicy {
                 self.funcsPathToName[funcDecl.path.joined(separator: ".")] = funcDecl.name
             }
         }
-        for string in preparedPolicy.staticData?.strings ?? [] {
+
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+
+        let staticStringNumberIndices = Set(preparedPolicy.staticStringNumbers)
+
+        for (index, string) in (preparedPolicy.staticData?.strings ?? []).enumerated() {
             // Normalize to contiguous UTF-8 for faster string comparisons
-            self.staticStrings.append(String(decoding: string.value.utf8, as: UTF8.self))
+            let stringValue = String(decoding: string.value.utf8, as: UTF8.self)
+            self.staticStrings.append(stringValue)
+
+            // Pre-parse only if this index is used by MakeNumberRefStmt
+            if staticStringNumberIndices.contains(index) {
+                self.staticStringNumbers.append(numberFormatter.number(from: stringValue))
+            } else {
+                self.staticStringNumbers.append(nil)
+            }
         }
     }
 
-    func resolveStaticString(_ index: Int) -> String? {
-        guard case self.staticStrings.startIndex..<self.staticStrings.endIndex = index else {
-            // Out-of-bounds
-            return nil
-        }
-
+    func resolveStaticString(_ index: Int) -> String {
         return self.staticStrings[index]
+    }
+
+    func resolveStaticNumber(_ index: Int) -> NSNumber? {
+        return self.staticStringNumbers[index]
     }
 }
 
@@ -206,25 +213,19 @@ internal final class IREvaluationContext {
     }
 
     // TODO, should we throw or return optional on lookup failures?
-    func resolveOperand(_ op: IR.Operand) throws -> AST.RegoValue {
+    func resolveOperand(_ op: IR.Operand) -> AST.RegoValue {
         switch op.value {
         case .localIndex(let idx):
             return resolveLocal(idx: Local(idx))
         case .bool(let boolValue):
             return .boolean(boolValue)
         case .stringIndex(let idx):
-            return try .string(resolveStaticString(Int(idx)))
+            return .string(resolveStaticString(Int(idx)))
         }
     }
 
-    func resolveStaticString(_ idx: Int) throws -> String {
-        guard let v = policy.resolveStaticString(idx) else {
-            throw RegoError(
-                code: .invalidOperand,
-                message: "unable to resolve static string: \(idx)"
-            )
-        }
-        return v
+    func resolveStaticString(_ idx: Int) -> String {
+        return policy.resolveStaticString(idx)
     }
 
     func traceEvent(
@@ -288,7 +289,7 @@ internal final class IREvaluationContext {
     // Helper for rendering a dynamic call path into a string
     private func resolveDynamicFunctionCallPath(path: [IR.Operand]) -> String {
         let path = path.map {
-            let v = (try? self.resolveOperand($0)) ?? "<unknown>"
+            let v = self.resolveOperand($0)
             if case .string(let s) = v {
                 return s
             }
@@ -460,7 +461,7 @@ func evalBlock(
         switch statement {
         case .arrayAppendStmt(let stmt):
             let array = ctx.resolveLocal(idx: stmt.array)
-            let value = try ctx.resolveOperand(stmt.value)
+            let value = ctx.resolveOperand(stmt.value)
             guard case .array(var arrayValue) = array, value != .undefined else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
             }
@@ -473,7 +474,7 @@ func evalBlock(
 
         case .assignVarOnceStmt(let stmt):
             // 'undefined' source value doesn't propagate aka don't break out of the block
-            let sourceValue = try ctx.resolveOperand(stmt.source)
+            let sourceValue = ctx.resolveOperand(stmt.source)
             let targetValue = ctx.resolveLocal(idx: stmt.target)
 
             // If it's the first time setting target, assign unconditionally
@@ -490,7 +491,7 @@ func evalBlock(
         case .assignVarStmt(let stmt):
             // 'undefined' source value doesn't propagate: allow
             // assiging undefined to target, and don't affect control flow.
-            let sourceValue = try ctx.resolveOperand(stmt.source)
+            let sourceValue = ctx.resolveOperand(stmt.source)
             ctx.assignLocal(idx: stmt.target, value: sourceValue)
 
         case .blockStmt(let stmt):
@@ -527,7 +528,7 @@ func evalBlock(
             var funcName = ""
             for i in stmt.path.indices {
                 let p = stmt.path[i]
-                let segment = try ctx.resolveOperand(p)
+                let segment = ctx.resolveOperand(p)
                 guard case .string(let stringValue) = segment else {
                     return failWithUndefined(withContext: ctx, stmt: statement)
                 }
@@ -570,8 +571,8 @@ func evalBlock(
             ctx.assignLocal(idx: stmt.result, value: result)
 
         case .dotStmt(let stmt):
-            let sourceValue = try ctx.resolveOperand(stmt.source)
-            let keyValue = try ctx.resolveOperand(stmt.key)
+            let sourceValue = ctx.resolveOperand(stmt.source)
+            let keyValue = ctx.resolveOperand(stmt.key)
 
             // If any input parameter is undefined then the statement is undefined
             guard sourceValue != .undefined, keyValue != .undefined else {
@@ -608,14 +609,14 @@ func evalBlock(
 
         case .equalStmt(let stmt):
             // This statement is undefined if a is not equal to b.
-            let a = try ctx.resolveOperand(stmt.a)
-            let b = try ctx.resolveOperand(stmt.b)
+            let a = ctx.resolveOperand(stmt.a)
+            let b = ctx.resolveOperand(stmt.b)
             if a == .undefined || b == .undefined || a != b {
                 return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
         case .isArrayStmt(let stmt):
-            guard case .array = try ctx.resolveOperand(stmt.source) else {
+            guard case .array = ctx.resolveOperand(stmt.source) else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
@@ -626,12 +627,12 @@ func evalBlock(
             }
 
         case .isObjectStmt(let stmt):
-            guard case .object = try ctx.resolveOperand(stmt.source) else {
+            guard case .object = ctx.resolveOperand(stmt.source) else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
         case .isSetStmt(let stmt):
-            guard case .set = try ctx.resolveOperand(stmt.source) else {
+            guard case .set = ctx.resolveOperand(stmt.source) else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
@@ -642,7 +643,7 @@ func evalBlock(
             }
 
         case .lenStmt(let stmt):
-            let sourceValue = try ctx.resolveOperand(stmt.source)
+            let sourceValue = ctx.resolveOperand(stmt.source)
             guard sourceValue != .undefined else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
             }
@@ -672,9 +673,7 @@ func evalBlock(
                 idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
 
         case .makeNumberRefStmt(let stmt):
-            let sourceStringValue = try ctx.resolveStaticString(
-                Int(stmt.index))
-            guard let n = numberFormatter.number(from: sourceStringValue) else {
+            guard let n = ctx.policy.resolveStaticNumber(Int(stmt.index)) else {
                 throw RegoError(code: .invalidDataType, message: "invalid number literal with MakeNumberRefStatement")
             }
             ctx.assignLocal(idx: stmt.target, value: .number(n))
@@ -690,8 +689,8 @@ func evalBlock(
 
         case .notEqualStmt(let stmt):
             // This statement is undefined if a is equal to b.
-            let a = try ctx.resolveOperand(stmt.a)
-            let b = try ctx.resolveOperand(stmt.b)
+            let a = ctx.resolveOperand(stmt.a)
+            let b = ctx.resolveOperand(stmt.b)
             if a == .undefined || b == .undefined || a == b {
                 return failWithUndefined(withContext: ctx, stmt: statement)
             }
@@ -711,8 +710,8 @@ func evalBlock(
             }
 
         case .objectInsertOnceStmt(let stmt):
-            let targetValue = try ctx.resolveOperand(stmt.value)
-            let key = try ctx.resolveOperand(stmt.key)
+            let targetValue = ctx.resolveOperand(stmt.value)
+            let key = ctx.resolveOperand(stmt.key)
             let target = ctx.resolveLocal(idx: stmt.object)
             guard targetValue != .undefined && key != .undefined && target != .undefined else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
@@ -737,8 +736,8 @@ func evalBlock(
             ctx.assignLocal(idx: stmt.object, value: .object(targetObjectValue))
 
         case .objectInsertStmt(let stmt):
-            let value = try ctx.resolveOperand(stmt.value)
-            let key = try ctx.resolveOperand(stmt.key)
+            let value = ctx.resolveOperand(stmt.value)
+            let key = ctx.resolveOperand(stmt.key)
             let target = ctx.resolveLocal(idx: stmt.object)
             guard value != .undefined && key != .undefined && target != .undefined else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
@@ -817,7 +816,7 @@ func evalBlock(
             )
 
         case .setAddStmt(let stmt):
-            let value = try ctx.resolveOperand(stmt.value)
+            let value = ctx.resolveOperand(stmt.value)
             let target = ctx.resolveLocal(idx: stmt.set)
             guard value != .undefined && target != .undefined else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
@@ -833,7 +832,7 @@ func evalBlock(
 
         case .withStmt(let stmt):
             // First we need to resolve the value that will be upserted
-            let overlayValue = try ctx.resolveOperand(stmt.value)
+            let overlayValue = ctx.resolveOperand(stmt.value)
 
             // Next look up the object we'll be upserting into
             let toPatch = ctx.resolveLocal(idx: stmt.local)
@@ -909,7 +908,7 @@ private func evalCall(
         // Note: we do not enforce that args are defined here, it appears
         // that the expectation is that statements within the function blocks
         // (for non-builtins) handle it.
-        argValues.append(try ctx.resolveOperand(arg))
+        argValues.append(ctx.resolveOperand(arg))
     }
 
     if isDynamic {

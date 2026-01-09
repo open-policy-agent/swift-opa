@@ -14,7 +14,7 @@ extension Policy {
 
     /// Prepare the policy for execution by running static analysis passes.
     /// This computes properties like maxLocal that are used for optimization.
-    mutating func prepareForExecution() {
+    public mutating func prepareForExecution() {
         // Compute maxLocal for all plans
         if var plans = self.plans {
             for i in plans.plans.indices {

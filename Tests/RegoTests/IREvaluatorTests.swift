@@ -293,12 +293,12 @@ struct IRStatementTests {
         withLocals locals: Locals,
         withFuncs funcs: [IR.Func] = [],
         withStaticStrings staticStrings: [String] = []
-    )
+    ) throws
         -> IREvaluationContext
     {
         let block = Block(statements: [stmt])
 
-        let policy = IndexedIRPolicy(
+        let policy = try IndexedIRPolicy(
             policy: IR.Policy(
                 staticData: IR.Static(
                     strings: staticStrings.map { IR.ConstString(value: $0) }
@@ -1154,7 +1154,7 @@ struct IRStatementTests {
 
     @Test(arguments: allTests)
     func testStatementEvaluation(tc: TestCase) async throws {
-        let ctx = prepareFrame(
+        let ctx = try prepareFrame(
             forStatement: tc.stmt,
             withLocals: tc.locals,
             withFuncs: tc.funcs,

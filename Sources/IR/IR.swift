@@ -6,6 +6,10 @@ public struct Policy: Codable, Hashable, Sendable {
     public var plans: Plans? = nil
     public var funcs: Funcs? = nil
 
+    // Computed during static analysis: which static string indices are numeric literals
+    // (i.e., referenced by MakeNumberRefStmt)
+    public var staticStringNumbers: [Int] = []
+
     public init(staticData: Static? = nil, plans: Plans? = nil, funcs: Funcs? = nil) {
         self.staticData = staticData
         self.plans = plans
@@ -16,6 +20,7 @@ public struct Policy: Codable, Hashable, Sendable {
         case staticData = "static"
         case plans
         case funcs
+        // staticStringNumbers not encoded - computed during prepareForExecution
     }
 }
 

@@ -186,7 +186,7 @@ extension OPA.Engine {
                 throw RegoError.init(code: .invalidArgumentError, message: "Cannot mix direct IR policies with bundles")
             }
 
-            evaluator = IREvaluator(policies: self.policies)
+            evaluator = try IREvaluator(policies: self.policies)
         } else {
             evaluator = try IREvaluator(bundles: loadedBundles)
         }

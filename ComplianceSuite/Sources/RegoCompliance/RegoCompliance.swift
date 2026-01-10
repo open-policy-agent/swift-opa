@@ -75,8 +75,32 @@ public struct ComplianceTesting {
             case wantPlanResult = "want_plan_result"
         }
 
-        public enum Error: Swift.Error {
-            case decodingFailed(filename: String, error: Swift.Error)
+        // Custom decoder to call prepareForExecution() on the plan
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.filename = nil
+            self.note = try container.decode(String.self, forKey: .note)
+            self.query = ""  // query is not in the JSON, it's computed later
+            self.modules = try container.decodeIfPresent([String].self, forKey: .modules)
+            self.data = try container.decodeIfPresent(AST.RegoValue.self, forKey: .data)
+            self.input = try container.decodeIfPresent(AST.RegoValue.self, forKey: .input)
+            self.inputTerm = try container.decodeIfPresent(String.self, forKey: .inputTerm)
+            self.wantDefined = try container.decodeIfPresent(Bool.self, forKey: .wantDefined) ?? false
+            self.wantResult = try container.decodeIfPresent(AST.RegoValue.self, forKey: .wantResult)
+            self.wantErrorCode = try container.decodeIfPresent(String.self, forKey: .wantErrorCode)
+            self.wantError = try container.decodeIfPresent(String.self, forKey: .wantError)
+            self.sortBindings = try container.decodeIfPresent(Bool.self, forKey: .sortBindings) ?? false
+            self.strictError = try container.decodeIfPresent(Bool.self, forKey: .strictError) ?? false
+
+            // Decode the plan and prepare it for execution (runs static analysis)
+            var plan = try container.decode(IR.Policy.self, forKey: .plan)
+            try plan.prepareForExecution()
+
+            self.plan = plan
+
+            self.entrypoints = try container.decodeIfPresent([String].self, forKey: .entrypoints) ?? []
+            self.wantPlanResult =
+                try container.decodeIfPresent(AST.RegoValue.self, forKey: .wantPlanResult) ?? .object([:])
         }
     }
 
@@ -150,7 +174,7 @@ public struct ComplianceTesting {
 
                 out.append(filtered)
             } catch {
-                throw ComplianceTestCase.Error.decodingFailed(
+                throw Error.decodingFailed(
                     filename: url.pathComponents.suffix(from: url.pathComponents.endIndex.advanced(by: -2)).joined(
                         separator: "/"
                     ),
@@ -363,6 +387,7 @@ public struct ComplianceTesting {
     }
 
     public enum Error: Swift.Error {
+        case decodingFailed(filename: String, error: Swift.Error)
         case loadFailed(reason: String)
         case skipped(reason: String)
         case testFailed(reason: String, error: Swift.Error? = nil)

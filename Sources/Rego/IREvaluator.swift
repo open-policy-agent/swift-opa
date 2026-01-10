@@ -12,18 +12,6 @@ private let numberFormatter: NumberFormatter = {
     return formatter
 }()
 
-/// InvocationKey is a key for memoizing an IR function call invocation.
-/// Note we capture the arguments as unresolved operands and not resolved values,
-/// as hashing the values was proving extremely expensive. We instead rely on the
-/// invariant that the plan / evaluator will not modify a local after it has been initally set.
-struct InvocationKey: Hashable {
-    let funcName: String
-    let args: [IR.Operand]
-}
-
-/// MemoCache is a memoization cache of plan invocations
-typealias MemoCache = [InvocationKey: AST.RegoValue]
-
 internal struct IREvaluator {
     let policies: [IndexedIRPolicy]
 
@@ -145,7 +133,7 @@ internal final class IREvaluationContext {
     var policy: IndexedIRPolicy
     var maxCallDepth: Int = 16_384
     var callDepth: Int = 0
-    var memoStack: [MemoCache] = []
+    var memoStack = MemoStack()
     var results: ResultSet
     var locals: Locals = Locals(repeating: nil, count: 2)
 
@@ -153,40 +141,6 @@ internal final class IREvaluationContext {
         self.ctx = ctx
         self.policy = policy
         self.results = ResultSet.empty
-    }
-
-    subscript(key: InvocationKey) -> AST.RegoValue? {
-        get {
-            guard !memoStack.isEmpty else {
-                return nil
-            }
-            return memoStack[memoStack.count - 1][key]
-        }
-        set {
-            if memoStack.isEmpty {
-                memoStack.append(MemoCache())
-            }
-            memoStack[memoStack.count - 1][key] = newValue
-        }
-    }
-
-    func pushMemoCache() {
-        memoStack.append(MemoCache())
-    }
-
-    func popMemoCache() {
-        guard !memoStack.isEmpty else {
-            return
-        }
-        memoStack.removeLast()
-    }
-
-    func withPushedMemoCache<T>(_ body: () async throws -> T) async rethrows -> T {
-        pushMemoCache()
-        defer {
-            popMemoCache()
-        }
-        return try await body()
     }
 
     func currentLocation(stmt: IR.Statement) throws -> OPA.Trace.Location {
@@ -549,7 +503,7 @@ func evalBlock(
                 isDynamic: true
             )
 
-            guard result != AST.RegoValue.undefined else {
+            guard result != .undefined else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
@@ -563,7 +517,7 @@ func evalBlock(
                 args: stmt.args ?? []
             )
 
-            guard result != AST.RegoValue.undefined else {
+            guard result != .undefined else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
             }
 
@@ -858,7 +812,7 @@ func evalBlock(
                 ctx.assignLocal(idx: stmt.local, value: toPatch)
             }
 
-            let blockResult = try await ctx.withPushedMemoCache {
+            let blockResult = try await ctx.memoStack.withPush {
                 // Execute the block with the patched value
                 return try await evalBlock(
                     withContext: ctx,
@@ -899,7 +853,7 @@ private func evalCall(
     // Check memo cache if applicable to save repeated evaluation time for rules
     let shouldMemoize = args.count == 2  // Currently support _rules_, not _functions_
     let sig = InvocationKey(funcName: funcName, args: args)
-    if shouldMemoize, let cachedResult = ctx[sig] {
+    if shouldMemoize, let cachedResult = ctx.memoStack[sig] {
         return cachedResult
     }
 
@@ -929,7 +883,7 @@ private func evalCall(
         )
 
         if shouldMemoize {
-            ctx[sig] = result
+            ctx.memoStack[sig] = result
         }
         return result
     }
@@ -944,7 +898,7 @@ private func evalCall(
         )
 
         if shouldMemoize {
-            ctx[sig] = result
+            ctx.memoStack[sig] = result
         }
 
         return result

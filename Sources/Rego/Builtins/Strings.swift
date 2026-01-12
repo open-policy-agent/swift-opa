@@ -479,7 +479,7 @@ func stringifyValue(_ v: RegoValue) throws -> String {
     if case .array(let a) = v {
         return try stringifyArray(a)
     }
-    
+
     if case .set(let s) = v {
         return try stringifySet(s)
     }
@@ -487,7 +487,7 @@ func stringifyValue(_ v: RegoValue) throws -> String {
     if case .object(let o) = v {
         return try stringifyObject(o)
     }
-    
+
     let encoder = JSONEncoder()
     encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
     encoder.nonConformingFloatEncodingStrategy = .throw
@@ -497,16 +497,17 @@ func stringifyValue(_ v: RegoValue) throws -> String {
     return output
 }
 
-func stringifyArray(_ a: Array<RegoValue>) throws -> String {
+func stringifyArray(_ a: [RegoValue]) throws -> String {
     if a.isEmpty {
         return "[]"
     }
 
     var result: String = "["
 
-    result.append(try a.map {
-        return try stringifyValue($0)
-    }.joined(separator: ", "))
+    result.append(
+        try a.map {
+            return try stringifyValue($0)
+        }.joined(separator: ", "))
 
     result.append("]")
 
@@ -520,9 +521,10 @@ func stringifySet(_ s: Set<RegoValue>) throws -> String {
 
     var result: String = "{"
 
-    result.append(try s.sorted().map {
-        return try stringifyValue($0)
-    }.joined(separator: ", "))
+    result.append(
+        try s.sorted().map {
+            return try stringifyValue($0)
+        }.joined(separator: ", "))
 
     result.append("}")
 
@@ -536,11 +538,12 @@ func stringifyObject(_ o: [RegoValue: RegoValue]) throws -> String {
 
     var result: String = "{"
 
-    result.append(try o.sorted{ 
-        return $0.key < $1.key
-    }.map {
-        return try stringifyValue($0.key) + ": " + stringifyValue($0.value)
-    }.joined(separator: ", "))
+    result.append(
+        try o.sorted {
+            return $0.key < $1.key
+        }.map {
+            return try stringifyValue($0.key) + ": " + stringifyValue($0.value)
+        }.joined(separator: ", "))
 
     result.append("}")
 

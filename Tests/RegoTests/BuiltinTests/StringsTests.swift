@@ -1024,6 +1024,97 @@ extension BuiltinTests.StringsTests {
         ),
     ]
 
+    static let interpolationTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "empty",
+            name: "internal.template_string",
+            args: [.array([])],
+            expected: .success("")
+        ),
+        BuiltinTests.TestCase(
+            description: "undefined optional",
+            name: "internal.template_string",
+            args: [.array([.set([])])],
+            expected: .success("<undefined>")
+        ),
+        BuiltinTests.TestCase(
+            description: "primitives",
+            name: "internal.template_string",
+            args: [.array(["foo ", 42, " ", 4.2, " ", false, " ", .null])],
+            expected: .success("foo 42 4.2 false null")
+        ),
+        BuiltinTests.TestCase(
+            description: "primitives, optional",
+            name: "internal.template_string",
+            args: [.array([.set(["foo"]), " ", .set([42]), " ", .set([4.2]), " ", .set([false]), " ", .set([.null])])],
+            expected: .success("foo 42 4.2 false null")
+        ),
+        BuiltinTests.TestCase(
+            description: "collections, optional",
+            name: "internal.template_string",
+            args: [
+                .array([
+                    .set([.array([])]), " ",
+                    .set([.array(["a", "b"])]), " ",
+                    .set([.set([])]), " ",
+                    .set([.set(["c"])]), " ",
+                    .set([.set(["d", 42, 4.2, false, .null])]), " ",
+                    .set([.object([:])]), " ",
+                    .set([.object(["d": "e"])]), " ",
+                    .set([.object(["f": "g", "h": "i"])]),
+                ])
+            ],
+            expected: .success(
+                """
+                [] ["a", "b"] set() {"c"} {null, false, 4.2, 42, "d"} {} {"d": "e"} {"f": "g", "h": "i"}
+                """)
+        ),
+        BuiltinTests.TestCase(
+            description: "nested empty array",
+            name: "internal.template_string",
+            args: [
+                .array([
+                    .set([.array([.array([])])])
+                ])
+            ],
+            expected: .success("[[]]")
+        ),
+        BuiltinTests.TestCase(
+            description: "nested empty set",
+            name: "internal.template_string",
+            args: [
+                .array([
+                    .set([.set([.set([])])])
+                ])
+            ],
+            expected: .success("{set()}")
+        ),
+        BuiltinTests.TestCase(
+            description: "multiple outputs",
+            name: "internal.template_string",
+            args: [
+                .array([
+                    .set(["foo", "bar"])
+                ])
+            ],
+            expected: .failure(
+                BuiltinError.halt(
+                    reason: "template-strings must not produce multiple outputs"))
+        ),
+        BuiltinTests.TestCase(
+            description: "illegal argument type",
+            name: "internal.template_string",
+            args: [
+                .array([
+                    .array(["foo", "bar"])
+                ])
+            ],
+            expected: .failure(
+                BuiltinError.halt(
+                    reason: "illegal argument type: array"))
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
             concatTests,
@@ -1035,6 +1126,7 @@ extension BuiltinTests.StringsTests {
             sprintfBasicTests,
             trimTests,
             upperTests,
+            interpolationTests,
 
             BuiltinTests.generateFailureTests(
                 builtinName: "startswith", sampleArgs: ["a", "b"], argIndex: 0, argName: "search",

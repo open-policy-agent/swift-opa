@@ -433,6 +433,121 @@ extension BuiltinFuncs {
 
         return .string(x.uppercased())
     }
+
+    static func templateString(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+
+        guard case .array(let parts) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "parts", got: args[0].typeName, want: "array")
+        }
+
+        return try .string(
+            parts.map {
+                switch $0 {
+                case .string, .number, .boolean, .null:
+                    return try stringifyRegoValue($0)
+                case .set(let s):
+                    if s.isEmpty {
+                        return "<undefined>"
+                    }
+
+                    if s.count > 1 {
+                        throw BuiltinError.halt(reason: "template-strings must not produce multiple outputs")
+                    }
+
+                    return try stringifyRegoValue(s.first!)
+                default:
+                    throw BuiltinError.halt(reason: "illegal argument type: " + $0.typeName)
+                }
+            }.joined())
+    }
+}
+
+// stringifyRegoValue returns a string representation of a RegoValue as expected by OPA string-interpolation
+// FIXME: Should this replace RegoValue+Codable stringification?
+func stringifyRegoValue(_ v: RegoValue) throws -> String {
+    if case .string(let s) = v {
+        return s
+    }
+
+    return try stringifyValue(v)
+}
+
+func stringifyValue(_ v: RegoValue) throws -> String {
+    if case .array(let a) = v {
+        return try stringifyArray(a)
+    }
+
+    if case .set(let s) = v {
+        return try stringifySet(s)
+    }
+
+    if case .object(let o) = v {
+        return try stringifyObject(o)
+    }
+
+    let encoder = JSONEncoder()
+    encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+    encoder.nonConformingFloatEncodingStrategy = .throw
+    guard let output = String(data: try encoder.encode(v), encoding: .utf8) else {
+        throw RegoValue.RegoEncodingError.invalidUTF8
+    }
+    return output
+}
+
+func stringifyArray(_ a: [RegoValue]) throws -> String {
+    if a.isEmpty {
+        return "[]"
+    }
+
+    var result: String = "["
+
+    result.append(
+        try a.map {
+            return try stringifyValue($0)
+        }.joined(separator: ", "))
+
+    result.append("]")
+
+    return result
+}
+
+func stringifySet(_ s: Set<RegoValue>) throws -> String {
+    if s.isEmpty {
+        return "set()"
+    }
+
+    var result: String = "{"
+
+    result.append(
+        try s.sorted().map {
+            return try stringifyValue($0)
+        }.joined(separator: ", "))
+
+    result.append("}")
+
+    return result
+}
+
+func stringifyObject(_ o: [RegoValue: RegoValue]) throws -> String {
+    if o.isEmpty {
+        return "{}"
+    }
+
+    var result: String = "{"
+
+    result.append(
+        try o.sorted {
+            return $0.key < $1.key
+        }.map {
+            return try stringifyValue($0.key) + ": " + stringifyValue($0.value)
+        }.joined(separator: ", "))
+
+    result.append("}")
+
+    return result
 }
 
 extension String {

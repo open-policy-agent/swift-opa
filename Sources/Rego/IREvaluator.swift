@@ -459,7 +459,7 @@ func evalBlock(
     stmtLoop: for i in block.statements.indices {
         let statement = block.statements[i]
 
-        if Task.isCancelled {
+        if i % 16 == 0 && Task.isCancelled {
             throw RegoError(code: .evaluationCancelled, message: "parent task cancelled")
         }
 

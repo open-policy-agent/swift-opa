@@ -15,7 +15,7 @@ struct InvocationKey: Hashable {
 typealias MemoCache = [InvocationKey: AST.RegoValue]
 
 /// MemoStack is a stack of MemoCaches
-struct MemoStack {
+final class MemoStack {
     var stack: [MemoCache] = []
 }
 
@@ -36,11 +36,11 @@ extension MemoStack {
         }
     }
 
-    mutating func push() {
+    func push() {
         self.stack.append(MemoCache.init())
     }
 
-    mutating func pop() {
+    func pop() {
         guard !self.stack.isEmpty else {
             return
         }
@@ -50,7 +50,7 @@ extension MemoStack {
     /// withPush returns the result of calling the provided closure with
     /// a fresh memoCache pushed on the stack. The memoCache will only be
     /// active during that call, and discarded when it completes.
-    mutating func withPush<T>(_ body: () async throws -> T) async rethrows -> T {
+    func withPush<T>(_ body: () async throws -> T) async rethrows -> T {
         self.push()
         defer {
             self.pop()

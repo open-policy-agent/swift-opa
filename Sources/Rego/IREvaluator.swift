@@ -921,10 +921,13 @@ private func evalCall(
             return .undefined
         }
 
+        // funcsPathToName and funcs are built together, so this must succeed
+        let fn = ctx.policy.funcs[funcName]!
+
         let result = try await callPlanFunc(
             ctx: ctx,
             caller: caller,
-            funcName: funcName,
+            fn: fn,
             args: argValues
         )
 
@@ -935,11 +938,11 @@ private func evalCall(
     }
 
     // Handle plan-defined functions first
-    if ctx.policy.funcs[funcName] != nil {
+    if let fn = ctx.policy.funcs[funcName] {
         let result = try await callPlanFunc(
             ctx: ctx,
             caller: caller,
-            funcName: funcName,
+            fn: fn,
             args: argValues
         )
 
@@ -978,14 +981,11 @@ private func evalCall(
 private func callPlanFunc(
     ctx: IREvaluationContext,
     caller: IR.Statement,
-    funcName: String,
+    fn: borrowing IR.Func,
     args: [AST.RegoValue]
 ) async throws -> AST.RegoValue {
-    guard let fn = ctx.policy.funcs[funcName] else {
-        throw RegoError(code: .internalError, message: "function definition not found: \(funcName)")
-    }
     guard fn.params.count == args.count else {
-        throw RegoError(code: .internalError, message: "mismatched argument count for function \(funcName)")
+        throw RegoError(code: .internalError, message: "mismatched argument count for function \(fn.name)")
     }
     guard ctx.callDepth < ctx.maxCallDepth else {
         throw RegoError(code: .maxCallDepthExceeded, message: "maximum call depth exceeded: \(ctx.callDepth)")

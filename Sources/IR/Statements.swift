@@ -1,3 +1,5 @@
+import AST
+
 public struct ArrayAppendStatement: Sendable, Codable, Hashable {
     public var location: Location = Location()
 

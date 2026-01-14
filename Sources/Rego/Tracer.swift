@@ -1,5 +1,4 @@
 import Foundation
-import IR
 
 extension OPA {
     /// Namespace for tracing-related types

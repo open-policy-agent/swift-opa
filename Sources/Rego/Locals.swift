@@ -1,6 +1,5 @@
 import AST
 import Foundation
-import IR
 
 /// Array-based storage for IR local variables.
 ///
@@ -51,13 +50,13 @@ internal struct Locals: Equatable, Sendable, Encodable {
     // Create Locals sized to accommodate given local indices
     // Used for function call frames where we need to pre-size for parameters
     // The O(N) max() scan is acceptable since functions typically have few parameters
-    init(accommodating locals: [IR.Local], minimumSize: Int = 0) {
-        let maxLocal = locals.max() ?? IR.Local(0)
+    init(accommodating locals: [Local], minimumSize: Int = 0) {
+        let maxLocal = locals.max() ?? Local(0)
         let requiredSize = Int(maxLocal) + 1 + minimumSize
         self.storage = Array(repeating: nil, count: requiredSize)
     }
 
-    subscript(index: IR.Local) -> AST.RegoValue? {
+    subscript(index: Local) -> AST.RegoValue? {
         get {
             let idx = Int(index)
             // Return nil if out of bounds. This happens when:

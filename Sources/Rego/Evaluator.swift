@@ -1,7 +1,6 @@
 // Evaluator.swift - this file contains code related to evaluating an Rego IR Plan.
 import AST
 import Foundation
-import IR
 
 protocol Evaluator: Sendable {
     func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet

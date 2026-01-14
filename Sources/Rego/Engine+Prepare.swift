@@ -1,4 +1,5 @@
 import AST
+import Bytecode
 import Foundation
 import IR
 
@@ -60,8 +61,9 @@ extension OPA.Engine {
             }
         }()
 
-        for policy in evaluator.policies.map(\.ir) {
-            guard let requiredBuiltInsArray = policy.staticData?.builtinFuncs else {
+        for policy in evaluator.policies {
+            let requiredBuiltInsArray = policy.builtinFuncs
+            guard !requiredBuiltInsArray.isEmpty else {
                 continue
             }
 

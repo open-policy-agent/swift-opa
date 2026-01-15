@@ -157,6 +157,12 @@ internal final class IREvaluationContext {
     var results: ResultSet
     var locals: Locals = Locals(repeating: nil, count: 2)
 
+    // Pool for reusing storage arrays across function calls
+    private var localsPool: [[AST.RegoValue?]] = []
+
+    // Pool for reusing args arrays
+    private var argsPool: [[AST.RegoValue]] = []
+
     init(ctx: EvaluationContext, policy: IndexedIRPolicy) {
         self.ctx = ctx
         self.policy = policy
@@ -228,6 +234,37 @@ internal final class IREvaluationContext {
 
     func resolveStaticString(_ idx: Int) -> String {
         return policy.resolveStaticString(idx)
+    }
+
+    func allocateLocals(count: Int) -> Locals {
+        if var storage = localsPool.popLast() {
+            if count > storage.count {
+                storage.append(contentsOf: repeatElement(nil, count: count - storage.count))
+            }
+            return Locals(storage)
+        }
+        return Locals(repeating: nil, count: count)
+    }
+
+    func releaseLocals(_ locals: Locals, usedCount: Int? = nil) {
+        var locals = locals
+        let clearedStorage = locals.releaseStorage(usedCount: usedCount)
+        localsPool.append(clearedStorage)
+    }
+
+    func allocateArgs(count: Int) -> [AST.RegoValue] {
+        if var args = argsPool.popLast() {
+            args.reserveCapacity(count)
+            return args
+        }
+        var args: [AST.RegoValue] = []
+        args.reserveCapacity(count)
+        return args
+    }
+
+    func releaseArgs(_ args: inout [AST.RegoValue]) {
+        args.removeAll(keepingCapacity: true)
+        argsPool.append(args)
     }
 
     func traceEvent(
@@ -911,8 +948,11 @@ private func evalCall(
         return cachedResult
     }
 
-    var argValues: [AST.RegoValue] = []
-    argValues.reserveCapacity(args.count)
+    var argValues = ctx.allocateArgs(count: args.count)
+    defer {
+        ctx.releaseArgs(&argValues)
+    }
+
     for arg in args {
         // Note: we do not enforce that args are defined here, it appears
         // that the expectation is that statements within the function blocks
@@ -1006,7 +1046,8 @@ private func callPlanFunc(
     // in the new frame.
 
     // Build locals array pre-sized to exact maximum needed for this function (computed via static analysis)
-    var callLocals = Locals(repeating: nil, count: max(fn.maxLocal + 1, 2))
+    let localsCount = max(fn.maxLocal + 1, 2)
+    var callLocals = ctx.allocateLocals(count: localsCount)
 
     // Assign parameters
     for (argValue, paramIdx) in zip(args, fn.params) {
@@ -1025,7 +1066,9 @@ private func callPlanFunc(
     ctx.callDepth += 1
     defer {
         ctx.callDepth -= 1
+        let returnedLocals = ctx.locals
         ctx.locals = savedLocals
+        ctx.releaseLocals(returnedLocals, usedCount: localsCount)
     }
 
     // Execute the function blocks with fresh locals

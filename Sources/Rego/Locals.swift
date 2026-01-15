@@ -83,6 +83,16 @@ internal struct Locals: Equatable, Sendable, Encodable {
     var count: Int { storage.count }
     var isEmpty: Bool { storage.isEmpty }
 
+    // Clear values up to usedCount and return the storage for pooling
+    mutating func releaseStorage(usedCount: Int? = nil) -> [AST.RegoValue?] {
+        let clearCount = usedCount ?? storage.count
+        for i in 0..<clearCount {
+            storage[i] = nil
+        }
+
+        return storage
+    }
+
     // Resize array to specific size, truncating or extending with nil as needed
     mutating func resize(to size: Int) {
         guard size >= 0 else {

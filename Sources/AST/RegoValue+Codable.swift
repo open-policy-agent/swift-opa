@@ -46,6 +46,11 @@ extension RegoValue: Codable {
         try self.init(from: d)
     }
 
+    // Initialize a RegoValue from a type that can be JSON-encoded
+    public init(encodable: Encodable) throws {
+        try self.init(jsonData: try JSONEncoder().encode(encodable))
+    }
+
     // Decodable initializer
     public init(from decoder: Decoder) throws {
         // Try as an object

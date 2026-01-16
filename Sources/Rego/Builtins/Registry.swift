@@ -144,6 +144,7 @@ public struct BuiltinRegistry: Sendable {
             "split": BuiltinFuncs.split,
             "sprintf": BuiltinFuncs.sprintf,
             "startswith": BuiltinFuncs.startsWith,
+            "strings.count": BuiltinFuncs.stringsCount,
             "strings.reverse": BuiltinFuncs.reverse,
             "substring": BuiltinFuncs.substring,
             "trim": BuiltinFuncs.trim,

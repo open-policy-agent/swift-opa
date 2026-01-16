@@ -122,6 +122,7 @@ public struct BuiltinRegistry: Sendable {
             "object.get": BuiltinFuncs.objectGet,
             "object.keys": BuiltinFuncs.objectKeys,
             "object.union": BuiltinFuncs.objectUnion,
+            "object.union_n": BuiltinFuncs.objectUnionN,
 
             // Rand
             "rand.intn": BuiltinFuncs.numbersRandIntN,

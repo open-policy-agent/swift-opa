@@ -12,7 +12,7 @@ extension Tag {
 
 private let complianceFilterFlag = "OPA_COMPLIANCE_TESTS"
 private let complianceTraceLevelFlag = "OPA_COMPLIANCE_TRACE"
-private let complianceTestsConfigFlag = "OPA_COMPLINACE_TESTS_CONFIG"
+private let complianceTestsConfigFlag = "OPA_COMPLIANCE_TESTS_CONFIG"
 private let complianceSkipKnownIssuesFlag = "OPA_COMPLIANCE_TESTS_SKIP_KNOWN_ISSUES"
 
 // Feature flag compliance tests, set OPA_COMPLIANCE_TESTS=... to run

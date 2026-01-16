@@ -185,10 +185,6 @@ public struct BuiltinRegistry: Sendable {
         self.builtins[name]
     }
 
-    init(builtins: [String: Builtin]) {
-        self.builtins = builtins
-    }
-
     func invoke(
         withContext ctx: BuiltinContext,
         name: String,

@@ -109,3 +109,25 @@ jobs:
           }
           diff_and_print main-passed pr-passed 'passed (main vs PR)' >> $GITHUB_STEP_SUMMARY
           diff_and_print main-failed pr-failed 'failed (main vs PR)' >> $GITHUB_STEP_SUMMARY
+
+  capabilities-check:
+    name: check capabilities.json unchanged
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - run: sudo xcode-select -s /Applications/Xcode_26.0.app
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: generate capabilities
+        run: make generate
+      - name: check for changes
+        run: |
+          if git diff --exit-code capabilities.json; then
+            echo "capabilities.json is up-to-date"
+          else
+            echo "::error::capabilities.json needs to be updated"
+            echo "Run: swift run swift-opa-cli capabilities opa-capabilities.json > capabilities.json"
+            echo "Differences:"
+            git diff capabilities.json
+            exit 1
+          fi

@@ -45,7 +45,7 @@ public struct BuiltinRegistry: Sendable {
         )
     }
 
-    fileprivate static var defaultBuiltins: [String: Builtin] {
+    internal static var defaultBuiltins: [String: Builtin] {
         return [
             // Aggregates
             "count": BuiltinFuncs.count,
@@ -209,6 +209,10 @@ public struct BuiltinRegistry: Sendable {
             }
             return .undefined
         }
+    }
+    /// Returns the names of all supported builtins
+    public static func getSupportedBuiltinNames() -> [String] {
+        return Array(defaultBuiltins.keys)
     }
 }
 

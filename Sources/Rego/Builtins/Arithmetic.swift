@@ -25,7 +25,7 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "number")
         }
 
-        return .number(NSDecimalNumber(decimal: x.decimalValue + y.decimalValue))
+        return .number(x + y)
     }
 
     static func minus(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -38,7 +38,7 @@ extension BuiltinFuncs {
             guard case .number(let y) = args[1] else {
                 throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "number")
             }
-            return .number(NSDecimalNumber(decimal: x.decimalValue - y.decimalValue))
+            return .number(x - y)
         case .set(let x):
             guard case .set(let y) = args[1] else {
                 throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "set")
@@ -68,7 +68,7 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "number")
         }
 
-        return .number(NSDecimalNumber(decimal: x.decimalValue * y.decimalValue))
+        return .number(x * y)
     }
 
     // Divides the first number by the second number.
@@ -86,12 +86,11 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "y", got: args[1].typeName, want: "number")
         }
 
-        // No divide-by-zero
-        guard y.decimalValue != 0 else {
+        guard y != RegoNumber(value: 0) else {
             throw BuiltinError.evalError(msg: "division by zero")
         }
 
-        return .number(NSDecimalNumber(decimal: x.decimalValue / y.decimalValue))
+        return .number(x / y)
     }
 
     static func round(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -107,7 +106,7 @@ extension BuiltinFuncs {
             return args[0]
         }
 
-        return .number(NSNumber(value: _round(x.doubleValue)))
+        return .number(RegoNumber(value: _round(x.doubleValue)))
     }
 
     static func ceil(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -123,7 +122,7 @@ extension BuiltinFuncs {
             return args[0]
         }
 
-        return .number(NSNumber(value: _ceil(x.doubleValue)))
+        return .number(RegoNumber(value: _ceil(x.doubleValue)))
     }
 
     static func floor(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -139,7 +138,7 @@ extension BuiltinFuncs {
             return args[0]
         }
 
-        return .number(NSNumber(value: _floor(x.doubleValue)))
+        return .number(RegoNumber(value: _floor(x.doubleValue)))
     }
 
     static func abs(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -151,7 +150,7 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "number")
         }
 
-        return .number(NSDecimalNumber(decimal: x.decimalValue.magnitude))
+        return .number(RegoNumber(x.decimalValue.magnitude))
     }
 
     // Returns the remainder for of `x` divided by `y`, for `y != 0`.
@@ -178,6 +177,6 @@ extension BuiltinFuncs {
             throw BuiltinError.evalError(msg: "modulo by zero")
         }
 
-        return .number(NSNumber(value: x % y))
+        return .number(RegoNumber(value: x % y))
     }
 }

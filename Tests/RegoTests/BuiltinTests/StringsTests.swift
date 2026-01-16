@@ -1129,6 +1129,13 @@ extension BuiltinTests.StringsTests {
             interpolationTests,
 
             BuiltinTests.generateFailureTests(
+                builtinName: "strings.count", sampleArgs: ["search", "substring"], argIndex: 0,
+                argName: "search", allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "strings.count", sampleArgs: ["search", "substring"], argIndex: 1,
+                argName: "substring", allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+
+            BuiltinTests.generateFailureTests(
                 builtinName: "startswith", sampleArgs: ["a", "b"], argIndex: 0, argName: "search",
                 allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
             BuiltinTests.generateFailureTests(

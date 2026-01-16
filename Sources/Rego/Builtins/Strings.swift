@@ -62,6 +62,28 @@ extension BuiltinFuncs {
         return .boolean(haystack.contains(needle))
     }
 
+    static func stringsCount(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
+        }
+
+        guard case .string(let search) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "search", got: args[0].typeName, want: "string")
+        }
+
+        guard case .string(let substring) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "substring", got: args[1].typeName, want: "string")
+        }
+
+        // Handle empty substring case - should return 0 per OPA behavior
+        guard !substring.isEmpty else {
+            return .number(0)
+        }
+
+        let occurrences = search.allRanges(of: substring).count
+        return .number(NSNumber(value: occurrences))
+    }
+
     static func endsWith(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)

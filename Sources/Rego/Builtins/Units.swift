@@ -98,12 +98,12 @@ extension BuiltinFuncs {
         let result = NSNumber(value: NSDecimalNumber(decimal: u.apply(to: x)).doubleValue)
 
         // Handle infinite values that would crash in toNumberRegoValue
-        if !result.doubleValue.isFinite {
-            if returnInts {
-                return .number(NSNumber(value: result.doubleValue > 0 ? Int64.max : Int64.min))
-            } else {
-                return .number(NSNumber(value: result.doubleValue))
-            }
+        guard result.doubleValue.isFinite else {
+            let infiniteValue =
+                returnInts
+                ? NSNumber(value: result.doubleValue > 0 ? Int64.max : Int64.min)
+                : NSNumber(value: result.doubleValue)
+            return .number(infiniteValue)
         }
 
         return result.toNumberRegoValue(asInt: returnInts)

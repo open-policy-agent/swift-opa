@@ -545,11 +545,55 @@ extension BuiltinTests.ObjectTests {
         ),
     ]
 
+    static let objectUnionNTests: [BuiltinTests.TestCase] = [
+        // Argument validation tests (not covered by JSON-based compliance tests)
+        BuiltinTests.TestCase(
+            description: "not enough args",
+            name: "object.union_n",
+            args: [],
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 1))
+        ),
+        BuiltinTests.TestCase(
+            description: "too many args",
+            name: "object.union_n",
+            args: [
+                .array([["a": 1]]),
+                .array([["b": 2]]),
+            ],
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 2, want: 1))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong arg type",
+            name: "object.union_n",
+            args: [
+                ["a": 1]
+            ],
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "objects", got: "object", want: "array"))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong array element type",
+            name: "object.union_n",
+            args: [
+                .array([["a": 1], "not an object"])
+            ],
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "objects[1]", got: "string", want: "object"))
+        ),
+        BuiltinTests.TestCase(
+            description: "mixed valid and invalid array elements",
+            name: "object.union_n",
+            args: [
+                .array([["a": 1], .null, ["c": 3]])
+            ],
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "objects[1]", got: "null", want: "object"))
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
             objectGetTests,
             objectKeysTests,
             objectUnionTests,
+            objectUnionNTests,
         ].flatMap { $0 }
     }
 

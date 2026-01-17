@@ -103,4 +103,32 @@ extension BuiltinFuncs {
 
         return .object(a.merging(b) { (_, new) in new })
     }
+
+    // union_n creates a new object by merging all objects in the provided array of objects to merge (array[object[any: any]])
+    // returns: output (any) a new object which is the result of an asymmetric recursive union of all objects
+    // where conflicts are resolved by choosing the key from the right-hand object
+    static func objectUnionN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+
+        guard case .array(let objects) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "objects", got: args[0].typeName, want: "array")
+        }
+
+        // Start with an empty object as the accumulator
+        var result: [AST.RegoValue: AST.RegoValue] = [:]
+
+        // Iterate through each object in the array
+        for (index, obj) in objects.enumerated() {
+            guard case .object(let objDict) = obj else {
+                throw BuiltinError.argumentTypeMismatch(arg: "objects[\(index)]", got: obj.typeName, want: "object")
+            }
+
+            // Merge this object into the result (right-hand side wins on conflicts)
+            result = result.merging(objDict) { (_, new) in new }
+        }
+
+        return .object(result)
+    }
 }

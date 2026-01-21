@@ -100,6 +100,7 @@ struct BuiltinTests {
         wantArgs: String? = nil,
         generateNumberOfArgsTest: Bool = false,
         numberAsInteger: Bool = false,
+        builtinRegistry: BuiltinRegistry = .defaultRegistry,
     ) -> [BuiltinTests.TestCase] {
         let argValues: [String: RegoValue] = [
             "array": [1, 2, 3], "boolean": false, "null": .null, (numberAsInteger ? "number[integer]" : "number"): 123,
@@ -109,7 +110,10 @@ struct BuiltinTests {
         var tests: [BuiltinTests.TestCase] = []
         if generateNumberOfArgsTest {
             tests.append(
-                contentsOf: generateNumberOfArgumentsFailureTests(builtinName: builtinName, sampleArgs: sampleArgs))
+                contentsOf: generateNumberOfArgumentsFailureTests(
+                    builtinName: builtinName,
+                    sampleArgs: sampleArgs,
+                    builtinRegistry: builtinRegistry))
         }
         // Formulating "want" part of the error message:
         // when passed explicitly, we will use the expression passed in
@@ -129,7 +133,8 @@ struct BuiltinTests {
                     args: wrongArgs,
                     expected: .failure(
                         BuiltinError.argumentTypeMismatch(arg: argName, got: testType, want: want)
-                    )
+                    ),
+                    builtinRegistry: builtinRegistry,
                 )
             )
         }
@@ -145,7 +150,8 @@ struct BuiltinTests {
     ///   - sampleArgs: The sample arguments to use. Use correct arguments for the builtin you are testing.
     static func generateNumberOfArgumentsFailureTests(
         builtinName: String,
-        sampleArgs: [RegoValue]
+        sampleArgs: [RegoValue],
+        builtinRegistry: BuiltinRegistry = .defaultRegistry,
     ) -> [BuiltinTests.TestCase] {
         var tests: [BuiltinTests.TestCase] = []
         // Only generate "too few" test case when expected number of arguments is > 0
@@ -156,7 +162,8 @@ struct BuiltinTests {
                     name: builtinName,
                     args: [],
                     expected: .failure(
-                        BuiltinError.argumentCountMismatch(got: 0, want: sampleArgs.count))
+                        BuiltinError.argumentCountMismatch(got: 0, want: sampleArgs.count)),
+                    builtinRegistry: builtinRegistry,
                 )
             )
         }
@@ -171,7 +178,8 @@ struct BuiltinTests {
                 args: tooManyArgs,
                 expected: .failure(
                     BuiltinError.argumentCountMismatch(
-                        got: tooManyArgs.count, want: sampleArgs.count))
+                        got: tooManyArgs.count, want: sampleArgs.count)),
+                builtinRegistry: builtinRegistry,
             )
         )
 

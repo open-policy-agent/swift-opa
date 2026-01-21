@@ -31,6 +31,10 @@ extension BuiltinTests.CustomBuiltinTests {
             ]
         )
 
+    // The testcases for too many/too few arguments, and for checking
+    // failures for wrong-typed arguments use the generateFailureTests
+    // infrastructure, using the custom registry providing this builtin.
+    // All other cases of interest are covered here.
     static let customBuiltinTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "Custom Builtin - 1 + 1",
@@ -47,43 +51,36 @@ extension BuiltinTests.CustomBuiltinTests {
             builtinRegistry: Self.customPlusBuiltinRegistry
         ),
         BuiltinTests.TestCase(
-            description: "Custom Builtin - not enough args",
-            name: "custom_plus",
-            args: [1],
-            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2)),
-            builtinRegistry: Self.customPlusBuiltinRegistry
-        ),
-        BuiltinTests.TestCase(
-            description: "Custom Builtin - too many args",
-            name: "custom_plus",
-            args: [1, 1, 1],
-            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2)),
-            builtinRegistry: Self.customPlusBuiltinRegistry
-        ),
-        BuiltinTests.TestCase(
-            description: "Custom Builtin - wrong lhs arg type",
-            name: "custom_plus",
-            args: ["1", 1],
-            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "x", got: "string", want: "number")),
-            builtinRegistry: Self.customPlusBuiltinRegistry
-        ),
-        BuiltinTests.TestCase(
-            description: "Custom Builtin - wrong rhs arg type",
-            name: "custom_plus",
-            args: [1, "1"],
-            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "y", got: "string", want: "number")),
-            builtinRegistry: Self.customPlusBuiltinRegistry
-        ),
-        BuiltinTests.TestCase(
             description: "Custom Builtin - not existent",
             name: "custom_plus2",  // does not exist
             args: [1, 1],
             expected: .failure(BuiltinRegistry.RegistryError.builtinNotFound(name: "custom_plus2")),
             builtinRegistry: Self.customPlusBuiltinRegistry
         ),
+
     ]
 
-    @Test(arguments: Self.customBuiltinTests)
+    static var allTests: [BuiltinTests.TestCase] {
+        [
+            BuiltinTests.generateFailureTests(
+                builtinName: "custom_plus", sampleArgs: [1, 1],
+                argIndex: 0, argName: "x",
+                allowedArgTypes: ["number"],
+                wantArgs: "number",
+                generateNumberOfArgsTest: true,
+                builtinRegistry: Self.customPlusBuiltinRegistry),
+            BuiltinTests.generateFailureTests(
+                builtinName: "custom_plus", sampleArgs: [1, 1],
+                argIndex: 1, argName: "y",
+                allowedArgTypes: ["number"],
+                wantArgs: "number",
+                generateNumberOfArgsTest: false,
+                builtinRegistry: Self.customPlusBuiltinRegistry),
+            customBuiltinTests,
+        ].flatMap { $0 }
+    }
+
+    @Test(arguments: Self.allTests)
     func testBuiltins(tc: BuiltinTests.TestCase) async throws {
         try await BuiltinTests.testBuiltin(tc: tc, builtinRegistry: tc.builtinRegistry)
     }

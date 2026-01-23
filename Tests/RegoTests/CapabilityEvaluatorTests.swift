@@ -55,7 +55,7 @@ struct CapabilityEvaluatorTests {
                 ))
         )
 
-        let error = try await #require(throws: RegoError.self, "Missing builtin must raise error") {
+        let error = try await requireThrows(throws: RegoError.self, "Missing builtin must raise error") {
             _ = try await engine.prepareForEvaluation(query: "policy")
         }
         #expect(error.code == .capabilitiesMissingBuiltin)
@@ -77,7 +77,7 @@ struct CapabilityEvaluatorTests {
                 ))
         )
 
-        let error = try await #require(throws: RegoError.self, "Mismatch builtin signature must fail") {
+        let error = try await requireThrows(throws: RegoError.self, "Mismatch builtin signature must fail") {
             _ = try await engine.prepareForEvaluation(query: "policy")
         }
         #expect(error.code == .capabilitiesMissingBuiltin)
@@ -125,7 +125,7 @@ struct CapabilityEvaluatorTests {
                 "my.slugify": { _, _ in .number(1) }
             ]
         )
-        let error = try await #require(throws: RegoError.self, "Missing builtin must raise error") {
+        let error = try await requireThrows(throws: RegoError.self, "Missing builtin must raise error") {
             _ = try await engine.prepareForEvaluation(
                 query: "policy"
             )
@@ -152,7 +152,7 @@ struct CapabilityEvaluatorTests {
             ]
         )
 
-        let error = try await #require(throws: RegoError.self, "Mismatched builtin signature must fail") {
+        let error = try await requireThrows(throws: RegoError.self, "Mismatched builtin signature must fail") {
             _ = try await engine.prepareForEvaluation(
                 query: "policy"
             )
@@ -176,7 +176,7 @@ struct CapabilityEvaluatorTests {
                 )),
             customBuiltins: [:]  // not specifying the builtin
         )
-        let error = try await #require(throws: RegoError.self, "Required builtin not provided must fail") {
+        let error = try await requireThrows(throws: RegoError.self, "Required builtin not provided must fail") {
             _ = try await engine.prepareForEvaluation(
                 query: "policy"
             )
@@ -198,7 +198,7 @@ struct CapabilityEvaluatorTests {
             capabilities: .path(IREvaluatorTests.relPath("TestData/Capabilities/does-not-exist.json"))
         )
 
-        let error = try await #require(throws: RegoError.self, "Unreadable capabilities file must raise error") {
+        let error = try await requireThrows(throws: RegoError.self, "Unreadable capabilities file must raise error") {
             _ = try await engine.prepareForEvaluation(query: "policy")
         }
         #expect(error.code == .capabilitiesReadError)
@@ -217,7 +217,7 @@ struct CapabilityEvaluatorTests {
             capabilities: .path(IREvaluatorTests.relPath("TestData/Capabilities/invalid.json"))
         )
 
-        let error = try await #require(throws: RegoError.self, "Invalid capabilities JSON must raise error") {
+        let error = try await requireThrows(throws: RegoError.self, "Invalid capabilities JSON must raise error") {
             _ = try await engine.prepareForEvaluation(query: "policy")
         }
         #expect(error.code == .capabilitiesDecodeError)
@@ -243,10 +243,30 @@ struct CapabilityEvaluatorTests {
             ]
         )
 
-        let error = try await #require(throws: RegoError.self, "Conflicting builtin name must raise error") {
+        let error = try await requireThrows(throws: RegoError.self, "Conflicting builtin name must raise error") {
             _ = try await engine.prepareForEvaluation(query: "policy")
         }
         #expect(error.code == .ambiguousBuiltinError)
         #expect(error.message.contains("count"))
+    }
+}
+
+// Note(philip): This function is needed to emulate modern #require behavior
+// in older versions of Swift (<= 6.0.3), returning the caught error. It should
+// be replaced with normal usage of #require as soon as 6.0.3 support is dropped.
+private func requireThrows<E: Error & Sendable, R>(
+    throws errorType: E.Type,
+    _ comment: String = "",
+    operation: () async throws -> R
+) async throws -> E {
+    do {
+        _ = try await operation()
+        #expect(Bool(false), "Expected \(errorType) to be thrown. \(comment)")
+        fatalError("This should never be reached")
+    } catch let error as E {
+        return error
+    } catch {
+        #expect(Bool(false), "Expected \(errorType) but got \(type(of: error)). \(comment)")
+        fatalError("This should never be reached")
     }
 }

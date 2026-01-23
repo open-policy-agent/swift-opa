@@ -55,7 +55,7 @@ struct BuiltinTests {
         case .success:
             #expect(successEquals(result, tc.expected))
         case .failure(let expectedError):
-            let error = try #require(throws: (any Error).self, "Expect an error to be thrown") {
+            let error = try requireThrows(throws: (any Error).self, "Expect an error to be thrown") {
                 try result.get()
             }
 
@@ -100,7 +100,7 @@ struct BuiltinTests {
         wantArgs: String? = nil,
         generateNumberOfArgsTest: Bool = false,
         numberAsInteger: Bool = false,
-        builtinRegistry: BuiltinRegistry = .defaultRegistry,
+        builtinRegistry: BuiltinRegistry = .defaultRegistry
     ) -> [BuiltinTests.TestCase] {
         let argValues: [String: RegoValue] = [
             "array": [1, 2, 3], "boolean": false, "null": .null, (numberAsInteger ? "number[integer]" : "number"): 123,
@@ -134,7 +134,7 @@ struct BuiltinTests {
                     expected: .failure(
                         BuiltinError.argumentTypeMismatch(arg: argName, got: testType, want: want)
                     ),
-                    builtinRegistry: builtinRegistry,
+                    builtinRegistry: builtinRegistry
                 )
             )
         }
@@ -151,7 +151,7 @@ struct BuiltinTests {
     static func generateNumberOfArgumentsFailureTests(
         builtinName: String,
         sampleArgs: [RegoValue],
-        builtinRegistry: BuiltinRegistry = .defaultRegistry,
+        builtinRegistry: BuiltinRegistry = .defaultRegistry
     ) -> [BuiltinTests.TestCase] {
         var tests: [BuiltinTests.TestCase] = []
         // Only generate "too few" test case when expected number of arguments is > 0
@@ -163,7 +163,7 @@ struct BuiltinTests {
                     args: [],
                     expected: .failure(
                         BuiltinError.argumentCountMismatch(got: 0, want: sampleArgs.count)),
-                    builtinRegistry: builtinRegistry,
+                    builtinRegistry: builtinRegistry
                 )
             )
         }
@@ -179,7 +179,7 @@ struct BuiltinTests {
                 expected: .failure(
                     BuiltinError.argumentCountMismatch(
                         got: tooManyArgs.count, want: sampleArgs.count)),
-                builtinRegistry: builtinRegistry,
+                builtinRegistry: builtinRegistry
             )
         )
 
@@ -200,5 +200,25 @@ extension Result {
         } catch {
             self = .failure(error)
         }
+    }
+}
+
+// Note(philip): This function is needed to emulate modern #require behavior
+// in older versions of Swift (<= 6.0.3), returning the caught error. It should
+// be replaced with normal usage of #require as soon as 6.0.3 support is dropped.
+private func requireThrows<E: Error & Sendable, R>(
+    throws errorType: E.Type,
+    _ comment: String = "",
+    operation: () throws -> R
+) throws -> E {
+    do {
+        _ = try operation()
+        #expect(Bool(false), "Expected \(errorType) to be thrown. \(comment)")
+        fatalError("This should never be reached")
+    } catch let error as E {
+        return error
+    } catch {
+        #expect(Bool(false), "Expected \(errorType) but got \(type(of: error)). \(comment)")
+        fatalError("This should never be reached")
     }
 }

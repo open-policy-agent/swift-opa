@@ -171,6 +171,11 @@ extension OPA.Engine {
             loadedBundles[path.name] = b
         }
 
+        guard loadedBundles.count <= 1 else {
+            throw RegoError(
+                code: .invalidArgumentError, message: "Support for loading multiple bundles is not implemented yet")
+        }
+
         // Verify correctness of this bundle set
         try checkBundlesForOverlap(bundleSet: loadedBundles)
 

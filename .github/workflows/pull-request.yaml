@@ -12,19 +12,51 @@ concurrency:
 
 jobs:
   ci:
-    name: 'make all'
+    name: Build Swift ${{ matrix.swift }}, Xcode ${{ matrix.xcode }}
     runs-on: macos-latest
     permissions:
       contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - xcode: "16.2"
+            swift: "6.0.3"
+          - xcode: "16.4"
+            swift: "6.1" # We can't go more modern than 6.1.0 for the 6.1 runner, due to Xcode version support.
+          - xcode: "26.2"
+            swift: "6.2.3"
+    env:
+      XCODE_VERSION: ${{ matrix.xcode }}
+      DEVELOPER_DIR: "/Applications/Xcode_${{ matrix.xcode }}.app"
+      SWIFT_VERSION: ${{ matrix.swift }}
     steps:
-      - run: sudo xcode-select -s /Applications/Xcode_26.0.app
-      - run: swift --version
+      - name: Select Xcode version
+        run: |
+          sudo xcode-select --switch "${DEVELOPER_DIR}/Contents/Developer"
+          xcodebuild -version
+      - name: Show Swift version
+        run: swift --version
+      - name: Fail if Swift version does not match expected version (${{ matrix.swift }})
+        run: |
+          SWIFT_OUTPUT=$(swift --version)
+          echo "${SWIFT_OUTPUT}"
+          # Check if our expected Swift version is the one in use.
+          if ! echo "${SWIFT_OUTPUT}" | grep -q "${SWIFT_VERSION}"; then
+            ACTUAL=$(echo "${SWIFT_OUTPUT}" | head -n 1 | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -n 1)
+            echo "::error::Expected Swift ${SWIFT_VERSION}, got ${ACTUAL}"
+            echo "**Version Mismatch**: Expected \`${SWIFT_VERSION}\`, got \`${ACTUAL}\`" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - name: Install jemalloc
         run: brew install jemalloc
-      - run: make lint
-      - run: make test
-      - run: make build
+      - name: Lint
+        run: make lint
+      - name: Test
+        run: make test
+      - name: Build
+        run: make build
       - name: make fmt lint test (ComplianceSuite)
         run: make fmt lint test
         working-directory: ComplianceSuite

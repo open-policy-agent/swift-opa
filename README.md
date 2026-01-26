@@ -1,5 +1,7 @@
 # Swift-OPA
 
+[![Swift 6.0.3+](https://img.shields.io/badge/Swift-6.0.3+-blue.svg)](https://developer.apple.com/swift/)
+
 Swift-OPA is a Swift package for evaluating [OPA IR
 Plans](https://www.openpolicyagent.org/docs/latest/ir/) compiled from
 [Rego](https://www.openpolicyagent.org/docs/latest/policy-language/#what-is-rego)

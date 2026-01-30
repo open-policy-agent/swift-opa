@@ -1,0 +1,104 @@
+name: Release Check
+
+# This workflow is isolated into its own file, because it requires
+# elevated pull_request_target permissions. Any executable code
+# or scripts here should depend only on trusted code in main, and
+# not on anything from the PR.
+on:
+  workflow_dispatch: {}
+  pull_request_target: {}
+
+# When a new revision is pushed to a PR, cancel all in-progress CI runs for that
+# PR. See https://docs.github.com/en/actions/using-jobs/using-concurrency
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release-check:
+    name: Release version check
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6.0.1
+        with:
+          ref: ${{ github.base_ref }}  # Use scripts only from trusted base branch
+          fetch-depth: 0  # Fetch full history to access all commits
+
+      - name: Fetch PR from fork
+        run: |
+          # Don't allow user to provide branch name. Bind to PR number ref explicitly.
+          git fetch origin "pull/${{ github.event.pull_request.number }}/head:pr-head"
+
+      - name: Check for release commits
+        id: check-release
+        run: |
+          RESULT=$(./tools/build/get-release-from-commits.sh "origin/${{ github.base_ref }}" "pr-head")
+          echo "Release commits detected: $RESULT"
+          if [ -n "$RESULT" ]; then
+            echo "result=true" >> $GITHUB_OUTPUT
+          else
+            echo "result=false" >> $GITHUB_OUTPUT
+          fi
+  
+      - name: Get CHANGELOG version from PR
+        if: steps.check-release.outputs.result == 'true'
+        id: changelog
+        run: |
+          # Checkout just the CHANGELOG from PR
+          git show "pr-head:CHANGELOG.md" > /tmp/changelog-pr.md
+          CHANGELOG_VERSION=$(grep -o -E '## [0-9.]+' /tmp/changelog-pr.md | head -n 1 | sed 's/## //' | grep -E '^[0-9.]+$' || echo "invalid")
+          echo "version=$CHANGELOG_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Post or update warning comment (release commit detected)
+        if: steps.check-release.outputs.result == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          MARKER: "<!-- release-commit-warning -->"
+        run: |
+          COMMIT_VERSION=$(./tools/build/get-release-from-commits.sh "origin/${{ github.base_ref }}" "pr-head")
+          CHANGELOG_VERSION="${{ steps.changelog.outputs.version }}"
+
+          COMMENT=$(mktemp)
+          echo "ℹ️ **Release Commit Detected**"                                                        >> "$COMMENT"
+          echo ""                                                                                      >> "$COMMENT"
+          echo "This PR contains commit(s) that match the case-insensitive regex \`^Release .*\`"      >> "$COMMENT"
+          echo ""                                                                                      >> "$COMMENT"
+          echo "Here are the latest versions reported from the places the release workflows will use:" >> "$COMMENT"
+          echo ""                                                                                      >> "$COMMENT"
+          echo "| Source | Version |"                                                                  >> "$COMMENT"
+          echo "| --- | --- |"                                                                         >> "$COMMENT"
+          echo "| Commit matching \`^Release .*\` | $COMMIT_VERSION |"                                 >> "$COMMENT"
+          echo "| \`CHANGELOG.md\` | $CHANGELOG_VERSION |"                                             >> "$COMMENT"
+
+          echo "Posting or updating release warning comment."
+          export COMMENT_BODY="$(cat "$COMMENT")"
+          ./tools/build/release-pr-comment.sh "$REPO" "$PR_NUMBER" "$MARKER"
+
+      - name: Update warning comment if present (no release commit)
+        if: steps.check-release.outputs.result != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          MARKER: "<!-- release-commit-warning -->"
+          COMMENT_BODY: |
+            ℹ️ A release commit was detected in earlier versions of this PR.
+
+            The current PR commits do not appear to be a release.
+        run: |
+          EXISTING_COMMENT=$(gh api repos/$REPO/issues/$PR_NUMBER/comments \
+              --jq ".[] | select(.body | contains(\"$MARKER\")) | .id" | head -1) || {
+              echo "Error: Failed to fetch existing comments" >&2
+              exit 2
+          }
+
+          if [ -n "$EXISTING_COMMENT" ]; then
+            echo "Updating release warning comment."
+            ./tools/build/release-pr-comment.sh "$REPO" "$PR_NUMBER" "$MARKER"
+          else
+            echo "No release warning comment found."
+          fi

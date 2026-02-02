@@ -1,4 +1,5 @@
 BINDIR ?= $(HOME)/bin
+OPA_BASE_CAPS_VERSION ?= v1.13.1
 
 .PHONY: all
 all: fmt lint test build
@@ -41,6 +42,11 @@ endif
 .PHONY: install-release
 install-release: build-release ensure-bindir
 	install $(shell swift build --show-bin-path -c release)/swift-opa-cli $(BINDIR)/
+
+.PHONY: generate
+generate:
+	curl -o opa-capabilities.json https://raw.githubusercontent.com/open-policy-agent/opa/refs/tags/$(OPA_BASE_CAPS_VERSION)/capabilities.json
+	swift run swift-opa-cli capabilities opa-capabilities.json > capabilities.json
 
 .PHONY: clean
 clean:

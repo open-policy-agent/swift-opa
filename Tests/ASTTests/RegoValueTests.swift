@@ -75,6 +75,65 @@ func testJsonToRegoValues() throws {
 }
 
 @Test
+func testEncodableToRegoValues() throws {
+    struct Input: Encodable {
+        let pets: [Pet]
+
+        struct Pet: Encodable {
+            let name: String
+            let age: Int
+            let sibling: String?
+            let weight: Double
+            let hasChildren: Bool
+            let hasBlueEyes: Bool
+            let children: [String]
+            let zero: Int
+            let one: Int
+        }
+    }
+
+    let input = Input(
+        pets: [
+            .init(
+                name: "Mr. Meowgi",
+                age: 4,
+                sibling: nil,
+                weight: 12.5,
+                hasChildren: true,
+                hasBlueEyes: false,
+                children: [
+                    "Wax On",
+                    "Wax Off",
+                ],
+                zero: 0,
+                one: 1,
+            )
+        ]
+    )
+    let val = try AST.RegoValue(encodable: input)
+
+    let expected: RegoValue = [
+        "pets": [
+            [
+                "name": "Mr. Meowgi",
+                "age": 4,
+                // With the default JSONEncoder, nil Optionals are not included in the serialized JSON, so 'sibling' is missing.
+                "weight": 12.5,
+                "hasChildren": true,
+                "hasBlueEyes": false,
+                "children": [
+                    "Wax On",
+                    "Wax Off",
+                ],
+                "zero": 0,
+                "one": 1,
+            ]
+        ]
+    ]
+    #expect(expected == val, "output did not match expectations")
+}
+
+@Test
 func testNumberIsInteger() throws {
     // Integers
     #expect(AST.RegoValue.number(0).integerValue == 0)

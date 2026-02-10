@@ -46,7 +46,7 @@ fi
 
 # Check for release pattern and extract version.
 VERSION=$(echo "$COMMITS" | grep -E -i "$PATTERN" | head -n 1 | grep -E -o '[0-9.]+') || {
-    echo "No matches found."
+    echo "No matches found." >&2
     exit 0
 }
 

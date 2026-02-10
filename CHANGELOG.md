@@ -8,7 +8,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 0.0.1
 
-This release is a release engineering experiment, designed to test out our Github Release automation.
+This release is a release engineering experiment, designed to test out our Github Release automation workflows.
 
 In future release notes, we will discuss significant change to the project since the last release.
 Thank you for reading!

@@ -5935,6 +5935,12 @@
     ]
   },
   {
+    "file": "TestData/v1/time/test-time-0972.json",
+    "note": [
+      "time.now_ns/consistent value for same evaluation"
+    ]
+  },
+  {
     "file": "TestData/v1/topdowndynamicdispatch/test-topdowndynamicdispatch-1068.json",
     "note": [
       "topdowndynamicdispatch/dynamic dispatch"
@@ -6517,6 +6523,12 @@
       "uuid-parse/positive-v2",
       "uuid-parse/positive-v3",
       "uuid-parse/negative"
+    ]
+  },
+  {
+    "file": "TestData/v1/uuid/test-uuid-rfc4122.json",
+    "note": [
+      "uuid.rfc4122/consistent values for same arguments"
     ]
   },
   {

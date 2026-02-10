@@ -9,6 +9,7 @@
 			"data": {},
 			"want_error_code": "eval_builtin_error",
 			"want_error": "extra data after a PEM certificate block",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

@@ -12,6 +12,7 @@
 					"x": "Monday"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

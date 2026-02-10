@@ -8,6 +8,7 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "negative offset",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -297,6 +298,7 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "negative offset",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

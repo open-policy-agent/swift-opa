@@ -12,6 +12,7 @@
 					"x": "a=c%3Db%2B1"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

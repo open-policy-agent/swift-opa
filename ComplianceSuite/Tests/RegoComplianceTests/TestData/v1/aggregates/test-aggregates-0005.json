@@ -19,6 +19,7 @@
 					"x": 4
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

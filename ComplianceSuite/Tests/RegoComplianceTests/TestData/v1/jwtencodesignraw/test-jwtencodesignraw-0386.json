@@ -12,6 +12,7 @@
 					"x": "eyJ0eXAiOiJ0ZXh0L3BsYWluIiwNCiAiYWxnIjoiSFMyNTYifQ.ZQ.oO8Vnc4Jv7-J231a1bEcQrgXfKbNW-kEvVY7BP1v5rM"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

@@ -12,6 +12,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -280,6 +281,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -548,6 +550,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -816,6 +819,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1084,6 +1088,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

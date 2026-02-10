@@ -16,6 +16,7 @@
 			},
 			"want_error_code": "eval_type_error",
 			"want_error": "operand 1 must be string but got number",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

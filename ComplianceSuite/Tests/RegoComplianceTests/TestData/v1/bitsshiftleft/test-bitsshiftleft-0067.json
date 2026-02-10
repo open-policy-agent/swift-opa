@@ -12,6 +12,7 @@
 					"x": 18446744073709551614
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

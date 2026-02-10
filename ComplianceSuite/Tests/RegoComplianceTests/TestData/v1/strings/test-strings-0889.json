@@ -12,6 +12,7 @@
 					"x": "cde"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -310,6 +311,7 @@
 					"x": "åä"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

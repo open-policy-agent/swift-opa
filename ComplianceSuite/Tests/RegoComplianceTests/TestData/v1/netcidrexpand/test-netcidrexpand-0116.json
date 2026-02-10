@@ -8,6 +8,7 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "net.cidr_expand: invalid CIDR address: 192.168.1.1/33",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

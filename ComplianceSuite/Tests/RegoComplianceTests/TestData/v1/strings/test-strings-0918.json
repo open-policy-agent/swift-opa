@@ -12,6 +12,7 @@
 					"x": "hi 05"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

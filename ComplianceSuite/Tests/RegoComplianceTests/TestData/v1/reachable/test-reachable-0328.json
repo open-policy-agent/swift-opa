@@ -9,6 +9,7 @@
 			"data": {},
 			"input_term": "{\"graph\": {\"a\": []}, \"initial\": \"a\"}",
 			"want_error_code": "eval_type_error",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

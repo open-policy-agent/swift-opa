@@ -11,6 +11,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -397,6 +398,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -793,6 +795,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1179,6 +1182,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1565,6 +1569,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2006,6 +2011,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2392,6 +2398,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2778,6 +2785,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3164,6 +3172,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3550,6 +3559,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3936,6 +3946,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4322,6 +4333,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4708,6 +4720,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -5104,6 +5117,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -5490,6 +5504,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -5886,6 +5901,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -6282,6 +6298,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -6678,6 +6695,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -7074,6 +7092,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -7470,6 +7489,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -7866,6 +7886,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -8262,6 +8283,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -8651,13 +8673,14 @@
 			"note": "graphql_schema_is_valid/success-schema-extensions directive only",
 			"query": "data.test.p = x",
 			"modules": [
-				"package test\n\nschema := `\n  extend schema @directive\n`\n\np if {\n\tgraphql.schema_is_valid(schema)\n}\n"
+				"package test\n\nschema := `\n  type Query {\n      x: Int\n  }\n  directive @directive(a: String = \"b\") on SCHEMA\n  extend schema @directive\n`\n\np if {\n\tgraphql.schema_is_valid(schema)\n}\n"
 			],
 			"want_result": [
 				{
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -8668,7 +8691,7 @@
 							"value": "x"
 						},
 						{
-							"value": "\n  extend schema @directive\n"
+							"value": "\n  type Query {\n      x: Int\n  }\n  directive @directive(a: String = \"b\") on SCHEMA\n  extend schema @directive\n"
 						}
 					],
 					"builtin_funcs": [
@@ -8895,7 +8918,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 7
+												"row": 11
 											}
 										},
 										{
@@ -8915,7 +8938,7 @@
 												"result": 4,
 												"file": 0,
 												"col": 26,
-												"row": 8
+												"row": 12
 											}
 										},
 										{
@@ -8928,7 +8951,7 @@
 												"target": 5,
 												"file": 0,
 												"col": 26,
-												"row": 8
+												"row": 12
 											}
 										},
 										{
@@ -8944,7 +8967,7 @@
 												"result": 6,
 												"file": 0,
 												"col": 2,
-												"row": 8
+												"row": 12
 											}
 										},
 										{
@@ -8960,7 +8983,7 @@
 												},
 												"file": 0,
 												"col": 2,
-												"row": 8
+												"row": 12
 											}
 										},
 										{
@@ -8973,7 +8996,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 7
+												"row": 11
 											}
 										}
 									]
@@ -8986,7 +9009,7 @@
 												"source": 3,
 												"file": 0,
 												"col": 1,
-												"row": 7
+												"row": 11
 											}
 										},
 										{
@@ -8999,7 +9022,7 @@
 												"target": 2,
 												"file": 0,
 												"col": 1,
-												"row": 7
+												"row": 11
 											}
 										}
 									]
@@ -9012,7 +9035,7 @@
 												"source": 2,
 												"file": 0,
 												"col": 1,
-												"row": 7
+												"row": 11
 											}
 										}
 									]
@@ -9044,6 +9067,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -9440,6 +9464,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -9836,6 +9861,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -10232,6 +10258,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -10628,6 +10655,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -11014,6 +11042,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -11400,6 +11429,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -11796,6 +11826,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -12182,6 +12213,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -12578,6 +12610,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -12974,6 +13007,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -13370,6 +13404,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -13766,6 +13801,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -14162,6 +14198,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -14558,6 +14595,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -14954,6 +14992,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -15350,6 +15389,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -15736,6 +15776,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -16122,6 +16163,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -16518,6 +16560,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -16914,6 +16957,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -17300,6 +17344,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -17686,6 +17731,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -18072,6 +18118,7 @@
 					"x": false
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -18437,6 +18484,458 @@
 												"file": 0,
 												"col": 1,
 												"row": 7
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": false
+				}
+			]
+		},
+		{
+			"note": "graphql_schema_is_valid/schema failure with object in input object",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\n\nschema := `\n  type Mutation {\n    createPupil(pupil: PupilInput!): Pupil\n  }\n  type Query {\n    pupil(firstname: String): Pupil\n  }\n  type Pupil {\n    friends: [Pupil!]!\n  }\n  input PupilInput {\n    friends: [Pupil]\n  }\n  schema {\n    query: Query\n    mutation: Mutation\n  }`\n\np := x if {\n  x := graphql.schema_is_valid(graphql.parse_schema(schema))\n}\n"
+			],
+			"want_result": [
+				{
+					"x": false
+				}
+			],
+			"ignore_generated_vars": false,
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "\n  type Mutation {\n    createPupil(pupil: PupilInput!): Pupil\n  }\n  type Query {\n    pupil(firstname: String): Pupil\n  }\n  type Pupil {\n    friends: [Pupil!]!\n  }\n  input PupilInput {\n    friends: [Pupil]\n  }\n  schema {\n    query: Query\n    mutation: Mutation\n  }"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "graphql.parse_schema",
+							"decl": {
+								"args": [
+									{
+										"description": "GraphQL schema string",
+										"name": "schema",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "AST object for the GraphQL schema.",
+									"dynamic": {
+										"key": {
+											"type": "any"
+										},
+										"value": {
+											"type": "any"
+										}
+									},
+									"name": "output",
+									"type": "object"
+								},
+								"type": "function"
+							}
+						},
+						{
+							"name": "graphql.schema_is_valid",
+							"decl": {
+								"args": [
+									{
+										"description": "the schema to verify",
+										"name": "schema",
+										"of": [
+											{
+												"type": "string"
+											},
+											{
+												"dynamic": {
+													"key": {
+														"type": "any"
+													},
+													"value": {
+														"type": "any"
+													}
+												},
+												"type": "object"
+											}
+										],
+										"type": "any"
+									}
+								],
+								"result": {
+									"description": "`true` if the schema is a valid GraphQL schema. `false` otherwise.",
+									"name": "output",
+									"type": "boolean"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.schema",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "string_index",
+													"value": 1
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"schema"
+							]
+						},
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 21
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.schema",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 53,
+												"row": 22
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 53,
+												"row": 22
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "graphql.parse_schema",
+												"args": [
+													{
+														"type": "local",
+														"value": 5
+													}
+												],
+												"result": 6,
+												"file": 0,
+												"col": 32,
+												"row": 22
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 6
+												},
+												"target": 7,
+												"file": 0,
+												"col": 32,
+												"row": 22
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "graphql.schema_is_valid",
+												"args": [
+													{
+														"type": "local",
+														"value": 7
+													}
+												],
+												"result": 8,
+												"file": 0,
+												"col": 8,
+												"row": 22
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 8
+												},
+												"target": 9,
+												"file": 0,
+												"col": 8,
+												"row": 22
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 9
+												},
+												"target": 10,
+												"file": 0,
+												"col": 3,
+												"row": 22
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 10
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 21
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 21
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 21
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 21
 											}
 										}
 									]

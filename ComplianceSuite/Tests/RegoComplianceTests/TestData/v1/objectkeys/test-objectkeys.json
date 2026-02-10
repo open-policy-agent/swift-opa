@@ -14,6 +14,7 @@
 					]
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -357,6 +358,7 @@
 					]
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -718,6 +720,7 @@
 					]
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1141,6 +1144,7 @@
 					]
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1536,6 +1540,7 @@
 					]
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1926,6 +1931,7 @@
 					"x": []
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2195,6 +2201,7 @@
 			"input_term": "{\"obj\":\"object\"}",
 			"want_error_code": "eval_type_error",
 			"want_error": "object.keys: operand 1 must be object but got string",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

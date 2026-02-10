@@ -8,6 +8,7 @@
 			],
 			"want_error_code": "eval_type_error",
 			"want_error": "invalid request parameters(s): {\"bad_key\"}",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

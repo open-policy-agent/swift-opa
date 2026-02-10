@@ -7,6 +7,7 @@
 				"package p\n\nf(x) if {\n\tr = input.that_is_not_there\n}\n"
 			],
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

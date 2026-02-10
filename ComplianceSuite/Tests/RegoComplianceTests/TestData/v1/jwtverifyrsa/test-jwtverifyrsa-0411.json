@@ -9,6 +9,7 @@
 			"data": {},
 			"want_error_code": "eval_builtin_error",
 			"want_error": "encoded JWT must have 3 sections, found 2",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

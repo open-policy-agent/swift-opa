@@ -11,6 +11,7 @@
 			},
 			"want_error_code": "eval_builtin_error",
 			"want_error": "rego_parse_error: unexpected eof token: expected ident",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

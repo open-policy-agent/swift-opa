@@ -12,6 +12,7 @@
 					"x": "cdefgh"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -310,6 +311,7 @@
 					"x": "äö"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

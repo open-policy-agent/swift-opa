@@ -18,6 +18,7 @@
 					"x": "w do you do?"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

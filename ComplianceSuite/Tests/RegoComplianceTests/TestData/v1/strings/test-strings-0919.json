@@ -12,6 +12,7 @@
 					"x": "hi 7F.01"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

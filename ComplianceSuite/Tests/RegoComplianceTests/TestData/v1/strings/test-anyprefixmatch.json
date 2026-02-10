@@ -22,6 +22,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -392,6 +393,7 @@
 				]
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -762,6 +764,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1136,6 +1139,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1510,6 +1514,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1880,6 +1885,7 @@
 				]
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2245,6 +2251,7 @@
 				]
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2607,6 +2614,7 @@
 				"strings": []
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2970,6 +2978,7 @@
 				]
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3329,6 +3338,7 @@
 				"strings": []
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3696,6 +3706,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4063,6 +4074,7 @@
 				]
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4429,6 +4441,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4795,6 +4808,7 @@
 				"string": "a/b/c"
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -5165,6 +5179,7 @@
 					"x": true
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -5791,6 +5806,7 @@
 				]
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -6413,6 +6429,7 @@
 				]
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -6775,6 +6792,7 @@
 				"strings": 1
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -7141,6 +7159,7 @@
 				]
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -7504,6 +7523,7 @@
 				]
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -7870,6 +7890,7 @@
 				]
 			},
 			"want_error": "test-0.rego:4: eval_type_error: strings.any_prefix_match: operand 1 must be array of strings but got array containing number",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -8233,6 +8254,7 @@
 				"strings": 1
 			},
 			"want_error": "test-0.rego:4: eval_type_error: strings.any_prefix_match: operand 1 must be one of {string, set, array} but got number",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -8600,6 +8622,7 @@
 				]
 			},
 			"want_error": "test-0.rego:4: eval_type_error: strings.any_prefix_match: operand 2 must be array of strings but got array containing number",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -8964,6 +8987,7 @@
 				]
 			},
 			"want_error": "test-0.rego:4: eval_type_error: strings.any_prefix_match: operand 2 must be one of {string, set, array} but got number",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

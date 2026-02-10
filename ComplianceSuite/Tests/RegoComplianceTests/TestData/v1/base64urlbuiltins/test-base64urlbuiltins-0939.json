@@ -11,6 +11,7 @@
 					"x": "aGVsbG8"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -265,6 +266,7 @@
 					"x": "dGhlcmU"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

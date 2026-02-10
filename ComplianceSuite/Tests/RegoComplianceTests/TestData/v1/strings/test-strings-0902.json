@@ -12,6 +12,7 @@
 					"x": "ABCDEF"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

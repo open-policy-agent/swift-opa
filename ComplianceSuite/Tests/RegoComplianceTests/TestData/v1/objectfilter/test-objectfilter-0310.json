@@ -9,6 +9,7 @@
 			"input_term": "{\"x\": false}",
 			"want_error_code": "eval_type_error",
 			"want_error": "object.filter: operand 1 must be object but got boolean",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

@@ -17,6 +17,7 @@
 					"x": 7
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -441,6 +442,7 @@
 			"query": "1 / 0",
 			"want_error_code": "eval_builtin_error",
 			"want_error": "div: divide by zero",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

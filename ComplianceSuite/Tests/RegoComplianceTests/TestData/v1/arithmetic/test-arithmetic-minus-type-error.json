@@ -8,6 +8,7 @@
 			],
 			"want_error_code": "eval_type_error",
 			"want_error": "operand 2 must be set but got number",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -341,6 +342,7 @@
 			],
 			"want_error_code": "eval_type_error",
 			"want_error": "operand 2 must be number but got set",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

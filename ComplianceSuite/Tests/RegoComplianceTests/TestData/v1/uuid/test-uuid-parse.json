@@ -18,6 +18,7 @@
 					}
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -326,6 +327,7 @@
 					}
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -634,6 +636,7 @@
 					}
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -929,6 +932,7 @@
 				"userid": 123
 			},
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

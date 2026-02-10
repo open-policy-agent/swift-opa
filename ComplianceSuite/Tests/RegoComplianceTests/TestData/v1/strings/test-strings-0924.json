@@ -14,6 +14,7 @@
 					"x": "rab"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -347,6 +348,7 @@
 					"x": "⃣️2"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -680,6 +682,7 @@
 					"x": "𝛾😀1"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1013,6 +1016,7 @@
 					"x": ""
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1343,6 +1347,7 @@
 			},
 			"want_error_code": "eval_type_error",
 			"want_error": "reverse: operand 1 must be string but got number",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1672,6 +1677,7 @@
 			},
 			"want_error_code": "eval_type_error",
 			"want_error": "reverse: operand 1 must be string but got object",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

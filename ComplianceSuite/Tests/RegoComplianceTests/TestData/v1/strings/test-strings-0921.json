@@ -12,6 +12,7 @@
 					"x": "hi 2e308"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

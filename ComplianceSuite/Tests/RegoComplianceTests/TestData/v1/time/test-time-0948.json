@@ -46,6 +46,7 @@
 					}
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -428,6 +429,7 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "time outside of valid range",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -688,6 +690,7 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "time outside of valid range",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

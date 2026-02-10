@@ -15,6 +15,7 @@
 				}
 			],
 			"sort_bindings": true,
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -55,8 +56,8 @@
 							"decl": {
 								"args": [
 									{
-										"description": "the object to patch",
-										"name": "object",
+										"description": "the object, array or set to patch",
+										"name": "target",
 										"type": "any"
 									},
 									{
@@ -729,6 +730,7 @@
 				}
 			],
 			"sort_bindings": true,
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -775,8 +777,8 @@
 							"decl": {
 								"args": [
 									{
-										"description": "the object to patch",
-										"name": "object",
+										"description": "the object, array or set to patch",
+										"name": "target",
 										"type": "any"
 									},
 									{
@@ -1458,6 +1460,7 @@
 				"package main\n\ndoc := {\"foo\": {\"a\", \"b\", \"c\"}}\n\npatch := [{\"op\": \"add\", \"path\": \"foo/d\", \"value\": \"e\"}]\n\nresult := r if r = json.patch(doc, patch)\n"
 			],
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1504,8 +1507,8 @@
 							"decl": {
 								"args": [
 									{
-										"description": "the object to patch",
-										"name": "object",
+										"description": "the object, array or set to patch",
+										"name": "target",
 										"type": "any"
 									},
 									{
@@ -2190,6 +2193,7 @@
 				}
 			],
 			"sort_bindings": true,
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2245,8 +2249,8 @@
 							"decl": {
 								"args": [
 									{
-										"description": "the object to patch",
-										"name": "object",
+										"description": "the object, array or set to patch",
+										"name": "target",
 										"type": "any"
 									},
 									{
@@ -3045,6 +3049,7 @@
 					]
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3079,8 +3084,8 @@
 							"decl": {
 								"args": [
 									{
-										"description": "the object to patch",
-										"name": "object",
+										"description": "the object, array or set to patch",
+										"name": "target",
 										"type": "any"
 									},
 									{

@@ -7,6 +7,7 @@
 				"package test2\n\np(1, a) := y if {\n\ty = a\n}\n\np(2, b) := y if {\n\ty = b + 1\n}\n\nr := y if {\n\tdata.test2.p(3, 0, y)\n}\n"
 			],
 			"want_result": [],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

@@ -10,6 +10,7 @@
 			"input_term": "{\"x\": [\"a\", \"b\", \"c\"]}",
 			"want_error_code": "eval_type_error",
 			"want_error": "json.remove: operand 1 must be object but got array",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

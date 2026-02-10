@@ -9,6 +9,7 @@
 			"data": {},
 			"want_error_code": "eval_builtin_error",
 			"want_error": "JWT payload had invalid encoding: illegal base64 data at input byte 17",
+			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

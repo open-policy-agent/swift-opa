@@ -12,6 +12,7 @@
 					"x": "/foo/bar/0/baz"
 				}
 			],
+			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

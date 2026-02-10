@@ -50,4 +50,5 @@ require (
 	sigs.k8s.io/yaml v1.6.0 // indirect
 )
 
+// TODO: Remove this when the upstream tool is merged
 replace github.com/open-policy-agent/opa v1.13.1 => github.com/sspaink/opa v0.0.0-20260211002534-ef3f74b6306d

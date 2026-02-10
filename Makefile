@@ -51,3 +51,7 @@ generate:
 .PHONY: clean
 clean:
 	rm -rf .build
+
+.PHONY: generate-compliance-tests
+generate-compliance-tests:
+	cd tools/generate-compliance-tests && go run main.go

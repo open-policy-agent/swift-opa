@@ -72,8 +72,6 @@ public struct RegoNumber: Sendable, Hashable {
         }
     }
 
-    private static let uint64MaxDecimal = Decimal(UInt64.max)
-
     /// Get as UInt64 (clamps negative values to 0, clamps large values to UInt64.max)
     public var clampedUint64Value: UInt64 {
         switch storage {

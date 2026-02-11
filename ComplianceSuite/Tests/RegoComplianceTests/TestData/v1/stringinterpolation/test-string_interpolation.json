@@ -11,7 +11,6 @@
 					"x": ""
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -288,7 +287,6 @@
 					"x": "foo bar baz"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -565,7 +563,6 @@
 					"x": "\t\n\""
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -847,7 +844,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1846,7 +1842,6 @@
 					"x": "42, 13.37, true, foo, null"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2265,7 +2260,6 @@
 					"x": "[], [42, 13.37, true, \"foo\", null], set(), {42}, {}, {\"a\": \"b\"}"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3249,7 +3243,6 @@
 					"x": "[\"a\", \"b\", \"c\"]"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3821,7 +3814,6 @@
 					"x": "{\"a\"}"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4360,7 +4352,6 @@
 					"x": "{\"a\": \"a\"}"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4903,7 +4894,6 @@
 					"x": "foo bar"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -5542,7 +5532,6 @@
 					"x": "foo bar baz"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -6246,7 +6235,6 @@
 					"x": "foo bar baz"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -7240,7 +7228,6 @@
 					"x": "\u003cundefined\u003e bar baz"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -8160,7 +8147,6 @@
 					"x": "foo \u003cundefined\u003e baz"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -9077,7 +9063,6 @@
 					"x": "sum: 43"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -9622,7 +9607,6 @@
 					"x": "\u003cundefined\u003e, \u003cundefined\u003e"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -10135,7 +10119,6 @@
 					]
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -10754,7 +10737,6 @@
 					]
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -11292,7 +11274,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -12068,7 +12049,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -12827,7 +12807,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -13506,7 +13485,6 @@
 					"x": "foo 42"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -14092,7 +14070,6 @@
 					"x": "foo 42 bar"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -15144,7 +15121,6 @@
 					"x": "foo \u003cundefined\u003e bar"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -16391,7 +16367,6 @@
 					"x": 42
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -17004,7 +16979,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

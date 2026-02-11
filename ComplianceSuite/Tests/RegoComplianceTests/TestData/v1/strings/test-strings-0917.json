@@ -12,7 +12,6 @@
 					"x": "hi there"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

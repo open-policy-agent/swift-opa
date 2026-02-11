@@ -11,7 +11,6 @@
 					"x": "-0-0-"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -290,7 +289,6 @@
 					"x": "foofoo"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -565,7 +563,6 @@
 				"package test\np := regex.replace(\"foo\", \"[\", \"$1\")\n"
 			],
 			"want_result": [],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -840,7 +837,6 @@
 					"x": "Foo"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1119,7 +1115,6 @@
 					"x": "foo"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1398,7 +1393,6 @@
 					"x": "M"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1677,7 +1671,6 @@
 					"x": "foF"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1956,7 +1949,6 @@
 					"x": "foo"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2235,7 +2227,6 @@
 					"x": "___ ___"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2514,7 +2505,6 @@
 					"x": "_ _x"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2793,7 +2783,6 @@
 					"x": "_o __"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

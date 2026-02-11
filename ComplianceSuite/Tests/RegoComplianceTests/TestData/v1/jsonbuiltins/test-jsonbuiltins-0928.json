@@ -8,7 +8,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "yaml: line 1: did not find",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

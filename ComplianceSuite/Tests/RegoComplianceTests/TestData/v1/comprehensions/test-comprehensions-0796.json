@@ -16,7 +16,6 @@
 			},
 			"want_error_code": "eval_conflict_error",
 			"want_error": "object keys must be unique",
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

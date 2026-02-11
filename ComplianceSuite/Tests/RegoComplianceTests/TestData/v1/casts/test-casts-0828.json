@@ -7,7 +7,6 @@
 				"package generated\n\np if {\n  to_number(\"nan\", b)\n}\n"
 			],
 			"want_error_code": "eval_type_error",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -269,7 +268,6 @@
 				"package generated\n\np if {\n  to_number(\"inf\", b)\n}\n"
 			],
 			"want_error_code": "eval_type_error",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -531,7 +529,6 @@
 				"package generated\n\np if {\n  to_number(\"-inf\", b)\n}\n"
 			],
 			"want_error_code": "eval_type_error",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -793,7 +790,6 @@
 				"package generated\n\np if {\n  to_number(\"Infinity\", b)\n}\n"
 			],
 			"want_error_code": "eval_type_error",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1055,7 +1051,6 @@
 				"package generated\n\np if {\n  to_number(\"-Infinity\", b)\n}\n"
 			],
 			"want_error_code": "eval_type_error",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1317,7 +1312,6 @@
 				"package generated\n\np if {\n  to_number(\"-nan\", b)\n}\n"
 			],
 			"want_error_code": "eval_type_error",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1579,7 +1573,6 @@
 				"package generated\n\np if {\n  to_number(\"-NaN\", b)\n}\n"
 			],
 			"want_error_code": "eval_type_error",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1841,7 +1834,6 @@
 				"package generated\n\np if {\n  to_number(\"iNf\", b)\n}\n"
 			],
 			"want_error_code": "eval_type_error",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

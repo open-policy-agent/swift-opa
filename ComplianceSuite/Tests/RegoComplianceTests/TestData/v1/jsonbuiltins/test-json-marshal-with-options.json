@@ -12,7 +12,6 @@
 					"x": "[\n  1234567890,\n  2000000,\n  1000000000\n]"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -638,7 +637,6 @@
 					"x": "[1234567890,2000000,1000000000]"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1241,7 +1239,6 @@
 					"x": "[\n\t1234567890,\n\t2000000,\n\t1000000000\n]"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1864,7 +1861,6 @@
 					"x": "[1234567890,2000000,1000000000]"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2533,7 +2529,6 @@
 					"x": "JSON =\u003e [\nJSON =\u003e \t1234567890,\nJSON =\u003e \t2000000,\nJSON =\u003e \t1000000000\nJSON =\u003e ]"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3159,7 +3154,6 @@
 					"x": "JSON =\u003e {\nJSON =\u003e \t\"bar\": \"baz\",\nJSON =\u003e \t\"foo\": \"bar\"\nJSON =\u003e }"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3546,7 +3540,6 @@
 					"x": "---[]"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3914,7 +3907,6 @@
 					"x": "[\n    [\n        [\n            [\n                [\n                    [\n                        []\n                    ]\n                ]\n            ]\n        ]\n    ]\n]"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4394,7 +4386,6 @@
 			"data": {},
 			"want_error_code": "eval_type_error",
 			"want_error": "object contained unknown key \"include_winning_lottery_numbers\"",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

@@ -12,7 +12,6 @@
 					"x": "hi 3.14"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

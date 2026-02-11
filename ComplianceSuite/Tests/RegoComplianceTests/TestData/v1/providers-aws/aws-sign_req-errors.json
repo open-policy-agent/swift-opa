@@ -8,7 +8,6 @@
 			],
 			"want_error_code": "eval_type_error",
 			"want_error": "providers.aws.sign_req: operand 1 missing required request parameters(s): {\"method\", \"url\"}",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -960,7 +959,6 @@
 			],
 			"want_error_code": "eval_type_error",
 			"want_error": "providers.aws.sign_req: operand 1 invalid values for required request parameters(s): {\"method\", \"url\"}",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1964,7 +1962,6 @@
 			],
 			"want_error_code": "eval_type_error",
 			"want_error": "providers.aws.sign_req: operand 2 missing required AWS config parameters(s): {\"aws_access_key\", \"aws_region\", \"aws_secret_access_key\", \"aws_service\"}",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -2855,7 +2852,6 @@
 			],
 			"want_error_code": "eval_type_error",
 			"want_error": "providers.aws.sign_req: operand 2 invalid values for required AWS config parameters(s): {\"aws_access_key\", \"aws_region\", \"aws_secret_access_key\", \"aws_service\"}",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -3891,7 +3887,6 @@
 			],
 			"want_error_code": "eval_type_error",
 			"want_error": "providers.aws.sign_req: operand 3 could not convert time_ns value into a unix timestamp",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -4877,7 +4872,6 @@
 			],
 			"want_error_code": "eval_type_error",
 			"want_error": "providers.aws.sign_req: operand 2 invalid value for 'disable_payload_signing' in AWS config",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

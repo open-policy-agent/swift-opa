@@ -7,7 +7,6 @@
 				"package generated\n\np if {\n\tnot true = true\n}\n"
 			],
 			"want_result": [],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

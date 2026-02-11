@@ -8,7 +8,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "input:pqrs], pos:5, set-close ']' with no preceding '[': the input provided is invalid",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

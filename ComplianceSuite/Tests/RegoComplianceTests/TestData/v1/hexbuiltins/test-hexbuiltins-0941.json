@@ -8,7 +8,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "invalid byte: U+0067 'g'",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

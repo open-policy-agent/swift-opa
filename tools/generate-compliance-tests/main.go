@@ -17,7 +17,7 @@ func main() {
 
 	outputDir := os.Args[1]
 
-	extendedSets, err := cases.LoadExtended()
+	extendedSets, err := cases.LoadIrExtendedTestCases()
 	if err != nil {
 		panic(err)
 	}

@@ -16,7 +16,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -566,7 +565,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -982,7 +980,6 @@
 			],
 			"want_error_code": "eval_conflict_error",
 			"want_error": "object keys must be unique",
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1245,7 +1242,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1451,7 +1447,6 @@
 					"x": 0
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1675,7 +1670,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2100,7 +2094,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2729,7 +2722,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3110,7 +3102,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3597,7 +3588,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3948,7 +3938,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3968,10 +3957,10 @@
 							"value": "d"
 						},
 						{
-							"value": "2"
+							"value": "1"
 						},
 						{
-							"value": "1"
+							"value": "2"
 						},
 						{
 							"value": "test"
@@ -3985,10 +3974,10 @@
 							"value": "\u003cquery\u003e"
 						},
 						{
-							"value": "module-1.rego"
+							"value": "module-0.rego"
 						},
 						{
-							"value": "module-0.rego"
+							"value": "module-1.rego"
 						}
 					]
 				},
@@ -4411,7 +4400,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4772,7 +4760,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -5129,7 +5116,6 @@
 					"x": {}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -5504,7 +5490,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -6430,7 +6415,6 @@
 					"x": "web"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -8247,7 +8231,6 @@
 					]
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -8603,7 +8586,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

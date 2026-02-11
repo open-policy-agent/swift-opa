@@ -8,7 +8,6 @@
 			],
 			"want_error_code": "eval_type_error",
 			"want_error": "strings.replace_n: operand 1 non-string key found in pattern object",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -345,7 +344,6 @@
 			},
 			"want_error_code": "eval_type_error",
 			"want_error": "strings.replace_n: operand 1 non-string value found in pattern object",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -693,7 +691,6 @@
 			},
 			"want_error_code": "eval_type_error",
 			"want_error": "strings.replace_n: operand 2 must be string but got number",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

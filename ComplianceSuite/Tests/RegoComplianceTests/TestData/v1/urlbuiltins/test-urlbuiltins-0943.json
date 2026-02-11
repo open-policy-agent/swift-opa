@@ -12,7 +12,6 @@
 					"x": "a=b\u0026c=d"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

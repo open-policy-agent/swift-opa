@@ -9,7 +9,6 @@
 			"data": {},
 			"want_error_code": "eval_builtin_error",
 			"want_error": "missing or invalid 'alg' header: cannot parse JSON",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

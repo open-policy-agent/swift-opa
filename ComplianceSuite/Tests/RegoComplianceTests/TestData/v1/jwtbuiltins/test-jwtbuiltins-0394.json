@@ -9,7 +9,6 @@
 			"data": {},
 			"want_error_code": "eval_builtin_error",
 			"want_error": "JWT header had invalid encoding: illegal base64 data at input byte 13",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

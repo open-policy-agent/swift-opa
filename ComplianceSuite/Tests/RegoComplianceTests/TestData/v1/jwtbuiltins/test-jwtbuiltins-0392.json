@@ -9,7 +9,6 @@
 			"data": {},
 			"want_error_code": "eval_builtin_error",
 			"want_error": "encoded JWT had no period separators",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

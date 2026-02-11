@@ -13,7 +13,6 @@
 					]
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -317,7 +316,6 @@
 					]
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -634,7 +632,6 @@
 					]
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -948,7 +945,6 @@
 				"package test\n\np := x if {\n\tnet.cidr_merge([\"2601:600:8a80:207e:a57d:7567:e2c9:e7b3\"], x)\n}\n"
 			],
 			"want_error": "eval_builtin_error: net.cidr_merge: IPv6 invalid: needs prefix length",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1241,7 +1237,6 @@
 				"package test\n\np := x if {\n\tnet.cidr_merge([\"2601:600:8a80:207e:a57d:7567:e2c9:e7b3\", \"2601:600:8a80:207e:a57d:7567:e2c9:e7b3\"], x)\n}\n"
 			],
 			"want_error": "eval_builtin_error: net.cidr_merge: IPv6 invalid: needs prefix length",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

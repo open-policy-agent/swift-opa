@@ -38,15 +38,14 @@
 				{
 					"x": {
 						"1": 1496455200000000000,
-						"2": -9223372036854775808,
-						"3": 9223372036854775807,
+						"2": -9223372036854776000,
+						"3": 9223372036854776000,
 						"4": 1496455200000000000,
 						"5": 1496455200000000000,
 						"6": 1496455200000000000
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -412,8 +411,8 @@
 				{
 					"x": {
 						"1": 1496455200000000000,
-						"2": -9223372036854775808,
-						"3": 9223372036854775807,
+						"2": -9223372036854776000,
+						"3": 9223372036854776000,
 						"4": 1496455200000000000,
 						"5": 1496455200000000000,
 						"6": 1496455200000000000
@@ -429,7 +428,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "time outside of valid range",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -690,7 +688,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "time outside of valid range",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

@@ -12,7 +12,6 @@
 					"x": "[1234567890,2000000,1000000000]"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

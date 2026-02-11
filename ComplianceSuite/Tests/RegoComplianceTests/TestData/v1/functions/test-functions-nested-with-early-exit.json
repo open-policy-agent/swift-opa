@@ -8,7 +8,6 @@
 			],
 			"want_error_code": "eval_conflict_error",
 			"want_error": "complete rules must not produce multiple outputs",
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -416,7 +415,6 @@
 			],
 			"want_error_code": "eval_conflict_error",
 			"want_error": "complete rules must not produce multiple outputs",
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -922,7 +920,6 @@
 			],
 			"want_error_code": "eval_conflict_error",
 			"want_error": "functions must not produce multiple outputs for same inputs",
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1371,7 +1368,6 @@
 			],
 			"want_error_code": "eval_conflict_error",
 			"want_error": "functions must not produce multiple outputs for same inputs",
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1944,7 +1940,6 @@
 			],
 			"want_error_code": "eval_conflict_error",
 			"want_error": "functions must not produce multiple outputs for same inputs",
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

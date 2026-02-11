@@ -9,7 +9,6 @@
 			"data": {},
 			"want_error_code": "eval_builtin_error",
 			"want_error": "failed to parse a JWK key (set)",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

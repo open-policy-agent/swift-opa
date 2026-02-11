@@ -15,7 +15,6 @@
 				}
 			],
 			"sort_bindings": true,
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -730,7 +729,6 @@
 				}
 			],
 			"sort_bindings": true,
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1460,7 +1458,6 @@
 				"package main\n\ndoc := {\"foo\": {\"a\", \"b\", \"c\"}}\n\npatch := [{\"op\": \"add\", \"path\": \"foo/d\", \"value\": \"e\"}]\n\nresult := r if r = json.patch(doc, patch)\n"
 			],
 			"want_result": [],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2193,7 +2190,6 @@
 				}
 			],
 			"sort_bindings": true,
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3049,7 +3045,6 @@
 					]
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

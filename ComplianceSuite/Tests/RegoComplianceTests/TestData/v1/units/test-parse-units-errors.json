@@ -8,7 +8,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "units.parse: no amount provided",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -260,7 +259,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "units.parse: no amount provided",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -512,7 +510,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "units.parse: no amount provided",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -764,7 +761,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "units.parse: could not parse amount to a number",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1016,7 +1012,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "units.parse: could not parse amount to a number",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1268,7 +1263,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "units.parse: spaces not allowed in resource strings",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1520,7 +1514,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "units.parse: spaces not allowed in resource strings",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

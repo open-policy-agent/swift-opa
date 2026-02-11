@@ -7,7 +7,6 @@
 				"package main\n\ndoc := [1, 2, 3]\n\npatch := [{\"op\": \"add\", \"path\": \"1.2\", \"value\": \"foo\"}]\n\nresult := r if r = json.patch(doc, patch)\n"
 			],
 			"want_result": [],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

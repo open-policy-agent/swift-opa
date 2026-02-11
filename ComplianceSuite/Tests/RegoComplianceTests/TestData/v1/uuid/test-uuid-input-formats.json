@@ -18,7 +18,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -321,13 +320,12 @@
 						"id": 1000,
 						"macvariables": "local:unicast",
 						"nodeid": "32-50-96-b3-9f-47",
-						"time": 1693566990121469600,
+						"time": 1693566990121469700,
 						"variant": "RFC4122",
 						"version": 2
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -611,7 +609,7 @@
 						"id": 1000,
 						"macvariables": "local:unicast",
 						"nodeid": "32-50-96-b3-9f-47",
-						"time": 1693566990121469600,
+						"time": 1693566990121469700,
 						"variant": "RFC4122",
 						"version": 2
 					}
@@ -636,7 +634,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

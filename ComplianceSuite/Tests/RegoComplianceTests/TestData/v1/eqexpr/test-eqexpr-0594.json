@@ -41,7 +41,6 @@
 				}
 			],
 			"sort_bindings": true,
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

@@ -12,7 +12,6 @@
 					"x": "[{\"foo\":[1,2,3]}]"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

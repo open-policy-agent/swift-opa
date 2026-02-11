@@ -9,7 +9,6 @@
 			"data": {},
 			"want_error_code": "eval_builtin_error",
 			"want_error": "JWT is a JWE object, which is not supported",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

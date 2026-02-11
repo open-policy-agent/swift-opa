@@ -11,7 +11,6 @@
 					"x": "123456789123456789123"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -327,7 +326,6 @@
 					"x": "1208925819614629174706175"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

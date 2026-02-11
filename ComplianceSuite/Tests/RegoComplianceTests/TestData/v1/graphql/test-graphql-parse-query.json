@@ -8,7 +8,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "graphql.parse_query: Expected Name, found \u003cEOF\u003e in GraphQL string at location 1:2",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -268,7 +267,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "graphql.parse_query: Expected \"on\", found Name \"Type\" in GraphQL string at location 3:22",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -641,7 +639,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "graphql.parse_query: Expected Name, found { in GraphQL string at location 1:10",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1014,7 +1011,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "graphql.parse_query: Unexpected Name \"notanoperation\" in GraphQL string at location 1:1",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1387,7 +1383,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "graphql.parse_query: Unexpected ... in GraphQL string at location 1:1",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1763,7 +1758,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3102,7 +3096,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "graphql.parse_query: Unexpected $ in GraphQL string at location 1:37",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -3478,7 +3471,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4603,7 +4595,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "graphql.parse_query: Unexpected Name \"on\" in GraphQL string at location 1:10",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -4976,7 +4967,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "graphql.parse_query: Expected Name, found } in GraphQL string at location 1:9",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -5352,7 +5342,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -6220,7 +6209,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -7613,7 +7601,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -9003,7 +8990,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -10393,7 +10379,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -11084,7 +11069,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -11775,7 +11759,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -12466,7 +12449,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -13157,7 +13139,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -14167,7 +14148,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -14944,7 +14924,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -16069,7 +16048,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -16937,7 +16915,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -17934,7 +17911,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -19087,7 +19063,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -20431,7 +20406,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -26489,7 +26463,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "graphql.parse_query: Expected {, found } in GraphQL string at location 1:16",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -26862,7 +26835,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "graphql.parse_query: expected at least one definition, found } in GraphQL string at location 1:21",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

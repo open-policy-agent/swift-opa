@@ -14,7 +14,6 @@
 					"with_timezone": "2022-12-03T00:10:53.141828752+05:30"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1150,7 +1149,6 @@
 			],
 			"want_error_code": "eval_builtin_error",
 			"want_error": "timestamp too big",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

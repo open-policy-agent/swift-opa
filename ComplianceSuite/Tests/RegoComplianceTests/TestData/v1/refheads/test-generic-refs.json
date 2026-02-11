@@ -21,7 +21,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -430,7 +429,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -828,7 +826,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1243,7 +1240,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1785,7 +1781,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2445,7 +2440,6 @@
 				"package test\n\np[q].r.s := i if q := [\"a\", \"b\", \"c\", \"b\"][i]\n"
 			],
 			"want_error_code": "eval_conflict_error",
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2922,7 +2916,6 @@
 				"package test\n\np[q].r.s := i if q := [\"a\", \"b\", \"c\"][i]\n\np.a.r := 42\n"
 			],
 			"want_error_code": "eval_conflict_error",
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3509,7 +3502,6 @@
 				"package test\n\np[q].r := v if {\n\tq := \"q\"\n\tv := {\"s\": {\"t\": 1}}\n}\n\np.q.r.s.t := 42\n"
 			],
 			"want_error_code": "eval_conflict_error",
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4161,7 +4153,6 @@
 				"package test\n\np[q].r := v if {\n\tq := \"q\"\n\tv := {\"s\": {\"t\": 1}}\n}\n\np.q.r.s.u := 42\n"
 			],
 			"want_error_code": "eval_conflict_error",
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4834,7 +4825,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -5480,7 +5470,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -5971,7 +5960,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -6779,7 +6767,6 @@
 					"x": "c"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -7625,7 +7612,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -7955,7 +7941,6 @@
 					}
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -8770,7 +8755,6 @@
 					"x": 2
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

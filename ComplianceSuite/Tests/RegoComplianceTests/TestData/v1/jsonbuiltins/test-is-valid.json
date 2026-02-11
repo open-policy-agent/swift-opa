@@ -15,7 +15,6 @@
 					]
 				}
 			],
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -524,7 +523,6 @@
 					"x": false
 				}
 			],
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -814,7 +812,6 @@
 					]
 				}
 			],
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -1323,7 +1320,6 @@
 					"x": false
 				}
 			],
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

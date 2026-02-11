@@ -13,7 +13,6 @@
 			},
 			"want_error_code": "eval_builtin_error",
 			"want_error": "divide by zero",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

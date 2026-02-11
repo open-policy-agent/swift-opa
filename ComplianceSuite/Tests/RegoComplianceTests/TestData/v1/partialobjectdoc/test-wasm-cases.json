@@ -11,7 +11,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -754,7 +753,6 @@
 				"b": 2
 			},
 			"want_result": [],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1403,7 +1401,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -2245,7 +2242,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3213,7 +3209,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -3982,7 +3977,6 @@
 			},
 			"want_error_code": "eval_conflict_error",
 			"want_error": "eval_conflict_error: complete rules must not produce multiple outputs",
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4580,7 +4574,6 @@
 					"x": true
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -4965,7 +4958,6 @@
 				"package x\n\np[\"a\"] := {\"b\": 2}\n"
 			],
 			"want_result": [],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],

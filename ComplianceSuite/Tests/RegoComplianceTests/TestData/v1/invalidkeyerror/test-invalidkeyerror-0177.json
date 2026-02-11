@@ -8,7 +8,6 @@
 			],
 			"want_error_code": "eval_type_error",
 			"want_error": "missing required request parameters(s): {\"url\"}",
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

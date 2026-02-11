@@ -11,7 +11,6 @@
 					"x": "hello world"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -541,7 +540,6 @@
 					"x": "2023"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1081,7 +1079,6 @@
 					"x": "hello rohan,hello john doe"
 				}
 			],
-			"ignore_generated_vars": false,
 			"entrypoints": [
 				"eval"
 			],
@@ -1650,7 +1647,6 @@
 					"x": "\u003cundefined\u003e"
 				}
 			],
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"
@@ -2181,7 +2177,6 @@
 					"x": "test \u003cundefined\u003e \u003cundefined\u003e 1"
 				}
 			],
-			"ignore_generated_vars": false,
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

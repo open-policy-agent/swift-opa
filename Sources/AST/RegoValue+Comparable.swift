@@ -54,7 +54,7 @@ extension RegoValue: Comparable {
             return rhs && !lhs
 
         case (.number(let lhs), .number(let rhs)):
-            return lhs.compare(rhs) == .orderedAscending
+            return lhs < rhs
 
         case (.object(let lhs), .object(let rhs)):
             // Objects - compare keys, then values, then length

@@ -245,7 +245,7 @@ extension BuiltinTests.AggregatesTests {
             description: "array",
             name: "sum",
             args: [[1, 2, 3.14, 4]],
-            expected: .success(.number(NSDecimalNumber(decimal: 1 + 2 + 3.14 + 4)))
+            expected: .success(.number(1 + 2 + 3.14 + 4))
         ),
         BuiltinTests.TestCase(
             description: "array of various objects",
@@ -265,7 +265,7 @@ extension BuiltinTests.AggregatesTests {
             description: "set",
             name: "sum",
             args: [.set([1, 5, 8.65])],
-            expected: .success(.number(NSDecimalNumber(decimal: 1 + 5 + 8.65)))
+            expected: .success(.number(1 + 5 + 8.65))
         ),
         BuiltinTests.TestCase(
             description: "set of various objects",
@@ -288,7 +288,7 @@ extension BuiltinTests.AggregatesTests {
             description: "array",
             name: "product",
             args: [[1, 2, 3.14, 4]],
-            expected: .success(.number(NSDecimalNumber(decimal: 1 * 2 * 3.14 * 4)))
+            expected: .success(.number(1 * 2 * 3.14 * 4))
         ),
         BuiltinTests.TestCase(
             description: "array of various objects",
@@ -308,7 +308,7 @@ extension BuiltinTests.AggregatesTests {
             description: "set",
             name: "product",
             args: [.set([1, 5, 8.65])],
-            expected: .success(.number(NSDecimalNumber(decimal: 1 * 5 * 8.65)))
+            expected: .success(.number(1 * 5 * 8.65))
         ),
         BuiltinTests.TestCase(
             description: "set of various objects",

@@ -22,19 +22,24 @@ extension BuiltinFuncs {
         guard intB >= 0 else {
             throw BuiltinError.argumentTypeMismatch(arg: "b", got: "negative integer", want: "unsigned integer")
         }
+
         // Shifts >= 64 bits return 0
         guard intB < 64 else {
-            return AST.RegoValue.number(NSNumber(value: 0))
+            return AST.RegoValue.number(RegoNumber(value: 0))
         }
 
         // For positive numbers, use unsigned arithmetic to handle cases
         // where shifting would move bits into the sign bit position
         if intA > 0 {
-            return AST.RegoValue.number(NSNumber(value: UInt64(intA) << intB))
+            let shiftResult = UInt64(intA) << intB
+            guard shiftResult <= UInt64(Int64.max) else {
+                return AST.RegoValue.number(RegoNumber(value: shiftResult))
+            }
+            return AST.RegoValue.number(RegoNumber(value: Int64(shiftResult)))
         }
 
         // For negative numbers or zero, use signed arithmetic with wrapping
-        return AST.RegoValue.number(NSNumber(value: intA &<< intB))
+        return AST.RegoValue.number(RegoNumber(value: Int64(intA &<< intB)))
     }
 
     static func bitsShiftRight(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -60,10 +65,10 @@ extension BuiltinFuncs {
 
         // Shifts >= 64 bits result in 0 or sign bit
         guard intB < 64 else {
-            return AST.RegoValue.number(NSNumber(value: intA >= 0 ? 0 : -1))
+            return AST.RegoValue.number(RegoNumber(value: intA >= 0 ? 0 : -1))
         }
 
-        return AST.RegoValue.number(NSNumber(value: intA >> intB))
+        return AST.RegoValue.number(RegoNumber(value: Int64(intA >> intB)))
     }
 
     static func bitsNegate(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -77,7 +82,7 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "a", got: args[0].typeName, want: "number[integer]")
         }
 
-        return AST.RegoValue.number(NSNumber(value: Int64(~intX)))
+        return AST.RegoValue.number(RegoNumber(value: Int64(~intX)))
     }
 
     static func bitsAnd(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -113,6 +118,6 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "b", got: args[1].typeName, want: "number[integer]")
         }
 
-        return AST.RegoValue.number(NSNumber(value: op(intX, intY)))
+        return AST.RegoValue.number(RegoNumber(value: op(intX, intY)))
     }
 }

@@ -96,7 +96,7 @@ internal struct IndexedIRPolicy {
 
     // Policy static values, indexes match original plan array
     var staticStrings: [String] = []
-    var staticStringNumbers: [NSNumber?] = []
+    var staticStringNumbers: [RegoNumber?] = []
 
     // On init() we'll pre-process some of the raw parsed IR.Policy to structure it in
     // more convienent (and optimized) structures to evaluate queries.
@@ -131,7 +131,15 @@ internal struct IndexedIRPolicy {
 
             // Pre-parse only if this index is used by MakeNumberRefStmt
             if staticStringNumberIndices.contains(index) {
-                self.staticStringNumbers.append(numberFormatter.number(from: stringValue))
+                // Try Decimal(string:) first for precision (handles large numbers correctly)
+                // Fall back to NumberFormatter for edge cases it might not handle
+                if let decimal = Decimal(string: stringValue) {
+                    self.staticStringNumbers.append(RegoNumber(decimal))
+                } else if let nsNumber = numberFormatter.number(from: stringValue) {
+                    self.staticStringNumbers.append(RegoNumber(nsNumber: nsNumber))
+                } else {
+                    self.staticStringNumbers.append(nil)
+                }
             } else {
                 self.staticStringNumbers.append(nil)
             }
@@ -142,7 +150,7 @@ internal struct IndexedIRPolicy {
         return self.staticStrings[index]
     }
 
-    func resolveStaticNumber(_ index: Int) -> NSNumber? {
+    func resolveStaticNumber(_ index: Int) -> RegoNumber? {
         return self.staticStringNumbers[index]
     }
 }
@@ -516,7 +524,7 @@ func evalBlock(
 
         case .assignIntStmt(let stmt):
             ctx.assignLocal(
-                idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
+                idx: stmt.target, value: .number(RegoNumber(value: Int64(stmt.value))))
 
         case .assignVarOnceStmt(let stmt):
             // 'undefined' source value doesn't propagate aka don't break out of the block
@@ -704,7 +712,7 @@ func evalBlock(
                 )
             }
 
-            ctx.assignLocal(idx: stmt.target, value: .number(NSNumber(value: len)))
+            ctx.assignLocal(idx: stmt.target, value: .number(RegoNumber(value: Int64(len))))
 
         case .makeArrayStmt(let stmt):
             var arr: [AST.RegoValue] = []
@@ -716,7 +724,7 @@ func evalBlock(
 
         case .makeNumberIntStmt(let stmt):
             ctx.assignLocal(
-                idx: stmt.target, value: .number(NSNumber(value: stmt.value)))
+                idx: stmt.target, value: .number(RegoNumber(value: Int64(stmt.value))))
 
         case .makeNumberRefStmt(let stmt):
             guard let n = ctx.policy.resolveStaticNumber(Int(stmt.index)) else {
@@ -1089,7 +1097,7 @@ private func evalScan(
     switch source {
     case .array(let arr):
         for i in 0..<arr.count {
-            let k: AST.RegoValue = .number(NSNumber(value: i))
+            let k: AST.RegoValue = .number(RegoNumber(value: Int64(i)))
             let v = arr[i] as AST.RegoValue
             try await evalScanBlock(ctx: ctx, stmt: stmt, key: k, value: v)
         }

@@ -31,7 +31,7 @@ extension BuiltinTests.TimeTests {
         // Make sure the output is *actually* an integer that represents time
         switch result {
         case .number(let actual):
-            #expect(actual.uint64Value >= expected)
+            #expect(actual.clampedUint64Value >= expected)
         default:
             Issue.record("time.now_ns should return a number, but got: \(result)")
         }
@@ -46,7 +46,7 @@ extension BuiltinTests.TimeTests {
         // Make sure the output is *actually* an integer that represents current time
         switch result {
         case .number(let actual):
-            #expect(actual.uint64Value == UInt64(expected.timeIntervalSince1970 * 1_000_000_000))
+            #expect(actual.clampedUint64Value == UInt64(expected.timeIntervalSince1970 * 1_000_000_000))
         default:
             Issue.record("time.now_ns should return a number, but got: \(result)")
         }

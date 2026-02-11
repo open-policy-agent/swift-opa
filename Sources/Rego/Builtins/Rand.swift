@@ -32,7 +32,7 @@ extension BuiltinFuncs {
                 value = UInt64(UInt64.random(in: 0..<UInt64(Swift.abs(n)), using: &ctx.rand.v))
             }
 
-            let result = RegoValue.number(NSNumber(value: value))
+            let result = RegoValue.number(RegoNumber(value: Int64(value)))
             ctx.cache.v[key, .namespace(randNamespace)] = result
 
             return result

@@ -10,7 +10,12 @@ import (
 )
 
 func main() {
-	outputDir := "../../ComplianceSuite/Tests/RegoComplianceTests/TestData/v1"
+	if len(os.Args) < 2 {
+		fmt.Println("Usage: main <source-dir>")
+		os.Exit(1)
+	}
+
+	outputDir := os.Args[1]
 
 	extendedSets, err := cases.LoadExtended()
 	if err != nil {

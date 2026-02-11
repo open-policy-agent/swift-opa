@@ -281,7 +281,12 @@ extension RegoNumber {
 
     /// Create RegoNumber from NSNumber (for number parsing - assumes non-boolean NSNumber)
     public init(nsNumber: NSNumber) {
-        let nsNumberIsFloatType = CFNumberIsFloatType(nsNumber as CFNumber)
+        #if canImport(Darwin)
+            let nsNumberIsFloatType = CFNumberIsFloatType(nsNumber as CFNumber)
+        #else
+            let objCType = String(cString: nsNumber.objCType)
+            let nsNumberIsFloatType = objCType.contains("f") || objCType.contains("d")
+        #endif
 
         if !nsNumberIsFloatType {
             let nsInt64Value = nsNumber.int64Value

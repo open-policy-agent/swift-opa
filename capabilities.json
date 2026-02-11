@@ -1812,6 +1812,32 @@
       },
       "name" : "uuid.rfc4122",
       "nondeterministic" : true
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "any"
+          }
+        ],
+        "result" : {
+          "static" : [
+            {
+              "dynamic" : {
+                "type" : "any"
+              },
+              "type" : "array"
+            },
+            {
+              "type" : "any"
+            }
+          ],
+          "type" : "array"
+        },
+        "type" : "function"
+      },
+      "name" : "walk",
+      "relation" : true
     }
   ],
   "features" : [

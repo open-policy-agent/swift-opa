@@ -60,7 +60,7 @@ extension BuiltinTests.RandTests {
         case .number(let value):
             #expect(!result.isFloat, "expect result to be an integer")
 
-            let intValue = value.uint64Value
+            let intValue = value.clampedUint64Value
 
             // Make sure the returned value is within correct bounds.
             if n != 0 {

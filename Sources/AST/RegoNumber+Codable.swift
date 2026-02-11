@@ -25,7 +25,7 @@ extension RegoNumber: Codable {
             }
 
             if v >= 0 {
-                let uint64Value = self.uint64Value
+                let uint64Value = self.clampedUint64Value
                 if Decimal(uint64Value) == v {
                     try container.encode(uint64Value)
                     return

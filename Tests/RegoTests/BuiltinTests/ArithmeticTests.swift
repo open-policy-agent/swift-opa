@@ -17,15 +17,12 @@ extension BuiltinTests.ArithmeticTests {
             args: [1, 1],
             expected: .success(2)
         ),
-        // TODO: Uh oh, we've got floating point comparison and math problems
-        // we might need to do something like what OPA does upstream using strings
-        // and "big" number libraries to achieve similar behaviors (and consistency)
-        //BuiltinTests.TestCase(
-        //    description: "1 + 1.234567890",
-        //    name: "plus",
-        //    args: [1, 1.234567890],
-        //    expected: .success(2.23456789)
-        //),
+        BuiltinTests.TestCase(
+            description: "1 + 1.234567890",
+            name: "plus",
+            args: [1, 1.234567890],
+            expected: .success(2.23456789)
+        ),
         BuiltinTests.TestCase(
             description: "1.33333 + 1.33333",
             name: "plus",
@@ -78,7 +75,7 @@ extension BuiltinTests.ArithmeticTests {
             expected: .success(0.76543211)
         ),
         BuiltinTests.TestCase(
-            description: "2.33333 + 1.33333",
+            description: "2.33333 - 1.33333",
             name: "minus",
             args: [2.33333, 1.33333],
             expected: .success(1)
@@ -480,8 +477,9 @@ extension BuiltinTests.ArithmeticTests {
     }
 
     static let knownIssues: Set<String> = [
+        "plus: 1 + 1.234567890",
         "minus: 2 - 1.234567890",
-        "minus: 2.33333 + 1.33333",
+        "minus: 2.33333 - 1.33333",
         "mul: overflow",
     ]
 

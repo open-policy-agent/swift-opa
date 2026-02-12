@@ -180,6 +180,9 @@ public struct BuiltinRegistry: Sendable {
             // UUID
             "uuid.rfc4122": BuiltinFuncs.makeRfc4122UUID,
             "uuid.parse": BuiltinFuncs.parseUUID,
+
+            // Walk
+            "walk": BuiltinFuncs.walk,
         ]
     }
 

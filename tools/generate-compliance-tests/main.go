@@ -25,7 +25,7 @@ func main() {
 	for _, extendedSet := range extendedSets {
 		tcJson, err := json.MarshalIndent(extendedSet, "", "\t")
 		if err != nil {
-			panic(fmt.Errorf("Failed to marchal tc to json: %s\n", err.Error()))
+			panic(fmt.Errorf("Failed to marchal test case to json: %s\n", err.Error()))
 		}
 
 		tPath := strings.Split(extendedSet.Cases[0].Filename, "/")
@@ -37,7 +37,7 @@ func main() {
 		}
 
 		if err := os.WriteFile(fmt.Sprintf("%s/%s", folderPath, tcFileName), tcJson, 0644); err != nil {
-			panic(fmt.Errorf("Failed to write tc: %s\n", err.Error()))
+			panic(fmt.Errorf("Failed to write test case: %s\n", err.Error()))
 		}
 	}
 }

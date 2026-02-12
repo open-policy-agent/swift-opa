@@ -8,7 +8,7 @@
 			],
 			"data": {},
 			"want_error_code": "eval_builtin_error",
-			"want_error": "unexpected end of JSON input",
+			"want_error": "missing or invalid 'alg' header: cannot parse JSON: cannot parse empty string",
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

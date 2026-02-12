@@ -1,0 +1,511 @@
+{
+	"cases": [
+		{
+			"note": "uuid.rfc4122/consistent values for same arguments",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\n\np := count(uuids) if {\n\tuuids := {uuid.rfc4122(\"key\") | numbers.range(1, 100)[_]}\n}\n"
+			],
+			"want_result": [
+				{
+					"x": 1
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "1"
+						},
+						{
+							"value": "100"
+						},
+						{
+							"value": "key"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "count",
+							"decl": {
+								"args": [
+									{
+										"description": "the set/array/object/string to be counted",
+										"name": "collection",
+										"of": [
+											{
+												"type": "string"
+											},
+											{
+												"dynamic": {
+													"type": "any"
+												},
+												"type": "array"
+											},
+											{
+												"dynamic": {
+													"key": {
+														"type": "any"
+													},
+													"value": {
+														"type": "any"
+													}
+												},
+												"type": "object"
+											},
+											{
+												"of": {
+													"type": "any"
+												},
+												"type": "set"
+											}
+										],
+										"type": "any"
+									}
+								],
+								"result": {
+									"description": "the count of elements, key/val pairs, or characters, respectively.",
+									"name": "n",
+									"type": "number"
+								},
+								"type": "function"
+							}
+						},
+						{
+							"name": "numbers.range",
+							"decl": {
+								"args": [
+									{
+										"description": "the start of the range",
+										"name": "a",
+										"type": "number"
+									},
+									{
+										"description": "the end of the range (inclusive)",
+										"name": "b",
+										"type": "number"
+									}
+								],
+								"result": {
+									"description": "the range between `a` and `b`",
+									"dynamic": {
+										"type": "number"
+									},
+									"name": "range",
+									"type": "array"
+								},
+								"type": "function"
+							}
+						},
+						{
+							"name": "uuid.rfc4122",
+							"decl": {
+								"args": [
+									{
+										"description": "seed string",
+										"name": "k",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "a version 4 UUID; for any given `k`, the output will be consistent throughout a query evaluation",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "MakeSetStmt",
+											"stmt": {
+												"target": 4,
+												"file": 0,
+												"col": 11,
+												"row": 4
+											}
+										},
+										{
+											"type": "BlockStmt",
+											"stmt": {
+												"blocks": [
+													{
+														"stmts": [
+															{
+																"type": "MakeNumberRefStmt",
+																"stmt": {
+																	"Index": 1,
+																	"target": 5,
+																	"file": 0,
+																	"col": 34,
+																	"row": 4
+																}
+															},
+															{
+																"type": "MakeNumberRefStmt",
+																"stmt": {
+																	"Index": 2,
+																	"target": 6,
+																	"file": 0,
+																	"col": 34,
+																	"row": 4
+																}
+															},
+															{
+																"type": "CallStmt",
+																"stmt": {
+																	"func": "numbers.range",
+																	"args": [
+																		{
+																			"type": "local",
+																			"value": 5
+																		},
+																		{
+																			"type": "local",
+																			"value": 6
+																		}
+																	],
+																	"result": 7,
+																	"file": 0,
+																	"col": 34,
+																	"row": 4
+																}
+															},
+															{
+																"type": "AssignVarStmt",
+																"stmt": {
+																	"source": {
+																		"type": "local",
+																		"value": 7
+																	},
+																	"target": 8,
+																	"file": 0,
+																	"col": 34,
+																	"row": 4
+																}
+															},
+															{
+																"type": "ScanStmt",
+																"stmt": {
+																	"source": 8,
+																	"key": 9,
+																	"value": 10,
+																	"block": {
+																		"stmts": [
+																			{
+																				"type": "AssignVarStmt",
+																				"stmt": {
+																					"source": {
+																						"type": "local",
+																						"value": 9
+																					},
+																					"target": 11,
+																					"file": 0,
+																					"col": 34,
+																					"row": 4
+																				}
+																			},
+																			{
+																				"type": "NotEqualStmt",
+																				"stmt": {
+																					"a": {
+																						"type": "local",
+																						"value": 10
+																					},
+																					"b": {
+																						"type": "bool",
+																						"value": false
+																					},
+																					"file": 0,
+																					"col": 34,
+																					"row": 4
+																				}
+																			},
+																			{
+																				"type": "CallStmt",
+																				"stmt": {
+																					"func": "uuid.rfc4122",
+																					"args": [
+																						{
+																							"type": "string_index",
+																							"value": 3
+																						}
+																					],
+																					"result": 12,
+																					"file": 0,
+																					"col": 12,
+																					"row": 4
+																				}
+																			},
+																			{
+																				"type": "AssignVarStmt",
+																				"stmt": {
+																					"source": {
+																						"type": "local",
+																						"value": 12
+																					},
+																					"target": 13,
+																					"file": 0,
+																					"col": 12,
+																					"row": 4
+																				}
+																			},
+																			{
+																				"type": "SetAddStmt",
+																				"stmt": {
+																					"value": {
+																						"type": "local",
+																						"value": 13
+																					},
+																					"set": 4,
+																					"file": 0,
+																					"col": 11,
+																					"row": 4
+																				}
+																			}
+																		]
+																	},
+																	"file": 0,
+																	"col": 34,
+																	"row": 4
+																}
+															}
+														]
+													}
+												],
+												"file": 0,
+												"col": 11,
+												"row": 4
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 14,
+												"file": 0,
+												"col": 11,
+												"row": 4
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "count",
+												"args": [
+													{
+														"type": "local",
+														"value": 14
+													}
+												],
+												"result": 15,
+												"file": 0,
+												"col": 6,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 15
+												},
+												"target": 16,
+												"file": 0,
+												"col": 6,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 16
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 3
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": 1
+				}
+			]
+		}
+	]
+}

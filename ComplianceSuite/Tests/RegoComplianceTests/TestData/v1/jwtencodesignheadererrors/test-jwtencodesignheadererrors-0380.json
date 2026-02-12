@@ -8,7 +8,7 @@
 			],
 			"data": {},
 			"want_error_code": "eval_builtin_error",
-			"want_error": "unknown signature algorithm",
+			"want_error": "unknown JWS algorithm: dummy",
 			"strict_error": true,
 			"entrypoints": [
 				"eval"

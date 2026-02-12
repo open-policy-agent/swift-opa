@@ -667,7 +667,7 @@
 			"note": "graphql_parse_query/success-basic-ast with arguments",
 			"query": "data.test.p = x",
 			"modules": [
-				"package test\n\ngql := `query hero ($episode: Episode!) {\n    hero (episode: $episode) {\n        id\n        name\n        friends {\n            id\n            name\n            friends {\n                id\n                name\n                appearsIn\n            }\n            appearsIn\n        }\n        appearsIn\n    }\n}`\n\nast := {\"Operations\": [{\n\t\"Name\": \"hero\",\n\t\"Operation\": \"query\",\n\t\"SelectionSet\": [{\n\t\t\"Alias\": \"hero\",\n\t\t\"Arguments\": [{\n\t\t\t\"Name\": \"episode\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Kind\": 0,\n\t\t\t\t\"Raw\": \"episode\",\n\t\t\t},\n\t\t}],\n\t\t\"Name\": \"hero\",\n\t\t\"SelectionSet\": [\n\t\t\t{\n\t\t\t\t\"Alias\": \"id\",\n\t\t\t\t\"Name\": \"id\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\"Name\": \"name\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"Alias\": \"friends\",\n\t\t\t\t\"Name\": \"friends\",\n\t\t\t\t\"SelectionSet\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"Alias\": \"id\",\n\t\t\t\t\t\t\"Name\": \"id\",\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\t\t\"Name\": \"name\",\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"Alias\": \"friends\",\n\t\t\t\t\t\t\"Name\": \"friends\",\n\t\t\t\t\t\t\"SelectionSet\": [\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"Alias\": \"id\",\n\t\t\t\t\t\t\t\t\"Name\": \"id\",\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\t\t\t\t\"Name\": \"name\",\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"Alias\": \"appearsIn\",\n\t\t\t\t\t\t\t\t\"Name\": \"appearsIn\",\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t],\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"Alias\": \"appearsIn\",\n\t\t\t\t\t\t\"Name\": \"appearsIn\",\n\t\t\t\t\t},\n\t\t\t\t],\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"Alias\": \"appearsIn\",\n\t\t\t\t\"Name\": \"appearsIn\",\n\t\t\t},\n\t\t],\n\t}],\n\t\"VariableDefinitions\": [{\n\t\t\"Type\": {\n\t\t\t\"NamedType\": \"Episode\",\n\t\t\t\"NonNull\": true,\n\t\t},\n\t\t\"Used\": false,\n\t\t\"Variable\": \"episode\",\n\t}],\n}]}\n\np if {\n\tgraphql.parse_query(gql) == ast\n}\n"
+				"package test\n\ngql := `query hero ($episode: Episode!) {\n    hero (episode: $episode) {\n        id\n        name\n        friends {\n            id\n            name\n            friends {\n                id\n                name\n                appearsIn\n            }\n            appearsIn\n        }\n        appearsIn\n    }\n}`\n\nast := {\"Operations\": [{\n\t\"Name\": \"hero\",\n\t\"Operation\": \"query\",\n\t\"SelectionSet\": [{\n\t\t\"Alias\": \"hero\",\n\t\t\"Arguments\": [{\n\t\t\t\"Name\": \"episode\",\n\t\t\t\"Value\": {\n                \"ExpectedTypeHasDefault\": false,\n\t\t\t\t\"Kind\": 0,\n\t\t\t\t\"Raw\": \"episode\",\n\t\t\t},\n\t\t}],\n\t\t\"Name\": \"hero\",\n\t\t\"SelectionSet\": [\n\t\t\t{\n\t\t\t\t\"Alias\": \"id\",\n\t\t\t\t\"Name\": \"id\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\"Name\": \"name\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"Alias\": \"friends\",\n\t\t\t\t\"Name\": \"friends\",\n\t\t\t\t\"SelectionSet\": [\n\t\t\t\t\t{\n\t\t\t\t\t\t\"Alias\": \"id\",\n\t\t\t\t\t\t\"Name\": \"id\",\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\t\t\"Name\": \"name\",\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"Alias\": \"friends\",\n\t\t\t\t\t\t\"Name\": \"friends\",\n\t\t\t\t\t\t\"SelectionSet\": [\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"Alias\": \"id\",\n\t\t\t\t\t\t\t\t\"Name\": \"id\",\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\t\t\t\t\"Name\": \"name\",\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\"Alias\": \"appearsIn\",\n\t\t\t\t\t\t\t\t\"Name\": \"appearsIn\",\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t],\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\t\"Alias\": \"appearsIn\",\n\t\t\t\t\t\t\"Name\": \"appearsIn\",\n\t\t\t\t\t},\n\t\t\t\t],\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"Alias\": \"appearsIn\",\n\t\t\t\t\"Name\": \"appearsIn\",\n\t\t\t},\n\t\t],\n\t}],\n\t\"VariableDefinitions\": [{\n\t\t\"Type\": {\n\t\t\t\"NamedType\": \"Episode\",\n\t\t\t\"NonNull\": true,\n\t\t},\n\t\t\"Used\": false,\n\t\t\"Variable\": \"episode\",\n\t}],\n}]}\n\np if {\n\tgraphql.parse_query(gql) == ast\n}\n"
 			],
 			"want_result": [
 				{
@@ -715,6 +715,9 @@
 						},
 						{
 							"value": "Value"
+						},
+						{
+							"value": "ExpectedTypeHasDefault"
 						},
 						{
 							"value": "Kind"
@@ -1122,9 +1125,26 @@
 											}
 										},
 										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 12
+												},
+												"value": {
+													"type": "bool",
+													"value": false
+												},
+												"object": 11,
+												"file": 0,
+												"col": 1,
+												"row": 21
+											}
+										},
+										{
 											"type": "MakeNumberRefStmt",
 											"stmt": {
-												"Index": 13,
+												"Index": 14,
 												"target": 12,
 												"file": 0,
 												"col": 1,
@@ -1136,7 +1156,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 12
+													"value": 13
 												},
 												"value": {
 													"type": "local",
@@ -1153,7 +1173,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 14
+													"value": 15
 												},
 												"value": {
 													"type": "string_index",
@@ -1257,7 +1277,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 15
+													"value": 16
 												},
 												"object": 14,
 												"file": 0,
@@ -1274,7 +1294,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 15
+													"value": 16
 												},
 												"object": 14,
 												"file": 0,
@@ -1313,7 +1333,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 16
+													"value": 17
 												},
 												"object": 15,
 												"file": 0,
@@ -1330,7 +1350,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 16
+													"value": 17
 												},
 												"object": 15,
 												"file": 0,
@@ -1369,7 +1389,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 17
+													"value": 18
 												},
 												"object": 16,
 												"file": 0,
@@ -1386,7 +1406,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 17
+													"value": 18
 												},
 												"object": 16,
 												"file": 0,
@@ -1422,7 +1442,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 15
+													"value": 16
 												},
 												"object": 18,
 												"file": 0,
@@ -1439,7 +1459,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 15
+													"value": 16
 												},
 												"object": 18,
 												"file": 0,
@@ -1478,7 +1498,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 16
+													"value": 17
 												},
 												"object": 19,
 												"file": 0,
@@ -1495,7 +1515,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 16
+													"value": 17
 												},
 												"object": 19,
 												"file": 0,
@@ -1534,7 +1554,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 17
+													"value": 18
 												},
 												"object": 20,
 												"file": 0,
@@ -1551,7 +1571,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 17
+													"value": 18
 												},
 												"object": 20,
 												"file": 0,
@@ -1587,7 +1607,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 15
+													"value": 16
 												},
 												"object": 22,
 												"file": 0,
@@ -1604,7 +1624,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 15
+													"value": 16
 												},
 												"object": 22,
 												"file": 0,
@@ -1643,7 +1663,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 16
+													"value": 17
 												},
 												"object": 23,
 												"file": 0,
@@ -1660,7 +1680,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 16
+													"value": 17
 												},
 												"object": 23,
 												"file": 0,
@@ -1699,7 +1719,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 24,
 												"file": 0,
@@ -1716,7 +1736,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 24,
 												"file": 0,
@@ -1785,7 +1805,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 25,
 												"file": 0,
@@ -1802,7 +1822,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 25,
 												"file": 0,
@@ -1871,7 +1891,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 26,
 												"file": 0,
@@ -1888,7 +1908,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 26,
 												"file": 0,
@@ -1989,11 +2009,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 21
+													"value": 22
 												},
 												"value": {
 													"type": "string_index",
-													"value": 22
+													"value": 23
 												},
 												"object": 29,
 												"file": 0,
@@ -2006,7 +2026,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 23
+													"value": 24
 												},
 												"value": {
 													"type": "bool",
@@ -2023,7 +2043,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 20
+													"value": 21
 												},
 												"value": {
 													"type": "local",
@@ -2040,7 +2060,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 24
+													"value": 25
 												},
 												"value": {
 													"type": "bool",
@@ -2057,7 +2077,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 25
+													"value": 26
 												},
 												"value": {
 													"type": "string_index",
@@ -2087,7 +2107,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 19
+													"value": 20
 												},
 												"value": {
 													"type": "local",
@@ -2206,7 +2226,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 95
+												"row": 96
 											}
 										},
 										{
@@ -2226,7 +2246,7 @@
 												"result": 4,
 												"file": 0,
 												"col": 22,
-												"row": 96
+												"row": 97
 											}
 										},
 										{
@@ -2239,7 +2259,7 @@
 												"target": 5,
 												"file": 0,
 												"col": 22,
-												"row": 96
+												"row": 97
 											}
 										},
 										{
@@ -2255,7 +2275,7 @@
 												"result": 6,
 												"file": 0,
 												"col": 2,
-												"row": 96
+												"row": 97
 											}
 										},
 										{
@@ -2268,7 +2288,7 @@
 												"target": 7,
 												"file": 0,
 												"col": 2,
-												"row": 96
+												"row": 97
 											}
 										},
 										{
@@ -2288,7 +2308,7 @@
 												"result": 8,
 												"file": 0,
 												"col": 2,
-												"row": 96
+												"row": 97
 											}
 										},
 										{
@@ -2304,7 +2324,7 @@
 												},
 												"file": 0,
 												"col": 2,
-												"row": 96
+												"row": 97
 											}
 										},
 										{
@@ -2317,7 +2337,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 95
+												"row": 96
 											}
 										}
 									]
@@ -2330,7 +2350,7 @@
 												"source": 3,
 												"file": 0,
 												"col": 1,
-												"row": 95
+												"row": 96
 											}
 										},
 										{
@@ -2343,7 +2363,7 @@
 												"target": 2,
 												"file": 0,
 												"col": 1,
-												"row": 95
+												"row": 96
 											}
 										}
 									]
@@ -2356,7 +2376,7 @@
 												"source": 2,
 												"file": 0,
 												"col": 1,
-												"row": 95
+												"row": 96
 											}
 										}
 									]
@@ -2381,7 +2401,7 @@
 			"note": "graphql_parse_query/success-basic-ast inline fragments and type conditions",
 			"query": "data.test.p = x",
 			"modules": [
-				"package test\n\ngql := `query HeroForEpisode($ep: Episode!) {\n  hero(episode: $ep) {\n    name\n    ... on Droid {\n      primaryFunction\n    }\n    ... on Human {\n      height\n    }\n  }\n}`\n\nast := {\"Operations\": [{\n\t\"Name\": \"HeroForEpisode\",\n\t\"Operation\": \"query\",\n\t\"SelectionSet\": [{\n\t\t\"Alias\": \"hero\",\n\t\t\"Arguments\": [{\n\t\t\t\"Name\": \"episode\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Kind\": 0,\n\t\t\t\t\"Raw\": \"ep\",\n\t\t\t},\n\t\t}],\n\t\t\"Name\": \"hero\",\n\t\t\"SelectionSet\": [\n\t\t\t{\n\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\"Name\": \"name\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"SelectionSet\": [{\n\t\t\t\t\t\"Alias\": \"primaryFunction\",\n\t\t\t\t\t\"Name\": \"primaryFunction\",\n\t\t\t\t}],\n\t\t\t\t\"TypeCondition\": \"Droid\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"SelectionSet\": [{\n\t\t\t\t\t\"Alias\": \"height\",\n\t\t\t\t\t\"Name\": \"height\",\n\t\t\t\t}],\n\t\t\t\t\"TypeCondition\": \"Human\",\n\t\t\t},\n\t\t],\n\t}],\n\t\"VariableDefinitions\": [{\n\t\t\"Type\": {\n\t\t\t\"NamedType\": \"Episode\",\n\t\t\t\"NonNull\": true,\n\t\t},\n\t\t\"Used\": false,\n\t\t\"Variable\": \"ep\",\n\t}],\n}]}\n\np if {\n\tgraphql.parse_query(gql) == ast\n}\n"
+				"package test\n\ngql := `query HeroForEpisode($ep: Episode!) {\n  hero(episode: $ep) {\n    name\n    ... on Droid {\n      primaryFunction\n    }\n    ... on Human {\n      height\n    }\n  }\n}`\n\nast := {\"Operations\": [{\n\t\"Name\": \"HeroForEpisode\",\n\t\"Operation\": \"query\",\n\t\"SelectionSet\": [{\n\t\t\"Alias\": \"hero\",\n\t\t\"Arguments\": [{\n\t\t\t\"Name\": \"episode\",\n\t\t\t\"Value\": {\n                \"ExpectedTypeHasDefault\": false,\n\t\t\t\t\"Kind\": 0,\n\t\t\t\t\"Raw\": \"ep\",\n\t\t\t},\n\t\t}],\n\t\t\"Name\": \"hero\",\n\t\t\"SelectionSet\": [\n\t\t\t{\n\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\"Name\": \"name\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"SelectionSet\": [{\n\t\t\t\t\t\"Alias\": \"primaryFunction\",\n\t\t\t\t\t\"Name\": \"primaryFunction\",\n\t\t\t\t}],\n\t\t\t\t\"TypeCondition\": \"Droid\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"SelectionSet\": [{\n\t\t\t\t\t\"Alias\": \"height\",\n\t\t\t\t\t\"Name\": \"height\",\n\t\t\t\t}],\n\t\t\t\t\"TypeCondition\": \"Human\",\n\t\t\t},\n\t\t],\n\t}],\n\t\"VariableDefinitions\": [{\n\t\t\"Type\": {\n\t\t\t\"NamedType\": \"Episode\",\n\t\t\t\"NonNull\": true,\n\t\t},\n\t\t\"Used\": false,\n\t\t\"Variable\": \"ep\",\n\t}],\n}]}\n\np if {\n\tgraphql.parse_query(gql) == ast\n}\n"
 			],
 			"want_result": [
 				{
@@ -2432,6 +2452,9 @@
 						},
 						{
 							"value": "Value"
+						},
+						{
+							"value": "ExpectedTypeHasDefault"
 						},
 						{
 							"value": "Kind"
@@ -2848,9 +2871,26 @@
 											}
 										},
 										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 13
+												},
+												"value": {
+													"type": "bool",
+													"value": false
+												},
+												"object": 11,
+												"file": 0,
+												"col": 1,
+												"row": 15
+											}
+										},
+										{
 											"type": "MakeNumberRefStmt",
 											"stmt": {
-												"Index": 14,
+												"Index": 15,
 												"target": 12,
 												"file": 0,
 												"col": 1,
@@ -2862,7 +2902,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 13
+													"value": 14
 												},
 												"value": {
 													"type": "local",
@@ -2879,11 +2919,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 15
+													"value": 16
 												},
 												"value": {
 													"type": "string_index",
-													"value": 16
+													"value": 17
 												},
 												"object": 11,
 												"file": 0,
@@ -2983,7 +3023,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 17
+													"value": 18
 												},
 												"object": 14,
 												"file": 0,
@@ -3000,7 +3040,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 17
+													"value": 18
 												},
 												"object": 14,
 												"file": 0,
@@ -3058,7 +3098,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 17,
 												"file": 0,
@@ -3075,7 +3115,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 17,
 												"file": 0,
@@ -3118,11 +3158,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 19
+													"value": 20
 												},
 												"value": {
 													"type": "string_index",
-													"value": 20
+													"value": 21
 												},
 												"object": 15,
 												"file": 0,
@@ -3180,7 +3220,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 21
+													"value": 22
 												},
 												"object": 20,
 												"file": 0,
@@ -3197,7 +3237,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 21
+													"value": 22
 												},
 												"object": 20,
 												"file": 0,
@@ -3240,11 +3280,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 19
+													"value": 20
 												},
 												"value": {
 													"type": "string_index",
-													"value": 22
+													"value": 23
 												},
 												"object": 18,
 												"file": 0,
@@ -3345,11 +3385,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 25
+													"value": 26
 												},
 												"value": {
 													"type": "string_index",
-													"value": 26
+													"value": 27
 												},
 												"object": 23,
 												"file": 0,
@@ -3362,7 +3402,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 27
+													"value": 28
 												},
 												"value": {
 													"type": "bool",
@@ -3379,7 +3419,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 24
+													"value": 25
 												},
 												"value": {
 													"type": "local",
@@ -3396,7 +3436,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 28
+													"value": 29
 												},
 												"value": {
 													"type": "bool",
@@ -3413,11 +3453,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 29
+													"value": 30
 												},
 												"value": {
 													"type": "string_index",
-													"value": 16
+													"value": 17
 												},
 												"object": 22,
 												"file": 0,
@@ -3443,7 +3483,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 23
+													"value": 24
 												},
 												"value": {
 													"type": "local",
@@ -3562,7 +3602,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 59
+												"row": 60
 											}
 										},
 										{
@@ -3582,7 +3622,7 @@
 												"result": 4,
 												"file": 0,
 												"col": 22,
-												"row": 60
+												"row": 61
 											}
 										},
 										{
@@ -3595,7 +3635,7 @@
 												"target": 5,
 												"file": 0,
 												"col": 22,
-												"row": 60
+												"row": 61
 											}
 										},
 										{
@@ -3611,7 +3651,7 @@
 												"result": 6,
 												"file": 0,
 												"col": 2,
-												"row": 60
+												"row": 61
 											}
 										},
 										{
@@ -3624,7 +3664,7 @@
 												"target": 7,
 												"file": 0,
 												"col": 2,
-												"row": 60
+												"row": 61
 											}
 										},
 										{
@@ -3644,7 +3684,7 @@
 												"result": 8,
 												"file": 0,
 												"col": 2,
-												"row": 60
+												"row": 61
 											}
 										},
 										{
@@ -3660,7 +3700,7 @@
 												},
 												"file": 0,
 												"col": 2,
-												"row": 60
+												"row": 61
 											}
 										},
 										{
@@ -3673,7 +3713,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 59
+												"row": 60
 											}
 										}
 									]
@@ -3686,7 +3726,7 @@
 												"source": 3,
 												"file": 0,
 												"col": 1,
-												"row": 59
+												"row": 60
 											}
 										},
 										{
@@ -3699,7 +3739,7 @@
 												"target": 2,
 												"file": 0,
 												"col": 1,
-												"row": 59
+												"row": 60
 											}
 										}
 									]
@@ -3712,7 +3752,7 @@
 												"source": 2,
 												"file": 0,
 												"col": 1,
-												"row": 59
+												"row": 60
 											}
 										}
 									]
@@ -3737,7 +3777,7 @@
 			"note": "graphql_parse_query/success-basic-ast meta fields and introspection",
 			"query": "data.test.p = x",
 			"modules": [
-				"package test\n\ngql := `{\n  search(text: \"an\") {\n    __typename\n    ... on Human {\n      name\n    }\n    ... on Droid {\n      name\n    }\n    ... on Starship {\n      name\n    }\n  }\n}`\n\nast := {\"Operations\": [{\n\t\"Name\": \"\",\n\t\"Operation\": \"query\",\n\t\"SelectionSet\": [{\n\t\t\"Alias\": \"search\",\n\t\t\"Arguments\": [{\n\t\t\t\"Name\": \"text\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Kind\": 3,\n\t\t\t\t\"Raw\": \"an\",\n\t\t\t},\n\t\t}],\n\t\t\"Name\": \"search\",\n\t\t\"SelectionSet\": [\n\t\t\t{\n\t\t\t\t\"Alias\": \"__typename\",\n\t\t\t\t\"Name\": \"__typename\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"SelectionSet\": [{\n\t\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\t\"Name\": \"name\",\n\t\t\t\t}],\n\t\t\t\t\"TypeCondition\": \"Human\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"SelectionSet\": [{\n\t\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\t\"Name\": \"name\",\n\t\t\t\t}],\n\t\t\t\t\"TypeCondition\": \"Droid\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"SelectionSet\": [{\n\t\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\t\"Name\": \"name\",\n\t\t\t\t}],\n\t\t\t\t\"TypeCondition\": \"Starship\",\n\t\t\t},\n\t\t],\n\t}],\n}]}\n\np if {\n\tgraphql.parse_query(gql) == ast\n}\n"
+				"package test\n\ngql := `{\n  search(text: \"an\") {\n    __typename\n    ... on Human {\n      name\n    }\n    ... on Droid {\n      name\n    }\n    ... on Starship {\n      name\n    }\n  }\n}`\n\nast := {\"Operations\": [{\n\t\"Name\": \"\",\n\t\"Operation\": \"query\",\n\t\"SelectionSet\": [{\n\t\t\"Alias\": \"search\",\n\t\t\"Arguments\": [{\n\t\t\t\"Name\": \"text\",\n\t\t\t\"Value\": {\n                \"ExpectedTypeHasDefault\": false,\n\t\t\t\t\"Kind\": 3,\n\t\t\t\t\"Raw\": \"an\",\n\t\t\t},\n\t\t}],\n\t\t\"Name\": \"search\",\n\t\t\"SelectionSet\": [\n\t\t\t{\n\t\t\t\t\"Alias\": \"__typename\",\n\t\t\t\t\"Name\": \"__typename\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"SelectionSet\": [{\n\t\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\t\"Name\": \"name\",\n\t\t\t\t}],\n\t\t\t\t\"TypeCondition\": \"Human\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"SelectionSet\": [{\n\t\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\t\"Name\": \"name\",\n\t\t\t\t}],\n\t\t\t\t\"TypeCondition\": \"Droid\",\n\t\t\t},\n\t\t\t{\n\t\t\t\t\"SelectionSet\": [{\n\t\t\t\t\t\"Alias\": \"name\",\n\t\t\t\t\t\"Name\": \"name\",\n\t\t\t\t}],\n\t\t\t\t\"TypeCondition\": \"Starship\",\n\t\t\t},\n\t\t],\n\t}],\n}]}\n\np if {\n\tgraphql.parse_query(gql) == ast\n}\n"
 			],
 			"want_result": [
 				{
@@ -3788,6 +3828,9 @@
 						},
 						{
 							"value": "Value"
+						},
+						{
+							"value": "ExpectedTypeHasDefault"
 						},
 						{
 							"value": "Kind"
@@ -4183,9 +4226,26 @@
 											}
 										},
 										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 13
+												},
+												"value": {
+													"type": "bool",
+													"value": false
+												},
+												"object": 11,
+												"file": 0,
+												"col": 1,
+												"row": 18
+											}
+										},
+										{
 											"type": "MakeNumberRefStmt",
 											"stmt": {
-												"Index": 14,
+												"Index": 15,
 												"target": 12,
 												"file": 0,
 												"col": 1,
@@ -4197,7 +4257,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 13
+													"value": 14
 												},
 												"value": {
 													"type": "local",
@@ -4214,11 +4274,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 15
+													"value": 16
 												},
 												"value": {
 													"type": "string_index",
-													"value": 16
+													"value": 17
 												},
 												"object": 11,
 												"file": 0,
@@ -4318,7 +4378,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 17
+													"value": 18
 												},
 												"object": 14,
 												"file": 0,
@@ -4335,7 +4395,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 17
+													"value": 18
 												},
 												"object": 14,
 												"file": 0,
@@ -4393,7 +4453,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 17,
 												"file": 0,
@@ -4410,7 +4470,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 17,
 												"file": 0,
@@ -4453,11 +4513,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 19
+													"value": 20
 												},
 												"value": {
 													"type": "string_index",
-													"value": 20
+													"value": 21
 												},
 												"object": 15,
 												"file": 0,
@@ -4515,7 +4575,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 20,
 												"file": 0,
@@ -4532,7 +4592,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 20,
 												"file": 0,
@@ -4575,11 +4635,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 19
+													"value": 20
 												},
 												"value": {
 													"type": "string_index",
-													"value": 21
+													"value": 22
 												},
 												"object": 18,
 												"file": 0,
@@ -4637,7 +4697,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 23,
 												"file": 0,
@@ -4654,7 +4714,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 23,
 												"file": 0,
@@ -4697,11 +4757,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 19
+													"value": 20
 												},
 												"value": {
 													"type": "string_index",
-													"value": 22
+													"value": 23
 												},
 												"object": 21,
 												"file": 0,
@@ -4876,7 +4936,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 61
+												"row": 62
 											}
 										},
 										{
@@ -4896,7 +4956,7 @@
 												"result": 4,
 												"file": 0,
 												"col": 22,
-												"row": 62
+												"row": 63
 											}
 										},
 										{
@@ -4909,7 +4969,7 @@
 												"target": 5,
 												"file": 0,
 												"col": 22,
-												"row": 62
+												"row": 63
 											}
 										},
 										{
@@ -4925,7 +4985,7 @@
 												"result": 6,
 												"file": 0,
 												"col": 2,
-												"row": 62
+												"row": 63
 											}
 										},
 										{
@@ -4938,7 +4998,7 @@
 												"target": 7,
 												"file": 0,
 												"col": 2,
-												"row": 62
+												"row": 63
 											}
 										},
 										{
@@ -4958,7 +5018,7 @@
 												"result": 8,
 												"file": 0,
 												"col": 2,
-												"row": 62
+												"row": 63
 											}
 										},
 										{
@@ -4974,7 +5034,7 @@
 												},
 												"file": 0,
 												"col": 2,
-												"row": 62
+												"row": 63
 											}
 										},
 										{
@@ -4987,7 +5047,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 61
+												"row": 62
 											}
 										}
 									]
@@ -5000,7 +5060,7 @@
 												"source": 3,
 												"file": 0,
 												"col": 1,
-												"row": 61
+												"row": 62
 											}
 										},
 										{
@@ -5013,7 +5073,7 @@
 												"target": 2,
 												"file": 0,
 												"col": 1,
-												"row": 61
+												"row": 62
 											}
 										}
 									]
@@ -5026,7 +5086,7 @@
 												"source": 2,
 												"file": 0,
 												"col": 1,
-												"row": 61
+												"row": 62
 											}
 										}
 									]

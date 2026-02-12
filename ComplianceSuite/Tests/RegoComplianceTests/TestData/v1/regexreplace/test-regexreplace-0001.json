@@ -4,9 +4,8 @@
 			"note": "regex.replace: test pattern match and replace",
 			"query": "data.test.p = x",
 			"modules": [
-				"package test\n\np := x if {\n\ts := \"-wy-wxxy-\"\n\tx := regex.replace(s, \"w(x*)y\", \"0\")\n}\n"
+				"package test\np := regex.replace(\"-wy-wxxy-\", \"w(x*)y\", \"0\")\n"
 			],
-			"data": {},
 			"want_result": [
 				{
 					"x": "-0-0-"
@@ -169,20 +168,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 3
-											}
-										},
-										{
-											"type": "AssignVarStmt",
-											"stmt": {
-												"source": {
-													"type": "string_index",
-													"value": 1
-												},
-												"target": 4,
-												"file": 0,
-												"col": 2,
-												"row": 4
+												"row": 2
 											}
 										},
 										{
@@ -191,8 +177,8 @@
 												"func": "regex.replace",
 												"args": [
 													{
-														"type": "local",
-														"value": 4
+														"type": "string_index",
+														"value": 1
 													},
 													{
 														"type": "string_index",
@@ -203,10 +189,10 @@
 														"value": 3
 													}
 												],
-												"result": 5,
+												"result": 4,
 												"file": 0,
-												"col": 7,
-												"row": 5
+												"col": 6,
+												"row": 2
 											}
 										},
 										{
@@ -214,25 +200,12 @@
 											"stmt": {
 												"source": {
 													"type": "local",
-													"value": 5
+													"value": 4
 												},
-												"target": 6,
+												"target": 5,
 												"file": 0,
-												"col": 7,
-												"row": 5
-											}
-										},
-										{
-											"type": "AssignVarStmt",
-											"stmt": {
-												"source": {
-													"type": "local",
-													"value": 6
-												},
-												"target": 7,
-												"file": 0,
-												"col": 2,
-												"row": 5
+												"col": 6,
+												"row": 2
 											}
 										},
 										{
@@ -240,12 +213,12 @@
 											"stmt": {
 												"source": {
 													"type": "local",
-													"value": 7
+													"value": 5
 												},
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										}
 									]
@@ -258,7 +231,7 @@
 												"source": 3,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										},
 										{
@@ -271,7 +244,7 @@
 												"target": 2,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										}
 									]
@@ -284,7 +257,7 @@
 												"source": 2,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										}
 									]
@@ -309,9 +282,8 @@
 			"note": "regex.replace: work with groups",
 			"query": "data.test.p = x",
 			"modules": [
-				"package test\n\np := x if {\n\ts := \"foo\"\n\tx := regex.replace(s, \"(foo)\", \"$1$1\")\n}\n"
+				"package test\np := regex.replace(\"foo\", \"(foo)\", \"$1$1\")\n"
 			],
-			"data": {},
 			"want_result": [
 				{
 					"x": "foofoo"
@@ -474,20 +446,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 3
-											}
-										},
-										{
-											"type": "AssignVarStmt",
-											"stmt": {
-												"source": {
-													"type": "string_index",
-													"value": 1
-												},
-												"target": 4,
-												"file": 0,
-												"col": 2,
-												"row": 4
+												"row": 2
 											}
 										},
 										{
@@ -496,8 +455,8 @@
 												"func": "regex.replace",
 												"args": [
 													{
-														"type": "local",
-														"value": 4
+														"type": "string_index",
+														"value": 1
 													},
 													{
 														"type": "string_index",
@@ -508,10 +467,10 @@
 														"value": 3
 													}
 												],
-												"result": 5,
+												"result": 4,
 												"file": 0,
-												"col": 7,
-												"row": 5
+												"col": 6,
+												"row": 2
 											}
 										},
 										{
@@ -519,25 +478,12 @@
 											"stmt": {
 												"source": {
 													"type": "local",
-													"value": 5
+													"value": 4
 												},
-												"target": 6,
+												"target": 5,
 												"file": 0,
-												"col": 7,
-												"row": 5
-											}
-										},
-										{
-											"type": "AssignVarStmt",
-											"stmt": {
-												"source": {
-													"type": "local",
-													"value": 6
-												},
-												"target": 7,
-												"file": 0,
-												"col": 2,
-												"row": 5
+												"col": 6,
+												"row": 2
 											}
 										},
 										{
@@ -545,12 +491,12 @@
 											"stmt": {
 												"source": {
 													"type": "local",
-													"value": 7
+													"value": 5
 												},
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										}
 									]
@@ -563,7 +509,7 @@
 												"source": 3,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										},
 										{
@@ -576,7 +522,7 @@
 												"target": 2,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										}
 									]
@@ -589,7 +535,7 @@
 												"source": 2,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										}
 									]
@@ -614,9 +560,8 @@
 			"note": "regex.replace: bad regex pattern: Syntax error",
 			"query": "data.test.p = x",
 			"modules": [
-				"package test\n\np := x if {\n\ts := \"foo\"\n\tx := regex.replace(s, \"[\", \"$1\")\n}\n"
+				"package test\np := regex.replace(\"foo\", \"[\", \"$1\")\n"
 			],
-			"data": {},
 			"want_result": [],
 			"entrypoints": [
 				"eval"
@@ -775,20 +720,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 3
-											}
-										},
-										{
-											"type": "AssignVarStmt",
-											"stmt": {
-												"source": {
-													"type": "string_index",
-													"value": 1
-												},
-												"target": 4,
-												"file": 0,
-												"col": 2,
-												"row": 4
+												"row": 2
 											}
 										},
 										{
@@ -797,8 +729,8 @@
 												"func": "regex.replace",
 												"args": [
 													{
-														"type": "local",
-														"value": 4
+														"type": "string_index",
+														"value": 1
 													},
 													{
 														"type": "string_index",
@@ -809,10 +741,10 @@
 														"value": 3
 													}
 												],
-												"result": 5,
+												"result": 4,
 												"file": 0,
-												"col": 7,
-												"row": 5
+												"col": 6,
+												"row": 2
 											}
 										},
 										{
@@ -820,25 +752,12 @@
 											"stmt": {
 												"source": {
 													"type": "local",
-													"value": 5
+													"value": 4
 												},
-												"target": 6,
+												"target": 5,
 												"file": 0,
-												"col": 7,
-												"row": 5
-											}
-										},
-										{
-											"type": "AssignVarStmt",
-											"stmt": {
-												"source": {
-													"type": "local",
-													"value": 6
-												},
-												"target": 7,
-												"file": 0,
-												"col": 2,
-												"row": 5
+												"col": 6,
+												"row": 2
 											}
 										},
 										{
@@ -846,12 +765,12 @@
 											"stmt": {
 												"source": {
 													"type": "local",
-													"value": 7
+													"value": 5
 												},
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										}
 									]
@@ -864,7 +783,7 @@
 												"source": 3,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										},
 										{
@@ -877,7 +796,7 @@
 												"target": 2,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										}
 									]
@@ -890,7 +809,7 @@
 												"source": 2,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										}
 									]
@@ -906,6 +825,2230 @@
 				}
 			},
 			"want_plan_result": []
+		},
+		{
+			"note": "regex.replace: anchored RE, start",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := regex.replace(\"foo\", \"^[a-z]\", \"F\")\n"
+			],
+			"want_result": [
+				{
+					"x": "Foo"
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "foo"
+						},
+						{
+							"value": "^[a-z]"
+						},
+						{
+							"value": "F"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "regex.replace",
+							"decl": {
+								"args": [
+									{
+										"description": "string being processed",
+										"name": "s",
+										"type": "string"
+									},
+									{
+										"description": "regex pattern to be applied",
+										"name": "pattern",
+										"type": "string"
+									},
+									{
+										"description": "regex value",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "string with replaced substrings",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "regex.replace",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													},
+													{
+														"type": "string_index",
+														"value": 3
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": "Foo"
+				}
+			]
+		},
+		{
+			"note": "regex.replace: anchored RE, start+end, no match",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := regex.replace(\"foo\", \"^[a-z]$\", \"F\")\n"
+			],
+			"want_result": [
+				{
+					"x": "foo"
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "foo"
+						},
+						{
+							"value": "^[a-z]$"
+						},
+						{
+							"value": "F"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "regex.replace",
+							"decl": {
+								"args": [
+									{
+										"description": "string being processed",
+										"name": "s",
+										"type": "string"
+									},
+									{
+										"description": "regex pattern to be applied",
+										"name": "pattern",
+										"type": "string"
+									},
+									{
+										"description": "regex value",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "string with replaced substrings",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "regex.replace",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													},
+													{
+														"type": "string_index",
+														"value": 3
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": "foo"
+				}
+			]
+		},
+		{
+			"note": "regex.replace: anchored RE, start+end, match",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := regex.replace(\"foo\", \"^[a-z]+$\", \"M\")\n"
+			],
+			"want_result": [
+				{
+					"x": "M"
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "foo"
+						},
+						{
+							"value": "^[a-z]+$"
+						},
+						{
+							"value": "M"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "regex.replace",
+							"decl": {
+								"args": [
+									{
+										"description": "string being processed",
+										"name": "s",
+										"type": "string"
+									},
+									{
+										"description": "regex pattern to be applied",
+										"name": "pattern",
+										"type": "string"
+									},
+									{
+										"description": "regex value",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "string with replaced substrings",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "regex.replace",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													},
+													{
+														"type": "string_index",
+														"value": 3
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": "M"
+				}
+			]
+		},
+		{
+			"note": "regex.replace: anchored RE, end",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := regex.replace(\"foo\", \"[a-z]$\", \"F\")\n"
+			],
+			"want_result": [
+				{
+					"x": "foF"
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "foo"
+						},
+						{
+							"value": "[a-z]$"
+						},
+						{
+							"value": "F"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "regex.replace",
+							"decl": {
+								"args": [
+									{
+										"description": "string being processed",
+										"name": "s",
+										"type": "string"
+									},
+									{
+										"description": "regex pattern to be applied",
+										"name": "pattern",
+										"type": "string"
+									},
+									{
+										"description": "regex value",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "string with replaced substrings",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "regex.replace",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													},
+													{
+														"type": "string_index",
+														"value": 3
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": "foF"
+				}
+			]
+		},
+		{
+			"note": "regex.replace: anchored RE, end, no match",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := regex.replace(\"foo\", \"x[a-z]$\", \"F\")\n"
+			],
+			"want_result": [
+				{
+					"x": "foo"
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "foo"
+						},
+						{
+							"value": "x[a-z]$"
+						},
+						{
+							"value": "F"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "regex.replace",
+							"decl": {
+								"args": [
+									{
+										"description": "string being processed",
+										"name": "s",
+										"type": "string"
+									},
+									{
+										"description": "regex pattern to be applied",
+										"name": "pattern",
+										"type": "string"
+									},
+									{
+										"description": "regex value",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "string with replaced substrings",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "regex.replace",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													},
+													{
+														"type": "string_index",
+														"value": 3
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": "foo"
+				}
+			]
+		},
+		{
+			"note": "regex.replace: per-character match",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := regex.replace(\"foo bar\", \"[a-z]\", \"_\")\n"
+			],
+			"want_result": [
+				{
+					"x": "___ ___"
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "foo bar"
+						},
+						{
+							"value": "[a-z]"
+						},
+						{
+							"value": "_"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "regex.replace",
+							"decl": {
+								"args": [
+									{
+										"description": "string being processed",
+										"name": "s",
+										"type": "string"
+									},
+									{
+										"description": "regex pattern to be applied",
+										"name": "pattern",
+										"type": "string"
+									},
+									{
+										"description": "regex value",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "string with replaced substrings",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "regex.replace",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													},
+													{
+														"type": "string_index",
+														"value": 3
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": "___ ___"
+				}
+			]
+		},
+		{
+			"note": "regex.replace: match with count",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := regex.replace(\"foo barx\", \"[a-z]{3}\", \"_\")\n"
+			],
+			"want_result": [
+				{
+					"x": "_ _x"
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "foo barx"
+						},
+						{
+							"value": "[a-z]{3}"
+						},
+						{
+							"value": "_"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "regex.replace",
+							"decl": {
+								"args": [
+									{
+										"description": "string being processed",
+										"name": "s",
+										"type": "string"
+									},
+									{
+										"description": "regex pattern to be applied",
+										"name": "pattern",
+										"type": "string"
+									},
+									{
+										"description": "regex value",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "string with replaced substrings",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "regex.replace",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													},
+													{
+														"type": "string_index",
+														"value": 3
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": "_ _x"
+				}
+			]
+		},
+		{
+			"note": "regex.replace: match with count, 2",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := regex.replace(\"foo barx\", \"[a-z]{2}\", \"_\")\n"
+			],
+			"want_result": [
+				{
+					"x": "_o __"
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "foo barx"
+						},
+						{
+							"value": "[a-z]{2}"
+						},
+						{
+							"value": "_"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "regex.replace",
+							"decl": {
+								"args": [
+									{
+										"description": "string being processed",
+										"name": "s",
+										"type": "string"
+									},
+									{
+										"description": "regex pattern to be applied",
+										"name": "pattern",
+										"type": "string"
+									},
+									{
+										"description": "regex value",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "string with replaced substrings",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "regex.replace",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													},
+													{
+														"type": "string_index",
+														"value": 3
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": "_o __"
+				}
+			]
 		}
 	]
 }

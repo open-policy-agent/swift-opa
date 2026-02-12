@@ -1985,7 +1985,7 @@
 			"note": "graphql_parse_and_verify/success validation rules are independent case 2",
 			"query": "data.test.p = x",
 			"modules": [
-				"package test\n\nschema := `\n  extend type Query {\n      myAction(myEnum: Locale!): SomeResult!\n  }\n  type SomeResult {\n      id: String\n  }\n  enum Locale {\n      EN\n      LT\n      DE\n  }\n`\n\nquery := `\n  # Note: there is default enum value in variables\n  query SomeOperation ($locale: Locale! = DE) {\n    myAction(myEnum: $locale) {\n      id\n    }\n  }\n`\n\nq_ast := {\"Operations\": [{\"Name\": \"SomeOperation\", \"Operation\": \"query\", \"SelectionSet\": [{\"Alias\": \"myAction\", \"Arguments\": [{\"Name\": \"myEnum\", \"Value\": {\"Kind\": 0, \"Raw\": \"locale\"}}], \"Name\": \"myAction\", \"SelectionSet\": [{\"Alias\": \"id\", \"Name\": \"id\"}]}], \"VariableDefinitions\": [{\"DefaultValue\": {\"Kind\": 7, \"Raw\": \"DE\"}, \"Type\": {\"NamedType\": \"Locale\", \"NonNull\": true}, \"Used\": false, \"Variable\": \"locale\"}]}]}\n\np if {\n\t[valid, q_ast, _] = graphql.parse_and_verify(query, schema)\n\tvalid\n}\n"
+				"package test\n\nschema := `\n  type Query {\n      x: Int\n  }\n  extend type Query {\n      myAction(myEnum: Locale!): SomeResult!\n  }\n  type SomeResult {\n      id: String\n  }\n  enum Locale {\n      EN\n      LT\n      DE\n  }\n`\n\nquery := `\n  query SomeOperation ($locale: Locale! = DE) {\n    myAction(myEnum: $locale) {\n      id\n    }\n  }\n`\n\nq_ast := {\"Operations\": [{\"Name\": \"SomeOperation\", \"Operation\": \"query\", \"SelectionSet\": [{\"Alias\": \"myAction\", \"Arguments\": [{\"Name\": \"myEnum\", \"Value\": {\"ExpectedTypeHasDefault\": false, \"Kind\": 0, \"Raw\": \"locale\"}}], \"Name\": \"myAction\", \"SelectionSet\": [{\"Alias\": \"id\", \"Name\": \"id\"}]}], \"VariableDefinitions\": [{\"DefaultValue\": {\"ExpectedTypeHasDefault\": false, \"Kind\": 7, \"Raw\": \"DE\"}, \"Type\": {\"NamedType\": \"Locale\", \"NonNull\": true}, \"Used\": false, \"Variable\": \"locale\"}]}]}\n\np if {\n\t[valid, q_ast, _] = graphql.parse_and_verify(query, schema)\n\tvalid\n}\n"
 			],
 			"want_result": [
 				{
@@ -2002,10 +2002,10 @@
 							"value": "x"
 						},
 						{
-							"value": "\n  # Note: there is default enum value in variables\n  query SomeOperation ($locale: Locale! = DE) {\n    myAction(myEnum: $locale) {\n      id\n    }\n  }\n"
+							"value": "\n  query SomeOperation ($locale: Locale! = DE) {\n    myAction(myEnum: $locale) {\n      id\n    }\n  }\n"
 						},
 						{
-							"value": "\n  extend type Query {\n      myAction(myEnum: Locale!): SomeResult!\n  }\n  type SomeResult {\n      id: String\n  }\n  enum Locale {\n      EN\n      LT\n      DE\n  }\n"
+							"value": "\n  type Query {\n      x: Int\n  }\n  extend type Query {\n      myAction(myEnum: Locale!): SomeResult!\n  }\n  type SomeResult {\n      id: String\n  }\n  enum Locale {\n      EN\n      LT\n      DE\n  }\n"
 						},
 						{
 							"value": "Operations"
@@ -2039,6 +2039,9 @@
 						},
 						{
 							"value": "Value"
+						},
+						{
+							"value": "ExpectedTypeHasDefault"
 						},
 						{
 							"value": "Kind"
@@ -2278,7 +2281,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 17
+												"row": 20
 											}
 										},
 										{
@@ -2291,7 +2294,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 17
+												"row": 20
 											}
 										}
 									]
@@ -2304,7 +2307,7 @@
 												"source": 3,
 												"file": 0,
 												"col": 1,
-												"row": 17
+												"row": 20
 											}
 										},
 										{
@@ -2317,7 +2320,7 @@
 												"target": 2,
 												"file": 0,
 												"col": 1,
-												"row": 17
+												"row": 20
 											}
 										}
 									]
@@ -2330,7 +2333,7 @@
 												"source": 2,
 												"file": 0,
 												"col": 1,
-												"row": 17
+												"row": 20
 											}
 										}
 									]
@@ -2438,7 +2441,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2447,7 +2450,7 @@
 												"target": 4,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2457,7 +2460,7 @@
 												"target": 5,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2466,7 +2469,7 @@
 												"target": 6,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2483,7 +2486,7 @@
 												"object": 6,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2500,7 +2503,7 @@
 												"object": 6,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2510,7 +2513,7 @@
 												"target": 7,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2519,7 +2522,7 @@
 												"target": 8,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2536,7 +2539,7 @@
 												"object": 8,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2546,7 +2549,7 @@
 												"target": 9,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2555,7 +2558,7 @@
 												"target": 10,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2572,7 +2575,7 @@
 												"object": 10,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2581,17 +2584,7 @@
 												"target": 11,
 												"file": 0,
 												"col": 1,
-												"row": 26
-											}
-										},
-										{
-											"type": "MakeNumberRefStmt",
-											"stmt": {
-												"Index": 15,
-												"target": 12,
-												"file": 0,
-												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2602,13 +2595,23 @@
 													"value": 14
 												},
 												"value": {
-													"type": "local",
-													"value": 12
+													"type": "bool",
+													"value": false
 												},
 												"object": 11,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
+											}
+										},
+										{
+											"type": "MakeNumberRefStmt",
+											"stmt": {
+												"Index": 16,
+												"target": 12,
+												"file": 0,
+												"col": 1,
+												"row": 28
 											}
 										},
 										{
@@ -2616,16 +2619,33 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 16
+													"value": 15
 												},
 												"value": {
-													"type": "string_index",
-													"value": 17
+													"type": "local",
+													"value": 12
 												},
 												"object": 11,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 17
+												},
+												"value": {
+													"type": "string_index",
+													"value": 18
+												},
+												"object": 11,
+												"file": 0,
+												"col": 1,
+												"row": 28
 											}
 										},
 										{
@@ -2642,7 +2662,7 @@
 												"object": 10,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2655,7 +2675,7 @@
 												"array": 9,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2672,7 +2692,7 @@
 												"object": 8,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2689,7 +2709,7 @@
 												"object": 8,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2699,7 +2719,7 @@
 												"target": 13,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2708,7 +2728,7 @@
 												"target": 14,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2720,12 +2740,12 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 14,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2737,12 +2757,12 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 14,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2755,7 +2775,7 @@
 												"array": 13,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2772,7 +2792,7 @@
 												"object": 8,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2785,7 +2805,7 @@
 												"array": 7,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2802,7 +2822,7 @@
 												"object": 6,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2812,7 +2832,7 @@
 												"target": 15,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2821,7 +2841,7 @@
 												"target": 16,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2830,17 +2850,7 @@
 												"target": 17,
 												"file": 0,
 												"col": 1,
-												"row": 26
-											}
-										},
-										{
-											"type": "MakeNumberRefStmt",
-											"stmt": {
-												"Index": 21,
-												"target": 18,
-												"file": 0,
-												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2851,13 +2861,40 @@
 													"value": 14
 												},
 												"value": {
+													"type": "bool",
+													"value": false
+												},
+												"object": 17,
+												"file": 0,
+												"col": 1,
+												"row": 28
+											}
+										},
+										{
+											"type": "MakeNumberRefStmt",
+											"stmt": {
+												"Index": 22,
+												"target": 18,
+												"file": 0,
+												"col": 1,
+												"row": 28
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 15
+												},
+												"value": {
 													"type": "local",
 													"value": 18
 												},
 												"object": 17,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2865,16 +2902,16 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 16
+													"value": 17
 												},
 												"value": {
 													"type": "string_index",
-													"value": 22
+													"value": 23
 												},
 												"object": 17,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2882,7 +2919,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 20
+													"value": 21
 												},
 												"value": {
 													"type": "local",
@@ -2891,7 +2928,7 @@
 												"object": 16,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2900,58 +2937,24 @@
 												"target": 19,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
 											"type": "ObjectInsertStmt",
 											"stmt": {
 												"key": {
-													"type": "string_index",
-													"value": 24
-												},
-												"value": {
 													"type": "string_index",
 													"value": 25
 												},
-												"object": 19,
-												"file": 0,
-												"col": 1,
-												"row": 26
-											}
-										},
-										{
-											"type": "ObjectInsertStmt",
-											"stmt": {
-												"key": {
+												"value": {
 													"type": "string_index",
 													"value": 26
 												},
-												"value": {
-													"type": "bool",
-													"value": true
-												},
 												"object": 19,
 												"file": 0,
 												"col": 1,
-												"row": 26
-											}
-										},
-										{
-											"type": "ObjectInsertStmt",
-											"stmt": {
-												"key": {
-													"type": "string_index",
-													"value": 23
-												},
-												"value": {
-													"type": "local",
-													"value": 19
-												},
-												"object": 16,
-												"file": 0,
-												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2963,12 +2966,29 @@
 												},
 												"value": {
 													"type": "bool",
-													"value": false
+													"value": true
+												},
+												"object": 19,
+												"file": 0,
+												"col": 1,
+												"row": 28
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 24
+												},
+												"value": {
+													"type": "local",
+													"value": 19
 												},
 												"object": 16,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -2979,13 +2999,30 @@
 													"value": 28
 												},
 												"value": {
-													"type": "string_index",
-													"value": 17
+													"type": "bool",
+													"value": false
 												},
 												"object": 16,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 29
+												},
+												"value": {
+													"type": "string_index",
+													"value": 18
+												},
+												"object": 16,
+												"file": 0,
+												"col": 1,
+												"row": 28
 											}
 										},
 										{
@@ -2998,7 +3035,7 @@
 												"array": 15,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -3006,7 +3043,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 19
+													"value": 20
 												},
 												"value": {
 													"type": "local",
@@ -3015,7 +3052,7 @@
 												"object": 6,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -3028,7 +3065,7 @@
 												"array": 5,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -3045,7 +3082,7 @@
 												"object": 4,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -3058,7 +3095,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										}
 									]
@@ -3071,7 +3108,7 @@
 												"source": 3,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										},
 										{
@@ -3084,7 +3121,7 @@
 												"target": 2,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										}
 									]
@@ -3097,7 +3134,7 @@
 												"source": 2,
 												"file": 0,
 												"col": 1,
-												"row": 26
+												"row": 28
 											}
 										}
 									]
@@ -3125,7 +3162,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 28
+												"row": 30
 											}
 										},
 										{
@@ -3145,7 +3182,7 @@
 												"result": 4,
 												"file": 0,
 												"col": 47,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3158,7 +3195,7 @@
 												"target": 5,
 												"file": 0,
 												"col": 47,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3178,7 +3215,7 @@
 												"result": 6,
 												"file": 0,
 												"col": 54,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3191,7 +3228,7 @@
 												"target": 7,
 												"file": 0,
 												"col": 54,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3211,7 +3248,7 @@
 												"result": 8,
 												"file": 0,
 												"col": 22,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3224,7 +3261,7 @@
 												"target": 9,
 												"file": 0,
 												"col": 22,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3244,7 +3281,7 @@
 												"result": 10,
 												"file": 0,
 												"col": 10,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3257,7 +3294,7 @@
 												"target": 11,
 												"file": 0,
 												"col": 10,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3269,7 +3306,7 @@
 												},
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3282,7 +3319,7 @@
 												"target": 13,
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3292,7 +3329,7 @@
 												"target": 12,
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3308,7 +3345,7 @@
 												},
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3318,7 +3355,7 @@
 												"target": 14,
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3328,7 +3365,7 @@
 												"target": 14,
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3345,7 +3382,7 @@
 												"target": 15,
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3358,7 +3395,7 @@
 												"target": 16,
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3368,7 +3405,7 @@
 												"target": 14,
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3385,7 +3422,7 @@
 												"target": 15,
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3401,7 +3438,7 @@
 												},
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3411,7 +3448,7 @@
 												"target": 14,
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3428,7 +3465,7 @@
 												"target": 15,
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3441,7 +3478,7 @@
 												"target": 17,
 												"file": 0,
 												"col": 2,
-												"row": 29
+												"row": 31
 											}
 										},
 										{
@@ -3457,7 +3494,7 @@
 												},
 												"file": 0,
 												"col": 2,
-												"row": 30
+												"row": 32
 											}
 										},
 										{
@@ -3470,7 +3507,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 28
+												"row": 30
 											}
 										}
 									]
@@ -3483,7 +3520,7 @@
 												"source": 3,
 												"file": 0,
 												"col": 1,
-												"row": 28
+												"row": 30
 											}
 										},
 										{
@@ -3496,7 +3533,7 @@
 												"target": 2,
 												"file": 0,
 												"col": 1,
-												"row": 28
+												"row": 30
 											}
 										}
 									]
@@ -3509,7 +3546,7 @@
 												"source": 2,
 												"file": 0,
 												"col": 1,
-												"row": 28
+												"row": 30
 											}
 										}
 									]
@@ -4320,7 +4357,7 @@
 			"note": "graphql_parse_and_verify/success no unused variables",
 			"query": "data.test.p = x",
 			"modules": [
-				"package test\n\nschema := `\n  type Query {\n    bar: String!\n  }\n`\n\nquery := `\n  query Foo($flag: Boolean!) {\n    ...Bar\n  }\n  fragment Bar on Query {\n    bar @include(if: $flag)\n  }\n`\n\nq_ast := {\"Fragments\": [{\"Name\": \"Bar\", \"SelectionSet\": [{\"Alias\": \"bar\", \"Directives\": [{\"Arguments\": [{\"Name\": \"if\", \"Value\": {\"Kind\": 0, \"Raw\": \"flag\"}}], \"Location\": \"\", \"Name\": \"include\"}], \"Name\": \"bar\"}], \"TypeCondition\": \"Query\"}], \"Operations\": [{\"Name\": \"Foo\", \"Operation\": \"query\", \"SelectionSet\": [{\"Name\": \"Bar\"}], \"VariableDefinitions\": [{\"Type\": {\"NamedType\": \"Boolean\", \"NonNull\": true}, \"Used\": false, \"Variable\": \"flag\"}]}]}\n\np if {\n\t[valid, q_ast, _] = graphql.parse_and_verify(query, schema)\n\tvalid\n}\n"
+				"package test\n\nschema := `\n  type Query {\n    bar: String!\n  }\n`\n\nquery := `\n  query Foo($flag: Boolean!) {\n    ...Bar\n  }\n  fragment Bar on Query {\n    bar @include(if: $flag)\n  }\n`\n\nq_ast := {\"Fragments\": [{\"Name\": \"Bar\", \"SelectionSet\": [{\"Alias\": \"bar\", \"Directives\": [{\"Arguments\": [{\"Name\": \"if\", \"Value\": {\"ExpectedTypeHasDefault\": false, \"Kind\": 0, \"Raw\": \"flag\"}}], \"Location\": \"\", \"Name\": \"include\"}], \"Name\": \"bar\"}], \"TypeCondition\": \"Query\"}], \"Operations\": [{\"Name\": \"Foo\", \"Operation\": \"query\", \"SelectionSet\": [{\"Name\": \"Bar\"}], \"VariableDefinitions\": [{\"Type\": {\"NamedType\": \"Boolean\", \"NonNull\": true}, \"Used\": false, \"Variable\": \"flag\"}]}]}\n\np if {\n\t[valid, q_ast, _] = graphql.parse_and_verify(query, schema)\n\tvalid\n}\n"
 			],
 			"want_result": [
 				{
@@ -4371,6 +4408,9 @@
 						},
 						{
 							"value": "Value"
+						},
+						{
+							"value": "ExpectedTypeHasDefault"
 						},
 						{
 							"value": "Kind"
@@ -4934,9 +4974,26 @@
 											}
 										},
 										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 13
+												},
+												"value": {
+													"type": "bool",
+													"value": false
+												},
+												"object": 13,
+												"file": 0,
+												"col": 1,
+												"row": 18
+											}
+										},
+										{
 											"type": "MakeNumberRefStmt",
 											"stmt": {
-												"Index": 14,
+												"Index": 15,
 												"target": 14,
 												"file": 0,
 												"col": 1,
@@ -4948,7 +5005,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 13
+													"value": 14
 												},
 												"value": {
 													"type": "local",
@@ -4965,11 +5022,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 15
+													"value": 16
 												},
 												"value": {
 													"type": "string_index",
-													"value": 16
+													"value": 17
 												},
 												"object": 13,
 												"file": 0,
@@ -5029,11 +5086,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 17
+													"value": 18
 												},
 												"value": {
 													"type": "string_index",
-													"value": 18
+													"value": 19
 												},
 												"object": 10,
 												"file": 0,
@@ -5050,7 +5107,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 19
+													"value": 20
 												},
 												"object": 10,
 												"file": 0,
@@ -5140,11 +5197,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 20
+													"value": 21
 												},
 												"value": {
 													"type": "string_index",
-													"value": 21
+													"value": 22
 												},
 												"object": 6,
 												"file": 0,
@@ -5210,7 +5267,7 @@
 												},
 												"value": {
 													"type": "string_index",
-													"value": 23
+													"value": 24
 												},
 												"object": 16,
 												"file": 0,
@@ -5223,11 +5280,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 24
+													"value": 25
 												},
 												"value": {
 													"type": "string_index",
-													"value": 25
+													"value": 26
 												},
 												"object": 16,
 												"file": 0,
@@ -5334,11 +5391,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 28
+													"value": 29
 												},
 												"value": {
 													"type": "string_index",
-													"value": 29
+													"value": 30
 												},
 												"object": 21,
 												"file": 0,
@@ -5351,7 +5408,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 30
+													"value": 31
 												},
 												"value": {
 													"type": "bool",
@@ -5368,7 +5425,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 27
+													"value": 28
 												},
 												"value": {
 													"type": "local",
@@ -5385,7 +5442,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 31
+													"value": 32
 												},
 												"value": {
 													"type": "bool",
@@ -5402,11 +5459,11 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 32
+													"value": 33
 												},
 												"value": {
 													"type": "string_index",
-													"value": 16
+													"value": 17
 												},
 												"object": 20,
 												"file": 0,
@@ -5432,7 +5489,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 26
+													"value": 27
 												},
 												"value": {
 													"type": "local",
@@ -5462,7 +5519,7 @@
 											"stmt": {
 												"key": {
 													"type": "string_index",
-													"value": 22
+													"value": 23
 												},
 												"value": {
 													"type": "local",

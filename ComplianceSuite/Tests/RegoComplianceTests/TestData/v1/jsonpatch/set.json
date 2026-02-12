@@ -55,8 +55,8 @@
 							"decl": {
 								"args": [
 									{
-										"description": "the object to patch",
-										"name": "object",
+										"description": "the object, array or set to patch",
+										"name": "target",
 										"type": "any"
 									},
 									{
@@ -775,8 +775,8 @@
 							"decl": {
 								"args": [
 									{
-										"description": "the object to patch",
-										"name": "object",
+										"description": "the object, array or set to patch",
+										"name": "target",
 										"type": "any"
 									},
 									{
@@ -1504,8 +1504,8 @@
 							"decl": {
 								"args": [
 									{
-										"description": "the object to patch",
-										"name": "object",
+										"description": "the object, array or set to patch",
+										"name": "target",
 										"type": "any"
 									},
 									{
@@ -2245,8 +2245,8 @@
 							"decl": {
 								"args": [
 									{
-										"description": "the object to patch",
-										"name": "object",
+										"description": "the object, array or set to patch",
+										"name": "target",
 										"type": "any"
 									},
 									{
@@ -3079,8 +3079,8 @@
 							"decl": {
 								"args": [
 									{
-										"description": "the object to patch",
-										"name": "object",
+										"description": "the object, array or set to patch",
+										"name": "target",
 										"type": "any"
 									},
 									{

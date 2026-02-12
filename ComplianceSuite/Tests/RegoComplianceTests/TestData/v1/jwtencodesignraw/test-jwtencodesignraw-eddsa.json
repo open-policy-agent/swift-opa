@@ -1,0 +1,283 @@
+{
+	"cases": [
+		{
+			"note": "jwtencodesignraw/EdDSA",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := x if {\n\tio.jwt.encode_sign_raw(\n\t\t`{\"alg\":\"EdDSA\",\"typ\":\"JWT\"}`,\n\t\t`{\"iss\":\"joe\",\"exp\":1300819380,\"http://example.com/is_root\":true}`,\n\t\t`{\"kty\":\"OKP\",\"alg\":\"EdDSA\",\"crv\":\"Ed25519\",\"x\":\"wEZFfoAj1rFKTLOOmjJjVZlCHwksuvMb2I5y_hg70E8\",\"d\":\"9XI34uQzYUJfWhDZf_0nYsLMBRVu8a6dFsy60P8uugk\"}`,\n\t\tx,\n\t)\n}\n"
+			],
+			"data": {},
+			"want_result": [
+				{
+					"x": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.jS1so-rsTaC8DdA8_ZnFXYbi9xOrMVXOviMFrahQ7ez0UKKzjU-2vxrM0ON-Vu3GXKhtBkkO3SUtNMoeYw3zDQ"
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "{\"alg\":\"EdDSA\",\"typ\":\"JWT\"}"
+						},
+						{
+							"value": "{\"iss\":\"joe\",\"exp\":1300819380,\"http://example.com/is_root\":true}"
+						},
+						{
+							"value": "{\"kty\":\"OKP\",\"alg\":\"EdDSA\",\"crv\":\"Ed25519\",\"x\":\"wEZFfoAj1rFKTLOOmjJjVZlCHwksuvMb2I5y_hg70E8\",\"d\":\"9XI34uQzYUJfWhDZf_0nYsLMBRVu8a6dFsy60P8uugk\"}"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "io.jwt.encode_sign_raw",
+							"decl": {
+								"args": [
+									{
+										"description": "JWS Protected Header",
+										"name": "headers",
+										"type": "string"
+									},
+									{
+										"description": "JWS Payload",
+										"name": "payload",
+										"type": "string"
+									},
+									{
+										"description": "JSON Web Key (RFC7517)",
+										"name": "key",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "signed JWT",
+									"name": "output",
+									"type": "string"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "io.jwt.encode_sign_raw",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													},
+													{
+														"type": "string_index",
+														"value": 3
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 2,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 2,
+												"row": 3
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJqb2UiLCJleHAiOjEzMDA4MTkzODAsImh0dHA6Ly9leGFtcGxlLmNvbS9pc19yb290Ijp0cnVlfQ.jS1so-rsTaC8DdA8_ZnFXYbi9xOrMVXOviMFrahQ7ez0UKKzjU-2vxrM0ON-Vu3GXKhtBkkO3SUtNMoeYw3zDQ"
+				}
+			]
+		}
+	]
+}

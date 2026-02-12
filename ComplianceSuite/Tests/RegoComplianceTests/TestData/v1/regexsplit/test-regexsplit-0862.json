@@ -2,14 +2,15 @@
 	"cases": [
 		{
 			"note": "regexsplit/regex.split: empty string",
-			"query": "data.generated.p = x",
+			"query": "data.test.p = x",
 			"modules": [
-				"package generated\n\np := x if {\n\tregex.split(\"^[a-z]+\\\\[[0-9]+\\\\]$\", \"\", [x])\n}\n"
+				"package test\np := regex.split(\"^[a-z]+\\\\[[0-9]+\\\\]$\", \"\")\n"
 			],
-			"data": {},
 			"want_result": [
 				{
-					"x": ""
+					"x": [
+						""
+					]
 				}
 			],
 			"entrypoints": [
@@ -75,7 +76,7 @@
 										{
 											"type": "CallStmt",
 											"stmt": {
-												"func": "g0.data.generated.p",
+												"func": "g0.data.test.p",
 												"args": [
 													{
 														"type": "local",
@@ -149,7 +150,7 @@
 				"funcs": {
 					"funcs": [
 						{
-							"name": "g0.data.generated.p",
+							"name": "g0.data.test.p",
 							"params": [
 								0,
 								1
@@ -164,7 +165,7 @@
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										},
 										{
@@ -183,96 +184,8 @@
 												],
 												"result": 4,
 												"file": 0,
-												"col": 2,
-												"row": 4
-											}
-										},
-										{
-											"type": "IsArrayStmt",
-											"stmt": {
-												"source": {
-													"type": "local",
-													"value": 4
-												},
-												"file": 0,
-												"col": 2,
-												"row": 4
-											}
-										},
-										{
-											"type": "LenStmt",
-											"stmt": {
-												"source": {
-													"type": "local",
-													"value": 4
-												},
-												"target": 6,
-												"file": 0,
-												"col": 2,
-												"row": 4
-											}
-										},
-										{
-											"type": "MakeNumberIntStmt",
-											"stmt": {
-												"value": 1,
-												"target": 5,
-												"file": 0,
-												"col": 2,
-												"row": 4
-											}
-										},
-										{
-											"type": "EqualStmt",
-											"stmt": {
-												"a": {
-													"type": "local",
-													"value": 6
-												},
-												"b": {
-													"type": "local",
-													"value": 5
-												},
-												"file": 0,
-												"col": 2,
-												"row": 4
-											}
-										},
-										{
-											"type": "MakeNumberIntStmt",
-											"stmt": {
-												"value": 0,
-												"target": 7,
-												"file": 0,
-												"col": 2,
-												"row": 4
-											}
-										},
-										{
-											"type": "AssignIntStmt",
-											"stmt": {
-												"value": 0,
-												"target": 7,
-												"file": 0,
-												"col": 2,
-												"row": 4
-											}
-										},
-										{
-											"type": "DotStmt",
-											"stmt": {
-												"source": {
-													"type": "local",
-													"value": 4
-												},
-												"key": {
-													"type": "local",
-													"value": 7
-												},
-												"target": 8,
-												"file": 0,
-												"col": 2,
-												"row": 4
+												"col": 6,
+												"row": 2
 											}
 										},
 										{
@@ -280,12 +193,12 @@
 											"stmt": {
 												"source": {
 													"type": "local",
-													"value": 8
+													"value": 4
 												},
-												"target": 9,
+												"target": 5,
 												"file": 0,
-												"col": 2,
-												"row": 4
+												"col": 6,
+												"row": 2
 											}
 										},
 										{
@@ -293,12 +206,12 @@
 											"stmt": {
 												"source": {
 													"type": "local",
-													"value": 9
+													"value": 5
 												},
 												"target": 3,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										}
 									]
@@ -311,7 +224,7 @@
 												"source": 3,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										},
 										{
@@ -324,7 +237,7 @@
 												"target": 2,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										}
 									]
@@ -337,7 +250,7 @@
 												"source": 2,
 												"file": 0,
 												"col": 1,
-												"row": 3
+												"row": 2
 											}
 										}
 									]
@@ -345,7 +258,7 @@
 							],
 							"path": [
 								"g0",
-								"generated",
+								"test",
 								"p"
 							]
 						}
@@ -354,7 +267,1107 @@
 			},
 			"want_plan_result": [
 				{
-					"x": ""
+					"x": [
+						""
+					]
+				}
+			]
+		},
+		{
+			"note": "regexsplit/regex.split: anchored RE, start",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := regex.split(\"^[a-z]+\", \"foobar baz\")\n"
+			],
+			"want_result": [
+				{
+					"x": [
+						"",
+						" baz"
+					]
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "^[a-z]+"
+						},
+						{
+							"value": "foobar baz"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "regex.split",
+							"decl": {
+								"args": [
+									{
+										"description": "regular expression",
+										"name": "pattern",
+										"type": "string"
+									},
+									{
+										"description": "string to match",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "the parts obtained by splitting `value`",
+									"dynamic": {
+										"type": "string"
+									},
+									"name": "output",
+									"type": "array"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "regex.split",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": [
+						"",
+						" baz"
+					]
+				}
+			]
+		},
+		{
+			"note": "regexsplit/regex.split: anchored RE, end",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := regex.split(\"[a-z]+$\", \"foobar baz\")\n"
+			],
+			"want_result": [
+				{
+					"x": [
+						"foobar ",
+						""
+					]
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "[a-z]+$"
+						},
+						{
+							"value": "foobar baz"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "regex.split",
+							"decl": {
+								"args": [
+									{
+										"description": "regular expression",
+										"name": "pattern",
+										"type": "string"
+									},
+									{
+										"description": "string to match",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "the parts obtained by splitting `value`",
+									"dynamic": {
+										"type": "string"
+									},
+									"name": "output",
+									"type": "array"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "regex.split",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": [
+						"foobar ",
+						""
+					]
+				}
+			]
+		},
+		{
+			"note": "regexsplit/regex.split: anchored RE, start+end",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := regex.split(\"^[a-z]+$\", \"foobar baz\")\n"
+			],
+			"want_result": [
+				{
+					"x": [
+						"foobar baz"
+					]
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "^[a-z]+$"
+						},
+						{
+							"value": "foobar baz"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "regex.split",
+							"decl": {
+								"args": [
+									{
+										"description": "regular expression",
+										"name": "pattern",
+										"type": "string"
+									},
+									{
+										"description": "string to match",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "the parts obtained by splitting `value`",
+									"dynamic": {
+										"type": "string"
+									},
+									"name": "output",
+									"type": "array"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "regex.split",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": [
+						"foobar baz"
+					]
+				}
+			]
+		},
+		{
+			"note": "regexsplit/regex.split: anchored RE, start+end, match",
+			"query": "data.test.p = x",
+			"modules": [
+				"package test\np := regex.split(\"^[a-z ]+$\", \"foobar baz\")\n"
+			],
+			"want_result": [
+				{
+					"x": [
+						"",
+						""
+					]
+				}
+			],
+			"entrypoints": [
+				"eval"
+			],
+			"plan": {
+				"static": {
+					"strings": [
+						{
+							"value": "x"
+						},
+						{
+							"value": "^[a-z ]+$"
+						},
+						{
+							"value": "foobar baz"
+						}
+					],
+					"builtin_funcs": [
+						{
+							"name": "regex.split",
+							"decl": {
+								"args": [
+									{
+										"description": "regular expression",
+										"name": "pattern",
+										"type": "string"
+									},
+									{
+										"description": "string to match",
+										"name": "value",
+										"type": "string"
+									}
+								],
+								"result": {
+									"description": "the parts obtained by splitting `value`",
+									"dynamic": {
+										"type": "string"
+									},
+									"name": "output",
+									"type": "array"
+								},
+								"type": "function"
+							}
+						}
+					],
+					"files": [
+						{
+							"value": "module-0.rego"
+						},
+						{
+							"value": "\u003cquery\u003e"
+						}
+					]
+				},
+				"plans": {
+					"plans": [
+						{
+							"name": "eval",
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "g0.data.test.p",
+												"args": [
+													{
+														"type": "local",
+														"value": 0
+													},
+													{
+														"type": "local",
+														"value": 1
+													}
+												],
+												"result": 2,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 2
+												},
+												"target": 3,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "MakeObjectStmt",
+											"stmt": {
+												"target": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ObjectInsertStmt",
+											"stmt": {
+												"key": {
+													"type": "string_index",
+													"value": 0
+												},
+												"value": {
+													"type": "local",
+													"value": 3
+												},
+												"object": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										},
+										{
+											"type": "ResultSetAddStmt",
+											"stmt": {
+												"value": 4,
+												"file": 1,
+												"col": 1,
+												"row": 1
+											}
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				"funcs": {
+					"funcs": [
+						{
+							"name": "g0.data.test.p",
+							"params": [
+								0,
+								1
+							],
+							"return": 2,
+							"blocks": [
+								{
+									"stmts": [
+										{
+											"type": "ResetLocalStmt",
+											"stmt": {
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "CallStmt",
+											"stmt": {
+												"func": "regex.split",
+												"args": [
+													{
+														"type": "string_index",
+														"value": 1
+													},
+													{
+														"type": "string_index",
+														"value": 2
+													}
+												],
+												"result": 4,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 4
+												},
+												"target": 5,
+												"file": 0,
+												"col": 6,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 5
+												},
+												"target": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "IsDefinedStmt",
+											"stmt": {
+												"source": 3,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										},
+										{
+											"type": "AssignVarOnceStmt",
+											"stmt": {
+												"source": {
+													"type": "local",
+													"value": 3
+												},
+												"target": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								},
+								{
+									"stmts": [
+										{
+											"type": "ReturnLocalStmt",
+											"stmt": {
+												"source": 2,
+												"file": 0,
+												"col": 1,
+												"row": 2
+											}
+										}
+									]
+								}
+							],
+							"path": [
+								"g0",
+								"test",
+								"p"
+							]
+						}
+					]
+				}
+			},
+			"want_plan_result": [
+				{
+					"x": [
+						"",
+						""
+					]
 				}
 			]
 		}

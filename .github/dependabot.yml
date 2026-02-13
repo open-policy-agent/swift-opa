@@ -1,0 +1,18 @@
+version: 2
+updates:
+  # Bundles all Github Actions updates into one PR.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+  # Only updates the go.mod when OPA has a version bump.
+  - package-ecosystem: "gomod"
+    directory: "/tools/generate-compliance-tests"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-name: "github.com/open-policy-agent/opa"

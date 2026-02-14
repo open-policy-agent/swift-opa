@@ -218,6 +218,14 @@ struct IREvaluatorTests {
                 sourceBundles: [relPath("TestData/Bundles/invalid-plan-json-bundle")],
                 expectedError: Rego.RegoError.Code.bundleInitializationError
             ),
+            ErrorCase(
+                description: "multiple bundles",
+                sourceBundles: [
+                    relPath("TestData/Bundles/main-root-bundle"),
+                    relPath("TestData/Bundles/other-root-bundle"),
+                ],
+                expectedError: Rego.RegoError.Code.invalidArgumentError,
+            ),
         ]
     }
 

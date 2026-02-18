@@ -45,6 +45,7 @@ let package = Package(
                 .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
             ]
         ),
+        .target(name: "Config"),
         // Internal module tests
         .testTarget(
             name: "ASTTests",
@@ -59,6 +60,10 @@ let package = Package(
             name: "RegoTests",
             dependencies: ["Rego"],
             resources: [.copy("TestData")]
+        ),
+        .testTarget(
+            name: "ConfigTests",
+            dependencies: ["Config"]
         ),
         // Public API surface tests
         .testTarget(

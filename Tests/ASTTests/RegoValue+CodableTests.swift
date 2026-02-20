@@ -148,3 +148,98 @@ struct RegoValueEncodingTests {
     }
 
 }
+
+@Suite
+struct RegoValueDecodingTests {
+
+    struct TestCase: CustomDebugStringConvertible {
+        let description: String
+        let value: String
+        var expected: RegoValue = ""
+        var expectError: Bool = false
+
+        var debugDescription: String {
+            description
+        }
+    }
+
+    static var bareValueDecodingTests: [TestCase] {
+        [
+            TestCase(description: "empty string", value: "", expected: ""),
+            TestCase(description: "simple string", value: "simple string", expected: "simple string"),
+            TestCase(description: "with quotes", value: "with \"quotes\"", expected: "with \"quotes\""),
+            TestCase(description: "bare number", value: "2", expected: .number(2)),
+            TestCase(description: "bare boolean", value: "true", expected: .boolean(true)),
+            TestCase(description: "bare null", value: "null", expected: .null),
+        ]
+    }
+
+    @Test(arguments: bareValueDecodingTests)
+    func testEncodeStrings(tc: TestCase) throws {
+        let encoded = try _PermissiveDecoder.decode(RegoValue.self, from: tc.value)
+        #expect(encoded == tc.expected)
+    }
+
+    // Meant to emulate YAML's "permissive" string decoding for literal values.
+    fileprivate struct _PermissiveDecoder: Decoder {
+        let val: String
+        init(_ val: String) { self.val = val }
+        var codingPath: [CodingKey] { [] }
+        var userInfo: [CodingUserInfoKey: Any] { [:] }
+        func container<K>(keyedBy: K.Type) throws -> KeyedDecodingContainer<K> {
+            throw DecodingError.typeMismatch(
+                KeyedDecodingContainer<K>.self,
+                DecodingError.Context(codingPath: [], debugDescription: "Not Implemented keyed container"))
+        }
+        func unkeyedContainer() throws -> UnkeyedDecodingContainer {
+            throw DecodingError.typeMismatch(
+                UnkeyedDecodingContainer.self,
+                DecodingError.Context(codingPath: [], debugDescription: "Not Implemented unkeyed container"))
+        }
+        func singleValueContainer() throws -> SingleValueDecodingContainer { _SVDC(val) }
+
+        // Entry point for decoding
+        public static func decode<T: Decodable>(_ type: T.Type, from s: String) throws -> T {
+            return try T(from: _PermissiveDecoder(s))
+        }
+    }
+
+    // Implements bare value parsing similarly to what we would see in YAML.
+    fileprivate struct _SVDC: SingleValueDecodingContainer {
+        var codingPath: [CodingKey] { [] }
+        let val: String
+        init(_ val: String) { self.val = val }
+        func decodeNil() -> Bool {
+            return val == "null"
+        }
+        func decode(_ type: Bool.Type) throws -> Bool {
+            if val == "true" { return true }
+            if val == "false" { return false }
+            throw DecodingError.typeMismatch(
+                Bool.self,
+                DecodingError.Context(codingPath: [], debugDescription: "Cannot decode '\(val)' as Bool"))
+        }
+        func decode(_ type: String.Type) throws -> String { val }
+        func decode(_ type: Int.Type) throws -> Int {
+            guard let result = Int(val) else {
+                throw DecodingError.typeMismatch(
+                    Int.self,
+                    DecodingError.Context(codingPath: [], debugDescription: "Cannot decode '\(val)' as Int"))
+            }
+            return result
+        }
+        func decode(_ type: Double.Type) throws -> Double {
+            guard let result = Double(val) else {
+                throw DecodingError.typeMismatch(
+                    Double.self,
+                    DecodingError.Context(codingPath: [], debugDescription: "Cannot decode '\(val)' as Double"))
+            }
+            return result
+        }
+        func decode<T: Decodable>(_ type: T.Type) throws -> T {
+            throw DecodingError.typeMismatch(
+                T.self,
+                DecodingError.Context(codingPath: [], debugDescription: "Cannot decode complex type from single value"))
+        }
+    }
+}

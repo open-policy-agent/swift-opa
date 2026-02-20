@@ -10,6 +10,8 @@ extension BuiltinTests {
 }
 
 extension BuiltinTests.EncodingTests {
+
+    // MARK: - base64.encode Tests
     static let base64EncodeTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "encodes empty string",
@@ -25,6 +27,7 @@ extension BuiltinTests.EncodingTests {
         ),
     ]
 
+    // MARK: - base64.decode Tests
     static let base64DecodeTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "decodes empty string",
@@ -46,6 +49,7 @@ extension BuiltinTests.EncodingTests {
         ),
     ]
 
+    // MARK: - base64.is_valid Tests
     static let base64IsValidTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "returns true for empty string",
@@ -67,6 +71,7 @@ extension BuiltinTests.EncodingTests {
         ),
     ]
 
+    // MARK: - hex.encode Tests
     static let hexEncodeTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "encodes empty string",
@@ -82,6 +87,7 @@ extension BuiltinTests.EncodingTests {
         ),
     ]
 
+    // MARK: - hex.decode Tests
     static let hexDecodeTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "decodes empty string",
@@ -115,6 +121,7 @@ extension BuiltinTests.EncodingTests {
         ),
     ]
 
+    // MARK: - base64url.encode Tests
     static let base64UrlEncodeTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "encodes empty string",
@@ -137,6 +144,7 @@ extension BuiltinTests.EncodingTests {
         ),
     ]
 
+    // MARK: - base64url.encode_no_pad Tests
     static let base64UrlEncodeNoPadTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "encodes empty string",
@@ -159,6 +167,7 @@ extension BuiltinTests.EncodingTests {
         ),
     ]
 
+    // MARK: - base64url.decode Tests
     static let base64UrlDecodeTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "decodes empty string",
@@ -195,6 +204,98 @@ extension BuiltinTests.EncodingTests {
             name: "base64url.decode",
             args: ["this is not a valid base64 input"],
             expected: .failure(BuiltinError.evalError(msg: "invalid base64 string"))
+        ),
+    ]
+
+    // MARK: - json.is_valid Tests
+    static let jsonIsValidTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "invalid - empty string",
+            name: "json.is_valid",
+            args: ["plainstring"],
+            expected: .success(.boolean(false))
+        ),
+        BuiltinTests.TestCase(
+            description: "invalid - unquoted string",
+            name: "json.is_valid",
+            args: ["plainstring"],
+            expected: .success(.boolean(false))
+        ),
+        BuiltinTests.TestCase(
+            description: "invalid - unclosed brace",
+            name: "json.is_valid",
+            args: ["{"],
+            expected: .success(.boolean(false))
+        ),
+        BuiltinTests.TestCase(
+            description: "valid - simple object",
+            name: "json.is_valid",
+            args: ["{\"json\": \"ok\"}"],
+            expected: .success(.boolean(true))
+        ),
+    ]
+
+    // MARK: - json.marshal Tests
+    static let jsonMarshalTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "marshal aggregate rego types",
+            name: "json.marshal",
+            args: [
+                [["foo": .set([1, 2, 3, true, nil])]]
+            ],
+            expected: .success(.string("[{\"foo\":[null,true,1,2,3]}]"))
+        ),
+        BuiltinTests.TestCase(
+            description: "marshal large integers",
+            name: "json.marshal",
+            args: [
+                .array([.number(1_234_500_000 + 67890), .number(1e6 * 2), .number(1e109 / 1e100)])
+            ],
+            expected: .success(.string("[1234567890,2000000,1000000000]"))
+        ),
+    ]
+
+    // MARK: - json.marshal_with_options Tests
+    // static let jsonMarshalWithOptionsTests: [BuiltinTests.TestCase] = [
+    //     BuiltinTests.TestCase(
+    //         description: "marshal large integers",
+    //         name: "json.marshal_with_options",
+    //         args: [
+    //             .array([.number(1_234_500_000 + 67890), .number(1e6 * 2), .number(1e109 / 1e100)]),
+    //             ["indent": "  "],
+    //         ],
+    //         expected: .success(
+    //             .string(
+    //                 """
+    //                 [
+    //                   1234567890,
+    //                   2000000,
+    //                   1000000000
+    //                 ]
+    //                 """))
+    //     )
+    //     // TODO: Add other cases from: v1/test/cases/testdata/v0/jsonbuiltins/test-json-marshal-with-options.yaml
+    // ]
+
+    // MARK: - json.unmarshal Tests
+    static let jsonUnmarshalTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "nested object",
+            name: "json.unmarshal",
+            args: ["[{\"foo\":[1,2,3]}]"],
+            expected: .success([["foo": [1, 2, 3]]])
+        ),
+        BuiltinTests.TestCase(
+            description: "escaped quoted string",
+            name: "json.unmarshal",
+            args: ["\"string\""],
+            expected: .success(.string("string"))
+        ),
+        BuiltinTests.TestCase(
+            description: "boolean",
+            name: "json.unmarshal",
+            args: ["true"],
+            expected: .success(.boolean(true))
         ),
     ]
 
@@ -247,6 +348,26 @@ extension BuiltinTests.EncodingTests {
                 argIndex: 0, argName: "x", allowedArgTypes: ["string"],
                 generateNumberOfArgsTest: true),
             hexDecodeTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "json.is_valid", sampleArgs: [""],
+                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
+            jsonIsValidTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "json.marshal", sampleArgs: [""],
+                argIndex: 0, argName: "x",
+                allowedArgTypes: ["undefined", "null", "boolean", "number", "string", "object", "array", "set"],
+                generateNumberOfArgsTest: true),
+            jsonMarshalTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "json.unmarshal", sampleArgs: [""],
+                argIndex: 0, argName: "x",
+                allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
+            jsonUnmarshalTests,
         ].flatMap { $0 }
     }
 

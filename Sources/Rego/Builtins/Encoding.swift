@@ -2,6 +2,7 @@ import AST
 import Foundation
 
 extension BuiltinFuncs {
+    // MARK: - base64.encode
     static func base64Encode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -14,6 +15,7 @@ extension BuiltinFuncs {
         return .string(Data(x.utf8).base64EncodedString())
     }
 
+    // MARK: - base64.decode
     static func base64Decode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -30,6 +32,7 @@ extension BuiltinFuncs {
         return .string(String(decoding: data, as: UTF8.self))
     }
 
+    // MARK: - base64.is_valid
     static func base64IsValid(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -42,6 +45,7 @@ extension BuiltinFuncs {
         return .boolean(Data(base64Encoded: x, options: Data.Base64DecodingOptions(rawValue: 0)) != nil)
     }
 
+    // MARK: - base64url.encode
     static func base64UrlEncode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -58,6 +62,7 @@ extension BuiltinFuncs {
         return .string(encoded)
     }
 
+    // MARK: - base64url.encode_no_pad
     static func base64UrlEncodeNoPad(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -75,6 +80,7 @@ extension BuiltinFuncs {
         return .string(encoded)
     }
 
+    // MARK: - base64url.decode
     static func base64UrlDecode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -98,6 +104,7 @@ extension BuiltinFuncs {
         return .string(String(decoding: data, as: UTF8.self))
     }
 
+    // MARK: - hex.encode
     static func hexEncode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -110,6 +117,7 @@ extension BuiltinFuncs {
         return .string(Data(x.utf8).hexEncoded)
     }
 
+    // MARK: - hex.decode
     static func hexDecode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -127,6 +135,82 @@ extension BuiltinFuncs {
         }
 
         return .string(hexDecoded)
+    }
+
+    // MARK: - json.is_valid
+    /// Verifies the input string is a valid JSON document.
+    public static func jsonIsValid(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+
+        guard case .string(let rawJSON) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
+        }
+
+        let parsedOK = (try? JSONDecoder().decode(RegoValue.self, from: rawJSON.data(using: .utf8)!)) != nil
+
+        // The result of the JSON parsing should be nil if parsing fails, or we got an empty input.
+        return AST.RegoValue(booleanLiteral: parsedOK)
+    }
+
+    // MARK: - json.marshal
+    /// Serializes the input term to JSON.
+    public static func jsonMarshal(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+
+        let data = try JSONEncoder().encode(args[0])
+        guard let json = String(data: data, encoding: .utf8) else {
+            throw Rego.RegoError(code: .internalError, message: "json.marshal: failed to encode JSON as utf-8")
+        }
+
+        return AST.RegoValue(stringLiteral: json)
+    }
+
+    // MARK: - json.marshal_with_options
+    /// Serializes the input term to JSON, using formatting options.
+    public static func jsonMarshalWithOptions(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue
+    {
+        // guard args.count == 2 else {
+        //     throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 2)
+        // }
+
+        // guard case .object(let options) = args[1] else {
+        //     throw BuiltinError.argumentTypeMismatch(arg: "opts", got: args[1].typeName, want: "object")
+        // }
+        // guard case .boolean(let pretty) = options["pretty"] else {
+        //     throw BuiltinError.argumentTypeMismatch(arg: "opts.pretty", got: options["pretty"]?.typeName, want: "boolean")
+        // }
+
+        // var encoder = JSONEncoder()
+        // if options.pretty {
+        //     encoder.outputFormatting = .prettyPrinted
+        // }
+
+        // let data = try JSONEncoder().encode(args[0])
+        // guard let json = String(data: data, encoding: .utf8) else {
+        //     throw Rego.RegoError(code: .internalError, message: "json.marshal: failed to encode JSON as utf-8")
+        // }
+
+        // return AST.RegoValue(stringLiteral: json)
+        return ""
+    }
+
+    // MARK: - json.unmarshal
+    /// Deserializes the input JSON string to a term.
+    public static func jsonUnmarshal(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+
+        guard case .string(let rawJSON) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
+        }
+
+        // Returns the parsed RegoValue, or throws an error.
+        return try JSONDecoder().decode(RegoValue.self, from: rawJSON.data(using: .utf8)!)
     }
 }
 

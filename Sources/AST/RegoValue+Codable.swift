@@ -88,9 +88,12 @@ extension RegoValue: Codable {
         do {
             let container = try decoder.singleValueContainer()
 
-            if let stringValue = try? container.decode(String.self) {
-                // Normalize string to contiguous UTF-8 for faster comparisons
-                self = .string(String(decoding: stringValue.utf8, as: UTF8.self))
+            if container.decodeNil() {
+                self = .null
+                return
+            }
+            if let boolValue = try? container.decode(Bool.self) {
+                self = .boolean(boolValue)
                 return
             }
 
@@ -106,12 +109,13 @@ extension RegoValue: Codable {
                 self = .number(RegoNumber(decimalValue))
                 return
             }
-            if let boolValue = try? container.decode(Bool.self) {
-                self = .boolean(boolValue)
-                return
-            }
-            if container.decodeNil() {
-                self = .null
+
+            // Note: Some decoders (e.g. YAML) are very permissive about type
+            // coercion, and will almost always decode a number as a valid
+            // string. As a result, we check for the string case last.
+            if let stringValue = try? container.decode(String.self) {
+                // Normalize string to contiguous UTF-8 for faster comparisons
+                self = .string(String(decoding: stringValue.utf8, as: UTF8.self))
                 return
             }
         } catch {}

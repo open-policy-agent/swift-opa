@@ -9,6 +9,8 @@ updates:
       dependencies:
         patterns:
           - "*"
+    cooldown:
+      default-days: 7
   # Only updates the go.mod when OPA has a version bump.
   - package-ecosystem: "gomod"
     directory: "/tools/generate-compliance-tests"
@@ -16,3 +18,5 @@ updates:
       interval: "weekly"
     allow:
       - dependency-name: "github.com/open-policy-agent/opa"
+    cooldown:
+      default-days: 7

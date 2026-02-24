@@ -10,6 +10,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   ci:
     name: Build Swift ${{ matrix.swift }}${{ matrix.xcode && format(', Xcode {0}', matrix.xcode) || '' }} (${{ matrix.os }})
@@ -43,7 +46,7 @@ jobs:
         run: |
           sudo xcode-select --switch "${DEVELOPER_DIR}/Contents/Developer"
           xcodebuild -version
-      - uses: swift-actions/setup-swift@v2
+      - uses: swift-actions/setup-swift@7ca6abe6b3b0e8b5421b88be48feee39cbf52c6a #v2.4.0
         if: runner.os == 'Linux'
         with:
           swift-version: ${{ matrix.swift }}
@@ -60,7 +63,9 @@ jobs:
             echo "**Version Mismatch**: Expected \`${SWIFT_VERSION}\`, got \`${ACTUAL}\`" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: Install jemalloc
         if: runner.os == 'macOS'
         run: brew install jemalloc
@@ -84,16 +89,18 @@ jobs:
       - run: sudo xcode-select -s /Applications/Xcode_26.0.app
       - run: swift --version
       - name: checkout PR
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           path: pr/swift-opa
           fetch-depth: 0 # fetch all history for all branches and tags
+          persist-credentials: false
       - name: checkout main
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: open-policy-agent/swift-opa
           ref: main
           path: main/swift-opa
+          persist-credentials: false
       - name: compliance tests (main)
         run: |
           (make test-compliance || true) > results
@@ -130,7 +137,9 @@ jobs:
       contents: read
     steps:
       - run: sudo xcode-select -s /Applications/Xcode_26.0.app
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - name: generate capabilities
         run: make generate
       - name: check for changes
@@ -144,3 +153,14 @@ jobs:
             git diff capabilities.json
             exit 1
           fi
+
+  gh-actions-lint:
+    name: Github Actions Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@0dce2577a4760a2749d8cfb7a84b7d5585ebcb7d # v0.5.0

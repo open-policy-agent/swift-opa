@@ -8,7 +8,7 @@ import class Foundation.ProcessInfo
 let package = Package(
     name: "swift-opa",
     platforms: [
-        .macOS(.v13),
+        .macOS(.v15),
         .iOS(.v16),
     ],
     products: [

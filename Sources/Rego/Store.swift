@@ -1,4 +1,5 @@
 import AST
+import Synchronization
 
 extension OPA {
     /// An abstraction over a store providing keyed access to data used in policy evaluation.
@@ -13,8 +14,13 @@ extension OPA {
     }
 
     /// InMemoryStore is an in-memory implementation of ``OPA/Store``
-    public struct InMemoryStore {
-        private var data: AST.RegoValue = AST.RegoValue.object([:])
+    /// This has to be a public final class to implement ``Sendable`` properly.
+    public final class InMemoryStore: Sendable {
+        private let data: Mutex<AST.RegoValue>
+
+        public init(initialData data: AST.RegoValue = .object([:])) {
+            self.data = Mutex(data)
+        }
     }
 }
 
@@ -41,27 +47,24 @@ struct NullStore: OPA.Store {
 }
 
 extension OPA.InMemoryStore: OPA.Store {
-    public init(initialData data: AST.RegoValue) {
-        self.data = data
-    }
-
     public func read(from path: StoreKeyPath) async throws -> AST.RegoValue {
-        var current: AST.RegoValue = data
-        for segment in path.segments {
-            guard case .object(let object) = current else {
-                throw RegoError(code: .storePathNotFound, message: "path not found: \(path)")
+        return try self.data.withLock({
+            var current: AST.RegoValue = $0
+            for segment in path.segments {
+                guard case .object(let object) = current else {
+                    throw RegoError(code: .storePathNotFound, message: "path not found: \(path)")
+                }
+                guard let next = object[.string(segment)] else {
+                    throw RegoError(code: .storePathNotFound, message: "path not found: \(path)")
+                }
+                current = next
             }
-            guard let next = object[.string(segment)] else {
-                throw RegoError(code: .storePathNotFound, message: "path not found: \(path)")
-            }
-            current = next
-        }
 
-        return current
+            return current
+        })
     }
 
-    public mutating func write(to path: StoreKeyPath, value: AST.RegoValue) async throws {
-        // TODO this is not achieving our goal of thread safety
-        data = data.patch(with: value, at: path.segments)
+    public func write(to path: StoreKeyPath, value: AST.RegoValue) async throws {
+        self.data.withLock({ $0 = $0.patch(with: value, at: path.segments) })
     }
 }

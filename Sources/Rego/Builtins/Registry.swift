@@ -127,6 +127,11 @@ public struct BuiltinRegistry: Sendable {
             // Rand
             "rand.intn": BuiltinFuncs.numbersRandIntN,
 
+            // Regex
+            "regex.match": BuiltinFuncs.regexMatch,
+            "regex.is_valid": BuiltinFuncs.regexIsValid,
+            "regex.find_all_string_submatch_n": BuiltinFuncs.regexFindAllStringSubmatchN,
+
             // Sets
             "and": BuiltinFuncs.and,
             "intersection": BuiltinFuncs.intersection,

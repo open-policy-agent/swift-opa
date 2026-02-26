@@ -59,7 +59,9 @@ extension BuiltinFuncs {
         if needle.isEmpty {
             return .boolean(true)
         }
-        return .boolean(haystack.contains(needle))
+        // Use .literal for byte-level comparison (no Unicode normalization),
+        // matching Go's strings.Contains() semantics.
+        return .boolean(haystack.range(of: needle, options: .literal) != nil)
     }
 
     static func stringsCount(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -97,7 +99,13 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "base", got: args[1].typeName, want: "string")
         }
 
-        return .boolean(search.hasSuffix(base))
+        // Use UTF-8 byte-level comparison, matching Go's strings.HasSuffix() semantics.
+        let searchUTF8 = search.utf8
+        let baseUTF8 = base.utf8
+        if baseUTF8.count > searchUTF8.count {
+            return .boolean(false)
+        }
+        return .boolean(searchUTF8.suffix(baseUTF8.count).elementsEqual(baseUTF8))
     }
 
     static func formatInt(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -280,7 +288,8 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "base", got: args[1].typeName, want: "string")
         }
 
-        return .boolean(search.hasPrefix(base))
+        // Use UTF-8 byte-level comparison, matching Go's strings.HasPrefix() semantics.
+        return .boolean(search.utf8.starts(with: base.utf8))
     }
 
     static func substring(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {

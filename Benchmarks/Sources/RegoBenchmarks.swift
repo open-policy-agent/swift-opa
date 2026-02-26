@@ -11,6 +11,9 @@ let benchmarks: @Sendable () -> Void = {
     let dynamicCallBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/dynamic-call-bundle")
     let arrayIterationBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/array-iteration-bundle")
     let numericLiteralsBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/numeric-literals-bundle")
+    let arrayBuildBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/array-build-bundle")
+    let objectBuildBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/object-build-bundle")
+    let setBuildBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/set-build-bundle")
 
     Benchmark(
         "Simple Policy Evaluation",
@@ -191,6 +194,70 @@ let benchmarks: @Sendable () -> Void = {
         for _ in benchmark.scaledIterations {
             do {
                 let result = try await preparedQuery?.evaluate(input: input)
+                blackHole(result)
+            } catch {}
+        }
+    }
+
+    let scanInput: AST.RegoValue = ["value": "/bin/nomatch"]
+
+    Benchmark(
+        "Build Literal Array (10 appends)",
+        configuration: .init(metrics: [.wallClock, .mallocCountTotal])
+    ) { benchmark in
+        var engine = OPA.Engine(
+            bundlePaths: [OPA.Engine.BundlePath(name: "array", url: arrayBuildBundleURL)])
+        var preparedQuery: OPA.Engine.PreparedQuery?
+        do {
+            preparedQuery = try await engine.prepareForEvaluation(query: "data.benchmark.array.matched")
+        } catch {}
+
+        benchmark.startMeasurement()
+        for _ in benchmark.scaledIterations {
+            do {
+                let result = try await preparedQuery?.evaluate(input: scanInput)
+                blackHole(result)
+            } catch {}
+        }
+    }
+
+    let collectionInput: AST.RegoValue = ["value": "__nomatch__"]
+
+    Benchmark(
+        "Build Literal Object (10 inserts)",
+        configuration: .init(metrics: [.wallClock, .mallocCountTotal])
+    ) { benchmark in
+        var engine = OPA.Engine(
+            bundlePaths: [OPA.Engine.BundlePath(name: "object", url: objectBuildBundleURL)])
+        var preparedQuery: OPA.Engine.PreparedQuery?
+        do {
+            preparedQuery = try await engine.prepareForEvaluation(query: "data.benchmark.object.matched")
+        } catch {}
+
+        benchmark.startMeasurement()
+        for _ in benchmark.scaledIterations {
+            do {
+                let result = try await preparedQuery?.evaluate(input: collectionInput)
+                blackHole(result)
+            } catch {}
+        }
+    }
+
+    Benchmark(
+        "Build Literal Set (10 adds)",
+        configuration: .init(metrics: [.wallClock, .mallocCountTotal])
+    ) { benchmark in
+        var engine = OPA.Engine(
+            bundlePaths: [OPA.Engine.BundlePath(name: "set", url: setBuildBundleURL)])
+        var preparedQuery: OPA.Engine.PreparedQuery?
+        do {
+            preparedQuery = try await engine.prepareForEvaluation(query: "data.benchmark.set.matched")
+        } catch {}
+
+        benchmark.startMeasurement()
+        for _ in benchmark.scaledIterations {
+            do {
+                let result = try await preparedQuery?.evaluate(input: collectionInput)
                 blackHole(result)
             } catch {}
         }

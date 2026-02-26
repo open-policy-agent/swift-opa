@@ -165,8 +165,8 @@ internal final class IREvaluationContext {
     var results: ResultSet
     var locals: Locals = Locals(repeating: nil, count: 2)
 
-    // Pool for reusing storage arrays across function calls
-    private var localsPool: [[AST.RegoValue?]] = []
+    // Pool for reusing LocalsStorage objects across function calls
+    private var localsPool: [LocalsStorage] = []
 
     // Pool for reusing args arrays
     private var argsPool: [[AST.RegoValue]] = []
@@ -245,9 +245,9 @@ internal final class IREvaluationContext {
     }
 
     func allocateLocals(count: Int) -> Locals {
-        if var storage = localsPool.popLast() {
-            if count > storage.count {
-                storage.append(contentsOf: repeatElement(nil, count: count - storage.count))
+        if let storage = localsPool.popLast() {
+            if count > storage.elements.count {
+                storage.elements.append(contentsOf: repeatElement(nil, count: count - storage.elements.count))
             }
             return Locals(storage)
         }
@@ -255,9 +255,8 @@ internal final class IREvaluationContext {
     }
 
     func releaseLocals(_ locals: Locals, usedCount: Int? = nil) {
-        var locals = locals
-        let clearedStorage = locals.releaseStorage(usedCount: usedCount)
-        localsPool.append(clearedStorage)
+        locals.clearForReuse(usedCount: usedCount)
+        localsPool.append(locals.backing)
     }
 
     func allocateArgs(count: Int) -> [AST.RegoValue] {

@@ -45,7 +45,7 @@ extension Locals {
             return self
         }
 
-        var result = Locals(self.storage)
+        var result = Locals(self.backing.elements)
 
         for i in 0..<rhs.count {
             if let rhsValue = rhs[IR.Local(i)] {

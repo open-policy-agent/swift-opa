@@ -2,11 +2,14 @@ import AST
 import Foundation
 import IR
 
-/// Array-based storage for IR local variables.
+/// Class-backed storage for IR local variables.
+///
+/// Uses a reference-type backing store so that assigning one Locals to another
+/// does NOT trigger copy-on-write on the underlying array. The pool in
+/// `IREvaluationContext` manages ownership explicitly — COW safety is redundant
+/// overhead in this hot path.
 ///
 /// # Implementation Assumptions
-///
-/// This implementation makes the following assumptions about how the IR planner allocates locals:
 ///
 /// 1. **Not Sparse**: The planner allocates locals with indices starting from 0 and
 ///    generally increasing consecutively. While gaps may exist, locals are not sparse
@@ -30,22 +33,46 @@ import IR
 ///
 /// These assumptions could be validated during the `prepare` phase if violations lead
 /// to incorrect behavior or excessive memory usage.
+
+/// Reference-counted backing store for Locals.
+/// Avoids copy-on-write overhead when Locals are saved/restored across function calls.
+// nonisolated(unsafe) is safe because IREvaluationContext is single-threaded during evaluation.
+internal final class LocalsStorage: @unchecked Sendable {
+    var elements: [AST.RegoValue?]
+
+    init(_ elements: [AST.RegoValue?]) {
+        self.elements = elements
+    }
+
+    init(repeating value: AST.RegoValue?, count: Int) {
+        self.elements = Array(repeating: value, count: count)
+    }
+}
+
 internal struct Locals: Equatable, Sendable, Encodable {
-    var storage: [AST.RegoValue?]
+    // Class-backed storage eliminates COW on the hot path.
+    // nonisolated(unsafe) is safe: Locals are only accessed by a single
+    // IREvaluationContext at a time, which is not shared across threads.
+    nonisolated(unsafe) var backing: LocalsStorage
 
     // Create empty Locals array
     init() {
-        self.storage = []
+        self.backing = LocalsStorage([])
     }
 
     // Create Locals from array of values
     init(_ elements: [AST.RegoValue?]) {
-        self.storage = elements
+        self.backing = LocalsStorage(elements)
+    }
+
+    // Create Locals wrapping an existing storage object (used by pool)
+    init(_ storage: LocalsStorage) {
+        self.backing = storage
     }
 
     // Create Locals with repeated value
     init(repeating value: AST.RegoValue?, count: Int) {
-        self.storage = Array(repeating: value, count: count)
+        self.backing = LocalsStorage(repeating: value, count: count)
     }
 
     // Create Locals sized to accommodate given local indices
@@ -54,7 +81,7 @@ internal struct Locals: Equatable, Sendable, Encodable {
     init(accommodating locals: [IR.Local], minimumSize: Int = 0) {
         let maxLocal = locals.max() ?? IR.Local(0)
         let requiredSize = Int(maxLocal) + 1 + minimumSize
-        self.storage = Array(repeating: nil, count: requiredSize)
+        self.backing = LocalsStorage(repeating: nil, count: requiredSize)
     }
 
     subscript(index: IR.Local) -> AST.RegoValue? {
@@ -63,49 +90,52 @@ internal struct Locals: Equatable, Sendable, Encodable {
             // Return nil if out of bounds. This happens when:
             // - The local hasn't been written to yet (treated as undefined)
             // - In tests that don't go through evalPlan pre-allocation
-            guard idx < storage.count else {
+            guard idx < backing.elements.count else {
                 return nil
             }
-            return storage[idx]
+            return backing.elements[idx]
         }
         set {
             let idx = Int(index)
             // Grow array if needed to accommodate the index.
             // After pre-allocation this should rarely trigger, but is needed
             // for tests and as a safety net.
-            if idx >= storage.count {
-                storage.append(contentsOf: repeatElement(nil, count: idx - storage.count + 1))
+            if idx >= backing.elements.count {
+                backing.elements.append(contentsOf: repeatElement(nil, count: idx - backing.elements.count + 1))
             }
-            storage[idx] = newValue
+            backing.elements[idx] = newValue
         }
     }
 
-    var count: Int { storage.count }
-    var isEmpty: Bool { storage.isEmpty }
+    var count: Int { backing.elements.count }
+    var isEmpty: Bool { backing.elements.isEmpty }
 
-    // Clear values up to usedCount and return the storage for pooling
-    mutating func releaseStorage(usedCount: Int? = nil) -> [AST.RegoValue?] {
-        let clearCount = usedCount ?? storage.count
+    // Clear values up to usedCount. The backing storage is reused in-place.
+    func clearForReuse(usedCount: Int? = nil) {
+        let clearCount = usedCount ?? backing.elements.count
         for i in 0..<clearCount {
-            storage[i] = nil
+            backing.elements[i] = nil
         }
-
-        return storage
     }
 
     // Resize array to specific size, truncating or extending with nil as needed
-    mutating func resize(to size: Int) {
+    func resize(to size: Int) {
         guard size >= 0 else {
             return
         }
-        if size < storage.count {
-            storage.removeLast(storage.count - size)
-        } else if size > storage.count {
-            storage.append(contentsOf: repeatElement(nil, count: size - storage.count))
+        if size < backing.elements.count {
+            backing.elements.removeLast(backing.elements.count - size)
+        } else if size > backing.elements.count {
+            backing.elements.append(contentsOf: repeatElement(nil, count: size - backing.elements.count))
         }
     }
 
     static func == (lhs: Locals, rhs: Locals) -> Bool {
-        return lhs.storage == rhs.storage
+        return lhs.backing.elements == rhs.backing.elements
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(backing.elements)
     }
 }

@@ -4,7 +4,7 @@ import Foundation
 public typealias Builtin = @Sendable (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
 
 public struct BuiltinContext {
-    public let location: OPA.Trace.Location
+    public var location: OPA.Trace.Location
     public var tracer: OPA.Trace.QueryTracer?
     /// Date and Time of Context creation
     public let timestamp: Date
@@ -12,7 +12,6 @@ public struct BuiltinContext {
     internal let rand: Ptr<RandomNumberGenerator>
 
     init(
-
         location: OPA.Trace.Location = .init(),
         tracer: OPA.Trace.QueryTracer? = nil,
         cache: Ptr<BuiltinsCache>? = nil,

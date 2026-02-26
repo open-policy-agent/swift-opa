@@ -171,11 +171,24 @@ internal final class IREvaluationContext {
     // Pool for reusing args arrays
     private var argsPool: [[AST.RegoValue]] = []
 
+    // Reusable builtin context — only location changes per call
+    var builtinContext: BuiltinContext
+
+    // Inline cache for resolved builtin function pointers, avoiding
+    // repeated Dictionary lookups on the BuiltinRegistry per call.
+    private var builtinCache: [String: Builtin] = [:]
+
     init(ctx: EvaluationContext, policy: IndexedIRPolicy) {
         self.ctx = ctx
         self.policy = policy
         self.tracingEnabled = ctx.tracer != nil
         self.results = ResultSet.empty
+        self.builtinContext = BuiltinContext(
+            tracer: ctx.tracer,
+            cache: ctx.builtinsCache,
+            timestamp: ctx.timestamp,
+            rand: ctx.builtinsRand
+        )
     }
 
     subscript(key: InvocationKey) -> AST.RegoValue? {
@@ -273,6 +286,18 @@ internal final class IREvaluationContext {
     func releaseArgs(_ args: inout [AST.RegoValue]) {
         args.removeAll(keepingCapacity: true)
         argsPool.append(args)
+    }
+
+    /// Resolve a builtin function by name, caching the result for future lookups.
+    func resolveBuiltin(name: String) -> Builtin? {
+        if let cached = builtinCache[name] {
+            return cached
+        }
+        if let builtin = ctx.builtins[name] {
+            builtinCache[name] = builtin
+            return builtin
+        }
+        return nil
     }
 
     func traceEvent(
@@ -1018,19 +1043,26 @@ private func evalCall(
         }
     }
 
-    let bctx = BuiltinContext(
-        location: try ctx.currentLocation(stmt: caller),
-        tracer: ctx.ctx.tracer,
-        cache: ctx.ctx.builtinsCache,
-        timestamp: ctx.ctx.timestamp
-    )
+    // Reuse the cached BuiltinContext, only updating location when tracing is enabled
+    if ctx.tracingEnabled {
+        ctx.builtinContext.location = try ctx.currentLocation(stmt: caller)
+    }
 
-    return try await ctx.ctx.builtins.invoke(
-        withContext: bctx,
-        name: funcName,
-        args: argValues,
-        strict: ctx.ctx.strictBuiltins
-    )
+    // Use cached builtin lookup to avoid repeated Dictionary lookups
+    guard let builtin = ctx.resolveBuiltin(name: funcName) else {
+        throw BuiltinRegistry.RegistryError.builtinNotFound(name: funcName)
+    }
+    do {
+        return try await builtin(ctx.builtinContext, argValues)
+    } catch {
+        if BuiltinError.isHaltError(error) {
+            throw error
+        }
+        if ctx.ctx.strictBuiltins {
+            throw error
+        }
+        return .undefined
+    }
 }
 
 // callPlanFunc will evaluate calling a function defined on the plan

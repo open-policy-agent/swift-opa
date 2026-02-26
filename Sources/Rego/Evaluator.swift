@@ -19,6 +19,8 @@ internal struct EvaluationContext {
     public let timestamp: Date
     /// Shared cache for builtin function calls
     public let builtinsCache: Ptr<BuiltinsCache>
+    /// Shared random number generator for builtin function calls
+    public let builtinsRand: Ptr<RandomNumberGenerator>
 
     init(
         query: String,
@@ -37,6 +39,7 @@ internal struct EvaluationContext {
         self.strictBuiltins = strictBuiltins
         self.timestamp = timestamp ?? Date()
         self.builtinsCache = Ptr<BuiltinsCache>(toCopyOf: BuiltinsCache())
+        self.builtinsRand = Ptr<RandomNumberGenerator>(toCopyOf: SystemRandomNumberGenerator())
     }
 }
 

@@ -104,7 +104,7 @@ let benchmarks: @Sendable () -> Void = {
         } catch {}
 
         let input: AST.RegoValue = [
-            "items": .array((1...10).map { .number($0 as NSNumber) }),
+            "items": .array((1...10).map { .number(RegoNumber(int: Int64($0))) }),
             "threshold": 5,
         ]
 
@@ -130,7 +130,7 @@ let benchmarks: @Sendable () -> Void = {
         } catch {}
 
         let input: AST.RegoValue = [
-            "items": .array((1...100).map { .number($0 as NSNumber) }),
+            "items": .array((1...100).map { .number(RegoNumber(int: Int64($0))) }),
             "threshold": 50,
         ]
 
@@ -156,7 +156,7 @@ let benchmarks: @Sendable () -> Void = {
         } catch {}
 
         let input: AST.RegoValue = [
-            "items": .array((1...1000).map { .number($0 as NSNumber) }),
+            "items": .array((1...1000).map { .number(RegoNumber(int: Int64($0))) }),
             "threshold": 500,
         ]
 

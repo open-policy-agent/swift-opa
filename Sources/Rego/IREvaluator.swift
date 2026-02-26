@@ -12,6 +12,20 @@ let localIdxData = Local(1)
 struct InvocationKey: Hashable {
     let funcName: String
     let args: [IR.Operand]
+    private let cachedHashValue: Int
+
+    init(funcName: String, args: [IR.Operand]) {
+        self.funcName = funcName
+        self.args = args
+        var hasher = Hasher()
+        hasher.combine(funcName)
+        hasher.combine(args)
+        self.cachedHashValue = hasher.finalize()
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(cachedHashValue)
+    }
 }
 
 /// MemoCache is a memoization cache of plan invocations

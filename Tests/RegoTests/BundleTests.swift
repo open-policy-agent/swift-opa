@@ -383,7 +383,7 @@ struct BundleLoaderTests {
             ),
             ErrorCase(
                 sourceBundle: relPath("TestData/Bundles/invalid-data-escaped-chroot"),
-                expectedError: BundleLoader.LoadError.dataEscapedRoot
+                expectedError: OPA.Bundle.BundleError.dataEscapedRoots("")
             ),
         ]
     }
@@ -478,18 +478,20 @@ struct BundleLoaderTests {
                 isValid: false
             ),
             BundleConsistencyTestCase(
-                description: "roots internal conflict with wildcard",
+                // OPA allows roots to overlap within a bundle, so taking
+                // ownership of the root path is fine, if it's only one bundle.
+                description: "roots overlap with wildcard",
                 sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
                 rootsOverride: ["", "user_roles"],
-                isValid: false
+                isValid: true
             ),
             BundleConsistencyTestCase(
-                // TODO we might decide to make this legal in the future (within a bundle, not across bundles)
-                // and double check upstream reference architecture behavior
-                description: "roots internal conflict",
+                // OPA allows roots to overlap within a bundle,
+                // e.g. ["/a", "/a/b"] is allowed.
+                description: "roots overlap within bundle",
                 sourceBundle: relPath("TestData/Bundles/simple-directory-bundle"),
                 rootsOverride: ["role_grants", "user_roles", "user_roles/uh-oh"],
-                isValid: false
+                isValid: true
             ),
         ]
     }
@@ -585,205 +587,79 @@ struct RelativePathTests {
 }
 
 @Suite
-struct PathTests {
-    struct TestCase {
-        var paths: [[String]]
-        var otherPaths: [[String]]
-        var hasConflict: Bool
+struct DataCoveredByRootsTests {
+    struct TestCase: CustomTestStringConvertible {
+        var description: String
+        var roots: [String]
+        var data: AST.RegoValue
+        var isValid: Bool
+
+        var testDescription: String { description }
     }
 
     static var testCases: [TestCase] {
         [
             TestCase(
-                paths: [
-                    ["a", "b"]
-                ],
-                otherPaths: [
-                    ["c", "d"]
-                ],
-                hasConflict: false
-            ),
-            TestCase(
-                paths: [
-                    ["a", "b"]
-                ],
-                otherPaths: [
-                    ["a", "d"]
-                ],
-                hasConflict: false
-            ),
-            TestCase(
-                paths: [
-                    ["a", "b"]
-                ],
-                otherPaths: [
-                    ["a", "b", "c"]
-                ],
-                hasConflict: true
-            ),
-            TestCase(
-                paths: [
-                    ["a", "b", "c"]
-                ],
-                otherPaths: [
-                    ["a", "b"]
-                ],
-                hasConflict: true
-            ),
-            TestCase(
-                paths: [
-                    ["a", "b"],
-                    ["a", "c"],
-                ],
-                otherPaths: [
-                    ["a", "d"],
-                    ["a", "e"],
-                ],
-                hasConflict: false
-            ),
-            TestCase(
-                paths: [
-                    ["a", "b"],
-                    ["a", "c"],
-                ],
-                otherPaths: [
-                    ["a", "c"],
-                    ["a", "e"],
-                ],
-                hasConflict: true
-            ),
-            TestCase(
-                paths: [
-                    ["a", "b"],
-                    ["a", "c"],
-                ],
-                otherPaths: [
-                    ["a", "c", "z"],
-                    ["a", "e"],
-                ],
-                hasConflict: true
-            ),
-            TestCase(
-                paths: [
-                    ["a"]
-                ],
-                otherPaths: [
-                    ["a", "c", "z"]
-                ],
-                hasConflict: true
-            ),
-            TestCase(
-                paths: [
-                    ["a", "b"],
-                    ["a", "b", "c"],
-                ],
-                otherPaths: [
-                    ["a", "c", "z"]
-                ],
-                hasConflict: false
-            ),
-        ]
-    }
-
-    // This test verifies whether multiple sets of root path segments conflict with
-    // each other.
-    // Root paths conflict if one is a strict prefix of the other.
-    @Test(arguments: testCases)
-    func testOverlap(tc: TestCase) {
-        let trieA: TrieNode = tc.paths.reduce(into: TrieNode(value: "data", isLeaf: false, children: [:])) {
-            (node, path) in
-            let (merged, _) = TrieNode.merge(node: node, withSegments: path[...])
-            node = merged
-        }
-        let trieB: TrieNode = tc.otherPaths.reduce(into: TrieNode(value: "data", isLeaf: false, children: [:])) {
-            (node, path) in
-            let (merged, _) = TrieNode.merge(node: node, withSegments: path[...])
-            node = merged
-        }
-
-        #expect(trieA.overlaps(with: trieB) == tc.hasConflict)
-    }
-
-    struct DataTreeContainedTestCase {
-        var paths: [[String]]
-        var data: AST.RegoValue
-        var isValid: Bool
-    }
-
-    static var dataTreeContainedTests: [DataTreeContainedTestCase] {
-        [
-            DataTreeContainedTestCase(
-                paths: [["foo", "bar"]],
-                data: [
-                    "foo": [
-                        "bar": 42
-                    ]
-                ],
+                description: "exact path covers leaf",
+                roots: ["foo/bar"],
+                data: ["foo": ["bar": 42]],
                 isValid: true
             ),
-            DataTreeContainedTestCase(
-                paths: [[""]],
-                data: [
-                    "foo": [
-                        "bar": 42
-                    ],
-                    "baz": 777,
-                ],
+            TestCase(
+                description: "wildcard root covers everything",
+                roots: [""],
+                data: ["foo": ["bar": 42], "baz": 777],
                 isValid: true
             ),
-            DataTreeContainedTestCase(
-                paths: [["foo", "bar"]],
-                data: [
-                    "foo": [
-                        "bar": 42
-                    ],
-                    "baz": 777,
-                ],
+            TestCase(
+                description: "sibling key escapes narrow root",
+                roots: ["foo/bar"],
+                data: ["foo": ["bar": 42], "baz": 777],
                 isValid: false
             ),
-            DataTreeContainedTestCase(
-                paths: [["foo", "bar"]],
-                data: [
-                    "foo": [
-                        "baz": 42
-                    ]
-                ],
+            TestCase(
+                description: "declared path missing in data is fine",
+                roots: ["foo/bar"],
+                data: ["foo": ["baz": 42]],
                 isValid: false
             ),
-            DataTreeContainedTestCase(
-                paths: [["foo", "bar"]],
+            TestCase(
+                description: "empty data under any roots is valid",
+                roots: ["foo/bar"],
                 data: [:],
                 isValid: true
             ),
-            DataTreeContainedTestCase(
-                paths: [[""]],
+            TestCase(
+                description: "wildcard root with shallow data",
+                roots: [""],
                 data: ["foo": 42],
                 isValid: true
             ),
-            DataTreeContainedTestCase(
-                paths: [],
-                data: ["foo": 42],
+            TestCase(
+                description: "slash-prefixed root normalizes",
+                roots: ["/foo/bar"],
+                data: ["foo": ["bar": ["x": 1]]],
+                isValid: true
+            ),
+            TestCase(
+                description: "root terminator covers subtree",
+                roots: ["foo"],
+                data: ["foo": ["bar": ["deeply": ["nested": 1]]]],
                 isValid: true
             ),
         ]
     }
 
-    // Verify whether data trees fall under defined roots path segments.
-    // A data tree is valid if all its keys fall within the scope of the roots.
-    @Test(arguments: dataTreeContainedTests)
-    func testDataTreeContained(tc: DataTreeContainedTestCase) {
-        var trie: TrieNode = tc.paths.reduce(into: TrieNode(value: "data", isLeaf: false, children: [:])) {
-            (node, path) in
-            // NOTE! We filter out empty string paths and address them below if needed
-            let (merged, _) = TrieNode.merge(node: node, withSegments: path.filter { $0 != "" }[...])
-            node = merged
+    @Test(arguments: testCases)
+    func testCoverage(tc: TestCase) {
+        let result = Result {
+            try OPA.Bundle.checkDataCoveredByRoots(data: tc.data, roots: tc.roots)
         }
-        // Hack for when we have no paths at all
-        if trie.children.isEmpty {
-            trie.isLeaf = true
+        if tc.isValid {
+            #expect(throws: Never.self) { try result.get() }
+        } else {
+            #expect(throws: (any Error).self) { try result.get() }
         }
-
-        #expect(trie.contains(dataTree: tc.data) == tc.isValid)
     }
 }
 

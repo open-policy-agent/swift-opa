@@ -515,6 +515,7 @@ func evalBlock(
         switch statement {
         case .arrayAppendStmt(let stmt):
             let array = ctx.resolveLocal(idx: stmt.array)
+            ctx.locals[stmt.array] = nil
             let value = ctx.resolveOperand(stmt.value)
             guard case .array(var arrayValue) = array, value != .undefined else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
@@ -766,8 +767,12 @@ func evalBlock(
         case .objectInsertOnceStmt(let stmt):
             let targetValue = ctx.resolveOperand(stmt.value)
             let key = ctx.resolveOperand(stmt.key)
+            guard targetValue != .undefined && key != .undefined else {
+                return failWithUndefined(withContext: ctx, stmt: statement)
+            }
             let target = ctx.resolveLocal(idx: stmt.object)
-            guard targetValue != .undefined && key != .undefined && target != .undefined else {
+            ctx.locals[stmt.object] = nil
+            guard target != .undefined else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
             }
             guard case .object(var targetObjectValue) = target else {
@@ -792,8 +797,12 @@ func evalBlock(
         case .objectInsertStmt(let stmt):
             let value = ctx.resolveOperand(stmt.value)
             let key = ctx.resolveOperand(stmt.key)
+            guard value != .undefined && key != .undefined else {
+                return failWithUndefined(withContext: ctx, stmt: statement)
+            }
             let target = ctx.resolveLocal(idx: stmt.object)
-            guard value != .undefined && key != .undefined && target != .undefined else {
+            ctx.locals[stmt.object] = nil
+            guard target != .undefined else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
             }
             guard case .object(var targetObjectValue) = target else {
@@ -871,8 +880,12 @@ func evalBlock(
 
         case .setAddStmt(let stmt):
             let value = ctx.resolveOperand(stmt.value)
+            guard value != .undefined else {
+                return failWithUndefined(withContext: ctx, stmt: statement)
+            }
             let target = ctx.resolveLocal(idx: stmt.set)
-            guard value != .undefined && target != .undefined else {
+            ctx.locals[stmt.set] = nil
+            guard target != .undefined else {
                 return failWithUndefined(withContext: ctx, stmt: statement)
             }
             guard case .set(var targetSetValue) = target else {

@@ -417,6 +417,39 @@ func decodeFuncs() throws {
     _ = try JSONDecoder().decode(Policy.self, from: input.data(using: .utf8)!)
 }
 
+@Test("Operand hashing and equality")
+func operandHashingAndEquality() {
+    // Equal operands have equal hashes and compare equal
+    let a = Operand(type: .local, value: .localIndex(5))
+    let b = Operand(type: .local, value: .localIndex(5))
+    #expect(a == b)
+    #expect(a.hashValue == b.hashValue)
+
+    // Different types are not equal
+    let c = Operand(type: .bool, value: .bool(true))
+    #expect(a != c)
+
+    // Different values of same type are not equal
+    let d = Operand(type: .local, value: .localIndex(6))
+    #expect(a != d)
+
+    // All three OpType variants produce distinct hashes
+    let local = Operand(type: .local, value: .localIndex(0))
+    let bool = Operand(type: .bool, value: .bool(false))
+    let strIdx = Operand(type: .stringIndex, value: .stringIndex(0))
+    let hashes: Set<Int> = [local.hashValue, bool.hashValue, strIdx.hashValue]
+    #expect(hashes.count == 3, "Each OpType variant should produce a distinct hash")
+
+    // Operands work correctly as dictionary keys (hash + equality together)
+    var dict: [Operand: String] = [:]
+    dict[a] = "first"
+    dict[c] = "second"
+    dict[strIdx] = "third"
+    #expect(dict[b] == "first", "Equal operand should retrieve the same value")
+    #expect(dict[d] == nil, "Different operand should not match")
+    #expect(dict.count == 3)
+}
+
 func commentFor(_ name: String?) -> Comment {
     guard let name else {
         return Comment("[failed testcase: unnamed]")

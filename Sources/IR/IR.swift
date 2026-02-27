@@ -646,6 +646,14 @@ public struct Operand: Hashable, Sendable {
         case local = "local"
         case bool = "bool"
         case stringIndex = "string_index"
+
+        public func hash(into hasher: inout Hasher) {
+            switch self {
+            case .local: hasher.combine(0 as UInt8)
+            case .bool: hasher.combine(1 as UInt8)
+            case .stringIndex: hasher.combine(2 as UInt8)
+            }
+        }
     }
 
     public enum Value: Codable, Hashable, Sendable {

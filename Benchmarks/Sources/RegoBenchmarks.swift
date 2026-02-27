@@ -199,6 +199,32 @@ let benchmarks: @Sendable () -> Void = {
         }
     }
 
+    let memoBundleURL = URL(fileURLWithPath: "../Tests/RegoTests/TestData/Bundles/memo-benchmark")
+
+    Benchmark(
+        "Memoization - Overlapping Rules",
+        configuration: .init(metrics: [.wallClock, .mallocCountTotal])
+    ) { benchmark in
+        var engine = OPA.Engine(
+            bundlePaths: [OPA.Engine.BundlePath(name: "memo", url: memoBundleURL)])
+        var preparedQuery: OPA.Engine.PreparedQuery?
+        do {
+            preparedQuery = try await engine.prepareForEvaluation(query: "data.benchmark.memo.result")
+        } catch {}
+
+        let input: AST.RegoValue = [
+            "value": 10
+        ]
+
+        benchmark.startMeasurement()
+        for _ in benchmark.scaledIterations {
+            do {
+                let result = try await preparedQuery?.evaluate(input: input)
+                blackHole(result)
+            } catch {}
+        }
+    }
+
     let scanInput: AST.RegoValue = ["value": "/bin/nomatch"]
 
     Benchmark(

@@ -60,6 +60,58 @@ extension OPA.Bundle {
         case overlappingRoots(String)
         case internalError(String)
     }
+
+    /// Checks if two bundle root paths overlap (one contains the other).
+    @inlinable
+    public static func rootPathsOverlap(_ pathA: String, _ pathB: String) -> Bool {
+        return rootContains(root: pathA, other: pathB) || rootContains(root: pathB, other: pathA)
+    }
+
+    /// Checks if any of the root paths contain the given path.
+    public static func rootPathsContain(_ roots: [String], path: String) -> Bool {
+        for root in roots {
+            if rootContains(root: root, other: path) {
+                return true
+            }
+        }
+        return false
+    }
+
+    /// Checks if `root` is a prefix path of `other`.
+    /// Optimized to minimize allocations using Substring views.
+    @inlinable
+    public static func rootContains(root: String, other: String) -> Bool {
+        // Empty root always contains other
+        if root.isEmpty {
+            return true
+        }
+
+        // Fast path: if root is longer than other (by character count),
+        // it can't be a prefix (with some edge cases around trailing slashes)
+        // This is a heuristic - the segment comparison below is authoritative
+
+        let rootSegments = root.split(separator: "/", omittingEmptySubsequences: false)
+        let otherSegments = other.split(separator: "/", omittingEmptySubsequences: false)
+
+        // Handle special case: single empty segment root
+        if rootSegments.count == 1 && rootSegments[0].isEmpty {
+            return true
+        }
+
+        // Root has more segments than other. It can't be a prefix.
+        if rootSegments.count > otherSegments.count {
+            return false
+        }
+
+        // Compare segments. Using zip stops at the shorter sequence.
+        for (rootSeg, otherSeg) in zip(rootSegments, otherSegments) {
+            if rootSeg != otherSeg {
+                return false
+            }
+        }
+
+        return true
+    }
 }
 
 extension OPA.Manifest {

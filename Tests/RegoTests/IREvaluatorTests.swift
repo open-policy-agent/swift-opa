@@ -1210,3 +1210,49 @@ extension IRStatementTests.TestCase: CustomTestStringConvertible {
         return "\(mirror.subjectType): \(description)"
     }
 }
+
+@Test("InvocationKey hashing and equality")
+func invocationKeyHashingAndEquality() {
+    let args1: [IR.Operand] = [
+        IR.Operand(type: .local, value: .localIndex(0)),
+        IR.Operand(type: .local, value: .localIndex(1)),
+    ]
+    let args2: [IR.Operand] = [
+        IR.Operand(type: .local, value: .localIndex(0)),
+        IR.Operand(type: .local, value: .localIndex(1)),
+    ]
+
+    // Equal keys have equal hashes and compare equal
+    let a = InvocationKey(funcName: "g0.data.policy.allow", args: args1)
+    let b = InvocationKey(funcName: "g0.data.policy.allow", args: args2)
+    #expect(a == b)
+    #expect(a.hashValue == b.hashValue)
+
+    // Different funcName makes keys unequal
+    let c = InvocationKey(funcName: "g0.data.policy.deny", args: args1)
+    #expect(a != c)
+
+    // Different args make keys unequal
+    let args3: [IR.Operand] = [
+        IR.Operand(type: .local, value: .localIndex(0)),
+        IR.Operand(type: .local, value: .localIndex(2)),
+    ]
+    let d = InvocationKey(funcName: "g0.data.policy.allow", args: args3)
+    #expect(a != d)
+
+    // Different arg types make keys unequal
+    let args4: [IR.Operand] = [
+        IR.Operand(type: .bool, value: .bool(true)),
+        IR.Operand(type: .local, value: .localIndex(1)),
+    ]
+    let e = InvocationKey(funcName: "g0.data.policy.allow", args: args4)
+    #expect(a != e)
+
+    // Works correctly as dictionary keys (exercises hash + equality together)
+    var cache: [InvocationKey: AST.RegoValue] = [:]
+    cache[a] = .boolean(true)
+    cache[c] = .boolean(false)
+    #expect(cache[b] == .boolean(true), "Equal key should retrieve the same cached value")
+    #expect(cache[d] == nil, "Different key should not match")
+    #expect(cache.count == 2)
+}

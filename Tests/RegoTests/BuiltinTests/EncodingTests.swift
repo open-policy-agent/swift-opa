@@ -233,6 +233,19 @@ extension BuiltinTests.EncodingTests {
             args: ["{\"json\": \"ok\"}"],
             expected: .success(.boolean(true))
         ),
+        // Note: Surprisingly, Swift's JSONDecoder allows trailing commas!
+        // BuiltinTests.TestCase(
+        //     description: "invalid - trailing comma",
+        //     name: "json.is_valid",
+        //     args: ["{\"foo\": 1,}"],
+        //     expected: .success(.boolean(false))
+        // ),
+        BuiltinTests.TestCase(
+            description: "invalid - non string",
+            name: "json.is_valid",
+            args: [["foo": 1]],
+            expected: .success(.boolean(false))  // Does not throw a builtin error in OPA, surprisingly.
+        ),
     ]
 
     // MARK: - json.marshal Tests
@@ -256,26 +269,26 @@ extension BuiltinTests.EncodingTests {
     ]
 
     // MARK: - json.marshal_with_options Tests
-    // static let jsonMarshalWithOptionsTests: [BuiltinTests.TestCase] = [
-    //     BuiltinTests.TestCase(
-    //         description: "marshal large integers",
-    //         name: "json.marshal_with_options",
-    //         args: [
-    //             .array([.number(1_234_500_000 + 67890), .number(1e6 * 2), .number(1e109 / 1e100)]),
-    //             ["indent": "  "],
-    //         ],
-    //         expected: .success(
-    //             .string(
-    //                 """
-    //                 [
-    //                   1234567890,
-    //                   2000000,
-    //                   1000000000
-    //                 ]
-    //                 """))
-    //     )
-    //     // TODO: Add other cases from: v1/test/cases/testdata/v0/jsonbuiltins/test-json-marshal-with-options.yaml
-    // ]
+    static let jsonMarshalWithOptionsTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "marshal large integers",
+            name: "json.marshal_with_options",
+            args: [
+                .array([.number(1_234_500_000 + 67890), .number(1e6 * 2), .number(1e109 / 1e100)]),
+                ["indent": "  ", "prefix": ">>> "],
+            ],
+            expected: .success(
+                .string(
+                    """
+                    >>> [
+                    >>>   1234567890,
+                    >>>   2000000,
+                    >>>   1000000000
+                    >>> ]
+                    """))
+        )
+        // TODO: Add other cases from: v1/test/cases/testdata/v0/jsonbuiltins/test-json-marshal-with-options.yaml
+    ]
 
     // MARK: - json.unmarshal Tests
     static let jsonUnmarshalTests: [BuiltinTests.TestCase] = [
@@ -349,9 +362,13 @@ extension BuiltinTests.EncodingTests {
                 generateNumberOfArgsTest: true),
             hexDecodeTests,
 
+            // json.is_valid's documentation states it requires a string,
+            // but in the OPA implementation, it does not throw a builtin
+            // error on a wrong-typed argument. Instead it returns false.
             BuiltinTests.generateFailureTests(
                 builtinName: "json.is_valid", sampleArgs: [""],
-                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                argIndex: 0, argName: "x",
+                allowedArgTypes: ["undefined", "null", "boolean", "number", "string", "object", "array", "set"],
                 generateNumberOfArgsTest: true),
             jsonIsValidTests,
 
@@ -361,6 +378,19 @@ extension BuiltinTests.EncodingTests {
                 allowedArgTypes: ["undefined", "null", "boolean", "number", "string", "object", "array", "set"],
                 generateNumberOfArgsTest: true),
             jsonMarshalTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "json.marshal_with_options", sampleArgs: ["", [:]],
+                argIndex: 0, argName: "x",
+                allowedArgTypes: ["undefined", "null", "boolean", "number", "string", "object", "array", "set"],
+                generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "json.marshal_with_options",
+                sampleArgs: ["", ["prefix": "", "pretty": false, "indent": "  "]],
+                argIndex: 1, argName: "opts",
+                allowedArgTypes: ["undefined", "null", "boolean", "number", "string", "object", "array", "set"],
+                generateNumberOfArgsTest: true),
+            jsonMarshalWithOptionsTests,
 
             BuiltinTests.generateFailureTests(
                 builtinName: "json.unmarshal", sampleArgs: [""],

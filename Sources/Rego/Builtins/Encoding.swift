@@ -145,7 +145,7 @@ extension BuiltinFuncs {
         }
 
         guard case .string(let rawJSON) = args[0] else {
-            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
+            return AST.RegoValue(booleanLiteral: false)
         }
 
         let parsedOK = (try? JSONDecoder().decode(RegoValue.self, from: rawJSON.data(using: .utf8)!)) != nil
@@ -161,7 +161,10 @@ extension BuiltinFuncs {
             throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
 
-        let data = try JSONEncoder().encode(args[0])
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+
+        let data = try encoder.encode(args[0])
         guard let json = String(data: data, encoding: .utf8) else {
             throw Rego.RegoError(code: .internalError, message: "json.marshal: failed to encode JSON as utf-8")
         }
@@ -170,32 +173,103 @@ extension BuiltinFuncs {
     }
 
     // MARK: - json.marshal_with_options
-    /// Serializes the input term to JSON, using formatting options.
+    /// Serializes the input term to JSON, with additional formatting options.
     public static func jsonMarshalWithOptions(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue
     {
-        // guard args.count == 2 else {
-        //     throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 2)
-        // }
+        guard args.count == 2 else {
+            throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 2)
+        }
 
-        // guard case .object(let options) = args[1] else {
-        //     throw BuiltinError.argumentTypeMismatch(arg: "opts", got: args[1].typeName, want: "object")
-        // }
-        // guard case .boolean(let pretty) = options["pretty"] else {
-        //     throw BuiltinError.argumentTypeMismatch(arg: "opts.pretty", got: options["pretty"]?.typeName, want: "boolean")
-        // }
+        guard case .object(let options) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "opts", got: args[1].typeName, want: "object")
+        }
 
-        // var encoder = JSONEncoder()
-        // if options.pretty {
-        //     encoder.outputFormatting = .prettyPrinted
-        // }
+        var indentWith = "\t"
+        var prefixWith = ""
+        var implicitPrettyPrint = false
+        var userDeclaredExplicitPrettyPrint = false
+        var shouldPrettyPrint = false
 
-        // let data = try JSONEncoder().encode(args[0])
-        // guard let json = String(data: data, encoding: .utf8) else {
-        //     throw Rego.RegoError(code: .internalError, message: "json.marshal: failed to encode JSON as utf-8")
-        // }
+        for (key, val) in options {
+            guard case .string(let keyStr) = key else {
+                throw BuiltinError.argumentTypeMismatch(arg: "opts.key", got: key.typeName, want: "string")
+            }
 
-        // return AST.RegoValue(stringLiteral: json)
-        return ""
+            switch keyStr {
+            case "prefix":
+                guard case .string(let prefixOpt) = val else {
+                    throw BuiltinError.argumentTypeMismatch(arg: "opts.prefix", got: val.typeName, want: "string")
+                }
+                prefixWith = prefixOpt
+                implicitPrettyPrint = true
+
+            case "indent":
+                guard case .string(let indentOpt) = val else {
+                    throw BuiltinError.argumentTypeMismatch(arg: "opts.indent", got: val.typeName, want: "string")
+                }
+                indentWith = indentOpt
+                implicitPrettyPrint = true
+
+            case "pretty":
+                userDeclaredExplicitPrettyPrint = true
+                guard case .boolean(let explicitPrettyPrint) = val else {
+                    throw BuiltinError.argumentTypeMismatch(arg: "opts.pretty", got: val.typeName, want: "boolean")
+                }
+                shouldPrettyPrint = explicitPrettyPrint
+
+            default:
+                throw Rego.RegoError(
+                    code: .internalError, message: "json.marshal_with_options: unknown key '\(keyStr)'")
+            }
+        }
+
+        // If the user didn't explicitly set "pretty", infer from whether
+        // "prefix" or "indent" was provided (matching Go behavior).
+        if !userDeclaredExplicitPrettyPrint {
+            shouldPrettyPrint = implicitPrettyPrint
+        }
+
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+
+        guard shouldPrettyPrint else {
+            let data = try encoder.encode(args[0])
+            guard let json = String(data: data, encoding: .utf8) else {
+                throw Rego.RegoError(
+                    code: .internalError, message: "json.marshal_with_options: failed to encode JSON as utf-8")
+            }
+            return AST.RegoValue(stringLiteral: json)
+        }
+        // Use .prettyPrinted to get structured output (2-space indent, no prefix),
+        // then transform to match the requested indent/prefix strings.
+        encoder.outputFormatting.insert(.prettyPrinted)
+        let data = try encoder.encode(args[0])
+        guard let json = String(data: data, encoding: .utf8) else {
+            throw Rego.RegoError(
+                code: .internalError, message: "json.marshal_with_options: failed to encode JSON as utf-8")
+        }
+
+        // Swift's .prettyPrinted uses 2-space indent and no prefix.
+        // Replace each leading group of 2 spaces with the custom indent,
+        // and prepend the prefix to every line.
+        let lines = json.split(separator: "\n", omittingEmptySubsequences: false)
+        let transformed = lines.enumerated().map { (_, line) -> String in
+            var depth = 0
+            var idx = line.startIndex
+            while idx < line.endIndex,
+                let next = line.index(idx, offsetBy: 2, limitedBy: line.endIndex),
+                line[idx] == " ",
+                line[line.index(after: idx)] == " "
+            {
+                depth += 1
+                idx = next
+            }
+            let content = String(line[idx...])
+            let indent = String(repeating: indentWith, count: depth)
+            return prefixWith + indent + content
+        }.joined(separator: "\n")
+
+        return AST.RegoValue(stringLiteral: transformed)
     }
 
     // MARK: - json.unmarshal

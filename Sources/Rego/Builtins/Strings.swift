@@ -59,7 +59,57 @@ extension BuiltinFuncs {
         if needle.isEmpty {
             return .boolean(true)
         }
-        return .boolean(haystack.contains(needle))
+        // Use byte-level comparison (no Unicode normalization),
+        // matching Go's strings.Contains() semantics.
+        return .boolean(utf8Contains(haystack: haystack, needle: needle))
+    }
+
+    /// Byte-level substring search on raw UTF-8 buffers using `memcmp`.
+    /// Semantically identical to Go's `strings.Contains()` → `bytealg.IndexString()`.
+    private static func utf8Contains(haystack: String, needle: String) -> Bool {
+        let needleCount = needle.utf8.count
+        let haystackCount = haystack.utf8.count
+        if needleCount > haystackCount {
+            return false
+        }
+
+        // Fast path: contiguous UTF-8 storage (nearly always available for native Swift strings)
+        if let result = haystack.utf8.withContiguousStorageIfAvailable({ hBuf in
+            needle.utf8.withContiguousStorageIfAvailable({ nBuf in
+                utf8ContainsBytes(hBuf, nBuf)
+            })
+        }), let inner = result {
+            return inner
+        }
+
+        // Fallback: copy to contiguous arrays
+        // (still faster than the Foundation String.range(of:) path)
+        return Array(haystack.utf8).withUnsafeBufferPointer { hBuf in
+            Array(needle.utf8).withUnsafeBufferPointer { nBuf in
+                utf8ContainsBytes(hBuf, nBuf)
+            }
+        }
+    }
+
+    /// Scans `haystack` for `needle` using `memcmp` at each candidate position.
+    private static func utf8ContainsBytes(
+        _ haystack: UnsafeBufferPointer<UInt8>,
+        _ needle: UnsafeBufferPointer<UInt8>
+    ) -> Bool {
+        let hLen = haystack.count
+        let nLen = needle.count
+        guard nLen <= hLen, let hBase = haystack.baseAddress, let nBase = needle.baseAddress else {
+            return false
+        }
+        let firstByte = nBase.pointee
+        let limit = hLen - nLen
+        for i in 0...limit {
+            // Quick first-byte check to skip memcmp for most positions
+            if hBase[i] == firstByte && memcmp(hBase + i, nBase, nLen) == 0 {
+                return true
+            }
+        }
+        return false
     }
 
     static func stringsCount(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -97,7 +147,30 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "base", got: args[1].typeName, want: "string")
         }
 
-        return .boolean(search.hasSuffix(base))
+        // Use UTF-8 byte-level comparison, matching Go's strings.HasSuffix() semantics.
+        if base.isEmpty {
+            return .boolean(true)
+        }
+        let baseCount = base.utf8.count
+        let searchCount = search.utf8.count
+        if baseCount > searchCount {
+            return .boolean(false)
+        }
+
+        // Fast path: contiguous memcmp
+        if let result = search.utf8.withContiguousStorageIfAvailable({ sBuf in
+            base.utf8.withContiguousStorageIfAvailable({ bBuf in
+                guard let sBase = sBuf.baseAddress, let bBase = bBuf.baseAddress else {
+                    return false
+                }
+                return memcmp(sBase + (sBuf.count - bBuf.count), bBase, bBuf.count) == 0
+            })
+        }), let inner = result {
+            return .boolean(inner)
+        }
+
+        // Fallback
+        return .boolean(search.utf8.suffix(baseCount).elementsEqual(base.utf8))
     }
 
     static func formatInt(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -280,7 +353,8 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "base", got: args[1].typeName, want: "string")
         }
 
-        return .boolean(search.hasPrefix(base))
+        // Use UTF-8 byte-level comparison, matching Go's strings.HasPrefix() semantics.
+        return .boolean(search.utf8.starts(with: base.utf8))
     }
 
     static func substring(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {

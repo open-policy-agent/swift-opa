@@ -1,7 +1,12 @@
 name: Check
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      debug_benchmarks:
+        description: "Print benchmark results for debugging"
+        type: boolean
+        default: false
   pull_request: {}
 
 # When a new revision is pushed to a PR, cancel all in-progress CI runs for that
@@ -164,3 +169,142 @@ jobs:
           persist-credentials: false
       - name: Run zizmor
         uses: zizmorcore/zizmor-action@0dce2577a4760a2749d8cfb7a84b7d5585ebcb7d # v0.5.0
+
+  benchmark:
+    name: benchmark comparison (vs base)
+    runs-on: ubuntu-latest
+    container: swift:noble
+    continue-on-error: true
+    env:
+      BENCHMARK_MAX_DURATION_SECONDS: "3"
+      BENCHMARK_WARMUP_ITERATIONS: "100"
+    permissions:
+      contents: read
+      pull-requests: write
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Detect Swift version
+        id: swift
+        run: echo "version=$(swift --version | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)" >> "$GITHUB_OUTPUT"
+      - name: Install jemalloc and zstd for cache
+        run: |
+          apt-get update -q
+          apt-get install -yq libjemalloc-dev zstd
+      - name: Checkout base branch
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+      - name: Checkout PR
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          path: pr
+          persist-credentials: false
+      - name: Restore .build cache
+        id: build-cache
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        with:
+          path: |
+            base/Benchmarks/.build
+            pr/Benchmarks/.build
+          key: benchmark-build-swift${{ steps.swift.outputs.version }}-${{ github.event.pull_request.base.sha }}
+          restore-keys: benchmark-build-swift${{ steps.swift.outputs.version }}-
+      - name: Restore baseline results cache
+        id: baseline-cache
+        uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        with:
+          path: base/Benchmarks/.benchmarkBaselines
+          key: benchmark-baseline-swift${{ steps.swift.outputs.version }}-${{ github.event.pull_request.base.sha }}
+      - name: Run benchmarks on base and save baseline
+        if: steps.baseline-cache.outputs.cache-hit != 'true'
+        run: |
+          swift package -c release --disable-sandbox \
+            --package-path Benchmarks \
+            benchmark baseline update base \
+            --no-progress
+        working-directory: base
+      - name: Print base benchmark results
+        if: inputs.debug_benchmarks == true
+        run: |
+          swift package -c release --disable-sandbox \
+            --package-path Benchmarks \
+            benchmark baseline read base \
+            --no-progress
+        working-directory: base
+      - name: Copy baseline to PR checkout
+        run: cp -R base/Benchmarks/.benchmarkBaselines pr/Benchmarks/.benchmarkBaselines
+      - name: Run benchmarks on PR and save baseline
+        run: |
+          swift package -c release --disable-sandbox \
+            --package-path Benchmarks \
+            benchmark baseline update pr \
+            --no-progress
+        working-directory: pr
+      - name: Print PR benchmark results
+        if: inputs.debug_benchmarks == true
+        run: |
+          swift package -c release --disable-sandbox \
+            --package-path Benchmarks \
+            benchmark baseline read pr \
+            --no-progress
+        working-directory: pr
+      - name: Compare PR benchmarks against baseline
+        id: compare
+        run: |
+          set +e
+          swift package -c release --disable-sandbox \
+            --package-path Benchmarks \
+            benchmark baseline compare base pr \
+            --no-progress \
+            --format markdown \
+            2>/dev/null \
+            | tee benchmark-comparison.md
+          EXIT_CODE=${PIPESTATUS[0]}
+          set -e
+
+          echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
+
+          case "${EXIT_CODE}" in
+            0) SUMMARY="✅ No significant performance changes" ;;
+            2) SUMMARY="❌ Potential performance regression detected 📉" ;;
+            4) SUMMARY="⚠️ Performance improvement detected 📈" ;;
+            *) SUMMARY="❓ Benchmark comparison completed (exit code: ${EXIT_CODE})" ;;
+          esac
+          echo "summary=${SUMMARY}" >> "$GITHUB_OUTPUT"
+
+          {
+            echo "comparison<<EOF"
+            cat benchmark-comparison.md
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+        working-directory: pr
+      - name: Find existing benchmark comment
+        if: github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@b30e6a3c0ed37e7c023ccd3f1db5c6c0b0c23aad # v4.0.0
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: "<!-- benchmark-comparison -->"
+      - name: Post PR comment
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        uses: peter-evans/create-or-update-comment@e8674b075228eee787fea43ef493e45ece1004c9 # v5.0.0
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          edit-mode: replace
+          body: |
+            <!-- benchmark-comparison -->
+            ## Benchmark Comparison
+
+            ${{ steps.compare.outputs.summary }}
+
+            <details>
+              <summary>Full comparison output</summary>
+
+            ${{ steps.compare.outputs.comparison }}
+
+            </details>

@@ -9,7 +9,7 @@ let package = Package(
     ],
     dependencies: [
         .package(name: "swift-opa", path: ".."),
-        .package(url: "https://github.com/ordo-one/package-benchmark", from: "1.4.0"),
+        .package(url: "https://github.com/ordo-one/package-benchmark", from: "1.31.0"),
     ],
     targets: [
         .executableTarget(

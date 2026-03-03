@@ -19,7 +19,7 @@ let package = Package(
             targets: ["RegoCompliance"])
     ],
     dependencies: [
-        .package(path: swiftOpaDependencyPath)
+        .package(name: "swift-opa", path: swiftOpaDependencyPath)
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.

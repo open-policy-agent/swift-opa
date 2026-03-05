@@ -2,6 +2,7 @@ import AST
 import Foundation
 
 extension BuiltinFuncs {
+    // MARK: - base64.encode
     static func base64Encode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -14,6 +15,7 @@ extension BuiltinFuncs {
         return .string(Data(x.utf8).base64EncodedString())
     }
 
+    // MARK: - base64.decode
     static func base64Decode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -30,6 +32,7 @@ extension BuiltinFuncs {
         return .string(String(decoding: data, as: UTF8.self))
     }
 
+    // MARK: - base64.is_valid
     static func base64IsValid(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -42,6 +45,7 @@ extension BuiltinFuncs {
         return .boolean(Data(base64Encoded: x, options: Data.Base64DecodingOptions(rawValue: 0)) != nil)
     }
 
+    // MARK: - base64url.encode
     static func base64UrlEncode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -58,6 +62,7 @@ extension BuiltinFuncs {
         return .string(encoded)
     }
 
+    // MARK: - base64url.encode_no_pad
     static func base64UrlEncodeNoPad(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -75,6 +80,7 @@ extension BuiltinFuncs {
         return .string(encoded)
     }
 
+    // MARK: - base64url.decode
     static func base64UrlDecode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -98,6 +104,7 @@ extension BuiltinFuncs {
         return .string(String(decoding: data, as: UTF8.self))
     }
 
+    // MARK: - hex.encode
     static func hexEncode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -110,6 +117,7 @@ extension BuiltinFuncs {
         return .string(Data(x.utf8).hexEncoded)
     }
 
+    // MARK: - hex.decode
     static func hexDecode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -127,6 +135,156 @@ extension BuiltinFuncs {
         }
 
         return .string(hexDecoded)
+    }
+
+    // MARK: - json.is_valid
+    /// Verifies the input string is a valid JSON document.
+    public static func jsonIsValid(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+
+        guard case .string(let rawJSON) = args[0] else {
+            return AST.RegoValue(booleanLiteral: false)
+        }
+
+        let parsedOK = (try? JSONDecoder().decode(RegoValue.self, from: rawJSON.data(using: .utf8)!)) != nil
+
+        // The result of the JSON parsing should be nil if parsing fails, or we got an empty input.
+        return AST.RegoValue(booleanLiteral: parsedOK)
+    }
+
+    // MARK: - json.marshal
+    /// Serializes the input term to JSON.
+    public static func jsonMarshal(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+
+        let data = try encoder.encode(args[0])
+        guard let json = String(data: data, encoding: .utf8) else {
+            throw Rego.RegoError(code: .internalError, message: "json.marshal: failed to encode JSON as utf-8")
+        }
+
+        return AST.RegoValue(stringLiteral: json)
+    }
+
+    // MARK: - json.marshal_with_options
+    /// Serializes the input term to JSON, with additional formatting options.
+    public static func jsonMarshalWithOptions(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue
+    {
+        guard args.count == 2 else {
+            throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 2)
+        }
+
+        guard case .object(let options) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "opts", got: args[1].typeName, want: "object")
+        }
+
+        var indentWith = "\t"
+        var prefixWith = ""
+        var implicitPrettyPrint = false
+        var userDeclaredExplicitPrettyPrint = false
+        var shouldPrettyPrint = false
+
+        for (key, val) in options {
+            guard case .string(let keyStr) = key else {
+                throw BuiltinError.argumentTypeMismatch(arg: "opts.key", got: key.typeName, want: "string")
+            }
+
+            switch keyStr {
+            case "prefix":
+                guard case .string(let prefixOpt) = val else {
+                    throw BuiltinError.argumentTypeMismatch(arg: "opts.prefix", got: val.typeName, want: "string")
+                }
+                prefixWith = prefixOpt
+                implicitPrettyPrint = true
+
+            case "indent":
+                guard case .string(let indentOpt) = val else {
+                    throw BuiltinError.argumentTypeMismatch(arg: "opts.indent", got: val.typeName, want: "string")
+                }
+                indentWith = indentOpt
+                implicitPrettyPrint = true
+
+            case "pretty":
+                userDeclaredExplicitPrettyPrint = true
+                guard case .boolean(let explicitPrettyPrint) = val else {
+                    throw BuiltinError.argumentTypeMismatch(arg: "opts.pretty", got: val.typeName, want: "boolean")
+                }
+                shouldPrettyPrint = explicitPrettyPrint
+
+            default:
+                throw Rego.RegoError(
+                    code: .internalError, message: "json.marshal_with_options: unknown key '\(keyStr)'")
+            }
+        }
+
+        // If the user didn't explicitly set "pretty", infer from whether
+        // "prefix" or "indent" was provided (matching Go behavior).
+        if !userDeclaredExplicitPrettyPrint {
+            shouldPrettyPrint = implicitPrettyPrint
+        }
+
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+
+        guard shouldPrettyPrint else {
+            let data = try encoder.encode(args[0])
+            guard let json = String(data: data, encoding: .utf8) else {
+                throw Rego.RegoError(
+                    code: .internalError, message: "json.marshal_with_options: failed to encode JSON as utf-8")
+            }
+            return AST.RegoValue(stringLiteral: json)
+        }
+        // Use .prettyPrinted to get structured output (2-space indent, no prefix),
+        // then transform to match the requested indent/prefix strings.
+        encoder.outputFormatting.insert(.prettyPrinted)
+        let data = try encoder.encode(args[0])
+        guard let json = String(data: data, encoding: .utf8) else {
+            throw Rego.RegoError(
+                code: .internalError, message: "json.marshal_with_options: failed to encode JSON as utf-8")
+        }
+
+        // Swift's .prettyPrinted uses 2-space indent and no prefix.
+        // Replace each leading group of 2 spaces with the custom indent,
+        // and prepend the prefix to every line.
+        let lines = json.split(separator: "\n", omittingEmptySubsequences: false)
+        let transformed = lines.enumerated().map { (_, line) -> String in
+            var depth = 0
+            var idx = line.startIndex
+            while idx < line.endIndex,
+                let next = line.index(idx, offsetBy: 2, limitedBy: line.endIndex),
+                line[idx] == " ",
+                line[line.index(after: idx)] == " "
+            {
+                depth += 1
+                idx = next
+            }
+            let content = String(line[idx...])
+            let indent = String(repeating: indentWith, count: depth)
+            return prefixWith + indent + content
+        }.joined(separator: "\n")
+
+        return AST.RegoValue(stringLiteral: transformed)
+    }
+
+    // MARK: - json.unmarshal
+    /// Deserializes the input JSON string to a term.
+    public static func jsonUnmarshal(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+
+        guard case .string(let rawJSON) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
+        }
+
+        // Returns the parsed RegoValue, or throws an error.
+        return try JSONDecoder().decode(RegoValue.self, from: rawJSON.data(using: .utf8)!)
     }
 }
 

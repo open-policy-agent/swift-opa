@@ -120,4 +120,9 @@ public struct BundleFile: Sendable, Hashable {
     public let url: URL  // relative to bundle root
     /// The raw file contents.
     public let data: Data
+
+    public init(url: URL, data: Data) {
+        self.url = url
+        self.data = data
+    }
 }

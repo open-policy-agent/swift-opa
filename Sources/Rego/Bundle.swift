@@ -31,11 +31,21 @@ extension OPA {
             case regoV0 = 0
             case regoV1 = 1
         }
+
+        public init(
+            revision: String = "", roots: [String] = [""], regoVersion: Version = .regoV1,
+            metadata: AST.RegoValue = .null
+        ) {
+            self.revision = revision
+            self.roots = roots
+            self.regoVersion = regoVersion
+            self.metadata = metadata
+        }
     }
 }
 
 extension OPA.Bundle {
-    init(
+    public init(
         manifest: OPA.Manifest = OPA.Manifest(), planFiles: [BundleFile] = [], regoFiles: [BundleFile] = [],
         data: AST.RegoValue = .object([:])
     ) throws(BundleError) {
@@ -56,7 +66,7 @@ extension OPA.Bundle {
         self.rootsTrie = trie
     }
 
-    enum BundleError: Swift.Error {
+    public enum BundleError: Swift.Error {
         case overlappingRoots(String)
         case internalError(String)
     }

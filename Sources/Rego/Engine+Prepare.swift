@@ -11,20 +11,47 @@ extension OPA.Engine {
     // space within the logical data tree.
     // Throws a bundleConflictError if a conflict is detected.
     func checkBundlesForOverlap(bundleSet bundles: [String: OPA.Bundle]) throws {
-        // Patch all the bundle data into the data tree on the store
-        var allRoots = TrieNode(value: "data", isLeaf: false, children: [:])
-        for (name, bundle) in bundles {
-            // Perform cross-bundle root overlap check
-            do {
-                allRoots = try mergeTrie(allRoots, withBundleRoots: bundle.manifest.roots)
-            } catch OPA.Bundle.BundleError.overlappingRoots {
-                throw RegoError(
-                    code: .bundleRootConflictError,
-                    message: "bundle \(name) overlaps with existing bundle roots"
-                )
-            } catch OPA.Bundle.BundleError.internalError(let msg) {
-                throw RegoError(code: .internalError, message: msg)
+        // Note(philip): The overlap check here is implemented with a
+        // straightforward O(N^2) algorithm, same as OPA. In practice,
+        // most bundles have few and shallow root path sets.
+        var collidingBundles: Set<String> = []
+        var conflictSet: Set<String> = []
+        for (name, bundle) in bundles.sorted(by: { $0.key < $1.key }) {
+            for (otherName, otherBundle) in bundles.sorted(by: { $0.key < $1.key }) {
+                if name == otherName {
+                    continue  // skip the current bundle.
+                }
+
+                for root in bundle.manifest.roots {
+                    let rootPath = root.trimmingCharacters(in: ["/"])
+                    for otherRoot in otherBundle.manifest.roots {
+                        let otherRootPath = otherRoot.trimmingCharacters(in: ["/"])
+                        guard OPA.Bundle.rootPathsOverlap(rootPath, otherRootPath) else {
+                            continue  // skip non-overlapping paths.
+                        }
+
+                        // Record conflicting bundles and paths.
+                        collidingBundles.insert(name)
+                        collidingBundles.insert(otherName)
+
+                        // Different message required if the roots are same
+                        if rootPath == otherRootPath {
+                            conflictSet.insert("root \(rootPath) is in multiple bundles")
+                        } else {
+                            let paths = [rootPath, otherRootPath].sorted()
+                            conflictSet.insert("\(paths[0]) overlaps \(paths[1])")
+                        }
+                    }
+                }
             }
+        }
+
+        guard collidingBundles.isEmpty && conflictSet.isEmpty else {
+            throw RegoError(
+                code: .bundleRootConflictError,
+                message:
+                    "detected overlapping roots in manifests for these bundles: [\(collidingBundles.sorted().joined(separator: ", "))] (\(conflictSet.sorted().joined(separator: ", ")))"
+            )
         }
     }
 

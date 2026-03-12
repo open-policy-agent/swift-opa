@@ -1,0 +1,2994 @@
+{
+  "funcs": {
+    "funcs": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 5,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "key": {
+                    "type": "string_index",
+                    "value": 1
+                  },
+                  "row": 5,
+                  "source": {
+                    "type": "local",
+                    "value": 0
+                  },
+                  "target": 4
+                },
+                "type": "DotStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "row": 5,
+                  "source": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "target": 5
+                },
+                "type": "AssignVarStmt"
+              },
+              {
+                "stmt": {
+                  "Index": 2,
+                  "col": 12,
+                  "file": 0,
+                  "row": 5,
+                  "target": 6
+                },
+                "type": "MakeNumberRefStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 5
+                    },
+                    {
+                      "type": "local",
+                      "value": 6
+                    }
+                  ],
+                  "col": 12,
+                  "file": 0,
+                  "func": "gt",
+                  "result": 7,
+                  "row": 5
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 12,
+                  "file": 0,
+                  "row": 5
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 5,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 5,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 5,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 5,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.check_1",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "check_1"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 7,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "key": {
+                    "type": "string_index",
+                    "value": 1
+                  },
+                  "row": 7,
+                  "source": {
+                    "type": "local",
+                    "value": 0
+                  },
+                  "target": 4
+                },
+                "type": "DotStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "row": 7,
+                  "source": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "target": 5
+                },
+                "type": "AssignVarStmt"
+              },
+              {
+                "stmt": {
+                  "Index": 3,
+                  "col": 12,
+                  "file": 0,
+                  "row": 7,
+                  "target": 6
+                },
+                "type": "MakeNumberRefStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 5
+                    },
+                    {
+                      "type": "local",
+                      "value": 6
+                    }
+                  ],
+                  "col": 12,
+                  "file": 0,
+                  "func": "gt",
+                  "result": 7,
+                  "row": 7
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 12,
+                  "file": 0,
+                  "row": 7
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 7,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 7,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 7,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 7,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.check_2",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "check_2"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 9,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "key": {
+                    "type": "string_index",
+                    "value": 1
+                  },
+                  "row": 9,
+                  "source": {
+                    "type": "local",
+                    "value": 0
+                  },
+                  "target": 4
+                },
+                "type": "DotStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "row": 9,
+                  "source": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "target": 5
+                },
+                "type": "AssignVarStmt"
+              },
+              {
+                "stmt": {
+                  "Index": 4,
+                  "col": 12,
+                  "file": 0,
+                  "row": 9,
+                  "target": 6
+                },
+                "type": "MakeNumberRefStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 5
+                    },
+                    {
+                      "type": "local",
+                      "value": 6
+                    }
+                  ],
+                  "col": 12,
+                  "file": 0,
+                  "func": "gt",
+                  "result": 7,
+                  "row": 9
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 12,
+                  "file": 0,
+                  "row": 9
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 9,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 9,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 9,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 9,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.check_3",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "check_3"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 11,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "key": {
+                    "type": "string_index",
+                    "value": 1
+                  },
+                  "row": 11,
+                  "source": {
+                    "type": "local",
+                    "value": 0
+                  },
+                  "target": 4
+                },
+                "type": "DotStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "row": 11,
+                  "source": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "target": 5
+                },
+                "type": "AssignVarStmt"
+              },
+              {
+                "stmt": {
+                  "Index": 5,
+                  "col": 12,
+                  "file": 0,
+                  "row": 11,
+                  "target": 6
+                },
+                "type": "MakeNumberRefStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 5
+                    },
+                    {
+                      "type": "local",
+                      "value": 6
+                    }
+                  ],
+                  "col": 12,
+                  "file": 0,
+                  "func": "gt",
+                  "result": 7,
+                  "row": 11
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 12,
+                  "file": 0,
+                  "row": 11
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 11,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 11,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 11,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 11,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.check_4",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "check_4"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 13,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "key": {
+                    "type": "string_index",
+                    "value": 1
+                  },
+                  "row": 13,
+                  "source": {
+                    "type": "local",
+                    "value": 0
+                  },
+                  "target": 4
+                },
+                "type": "DotStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "row": 13,
+                  "source": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "target": 5
+                },
+                "type": "AssignVarStmt"
+              },
+              {
+                "stmt": {
+                  "Index": 6,
+                  "col": 12,
+                  "file": 0,
+                  "row": 13,
+                  "target": 6
+                },
+                "type": "MakeNumberRefStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 5
+                    },
+                    {
+                      "type": "local",
+                      "value": 6
+                    }
+                  ],
+                  "col": 12,
+                  "file": 0,
+                  "func": "gt",
+                  "result": 7,
+                  "row": 13
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 12,
+                  "file": 0,
+                  "row": 13
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 13,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 13,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 13,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 13,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.check_5",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "check_5"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 27,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_1",
+                  "result": 4,
+                  "row": 28
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 28
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_2",
+                  "result": 5,
+                  "row": 29
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 5
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 29
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_3",
+                  "result": 6,
+                  "row": 30
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 6
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 30
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_4",
+                  "result": 7,
+                  "row": 31
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 31
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_5",
+                  "result": 8,
+                  "row": 32
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 8
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 32
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 27,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 27,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 27,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 27,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.composite_a",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "composite_a"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 15,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "key": {
+                    "type": "string_index",
+                    "value": 1
+                  },
+                  "row": 15,
+                  "source": {
+                    "type": "local",
+                    "value": 0
+                  },
+                  "target": 4
+                },
+                "type": "DotStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "row": 15,
+                  "source": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "target": 5
+                },
+                "type": "AssignVarStmt"
+              },
+              {
+                "stmt": {
+                  "Index": 7,
+                  "col": 12,
+                  "file": 0,
+                  "row": 15,
+                  "target": 6
+                },
+                "type": "MakeNumberRefStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 5
+                    },
+                    {
+                      "type": "local",
+                      "value": 6
+                    }
+                  ],
+                  "col": 12,
+                  "file": 0,
+                  "func": "gt",
+                  "result": 7,
+                  "row": 15
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 12,
+                  "file": 0,
+                  "row": 15
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 15,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 15,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 15,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 15,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.check_6",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "check_6"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 17,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "key": {
+                    "type": "string_index",
+                    "value": 1
+                  },
+                  "row": 17,
+                  "source": {
+                    "type": "local",
+                    "value": 0
+                  },
+                  "target": 4
+                },
+                "type": "DotStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "row": 17,
+                  "source": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "target": 5
+                },
+                "type": "AssignVarStmt"
+              },
+              {
+                "stmt": {
+                  "Index": 8,
+                  "col": 12,
+                  "file": 0,
+                  "row": 17,
+                  "target": 6
+                },
+                "type": "MakeNumberRefStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 5
+                    },
+                    {
+                      "type": "local",
+                      "value": 6
+                    }
+                  ],
+                  "col": 12,
+                  "file": 0,
+                  "func": "gt",
+                  "result": 7,
+                  "row": 17
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 12,
+                  "file": 0,
+                  "row": 17
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 17,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 17,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 17,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 17,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.check_7",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "check_7"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 35,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_3",
+                  "result": 4,
+                  "row": 36
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 36
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_4",
+                  "result": 5,
+                  "row": 37
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 5
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 37
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_5",
+                  "result": 6,
+                  "row": 38
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 6
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 38
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_6",
+                  "result": 7,
+                  "row": 39
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 39
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_7",
+                  "result": 8,
+                  "row": 40
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 8
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 40
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 35,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 35,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 35,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 35,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.composite_b",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "composite_b"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 19,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "key": {
+                    "type": "string_index",
+                    "value": 1
+                  },
+                  "row": 19,
+                  "source": {
+                    "type": "local",
+                    "value": 0
+                  },
+                  "target": 4
+                },
+                "type": "DotStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "row": 19,
+                  "source": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "target": 5
+                },
+                "type": "AssignVarStmt"
+              },
+              {
+                "stmt": {
+                  "Index": 9,
+                  "col": 12,
+                  "file": 0,
+                  "row": 19,
+                  "target": 6
+                },
+                "type": "MakeNumberRefStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 5
+                    },
+                    {
+                      "type": "local",
+                      "value": 6
+                    }
+                  ],
+                  "col": 12,
+                  "file": 0,
+                  "func": "gt",
+                  "result": 7,
+                  "row": 19
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 12,
+                  "file": 0,
+                  "row": 19
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 19,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 19,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 19,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 19,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.check_8",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "check_8"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 21,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "key": {
+                    "type": "string_index",
+                    "value": 1
+                  },
+                  "row": 21,
+                  "source": {
+                    "type": "local",
+                    "value": 0
+                  },
+                  "target": 4
+                },
+                "type": "DotStmt"
+              },
+              {
+                "stmt": {
+                  "col": 12,
+                  "file": 0,
+                  "row": 21,
+                  "source": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "target": 5
+                },
+                "type": "AssignVarStmt"
+              },
+              {
+                "stmt": {
+                  "Index": 10,
+                  "col": 12,
+                  "file": 0,
+                  "row": 21,
+                  "target": 6
+                },
+                "type": "MakeNumberRefStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 5
+                    },
+                    {
+                      "type": "local",
+                      "value": 6
+                    }
+                  ],
+                  "col": 12,
+                  "file": 0,
+                  "func": "gt",
+                  "result": 7,
+                  "row": 21
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 12,
+                  "file": 0,
+                  "row": 21
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 21,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 21,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 21,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 21,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.check_9",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "check_9"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 43,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_5",
+                  "result": 4,
+                  "row": 44
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 44
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_6",
+                  "result": 5,
+                  "row": 45
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 5
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 45
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_7",
+                  "result": 6,
+                  "row": 46
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 6
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 46
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_8",
+                  "result": 7,
+                  "row": 47
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 47
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_9",
+                  "result": 8,
+                  "row": 48
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 8
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 48
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 43,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 43,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 43,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 43,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.composite_c",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "composite_c"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 23,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "col": 13,
+                  "file": 0,
+                  "key": {
+                    "type": "string_index",
+                    "value": 1
+                  },
+                  "row": 23,
+                  "source": {
+                    "type": "local",
+                    "value": 0
+                  },
+                  "target": 4
+                },
+                "type": "DotStmt"
+              },
+              {
+                "stmt": {
+                  "col": 13,
+                  "file": 0,
+                  "row": 23,
+                  "source": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "target": 5
+                },
+                "type": "AssignVarStmt"
+              },
+              {
+                "stmt": {
+                  "Index": 11,
+                  "col": 13,
+                  "file": 0,
+                  "row": 23,
+                  "target": 6
+                },
+                "type": "MakeNumberRefStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 5
+                    },
+                    {
+                      "type": "local",
+                      "value": 6
+                    }
+                  ],
+                  "col": 13,
+                  "file": 0,
+                  "func": "gt",
+                  "result": 7,
+                  "row": 23
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 13,
+                  "file": 0,
+                  "row": 23
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 23,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 23,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 23,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 23,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.check_10",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "check_10"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 51,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_7",
+                  "result": 4,
+                  "row": 52
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 52
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_8",
+                  "result": 5,
+                  "row": 53
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 5
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 53
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_9",
+                  "result": 6,
+                  "row": 54
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 6
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 54
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_10",
+                  "result": 7,
+                  "row": 55
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 55
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.check_1",
+                  "result": 8,
+                  "row": 56
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 8
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 56
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 51,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 51,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 51,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 51,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.composite_d",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "composite_d"
+        ],
+        "return": 2
+      },
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 60,
+                  "target": 3
+                },
+                "type": "ResetLocalStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.composite_a",
+                  "result": 4,
+                  "row": 61
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 4
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 61
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.composite_b",
+                  "result": 5,
+                  "row": 62
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 5
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 62
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.composite_c",
+                  "result": 6,
+                  "row": 63
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 6
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 63
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 2,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.composite_d",
+                  "result": 7,
+                  "row": 64
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "a": {
+                    "type": "local",
+                    "value": 7
+                  },
+                  "b": {
+                    "type": "bool",
+                    "value": false
+                  },
+                  "col": 2,
+                  "file": 0,
+                  "row": 64
+                },
+                "type": "NotEqualStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 60,
+                  "source": {
+                    "type": "bool",
+                    "value": true
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 60,
+                  "source": 3
+                },
+                "type": "IsDefinedStmt"
+              },
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 60,
+                  "source": {
+                    "type": "local",
+                    "value": 3
+                  },
+                  "target": 2
+                },
+                "type": "AssignVarOnceStmt"
+              }
+            ]
+          },
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "col": 1,
+                  "file": 0,
+                  "row": 60,
+                  "source": 2
+                },
+                "type": "ReturnLocalStmt"
+              }
+            ]
+          }
+        ],
+        "name": "g0.data.benchmark.memo.result",
+        "params": [
+          0,
+          1
+        ],
+        "path": [
+          "g0",
+          "benchmark",
+          "memo",
+          "result"
+        ],
+        "return": 2
+      }
+    ]
+  },
+  "plans": {
+    "plans": [
+      {
+        "blocks": [
+          {
+            "stmts": [
+              {
+                "stmt": {
+                  "args": [
+                    {
+                      "type": "local",
+                      "value": 0
+                    },
+                    {
+                      "type": "local",
+                      "value": 1
+                    }
+                  ],
+                  "col": 0,
+                  "file": 0,
+                  "func": "g0.data.benchmark.memo.result",
+                  "result": 2,
+                  "row": 0
+                },
+                "type": "CallStmt"
+              },
+              {
+                "stmt": {
+                  "col": 0,
+                  "file": 0,
+                  "row": 0,
+                  "source": {
+                    "type": "local",
+                    "value": 2
+                  },
+                  "target": 3
+                },
+                "type": "AssignVarStmt"
+              },
+              {
+                "stmt": {
+                  "col": 0,
+                  "file": 0,
+                  "row": 0,
+                  "target": 4
+                },
+                "type": "MakeObjectStmt"
+              },
+              {
+                "stmt": {
+                  "col": 0,
+                  "file": 0,
+                  "key": {
+                    "type": "string_index",
+                    "value": 0
+                  },
+                  "object": 4,
+                  "row": 0,
+                  "value": {
+                    "type": "local",
+                    "value": 3
+                  }
+                },
+                "type": "ObjectInsertStmt"
+              },
+              {
+                "stmt": {
+                  "col": 0,
+                  "file": 0,
+                  "row": 0,
+                  "value": 4
+                },
+                "type": "ResultSetAddStmt"
+              }
+            ]
+          }
+        ],
+        "name": "benchmark/memo/result"
+      }
+    ]
+  },
+  "static": {
+    "builtin_funcs": [
+      {
+        "decl": {
+          "args": [
+            {
+              "name": "x",
+              "type": "any"
+            },
+            {
+              "name": "y",
+              "type": "any"
+            }
+          ],
+          "result": {
+            "description": "true if `x` is greater than `y`; false otherwise",
+            "name": "result",
+            "type": "boolean"
+          },
+          "type": "function"
+        },
+        "name": "gt"
+      }
+    ],
+    "files": [
+      {
+        "value": "policy.rego"
+      }
+    ],
+    "strings": [
+      {
+        "value": "result"
+      },
+      {
+        "value": "value"
+      },
+      {
+        "value": "0"
+      },
+      {
+        "value": "1"
+      },
+      {
+        "value": "2"
+      },
+      {
+        "value": "3"
+      },
+      {
+        "value": "4"
+      },
+      {
+        "value": "5"
+      },
+      {
+        "value": "6"
+      },
+      {
+        "value": "7"
+      },
+      {
+        "value": "8"
+      },
+      {
+        "value": "9"
+      }
+    ]
+  }
+}

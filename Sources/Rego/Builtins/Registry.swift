@@ -161,6 +161,7 @@ public struct BuiltinRegistry: Sendable {
             "internal.template_string": BuiltinFuncs.templateString,
 
             // Time
+            "time.add_date": BuiltinFuncs.timeAddDate,
             "time.now_ns": BuiltinFuncs.timeNowNanos,
 
             // Trace

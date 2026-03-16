@@ -1590,6 +1590,29 @@
     },
     {
       "decl" : {
+        "args" : [
+          {
+            "type" : "number"
+          },
+          {
+            "type" : "number"
+          },
+          {
+            "type" : "number"
+          },
+          {
+            "type" : "number"
+          }
+        ],
+        "result" : {
+          "type" : "number"
+        },
+        "type" : "function"
+      },
+      "name" : "time.add_date"
+    },
+    {
+      "decl" : {
         "result" : {
           "type" : "number"
         },

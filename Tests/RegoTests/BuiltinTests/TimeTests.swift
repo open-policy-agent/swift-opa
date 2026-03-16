@@ -164,6 +164,20 @@ extension BuiltinTests.TimeTests {
             args: [1_582_977_600_000_000_000],
             expected: .success([12, 0, 0])
         ),
+        // Sub-second into new year: 2020-01-01 00:00:00.9 UTC — clock must be 00:00:00
+        BuiltinTests.TestCase(
+            description: "1ns truncation does not affect clock",
+            name: "time.clock",
+            args: [1_577_836_800_000_000_001],
+            expected: .success([0, 0, 0])
+        ),
+        // Negative ns: -900_000_000 = 1969-12-31 23:59:59.1 UTC
+        BuiltinTests.TestCase(
+            description: "negative sub-second ns returns correct clock (pre-epoch)",
+            name: "time.clock",
+            args: [-900_000_000],
+            expected: .success([23, 59, 59])
+        ),
         BuiltinTests.TestCase(
             description: "unknown timezone",
             name: "time.clock",
@@ -259,6 +273,20 @@ extension BuiltinTests.TimeTests {
             name: "time.date",
             args: [1_582_977_600_000_000_000],
             expected: .success([2020, 2, 29])
+        ),
+        // Sub-second into new year: 2020-01-01 00:00:00.9 UTC — date must be Jan 1
+        BuiltinTests.TestCase(
+            description: "1ns truncation does not affect date",
+            name: "time.date",
+            args: [1_577_836_800_000_000_001],
+            expected: .success([2020, 1, 1])
+        ),
+        // Negative ns: -900_000_000 = 1969-12-31 23:59:59.1 UTC
+        BuiltinTests.TestCase(
+            description: "negative sub-second ns returns correct date (pre-epoch)",
+            name: "time.date",
+            args: [-900_000_000],
+            expected: .success([1969, 12, 31])
         ),
         BuiltinTests.TestCase(
             description: "unknown timezone",
@@ -381,6 +409,20 @@ extension BuiltinTests.TimeTests {
             expected: .failure(
                 BuiltinError.evalError(msg: "unknown timezone: foo/bar"))
         ),
+        // Negative ns: -900_000_000 = 1969-12-31 23:59:59.1 UTC (Wednesday)
+        BuiltinTests.TestCase(
+            description: "negative sub-second ns returns correct weekday (pre-epoch)",
+            name: "time.weekday",
+            args: [-900_000_000],
+            expected: .success("Wednesday")
+        ),
+        // Sub-second into new year: 2020-01-01 00:00:00.000000001 UTC — weekday must be Wednesday
+        BuiltinTests.TestCase(
+            description: "1ns truncation does not affect weekday",
+            name: "time.weekday",
+            args: [1_577_836_800_000_000_001],
+            expected: .success("Wednesday")
+        ),
     ]
 
     // MARK: - All time Tests
@@ -414,6 +456,12 @@ extension BuiltinTests.TimeTests {
                 generateNumberOfArgsTest: true, numberAsInteger: true),
             BuiltinTests.generateFailureTests(
                 builtinName: "time.date", sampleArgs: [[1_585_852_421_593_912_000, "UTC"]], argIndex: 0,
+                argName: "x",
+                allowedArgTypes: ["array", "number[integer]"],
+                wantArgs: "any<number[integer], array<number[integer], string>>",
+                generateNumberOfArgsTest: true, numberAsInteger: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "time.weekday", sampleArgs: [[1_585_852_421_593_912_000, "UTC"]], argIndex: 0,
                 argName: "x",
                 allowedArgTypes: ["array", "number[integer]"],
                 wantArgs: "any<number[integer], array<number[integer], string>>",

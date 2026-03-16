@@ -116,7 +116,11 @@ extension BuiltinFuncs {
     /// a UTC-based Gregorian `Calendar` configured with the specified timezone.
     private static func dateWithCalendar(_ arg: AST.RegoValue) throws -> (Date, Calendar) {
         let (ns, timeZone) = try parseNanosWithTimezone(arg)
-        let date = Date(timeIntervalSince1970: TimeInterval(ns / 1_000_000_000))
+        // Use floor division rather than truncation.
+        // Without this, negative timestamps with sub-second nanos land in the wrong second,
+        // e.g. ns=-900_000_000 (-0.9s) would truncate to 0 (epoch) instead of -1 (1969-12-31 23:59:59).
+        let wholeSeconds = ns / 1_000_000_000 - (ns % 1_000_000_000 < 0 ? 1 : 0)
+        let date = Date(timeIntervalSince1970: TimeInterval(wholeSeconds))
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = timeZone
         return (date, cal)

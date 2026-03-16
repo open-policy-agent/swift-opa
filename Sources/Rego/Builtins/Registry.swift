@@ -113,6 +113,9 @@ public struct BuiltinRegistry: Sendable {
             "base64url.decode": BuiltinFuncs.base64UrlDecode,
             "hex.encode": BuiltinFuncs.hexEncode,
             "hex.decode": BuiltinFuncs.hexDecode,
+            "json.is_valid": BuiltinFuncs.jsonIsValid,
+            "json.marshal": BuiltinFuncs.jsonMarshal,
+            "json.unmarshal": BuiltinFuncs.jsonUnmarshal,
 
             // Numbers
             "numbers.range": BuiltinFuncs.numbersRange,

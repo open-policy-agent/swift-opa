@@ -30,7 +30,7 @@ RELEASE_NOTES="release-notes.md"
 echo -e "${TAG_NAME}\n" > "${RELEASE_NOTES}"
 
 # Fill in the description
-./build/latest-release-notes.sh --output="${RELEASE_NOTES}"
+./tools/build/latest-release-notes.sh --output="${RELEASE_NOTES}"
 
 # Update or create a release on github
 if gh release view "${TAG_NAME}" --repo open-policy-agent/swift-opa > /dev/null; then

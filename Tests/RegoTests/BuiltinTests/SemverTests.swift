@@ -72,6 +72,12 @@ extension BuiltinTests.SemverTests {
         "1.2.3.4",
         "0.88.0-11_e4e5dcabb",
         "0.88.0+11_e4e5dcabb",
+        "1..2.3",
+        "1.2.3..",
+        "1.2..3",
+        "...1.2.3",
+        "foo",
+        "x.y.z",
     ]
 
     // MARK: - semver.compare test cases
@@ -80,28 +86,28 @@ extension BuiltinTests.SemverTests {
         for (greater, lesser) in greaterLesserFixtures {
             cases.append(
                 BuiltinTests.TestCase(
-                    description: "compare: \(greater) > \(lesser)",
+                    description: "\(greater) > \(lesser)",
                     name: "semver.compare",
                     args: [.string(greater), .string(lesser)],
                     expected: .success(1)
                 ))
             cases.append(
                 BuiltinTests.TestCase(
-                    description: "compare: \(lesser) < \(greater)",
+                    description: "\(lesser) < \(greater)",
                     name: "semver.compare",
                     args: [.string(lesser), .string(greater)],
                     expected: .success(-1)
                 ))
             cases.append(
                 BuiltinTests.TestCase(
-                    description: "compare: v\(lesser) < \(greater)",
+                    description: "v\(lesser) < \(greater)",
                     name: "semver.compare",
                     args: [.string("v" + lesser), .string(greater)],
                     expected: .success(-1)
                 ))
             cases.append(
                 BuiltinTests.TestCase(
-                    description: "compare: \(lesser) < v\(greater)",
+                    description: "\(lesser) < v\(greater)",
                     name: "semver.compare",
                     args: [.string(lesser), .string("v" + greater)],
                     expected: .success(-1)
@@ -110,14 +116,14 @@ extension BuiltinTests.SemverTests {
         for v in equalFixtures {
             cases.append(
                 BuiltinTests.TestCase(
-                    description: "compare: \(v) == \(v)",
+                    description: "\(v) == \(v)",
                     name: "semver.compare",
                     args: [.string(v), .string(v)],
                     expected: .success(0)
                 ))
             cases.append(
                 BuiltinTests.TestCase(
-                    description: "compare: \(v) == v\(v)",
+                    description: "\(v) == v\(v)",
                     name: "semver.compare",
                     args: [.string(v), .string("v" + v)],
                     expected: .success(0)
@@ -149,14 +155,14 @@ extension BuiltinTests.SemverTests {
         for v in equalFixtures {
             cases.append(
                 BuiltinTests.TestCase(
-                    description: "is_valid: \(v) is valid",
+                    description: "\(v) is valid",
                     name: "semver.is_valid",
                     args: [.string(v)],
                     expected: .success(true)
                 ))
             cases.append(
                 BuiltinTests.TestCase(
-                    description: "is_valid: v\(v) is valid",
+                    description: "v\(v) is valid",
                     name: "semver.is_valid",
                     args: [.string("v" + v)],
                     expected: .success(true)
@@ -165,7 +171,7 @@ extension BuiltinTests.SemverTests {
         for v in badInputFixtures {
             cases.append(
                 BuiltinTests.TestCase(
-                    description: "is_valid: \(v) is invalid",
+                    description: "\(v) is NOT valid",
                     name: "semver.is_valid",
                     args: [.string(v)],
                     expected: .success(false)

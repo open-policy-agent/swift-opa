@@ -10,6 +10,7 @@ extension BuiltinTests {
 }
 
 extension BuiltinTests.TimeTests {
+    // MARK: - time.add_date Tests
     static let addDateTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "ns must be an integer",
@@ -76,6 +77,355 @@ extension BuiltinTests.TimeTests {
         ),
     ]
 
+    // MARK: - time.clock Tests
+    static let clockTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "x must be an integer",
+            name: "time.clock",
+            args: [42.5],
+            expected: .failure(
+                BuiltinError.evalError(msg: "timestamp must be an integer, but got a floating-point number"))
+        ),
+        BuiltinTests.TestCase(
+            description: "timestamp too big",
+            name: "time.clock",
+            args: [.number(RegoNumber(nsNumber: UInt64.max as NSNumber))],
+            expected: .failure(
+                BuiltinError.evalError(msg: "timestamp too big"))
+        ),
+        BuiltinTests.TestCase(
+            description: "x[0] must be an integer when array is used",
+            name: "time.clock",
+            args: [[42.5, "UTC"]],
+            expected: .failure(
+                BuiltinError.evalError(msg: "timestamp must be an integer, but got a floating-point number"))
+        ),
+        BuiltinTests.TestCase(
+            description: "x[0] timestamp too big when array is used",
+            name: "time.clock",
+            args: [[.number(RegoNumber(nsNumber: UInt64.max as NSNumber)), "UTC"]],
+            expected: .failure(
+                BuiltinError.evalError(msg: "timestamp too big"))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty array",
+            name: "time.clock",
+            args: [[]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "x",
+                    got: "array",
+                    want: "any<number[integer], array<number[integer], string>>")
+            )
+        ),
+        BuiltinTests.TestCase(
+            description: "single element array",
+            name: "time.clock",
+            args: [[123]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "x",
+                    got: "array",
+                    want: "any<number[integer], array<number[integer], string>>")
+            )
+        ),
+        BuiltinTests.TestCase(
+            description: "long array",
+            name: "time.clock",
+            args: [[123, "UTC", 0]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "x",
+                    got: "array",
+                    want: "any<number[integer], array<number[integer], string>>")
+            )
+        ),
+        BuiltinTests.TestCase(
+            description: "12:01:02 (defaults to UTC tz)",
+            name: "time.clock",
+            args: [1_517_832_062_000_000_000],
+            expected: .success([12, 1, 2])
+        ),
+        BuiltinTests.TestCase(
+            description: "12:01:02 in UTC tz",
+            name: "time.clock",
+            args: [[1_517_832_062_000_000_000, "UTC"]],
+            expected: .success([12, 1, 2])
+        ),
+        BuiltinTests.TestCase(
+            description: "7:01:02 in NYC tz",
+            name: "time.clock",
+            args: [[1_517_832_062_000_000_000, "America/New_York"]],
+            expected: .success([7, 1, 2])
+        ),
+        BuiltinTests.TestCase(
+            description: "12:00:00 in a leap day",
+            name: "time.clock",
+            args: [1_582_977_600_000_000_000],
+            expected: .success([12, 0, 0])
+        ),
+        // Sub-second into new year: 2020-01-01 00:00:00.9 UTC — clock must be 00:00:00
+        BuiltinTests.TestCase(
+            description: "1ns truncation does not affect clock",
+            name: "time.clock",
+            args: [1_577_836_800_000_000_001],
+            expected: .success([0, 0, 0])
+        ),
+        // Negative ns: -900_000_000 = 1969-12-31 23:59:59.1 UTC
+        BuiltinTests.TestCase(
+            description: "negative sub-second ns returns correct clock (pre-epoch)",
+            name: "time.clock",
+            args: [-900_000_000],
+            expected: .success([23, 59, 59])
+        ),
+        BuiltinTests.TestCase(
+            description: "unknown timezone",
+            name: "time.clock",
+            args: [[1_517_814_000_000_000_000, "foo/bar"]],
+            expected: .failure(
+                BuiltinError.evalError(msg: "unknown timezone: foo/bar"))
+        ),
+    ]
+
+    // MARK: - time.date Tests
+    static let dateTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "x must be an integer",
+            name: "time.date",
+            args: [42.5],
+            expected: .failure(
+                BuiltinError.evalError(msg: "timestamp must be an integer, but got a floating-point number"))
+        ),
+        BuiltinTests.TestCase(
+            description: "timestamp too big",
+            name: "time.date",
+            args: [.number(RegoNumber(nsNumber: UInt64.max as NSNumber))],
+            expected: .failure(
+                BuiltinError.evalError(msg: "timestamp too big"))
+        ),
+        BuiltinTests.TestCase(
+            description: "x[0] must be an integer when array is used",
+            name: "time.date",
+            args: [[42.5, "UTC"]],
+            expected: .failure(
+                BuiltinError.evalError(msg: "timestamp must be an integer, but got a floating-point number"))
+        ),
+        BuiltinTests.TestCase(
+            description: "x[0] timestamp too big when array is used",
+            name: "time.date",
+            args: [[.number(RegoNumber(nsNumber: UInt64.max as NSNumber)), "UTC"]],
+            expected: .failure(
+                BuiltinError.evalError(msg: "timestamp too big"))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty array",
+            name: "time.date",
+            args: [[]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "x",
+                    got: "array",
+                    want: "any<number[integer], array<number[integer], string>>")
+            )
+        ),
+        BuiltinTests.TestCase(
+            description: "single element array",
+            name: "time.date",
+            args: [[123]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "x",
+                    got: "array",
+                    want: "any<number[integer], array<number[integer], string>>")
+            )
+        ),
+        BuiltinTests.TestCase(
+            description: "long array",
+            name: "time.date",
+            args: [[123, "UTC", 0]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "x",
+                    got: "array",
+                    want: "any<number[integer], array<number[integer], string>>")
+            )
+        ),
+        BuiltinTests.TestCase(
+            description: "2018-02-05 (defaults to UTC tz)",
+            name: "time.date",
+            args: [1_517_814_000_000_000_000],
+            expected: .success([2018, 2, 5])
+        ),
+        BuiltinTests.TestCase(
+            description: "2018-02-05 in UTC tz",
+            name: "time.date",
+            args: [[1_517_814_000_000_000_000, "UTC"]],
+            expected: .success([2018, 2, 5])
+        ),
+        BuiltinTests.TestCase(
+            description: "2018-02-04 in LA tz",
+            name: "time.date",
+            args: [[1_517_814_000_000_000_000, "America/Los_Angeles"]],
+            expected: .success([2018, 2, 4])
+        ),
+        BuiltinTests.TestCase(
+            description: "2020-02-29 is a leap day",
+            name: "time.date",
+            args: [1_582_977_600_000_000_000],
+            expected: .success([2020, 2, 29])
+        ),
+        // Sub-second into new year: 2020-01-01 00:00:00.9 UTC — date must be Jan 1
+        BuiltinTests.TestCase(
+            description: "1ns truncation does not affect date",
+            name: "time.date",
+            args: [1_577_836_800_000_000_001],
+            expected: .success([2020, 1, 1])
+        ),
+        // Negative ns: -900_000_000 = 1969-12-31 23:59:59.1 UTC
+        BuiltinTests.TestCase(
+            description: "negative sub-second ns returns correct date (pre-epoch)",
+            name: "time.date",
+            args: [-900_000_000],
+            expected: .success([1969, 12, 31])
+        ),
+        BuiltinTests.TestCase(
+            description: "unknown timezone",
+            name: "time.date",
+            args: [[1_517_814_000_000_000_000, "foo/bar"]],
+            expected: .failure(
+                BuiltinError.evalError(msg: "unknown timezone: foo/bar"))
+        ),
+    ]
+
+    // MARK: - time.weekday Tests
+    static let weekdayTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "x must be an integer",
+            name: "time.weekday",
+            args: [42.5],
+            expected: .failure(
+                BuiltinError.evalError(msg: "timestamp must be an integer, but got a floating-point number"))
+        ),
+        BuiltinTests.TestCase(
+            description: "timestamp too big",
+            name: "time.weekday",
+            args: [[.number(RegoNumber(nsNumber: UInt64.max as NSNumber)), "UTC"]],
+            expected: .failure(
+                BuiltinError.evalError(msg: "timestamp too big"))
+        ),
+        BuiltinTests.TestCase(
+            description: "x[0] must be an integer when array is used",
+            name: "time.weekday",
+            args: [[42.5, "UTC"]],
+            expected: .failure(
+                BuiltinError.evalError(msg: "timestamp must be an integer, but got a floating-point number"))
+        ),
+        BuiltinTests.TestCase(
+            description: "x[0] timestamp too big when array is used",
+            name: "time.weekday",
+            args: [[.number(RegoNumber(nsNumber: UInt64.max as NSNumber)), "UTC"]],
+            expected: .failure(
+                BuiltinError.evalError(msg: "timestamp too big"))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty array",
+            name: "time.weekday",
+            args: [[]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "x",
+                    got: "array",
+                    want: "any<number[integer], array<number[integer], string>>")
+            )
+        ),
+        BuiltinTests.TestCase(
+            description: "single element array",
+            name: "time.weekday",
+            args: [[123]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "x",
+                    got: "array",
+                    want: "any<number[integer], array<number[integer], string>>")
+            )
+        ),
+        BuiltinTests.TestCase(
+            description: "long array",
+            name: "time.weekday",
+            args: [[123, "UTC", 0]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "x",
+                    got: "array",
+                    want: "any<number[integer], array<number[integer], string>>")
+            )
+        ),
+        BuiltinTests.TestCase(
+            description: "Monday",
+            name: "time.weekday",
+            args: [1_517_832_000_000_000_000],
+            expected: .success("Monday")
+        ),
+        BuiltinTests.TestCase(
+            description: "Tuesday",
+            name: "time.weekday",
+            args: [1_517_918_400_000_000_000],
+            expected: .success("Tuesday")
+        ),
+        BuiltinTests.TestCase(
+            description: "Wednesday",
+            name: "time.weekday",
+            args: [1_518_004_800_000_000_000],
+            expected: .success("Wednesday")
+        ),
+        BuiltinTests.TestCase(
+            description: "Thursday",
+            name: "time.weekday",
+            args: [1_518_091_200_000_000_000],
+            expected: .success("Thursday")
+        ),
+        BuiltinTests.TestCase(
+            description: "Friday",
+            name: "time.weekday",
+            args: [1_518_177_600_000_000_000],
+            expected: .success("Friday")
+        ),
+        BuiltinTests.TestCase(
+            description: "Saturday",
+            name: "time.weekday",
+            args: [1_518_264_000_000_000_000],
+            expected: .success("Saturday")
+        ),
+        BuiltinTests.TestCase(
+            description: "Sunday",
+            name: "time.weekday",
+            args: [1_518_350_400_000_000_000],
+            expected: .success("Sunday")
+        ),
+        BuiltinTests.TestCase(
+            description: "unknown timezone",
+            name: "time.weekday",
+            args: [[1_517_814_000_000_000_000, "foo/bar"]],
+            expected: .failure(
+                BuiltinError.evalError(msg: "unknown timezone: foo/bar"))
+        ),
+        // Negative ns: -900_000_000 = 1969-12-31 23:59:59.1 UTC (Wednesday)
+        BuiltinTests.TestCase(
+            description: "negative sub-second ns returns correct weekday (pre-epoch)",
+            name: "time.weekday",
+            args: [-900_000_000],
+            expected: .success("Wednesday")
+        ),
+        // Sub-second into new year: 2020-01-01 00:00:00.000000001 UTC — weekday must be Wednesday
+        BuiltinTests.TestCase(
+            description: "1ns truncation does not affect weekday",
+            name: "time.weekday",
+            args: [1_577_836_800_000_000_001],
+            expected: .success("Wednesday")
+        ),
+    ]
+
+    // MARK: - All time Tests
     static var allTests: [BuiltinTests.TestCase] {
         [
             BuiltinTests.generateFailureTests(
@@ -98,9 +448,30 @@ extension BuiltinTests.TimeTests {
                 argName: "days",
                 allowedArgTypes: ["number[integer]"],
                 generateNumberOfArgsTest: false, numberAsInteger: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "time.clock", sampleArgs: [[1_585_852_421_593_912_000, "UTC"]], argIndex: 0,
+                argName: "x",
+                allowedArgTypes: ["array", "number[integer]"],
+                wantArgs: "any<number[integer], array<number[integer], string>>",
+                generateNumberOfArgsTest: true, numberAsInteger: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "time.date", sampleArgs: [[1_585_852_421_593_912_000, "UTC"]], argIndex: 0,
+                argName: "x",
+                allowedArgTypes: ["array", "number[integer]"],
+                wantArgs: "any<number[integer], array<number[integer], string>>",
+                generateNumberOfArgsTest: true, numberAsInteger: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "time.weekday", sampleArgs: [[1_585_852_421_593_912_000, "UTC"]], argIndex: 0,
+                argName: "x",
+                allowedArgTypes: ["array", "number[integer]"],
+                wantArgs: "any<number[integer], array<number[integer], string>>",
+                generateNumberOfArgsTest: true, numberAsInteger: true),
             BuiltinTests.generateNumberOfArgumentsFailureTests(
                 builtinName: "time.now_ns", sampleArgs: []),
             addDateTests,
+            clockTests,
+            dateTests,
+            weekdayTests,
         ].flatMap { $0 }
     }
 
@@ -109,6 +480,7 @@ extension BuiltinTests.TimeTests {
         try await BuiltinTests.testBuiltin(tc: tc)
     }
 
+    // MARK: - time.now_ns Tests
     @Test
     func timeNowNanosReturnsValidTime() async throws {
         let expected = UInt64(Date().timeIntervalSince1970 * 1_000_000_000)

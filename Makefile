@@ -2,7 +2,7 @@ BINDIR ?= $(HOME)/bin
 OPA_BASE_CAPS_VERSION ?= v1.13.1
 
 .PHONY: all
-all: fmt lint test build
+all: fmt lint test generate build
 
 .PHONY: fmt
 fmt:

@@ -1726,6 +1726,119 @@
     },
     {
       "decl" : {
+        "args" : [
+          {
+            "of" : [
+              {
+                "type" : "number"
+              },
+              {
+                "static" : [
+                  {
+                    "type" : "number"
+                  },
+                  {
+                    "type" : "string"
+                  }
+                ],
+                "type" : "array"
+              }
+            ],
+            "type" : "any"
+          },
+          {
+            "of" : [
+              {
+                "type" : "number"
+              },
+              {
+                "static" : [
+                  {
+                    "type" : "number"
+                  },
+                  {
+                    "type" : "string"
+                  }
+                ],
+                "type" : "array"
+              }
+            ],
+            "type" : "any"
+          }
+        ],
+        "result" : {
+          "static" : [
+            {
+              "type" : "number"
+            },
+            {
+              "type" : "number"
+            },
+            {
+              "type" : "number"
+            },
+            {
+              "type" : "number"
+            },
+            {
+              "type" : "number"
+            },
+            {
+              "type" : "number"
+            }
+          ],
+          "type" : "array"
+        },
+        "type" : "function"
+      },
+      "name" : "time.diff"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "of" : [
+              {
+                "type" : "number"
+              },
+              {
+                "static" : [
+                  {
+                    "type" : "number"
+                  },
+                  {
+                    "type" : "string"
+                  }
+                ],
+                "type" : "array"
+              },
+              {
+                "static" : [
+                  {
+                    "type" : "number"
+                  },
+                  {
+                    "type" : "string"
+                  },
+                  {
+                    "type" : "string"
+                  }
+                ],
+                "type" : "array"
+              }
+            ],
+            "type" : "any"
+          }
+        ],
+        "result" : {
+          "type" : "string"
+        },
+        "type" : "function"
+      },
+      "name" : "time.format"
+    },
+    {
+      "decl" : {
         "result" : {
           "type" : "number"
         },
@@ -1733,6 +1846,51 @@
       },
       "name" : "time.now_ns",
       "nondeterministic" : true
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "string"
+          }
+        ],
+        "result" : {
+          "type" : "number"
+        },
+        "type" : "function"
+      },
+      "name" : "time.parse_duration_ns"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          }
+        ],
+        "result" : {
+          "type" : "number"
+        },
+        "type" : "function"
+      },
+      "name" : "time.parse_ns"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "string"
+          }
+        ],
+        "result" : {
+          "type" : "number"
+        },
+        "type" : "function"
+      },
+      "name" : "time.parse_rfc3339_ns"
     },
     {
       "decl" : {

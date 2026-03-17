@@ -169,7 +169,9 @@ extension VM {
                 return BlockResult(breakCounter: UInt32(length))
             case Int(Opcode.assignVar1.rawValue):
                 // Payload is [target:12 | source:12] packed in the header length field.
-                context.locals[Local(UInt32(length) >> 12)] = context.locals[Local(UInt32(length) & 0xFFF)]
+                // Read through resolveLocal so an unbound source is promoted to .undefined,
+                // matching the non-compact assignVar path.
+                context.locals[Local(UInt32(length) >> 12)] = context.resolveLocal(idx: Local(UInt32(length) & 0xFFF))
                 continue
             // ── Non-compact opcodes (rawValues 0–34): `length` is payload byte count ─────────
             // Assignments

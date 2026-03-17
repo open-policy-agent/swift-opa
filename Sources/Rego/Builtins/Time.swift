@@ -3,8 +3,10 @@ import Foundation
 
 private let minDateAllowedForNsConversion = Date(timeIntervalSince1970: TimeInterval(Int64.min) / 1_000_000_000)
 private let maxDateAllowedForNsConversion = Date(timeIntervalSince1970: TimeInterval(Int64.max) / 1_000_000_000)
+private let weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 extension BuiltinFuncs {
+    // MARK: - time.now_ns
     static func timeNowNanos(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 0 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 0)
@@ -17,6 +19,7 @@ extension BuiltinFuncs {
         return .number(RegoNumber(value: Int64(bitPattern: nanos)))
     }
 
+    // MARK: - time.add_date
     static func timeAddDate(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 4 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 4)
@@ -69,6 +72,100 @@ extension BuiltinFuncs {
         // Reconstruct back to nanoseconds by preserving the sub-second part of the input.
         let subSecondNanos = nsInt64 % 1_000_000_000
         return .number(RegoNumber(int: try toSafeUnixNanos(newDate, subSecondNanos: subSecondNanos)))
+    }
+
+    // MARK: - time.clock
+    static func timeClock(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+        let (date, cal) = try dateWithCalendar(args[0])
+        let comps = cal.dateComponents([.hour, .minute, .second], from: date)
+        return .array([
+            .number(RegoNumber(int: Int64(comps.hour ?? 0))),
+            .number(RegoNumber(int: Int64(comps.minute ?? 0))),
+            .number(RegoNumber(int: Int64(comps.second ?? 0))),
+        ])
+    }
+
+    // MARK: - time.date
+    static func timeDate(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+        let (date, cal) = try dateWithCalendar(args[0])
+        let comps = cal.dateComponents([.year, .month, .day], from: date)
+        return .array([
+            .number(RegoNumber(int: Int64(comps.year ?? 0))),
+            .number(RegoNumber(int: Int64(comps.month ?? 0))),
+            .number(RegoNumber(int: Int64(comps.day ?? 0))),
+        ])
+    }
+
+    // MARK: - time.weekday
+    static func timeWeekday(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+        let (date, cal) = try dateWithCalendar(args[0])
+        return .string(weekdayNames[cal.component(.weekday, from: date) - 1])
+    }
+
+    // MARK: - private utilities
+    /// Parses `nanoseconds` or `[nanoseconds, timezone]` argument and returns the corresponding `Date` and
+    /// a UTC-based Gregorian `Calendar` configured with the specified timezone.
+    private static func dateWithCalendar(_ arg: AST.RegoValue) throws -> (Date, Calendar) {
+        let (ns, timeZone) = try parseNanosWithTimezone(arg)
+        // Use floor division rather than truncation.
+        // Without this, negative timestamps with sub-second nanos land in the wrong second,
+        // e.g. ns=-900_000_000 (-0.9s) would truncate to 0 (epoch) instead of -1 (1969-12-31 23:59:59).
+        let wholeSeconds = ns / 1_000_000_000 - (ns % 1_000_000_000 < 0 ? 1 : 0)
+        let date = Date(timeIntervalSince1970: TimeInterval(wholeSeconds))
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = timeZone
+        return (date, cal)
+    }
+
+    /// Parses a time.clock/time.date argument which is either ns (number) or [ns, timezone] (array).
+    /// Mirrors golang's OPA: throws "timestamp too big" if ns does not fit in Int64.
+    private static func parseNanosWithTimezone(_ arg: AST.RegoValue) throws -> (Int64, TimeZone) {
+        let floatNsError = "timestamp must be an integer, but got a floating-point number"
+        switch arg {
+        case .number(let x):
+            guard let ns = x.int64Value else {
+                if x.clampedUint64Value > Int64.max {
+                    throw BuiltinError.evalError(msg: "timestamp too big")
+                }
+                throw BuiltinError.evalError(msg: floatNsError)
+            }
+            return (ns, TimeZone(identifier: "UTC")!)
+        case .array(let a) where a.count == 2:
+            guard case .number(let x) = a[0] else {
+                throw BuiltinError.argumentTypeMismatch(arg: "nanoseconds", got: arg.typeName, want: "number[integer]")
+            }
+            guard let ns = x.int64Value else {
+                if x.clampedUint64Value > Int64.max {
+                    throw BuiltinError.evalError(msg: "timestamp too big")
+                }
+                throw BuiltinError.evalError(msg: floatNsError)
+            }
+            guard case .string(let timeZoneName) = a[1] else {
+                throw BuiltinError.argumentTypeMismatch(arg: "timeZone", got: arg.typeName, want: "string")
+            }
+            guard !timeZoneName.isEmpty else {
+                return (ns, TimeZone(identifier: "UTC")!)
+            }
+            if timeZoneName.lowercased() == "local" {
+                return (ns, TimeZone.current)
+            }
+            guard let tz = TimeZone(identifier: String(timeZoneName)) else {
+                throw BuiltinError.evalError(msg: "unknown timezone: \(timeZoneName)")
+            }
+            return (ns, tz)
+        default:
+            throw BuiltinError.argumentTypeMismatch(
+                arg: "x", got: arg.typeName, want: "any<number[integer], array<number[integer], string>>")
+        }
     }
 
     /// Returns the nanoseconds since epoch as Int64,

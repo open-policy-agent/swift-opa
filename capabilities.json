@@ -1644,6 +1644,88 @@
     },
     {
       "decl" : {
+        "args" : [
+          {
+            "of" : [
+              {
+                "type" : "number"
+              },
+              {
+                "static" : [
+                  {
+                    "type" : "number"
+                  },
+                  {
+                    "type" : "string"
+                  }
+                ],
+                "type" : "array"
+              }
+            ],
+            "type" : "any"
+          }
+        ],
+        "result" : {
+          "static" : [
+            {
+              "type" : "number"
+            },
+            {
+              "type" : "number"
+            },
+            {
+              "type" : "number"
+            }
+          ],
+          "type" : "array"
+        },
+        "type" : "function"
+      },
+      "name" : "time.clock"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "of" : [
+              {
+                "type" : "number"
+              },
+              {
+                "static" : [
+                  {
+                    "type" : "number"
+                  },
+                  {
+                    "type" : "string"
+                  }
+                ],
+                "type" : "array"
+              }
+            ],
+            "type" : "any"
+          }
+        ],
+        "result" : {
+          "static" : [
+            {
+              "type" : "number"
+            },
+            {
+              "type" : "number"
+            },
+            {
+              "type" : "number"
+            }
+          ],
+          "type" : "array"
+        },
+        "type" : "function"
+      },
+      "name" : "time.date"
+    },
+    {
+      "decl" : {
         "result" : {
           "type" : "number"
         },
@@ -1651,6 +1733,36 @@
       },
       "name" : "time.now_ns",
       "nondeterministic" : true
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "of" : [
+              {
+                "type" : "number"
+              },
+              {
+                "static" : [
+                  {
+                    "type" : "number"
+                  },
+                  {
+                    "type" : "string"
+                  }
+                ],
+                "type" : "array"
+              }
+            ],
+            "type" : "any"
+          }
+        ],
+        "result" : {
+          "type" : "string"
+        },
+        "type" : "function"
+      },
+      "name" : "time.weekday"
     },
     {
       "decl" : {

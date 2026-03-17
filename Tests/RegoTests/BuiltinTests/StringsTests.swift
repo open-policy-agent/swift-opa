@@ -186,6 +186,98 @@ extension BuiltinTests.StringsTests {
             args: [1, "hello, world!"],
             expected: .failure(BuiltinError.argumentTypeMismatch(arg: "haystack", got: "number", want: "string"))
         ),
+        BuiltinTests.TestCase(
+            description: "multi-byte UTF-8 emoji",
+            name: "contains",
+            args: ["hello \u{1F600} world", "\u{1F600}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "multi-byte UTF-8 CJK",
+            name: "contains",
+            args: ["\u{4F60}\u{597D}\u{4E16}\u{754C}", "\u{4E16}\u{754C}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "single character needle found",
+            name: "contains",
+            args: ["abcdef", "d"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "single character needle not found",
+            name: "contains",
+            args: ["abcdef", "z"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "needle at start",
+            name: "contains",
+            args: ["hello world", "hello"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "needle at end",
+            name: "contains",
+            args: ["hello world", "world"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "repeated pattern finds first",
+            name: "contains",
+            args: ["abcabcabc", "cab"],
+            expected: .success(true)
+        ),
+        // Unicode normalization: precomposed é (U+00E9) vs decomposed e + combining accent (U+0301).
+        // Go does byte-level comparison with no normalization, so these must NOT match.
+        BuiltinTests.TestCase(
+            description: "normalization mismatch: precomposed haystack, decomposed needle",
+            name: "contains",
+            args: ["caf\u{00E9}", "e\u{0301}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "normalization mismatch: decomposed haystack, precomposed needle",
+            name: "contains",
+            args: ["cafe\u{0301}", "\u{00E9}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "precomposed accent matches same bytes",
+            name: "contains",
+            args: ["caf\u{00E9}", "\u{00E9}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "decomposed accent matches same bytes",
+            name: "contains",
+            args: ["cafe\u{0301}", "e\u{0301}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "emoji not found",
+            name: "contains",
+            args: ["hello world", "\u{1F600}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "case sensitive mismatch",
+            name: "contains",
+            args: ["Hello World", "hello"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "multi-byte needle longer than haystack",
+            name: "contains",
+            args: ["\u{1F600}", "\u{1F600}\u{1F601}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "haystack is needle repeated",
+            name: "contains",
+            args: ["aaa", "a"],
+            expected: .success(true)
+        ),
     ]
 
     static let endsWithTests: [BuiltinTests.TestCase] = [
@@ -260,6 +352,80 @@ extension BuiltinTests.StringsTests {
             name: "endswith",
             args: [1, "hello, world!"],
             expected: .failure(BuiltinError.argumentTypeMismatch(arg: "search", got: "number", want: "string"))
+        ),
+        BuiltinTests.TestCase(
+            description: "multi-byte UTF-8 emoji suffix",
+            name: "endswith",
+            args: ["hello \u{1F600}", "\u{1F600}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "multi-byte UTF-8 emoji suffix not found",
+            name: "endswith",
+            args: ["hello \u{1F600}", "\u{1F601}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "multi-byte UTF-8 CJK suffix",
+            name: "endswith",
+            args: ["\u{4F60}\u{597D}\u{4E16}\u{754C}", "\u{4E16}\u{754C}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "multi-byte UTF-8 CJK suffix not found",
+            name: "endswith",
+            args: ["\u{4F60}\u{597D}\u{4E16}\u{754C}", "\u{4E16}\u{754C}\u{FF01}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "single character suffix found",
+            name: "endswith",
+            args: ["abcdef", "f"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "single character suffix not found",
+            name: "endswith",
+            args: ["abcdef", "a"],
+            expected: .success(false)
+        ),
+        // Unicode normalization: precomposed é (U+00E9) vs decomposed e + combining accent (U+0301).
+        // Go does byte-level comparison with no normalization, so these must NOT match.
+        BuiltinTests.TestCase(
+            description: "normalization mismatch: precomposed search, decomposed base",
+            name: "endswith",
+            args: ["caf\u{00E9}", "e\u{0301}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "normalization mismatch: decomposed search, precomposed base",
+            name: "endswith",
+            args: ["cafe\u{0301}", "\u{00E9}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "precomposed accent matches same bytes",
+            name: "endswith",
+            args: ["caf\u{00E9}", "f\u{00E9}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "decomposed accent matches same bytes",
+            name: "endswith",
+            args: ["cafe\u{0301}", "e\u{0301}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "case sensitive suffix mismatch",
+            name: "endswith",
+            args: ["Hello World", "WORLD"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "suffix is entire string with emoji",
+            name: "endswith",
+            args: ["\u{1F600}\u{1F601}", "\u{1F600}\u{1F601}"],
+            expected: .success(true)
         ),
     ]
 
@@ -790,6 +956,110 @@ extension BuiltinTests.StringsTests {
             description: "both empty",
             name: "startswith",
             args: ["", ""],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "too many args",
+            name: "startswith",
+            args: ["hello, world!", "hello", "extra"],
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 3, want: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "not enough args",
+            name: "startswith",
+            args: ["hello, world!"],
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 1, want: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "no args",
+            name: "startswith",
+            args: [],
+            expected: .failure(BuiltinError.argumentCountMismatch(got: 0, want: 2))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong type base",
+            name: "startswith",
+            args: ["hello, world!", 1],
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "base", got: "number", want: "string"))
+        ),
+        BuiltinTests.TestCase(
+            description: "wrong type search",
+            name: "startswith",
+            args: [1, "hello, world!"],
+            expected: .failure(BuiltinError.argumentTypeMismatch(arg: "search", got: "number", want: "string"))
+        ),
+        BuiltinTests.TestCase(
+            description: "multi-byte UTF-8 emoji prefix",
+            name: "startswith",
+            args: ["\u{1F600} hello", "\u{1F600}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "multi-byte UTF-8 emoji prefix not found",
+            name: "startswith",
+            args: ["\u{1F600} hello", "\u{1F601}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "multi-byte UTF-8 CJK prefix",
+            name: "startswith",
+            args: ["\u{4F60}\u{597D}\u{4E16}\u{754C}", "\u{4F60}\u{597D}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "multi-byte UTF-8 CJK prefix not found",
+            name: "startswith",
+            args: ["\u{4F60}\u{597D}\u{4E16}\u{754C}", "\u{4E16}\u{754C}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "single character prefix found",
+            name: "startswith",
+            args: ["abcdef", "a"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "single character prefix not found",
+            name: "startswith",
+            args: ["abcdef", "z"],
+            expected: .success(false)
+        ),
+        // Unicode normalization: precomposed é (U+00E9) vs decomposed e + combining accent (U+0301).
+        // Go does byte-level comparison with no normalization, so these must NOT match.
+        BuiltinTests.TestCase(
+            description: "normalization mismatch: precomposed search, decomposed base",
+            name: "startswith",
+            args: ["\u{00E9}lan", "e\u{0301}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "normalization mismatch: decomposed search, precomposed base",
+            name: "startswith",
+            args: ["e\u{0301}lan", "\u{00E9}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "precomposed accent matches same bytes",
+            name: "startswith",
+            args: ["\u{00E9}lan", "\u{00E9}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "decomposed accent matches same bytes",
+            name: "startswith",
+            args: ["e\u{0301}lan", "e\u{0301}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "case sensitive prefix mismatch",
+            name: "startswith",
+            args: ["Hello World", "hello"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "prefix is entire string with emoji",
+            name: "startswith",
+            args: ["\u{1F600}\u{1F601}", "\u{1F600}\u{1F601}"],
             expected: .success(true)
         ),
     ]

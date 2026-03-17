@@ -1425,6 +1425,37 @@
       "decl" : {
         "args" : [
           {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          }
+        ],
+        "result" : {
+          "type" : "number"
+        },
+        "type" : "function"
+      },
+      "name" : "semver.compare"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "any"
+          }
+        ],
+        "result" : {
+          "type" : "boolean"
+        },
+        "type" : "function"
+      },
+      "name" : "semver.is_valid"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
             "of" : [
               {
                 "dynamic" : {

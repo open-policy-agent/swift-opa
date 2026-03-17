@@ -130,6 +130,10 @@ public struct BuiltinRegistry: Sendable {
             // Rand
             "rand.intn": BuiltinFuncs.numbersRandIntN,
 
+            // SemVer
+            "semver.compare": BuiltinFuncs.semverCompare,
+            "semver.is_valid": BuiltinFuncs.semverIsValid,
+
             // Sets
             "and": BuiltinFuncs.and,
             "intersection": BuiltinFuncs.intersection,

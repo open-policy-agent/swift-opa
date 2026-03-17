@@ -58,6 +58,16 @@ extension Statement {
 }
 
 extension Plan {
+    mutating func renumberLocals() {
+        var counter = 2
+        var remappings = [0: 0, 1: 1]
+        for i in blocks.indices {
+            blocks[i].walk { statement in
+                statement.renumberLocals(counter: &counter, remappedLocals: &remappings)
+            }
+        }
+    }
+
     mutating func computeMaxLocal() {
         var maxLocal = -1
         for i in blocks.indices {
@@ -70,6 +80,16 @@ extension Plan {
 }
 
 extension Func {
+    mutating func renumberLocals() {
+        var counter = 1
+        var remappings = [0: 0, 1: 1]
+        for i in blocks.indices {
+            blocks[i].walk { statement in
+                statement.renumberLocals(counter: &counter, remappedLocals: &remappings)
+            }
+        }
+    }
+
     mutating func computeMaxLocal() {
         var maxLocal = -1
 
@@ -89,6 +109,174 @@ extension Func {
 }
 
 extension Statement {
+    mutating func renumberLocals(counter: inout Int, remappedLocals: inout [Int: Int]) {
+        switch self {
+        case .arrayAppendStmt(var stmt):
+            stmt.array = Local(remapLocal(Int(stmt.array), &counter, &remappedLocals))
+            if case .localIndex(let idx) = stmt.value.value {
+                stmt.value.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .arrayAppendStmt(stmt)
+        case .assignIntStmt(var stmt):
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            self = .assignIntStmt(stmt)
+        case .assignVarStmt(var stmt):
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            if case .localIndex(let idx) = stmt.source.value {
+                stmt.source.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .assignVarStmt(stmt)
+        case .assignVarOnceStmt(var stmt):
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            if case .localIndex(let idx) = stmt.source.value {
+                stmt.source.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .assignVarOnceStmt(stmt)
+        case .callStmt(var stmt):
+            stmt.result = Local(remapLocal(Int(stmt.result), &counter, &remappedLocals))
+            if let args = stmt.args {
+                for i in args.indices {
+                    if case .localIndex(let idx) = stmt.args![i].value {
+                        stmt.args![i].value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+                    }
+                }
+            }
+            self = .callStmt(stmt)
+        case .callDynamicStmt(var stmt):
+            stmt.result = Local(remapLocal(Int(stmt.result), &counter, &remappedLocals))
+            for i in stmt.args.indices {
+                stmt.args[i] = Local(remapLocal(Int(stmt.args[i]), &counter, &remappedLocals))
+            }
+            for i in stmt.path.indices {
+                if case .localIndex(let idx) = stmt.path[i].value {
+                    stmt.path[i].value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+                }
+            }
+            self = .callDynamicStmt(stmt)
+        case .dotStmt(var stmt):
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            if case .localIndex(let idx) = stmt.source.value {
+                stmt.source.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            if case .localIndex(let idx) = stmt.key.value {
+                stmt.key.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .dotStmt(stmt)
+        case .equalStmt(var stmt):
+            if case .localIndex(let idx) = stmt.a.value {
+                stmt.a.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            if case .localIndex(let idx) = stmt.b.value {
+                stmt.b.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .equalStmt(stmt)
+        case .isArrayStmt(var stmt):
+            if case .localIndex(let idx) = stmt.source.value {
+                stmt.source.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .isArrayStmt(stmt)
+        case .isDefinedStmt(var stmt):
+            stmt.source = Local(remapLocal(Int(stmt.source), &counter, &remappedLocals))
+            self = .isDefinedStmt(stmt)
+        case .isObjectStmt(var stmt):
+            if case .localIndex(let idx) = stmt.source.value {
+                stmt.source.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .isObjectStmt(stmt)
+        case .isSetStmt(var stmt):
+            if case .localIndex(let idx) = stmt.source.value {
+                stmt.source.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .isSetStmt(stmt)
+        case .isUndefinedStmt(var stmt):
+            stmt.source = Local(remapLocal(Int(stmt.source), &counter, &remappedLocals))
+            self = .isUndefinedStmt(stmt)
+        case .lenStmt(var stmt):
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            if case .localIndex(let idx) = stmt.source.value {
+                stmt.source.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .lenStmt(stmt)
+        case .makeArrayStmt(var stmt):
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            self = .makeArrayStmt(stmt)
+        case .makeNullStmt(var stmt):
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            self = .makeNullStmt(stmt)
+        case .makeNumberIntStmt(var stmt):
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            self = .makeNumberIntStmt(stmt)
+        case .makeNumberRefStmt(var stmt):
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            self = .makeNumberRefStmt(stmt)
+        case .makeObjectStmt(var stmt):
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            self = .makeObjectStmt(stmt)
+        case .makeSetStmt(var stmt):
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            self = .makeSetStmt(stmt)
+        case .notEqualStmt(var stmt):
+            if case .localIndex(let idx) = stmt.a.value {
+                stmt.a.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            if case .localIndex(let idx) = stmt.b.value {
+                stmt.b.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .notEqualStmt(stmt)
+        case .objectInsertStmt(var stmt):
+            stmt.object = Local(remapLocal(Int(stmt.object), &counter, &remappedLocals))
+            if case .localIndex(let idx) = stmt.key.value {
+                stmt.key.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            if case .localIndex(let idx) = stmt.value.value {
+                stmt.value.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .objectInsertStmt(stmt)
+        case .objectInsertOnceStmt(var stmt):
+            stmt.object = Local(remapLocal(Int(stmt.object), &counter, &remappedLocals))
+            if case .localIndex(let idx) = stmt.key.value {
+                stmt.key.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            if case .localIndex(let idx) = stmt.value.value {
+                stmt.value.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .objectInsertOnceStmt(stmt)
+        case .objectMergeStmt(var stmt):
+            stmt.a = Local(remapLocal(Int(stmt.a), &counter, &remappedLocals))
+            stmt.b = Local(remapLocal(Int(stmt.b), &counter, &remappedLocals))
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            self = .objectMergeStmt(stmt)
+        case .resetLocalStmt(var stmt):
+            stmt.target = Local(remapLocal(Int(stmt.target), &counter, &remappedLocals))
+            self = .resetLocalStmt(stmt)
+        case .resultSetAddStmt(var stmt):
+            stmt.value = Local(remapLocal(Int(stmt.value), &counter, &remappedLocals))
+            self = .resultSetAddStmt(stmt)
+        case .returnLocalStmt(var stmt):
+            stmt.source = Local(remapLocal(Int(stmt.source), &counter, &remappedLocals))
+            self = .returnLocalStmt(stmt)
+        case .scanStmt(var stmt):
+            stmt.source = Local(remapLocal(Int(stmt.source), &counter, &remappedLocals))
+            stmt.key = Local(remapLocal(Int(stmt.key), &counter, &remappedLocals))
+            stmt.value = Local(remapLocal(Int(stmt.value), &counter, &remappedLocals))
+            self = .scanStmt(stmt)
+        case .setAddStmt(var stmt):
+            stmt.set = Local(remapLocal(Int(stmt.set), &counter, &remappedLocals))
+            if case .localIndex(let idx) = stmt.value.value {
+                stmt.value.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .setAddStmt(stmt)
+        case .withStmt(var stmt):
+            stmt.local = Local(remapLocal(Int(stmt.local), &counter, &remappedLocals))
+            if case .localIndex(let idx) = stmt.value.value {
+                stmt.value.value = .localIndex(remapLocal(idx, &counter, &remappedLocals))
+            }
+            self = .withStmt(stmt)
+        case .breakStmt, .nopStmt, .blockStmt, .notStmt, .unknown:
+            break
+        }
+    }
+
     func maxLocalUsed() -> Int {
         var maxLocal = -1
 
@@ -196,6 +384,19 @@ extension Statement {
         default:
             return -1
         }
+    }
+
+    // Remapping locals to ensure they are part of a contiguous range of numbers.
+    // We use a counter variable to track the next available mapping index.
+    private func remapLocal(_ local: Int, _ nextAvailCounter: inout Int, _ remappedLocals: inout [Int: Int]) -> Int {
+        // Have we seen this index before? If not, map it, and bump the counter.
+        guard let idx: Int = remappedLocals[local] else {
+            let mappedIdx: Int = nextAvailCounter
+            remappedLocals[local] = mappedIdx
+            nextAvailCounter += 1
+            return mappedIdx
+        }
+        return idx
     }
 }
 

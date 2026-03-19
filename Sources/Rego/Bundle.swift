@@ -76,44 +76,7 @@ extension OPA.Manifest {
     /// Construct a manifest by parsing the provided JSON-encoded data.
     /// - Parameter jsonData: The JSON-encoded manifest data.
     public init(from jsonData: Data) throws {
-        let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
-        guard let jsonDict = jsonObject as? [String: Any] else {
-            throw DecodingError.typeMismatch(
-                [String: Any].self,
-                DecodingError.Context(codingPath: [], debugDescription: "Invalid JSON format"))
-        }
-
-        let revision = jsonDict["revision"] as? String ?? ""
-        self.revision = revision
-
-        var roots = jsonDict["roots"] as? [String] ?? [""]
-        if roots.isEmpty {
-            roots = [""]
-        }
-        self.roots = roots
-
-        let regoVersionInt = jsonDict["rego_version"] as? Int ?? 1
-        self.regoVersion =
-            switch regoVersionInt {
-            case 0:
-                .regoV0
-            case 1:
-                .regoV1
-            default:
-                throw DecodingError.dataCorrupted(
-                    DecodingError.Context(
-                        codingPath: [], debugDescription: "Unsupported Rego version"))
-            }
-
-        guard let metadataAny = jsonDict["metadata"] else {
-            // No metadata, use default
-            self.metadata = .null
-            return
-        }
-
-        // Parse metadata
-        let metadataValue = try AST.RegoValue(from: metadataAny)
-        self.metadata = metadataValue
+        self = try JSONDecoder().decode(Self.self, from: jsonData)
     }
 
     enum CodingKeys: String, CodingKey {

@@ -297,7 +297,8 @@
 				{
 					"x": ""
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/substring: offset too long unicode",
@@ -595,7 +596,8 @@
 				{
 					"x": ""
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

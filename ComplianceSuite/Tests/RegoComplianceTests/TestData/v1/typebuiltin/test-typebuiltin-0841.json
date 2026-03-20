@@ -337,7 +337,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

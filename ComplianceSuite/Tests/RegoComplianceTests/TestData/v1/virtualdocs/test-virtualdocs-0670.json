@@ -610,7 +610,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

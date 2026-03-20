@@ -264,7 +264,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/indexof",
@@ -530,7 +531,8 @@
 				{
 					"x": 8
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -800,7 +800,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-object-types with description",
@@ -1602,7 +1603,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-object-types with block description",
@@ -2643,7 +2645,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-object-types with field arg",
@@ -3597,7 +3600,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-object-types with field arg and default value",
@@ -4653,7 +4657,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-object-types with field list arg",
@@ -5667,7 +5672,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-object-types with two args",
@@ -6743,7 +6749,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-object-types must define one or more fields",
@@ -7115,7 +7122,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-type-extensions Object extension",
@@ -7917,7 +7925,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-type-extensions without any fields",
@@ -8604,7 +8613,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-type-extensions without fields twice",
@@ -9424,7 +9434,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-type-extensions without anything errors",
@@ -9796,7 +9807,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-type-extensions can have descriptions",
@@ -10168,7 +10180,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-type-extensions can not have descriptions on types",
@@ -10540,7 +10553,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-type-extensions all can have directives",
@@ -12153,7 +12167,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-schema-definition simple",
@@ -12826,7 +12841,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-schema-extensions simple",
@@ -13499,7 +13515,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-schema-extensions directive only",
@@ -14169,7 +14186,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-schema-extensions without anything errors",
@@ -14541,7 +14559,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-inheritance single",
@@ -15389,7 +15408,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-inheritance multi",
@@ -16253,7 +16273,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-inheritance multi with leading amp",
@@ -17117,7 +17138,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-enums single value",
@@ -17847,7 +17869,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-enums double value",
@@ -18225,7 +18248,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-enums must define one or more unique enum values",
@@ -18597,7 +18621,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-interface simple",
@@ -19399,7 +19424,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-interface must define one or more fields",
@@ -19771,7 +19797,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-interface may define intermediate interfaces",
@@ -21131,7 +21158,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-unions simple",
@@ -21818,7 +21846,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-unions with two types",
@@ -22521,7 +22550,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-unions with leading pipe",
@@ -23224,7 +23254,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-unions cant be empty",
@@ -23596,7 +23627,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-unions cant double pipe",
@@ -23968,7 +24000,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-unions cant have trailing pipe",
@@ -24340,7 +24373,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-scalar simple",
@@ -24981,7 +25015,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-input-object simple",
@@ -25783,7 +25818,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-input-object can not have args",
@@ -26155,7 +26191,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-input-object must define one or more input fields",
@@ -26527,7 +26564,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-directives simple",
@@ -26905,7 +26943,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-directives executable",
@@ -28402,7 +28441,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/success-directives repeatable",
@@ -29066,7 +29106,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-directives invalid location",
@@ -29438,7 +29479,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-fuzzer 1",
@@ -29810,7 +29852,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_schema/failure-fuzzer 2",
@@ -30182,7 +30225,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

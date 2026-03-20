@@ -332,7 +332,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

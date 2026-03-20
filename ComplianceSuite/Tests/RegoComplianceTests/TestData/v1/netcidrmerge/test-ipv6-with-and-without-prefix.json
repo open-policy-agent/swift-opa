@@ -301,7 +301,8 @@
 						"2601:600:8a80:207e:a57d:7567:e2c9:e7b3/128"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr ipv6 with prefix, same twice",
@@ -617,7 +618,8 @@
 						"2601:600:8a80:207e:a57d:7567:e2c9:e7b3/128"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr ipv6 with prefix, two different prefixes",
@@ -936,7 +938,8 @@
 						"2601:600:8a80:207e::/64"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr ipv6 without prefix",
@@ -1228,7 +1231,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr ipv6 without prefix, same twice",
@@ -1533,7 +1537,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

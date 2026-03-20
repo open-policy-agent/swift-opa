@@ -505,7 +505,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

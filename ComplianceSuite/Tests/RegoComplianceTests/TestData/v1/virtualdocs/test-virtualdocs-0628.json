@@ -576,7 +576,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

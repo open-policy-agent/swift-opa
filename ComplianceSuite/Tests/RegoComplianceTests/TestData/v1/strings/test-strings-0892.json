@@ -287,7 +287,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "strings/substring: offset negative unicode",
@@ -576,7 +577,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

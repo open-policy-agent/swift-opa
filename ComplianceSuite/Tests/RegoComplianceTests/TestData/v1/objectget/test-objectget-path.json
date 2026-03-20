@@ -357,7 +357,8 @@
 						"a": 1
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectget/path_with_single_element",
@@ -725,7 +726,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectget/path_with_two_elements",
@@ -1135,7 +1137,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectget/path_with_three_elements",
@@ -1587,7 +1590,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectget/path_with_single_element_no_result",
@@ -1958,7 +1962,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectget/path_with_two_elements_no_result",
@@ -2368,7 +2373,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectget/path_with_three_elements_no_result",
@@ -2820,7 +2826,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectget/path_with_non_string_keys",
@@ -3447,7 +3454,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectget/get_intermediate_non_object",
@@ -3942,7 +3950,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectget/get_intermediate_array",
@@ -4443,7 +4452,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectget/get_for_non_object",
@@ -4800,7 +4810,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

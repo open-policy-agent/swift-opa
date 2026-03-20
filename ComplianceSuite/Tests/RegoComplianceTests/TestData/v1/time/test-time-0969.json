@@ -335,7 +335,8 @@
 				{
 					"x": 1551465221593912000
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "time/add_date too small result",
@@ -656,7 +657,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

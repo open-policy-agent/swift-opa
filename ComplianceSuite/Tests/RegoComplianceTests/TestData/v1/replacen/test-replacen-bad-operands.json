@@ -329,7 +329,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "replacen/bad pattern object operand/non-string value",
@@ -678,7 +679,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "replacen/bad pattern object operand/non-string value",
@@ -1054,7 +1056,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

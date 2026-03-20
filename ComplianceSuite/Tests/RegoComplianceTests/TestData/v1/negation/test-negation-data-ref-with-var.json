@@ -461,7 +461,8 @@
 				{
 					"x": "v0"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "negation/neg: ref with variable",
@@ -916,7 +917,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "negation/neg: ref with variable (hit) and virtual doc (miss))",
@@ -1409,7 +1411,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "negation/neg: ref with variable (miss) and virtual doc (hit)",
@@ -1902,7 +1905,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		}
 	]
 }

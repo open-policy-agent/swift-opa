@@ -252,7 +252,8 @@
 				{
 					"x": "aGVsbG8="
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "base64urlbuiltins/encode-2",
@@ -506,7 +507,8 @@
 				{
 					"x": "dGhlcmU="
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

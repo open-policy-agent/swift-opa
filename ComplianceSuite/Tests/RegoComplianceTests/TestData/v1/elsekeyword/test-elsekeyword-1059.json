@@ -418,7 +418,8 @@
 						"goodbye"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

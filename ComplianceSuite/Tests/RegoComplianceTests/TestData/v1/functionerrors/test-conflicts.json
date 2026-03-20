@@ -566,7 +566,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "functionerrors/conflict: plain false and true result, second round",
@@ -1134,7 +1135,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

@@ -339,7 +339,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: captured result, rule replacement",
@@ -680,7 +681,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: direct call, arity 0, rule replacement",
@@ -1021,7 +1023,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: direct call, arity 1, rule replacement",
@@ -1447,7 +1450,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: indirect call, arity 1, rule replacement",
@@ -2004,7 +2008,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

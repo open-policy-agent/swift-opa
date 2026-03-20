@@ -263,7 +263,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "floor rounds down (2)",
@@ -528,7 +529,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "floor rounds down (3)",
@@ -793,7 +795,8 @@
 				{
 					"x": 99
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "floor integer",
@@ -1058,7 +1061,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "floor negative",
@@ -1323,7 +1327,8 @@
 				{
 					"x": -2
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

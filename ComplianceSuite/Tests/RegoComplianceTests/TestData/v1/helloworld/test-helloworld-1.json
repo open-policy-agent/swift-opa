@@ -434,7 +434,8 @@
 				{
 					"x": 7
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "helloworld/another_test_for_builtin_error",
@@ -594,7 +595,8 @@
 					"funcs": null
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

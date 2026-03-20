@@ -557,7 +557,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "every/example, success",
@@ -1124,7 +1125,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/example with two sets",
@@ -1959,7 +1961,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/example with two sets (fail)",
@@ -2786,7 +2789,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "every/example every/some, fail",
@@ -3527,7 +3531,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "every/example every/some, success",
@@ -4276,7 +4281,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/example some/every",
@@ -4884,7 +4890,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

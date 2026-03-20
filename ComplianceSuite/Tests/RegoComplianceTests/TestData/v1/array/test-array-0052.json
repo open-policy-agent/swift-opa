@@ -349,7 +349,8 @@
 						1
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "array/reverse_empty",
@@ -688,7 +689,8 @@
 				{
 					"x": []
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "array/reverse_object_error",
@@ -1024,7 +1026,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

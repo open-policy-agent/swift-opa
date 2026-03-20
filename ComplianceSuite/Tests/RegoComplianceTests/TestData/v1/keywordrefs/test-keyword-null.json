@@ -391,7 +391,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "keywordrefs/null keyword in package, import alias",
@@ -783,7 +784,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "keywordrefs/null keyword rule refhead",
@@ -1265,7 +1267,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "keywordrefs/null keyword rule refhead, else bodies",
@@ -2106,7 +2109,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "keywordrefs/null keyword rule refhead, partial set",
@@ -2717,7 +2721,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "keywordrefs/null keyword rule refhead, partial object",
@@ -3882,7 +3887,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "keywordrefs/null keyword function refhead",
@@ -5089,7 +5095,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

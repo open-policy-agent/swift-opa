@@ -403,7 +403,8 @@
 						null
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "json_verify_schema/valid schema object",
@@ -837,7 +838,8 @@
 						null
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "json_verify_schema/invalid schema string",
@@ -1242,7 +1244,8 @@
 						"jsonschema: has a primitive type that is NOT VALID -- given: /unknown_type/ Expected valid values are:[array boolean integer number null object string]"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "json_verify_schema/invalid schema object",
@@ -1676,7 +1679,8 @@
 						"jsonschema: has a primitive type that is NOT VALID -- given: /unknown_type/ Expected valid values are:[array boolean integer number null object string]"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -949,7 +949,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "providers-aws-sign_req/failure-simple-invalid type http request keys",
@@ -1952,7 +1953,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "providers-aws-sign_req/failure-simple-missing aws keys",
@@ -2842,7 +2844,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "providers-aws-sign_req/failure-simple-invalid type aws keys",
@@ -3877,7 +3880,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "providers-aws-sign_req/failure-simple-bad timestamp",
@@ -4862,7 +4866,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "providers-aws-sign_req/failure-simple-bad-type-payload-signing-config",
@@ -5913,7 +5918,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

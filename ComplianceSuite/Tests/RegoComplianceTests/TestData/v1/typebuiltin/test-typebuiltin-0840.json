@@ -451,7 +451,8 @@
 						true
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

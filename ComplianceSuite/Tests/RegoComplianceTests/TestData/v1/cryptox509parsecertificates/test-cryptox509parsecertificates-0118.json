@@ -527,7 +527,8 @@
 						"Thawte SGC CA"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

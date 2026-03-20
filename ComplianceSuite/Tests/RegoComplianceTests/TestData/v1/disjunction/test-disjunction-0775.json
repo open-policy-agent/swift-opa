@@ -361,7 +361,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "disjunction/complete: nested conflict, else",
@@ -822,7 +823,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "disjunction/nested function with conflict",
@@ -1255,7 +1257,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "disjunction/nested function with conflict, else",
@@ -1796,7 +1799,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "disjunction/complete: conflict involving early-exit complete rule (set enumeration)",
@@ -2309,7 +2313,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "disjunction/complete: conflict involving early-exit complete rule (array enumeration)",
@@ -2823,7 +2828,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "disjunction/complete: conflict involving early-exit complete rule (object enumeration)",
@@ -3350,7 +3356,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "disjunction/complete: conflict involving early-exit partial rule",
@@ -3877,7 +3884,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "disjunction/complete: conflict involving early-exit complete rule, else",
@@ -4439,7 +4447,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "disjunction/complete: conflict involving early-exit complete rule, multiple",
@@ -4952,7 +4961,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "disjunction/complete: conflict involving early-exit complete rule, data array enumeration",
@@ -5376,7 +5386,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "disjunction/complete: conflict involving early-exit complete rule, data object enumeration",
@@ -5800,7 +5811,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

@@ -291,7 +291,8 @@
 				{
 					"x": "hi there"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

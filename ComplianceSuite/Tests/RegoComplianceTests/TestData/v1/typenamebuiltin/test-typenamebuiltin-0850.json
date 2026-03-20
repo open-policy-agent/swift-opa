@@ -263,7 +263,8 @@
 				{
 					"x": "number"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

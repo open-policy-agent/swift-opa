@@ -265,7 +265,8 @@
 				{
 					"x": "oo.ba"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

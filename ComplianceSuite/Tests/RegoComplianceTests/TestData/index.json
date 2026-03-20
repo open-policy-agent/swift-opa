@@ -339,6 +339,17 @@
     ]
   },
   {
+    "file": "TestData/v1/array/flatten.json",
+    "note": [
+      "array/flatten empty array",
+      "array/flatten only arrays",
+      "array/flatten single item array in array",
+      "array/flatten has nesting depth 1",
+      "array/flatten mixed types",
+      "array/flatten type error"
+    ]
+  },
+  {
     "file": "TestData/v1/array/test-array-0041.json",
     "note": [
       "array/concat"
@@ -688,6 +699,19 @@
     "file": "TestData/v1/casts/test-casts-0827.json",
     "note": [
       "casts/to_number: bad input"
+    ]
+  },
+  {
+    "file": "TestData/v1/casts/test-casts-0828.json",
+    "note": [
+      "casts/to_number: nan input",
+      "casts/to_number: inf input",
+      "casts/to_number: -inf input",
+      "casts/to_number: Infinity input",
+      "casts/to_number: -Infinity input",
+      "casts/to_number: -nan input",
+      "casts/to_number: -NaN input",
+      "casts/to_number: iNf input"
     ]
   },
   {
@@ -2503,7 +2527,9 @@
       "graphql_is_valid/success validation rules are independent case 2",
       "graphql_is_valid/success deprecating types",
       "graphql_is_valid/success no unused variables",
-      "graphql_is_valid/success - AST objects - Employee example"
+      "graphql_is_valid/success - AST objects - Employee example",
+      "graphql_is_valid/undefined argument",
+      "graphql_is_valid/undefined argument schema ast"
     ]
   },
   {
@@ -2659,7 +2685,8 @@
       "graphql_schema_is_valid/success-directives simple",
       "graphql_schema_is_valid/success-directives executable",
       "graphql_schema_is_valid/success-directives repeatable",
-      "graphql_schema_is_valid/failure-directives invalid location"
+      "graphql_schema_is_valid/failure-directives invalid location",
+      "graphql_schema_is_valid/schema failure with object in input object"
     ]
   },
   {
@@ -3466,6 +3493,12 @@
     ]
   },
   {
+    "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-eddsa.json",
+    "note": [
+      "jwtdecodeverify/EdDSA"
+    ]
+  },
+  {
     "file": "TestData/v1/jwtdecodeverify/test-jwtdecodeverify-invalid-exp-type.json",
     "note": [
       "jwtdecodeverify/invalid-exp"
@@ -3499,6 +3532,12 @@
     "file": "TestData/v1/jwtencodesign/test-jwtencodesign-0494.json",
     "note": [
       "jwtencodesign/https://tools.ietf.org/html/rfc7515#appendix-A.2"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesign/test-jwtencodesign-eddsa.json",
+    "note": [
+      "jwtencodesign/EdDSA"
     ]
   },
   {
@@ -3589,6 +3628,18 @@
     "file": "TestData/v1/jwtencodesignraw/test-jwtencodesignraw-0388.json",
     "note": [
       "jwtencodesignraw/https://tools.ietf.org/html/rfc7515#appendix-A.2"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtencodesignraw/test-jwtencodesignraw-eddsa.json",
+    "note": [
+      "jwtencodesignraw/EdDSA"
+    ]
+  },
+  {
+    "file": "TestData/v1/jwtverifyeddsa/test-jwtverifyeddsa.json",
+    "note": [
+      "jwtverifyeddsa/success-cert"
     ]
   },
   {
@@ -3877,6 +3928,186 @@
     "file": "TestData/v1/jwtverifyrsa/test-jwtverifyrsa-0439.json",
     "note": [
       "jwtverifyrsa/failure-wrong key"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-as.json",
+    "note": [
+      "keywordrefs/as keyword in package",
+      "keywordrefs/as keyword in package, import alias",
+      "keywordrefs/as keyword rule refhead",
+      "keywordrefs/as keyword rule refhead, else bodies",
+      "keywordrefs/as keyword rule refhead, partial set",
+      "keywordrefs/as keyword rule refhead, partial object",
+      "keywordrefs/as keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-contains.json",
+    "note": [
+      "keywordrefs/contains keyword in package",
+      "keywordrefs/contains keyword in package, import alias",
+      "keywordrefs/contains keyword rule refhead",
+      "keywordrefs/contains keyword rule refhead, else bodies",
+      "keywordrefs/contains keyword rule refhead, partial set",
+      "keywordrefs/contains keyword rule refhead, partial object",
+      "keywordrefs/contains keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-default.json",
+    "note": [
+      "keywordrefs/default keyword in package",
+      "keywordrefs/default keyword in package, import alias",
+      "keywordrefs/default keyword rule refhead",
+      "keywordrefs/default keyword rule refhead, else bodies",
+      "keywordrefs/default keyword rule refhead, partial set",
+      "keywordrefs/default keyword rule refhead, partial object",
+      "keywordrefs/default keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-else.json",
+    "note": [
+      "keywordrefs/else keyword in package",
+      "keywordrefs/else keyword in package, import alias",
+      "keywordrefs/else keyword rule refhead",
+      "keywordrefs/else keyword rule refhead, else bodies",
+      "keywordrefs/else keyword rule refhead, partial set",
+      "keywordrefs/else keyword rule refhead, partial object",
+      "keywordrefs/else keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-every.json",
+    "note": [
+      "keywordrefs/every keyword in package",
+      "keywordrefs/every keyword in package, import alias",
+      "keywordrefs/every keyword rule refhead",
+      "keywordrefs/every keyword rule refhead, else bodies",
+      "keywordrefs/every keyword rule refhead, partial set",
+      "keywordrefs/every keyword rule refhead, partial object",
+      "keywordrefs/every keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-false.json",
+    "note": [
+      "keywordrefs/false keyword in package",
+      "keywordrefs/false keyword in package, import alias",
+      "keywordrefs/false keyword rule refhead",
+      "keywordrefs/false keyword rule refhead, else bodies",
+      "keywordrefs/false keyword rule refhead, partial set",
+      "keywordrefs/false keyword rule refhead, partial object",
+      "keywordrefs/false keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-if.json",
+    "note": [
+      "keywordrefs/if keyword in package",
+      "keywordrefs/if keyword in package, import alias",
+      "keywordrefs/if keyword rule refhead",
+      "keywordrefs/if keyword rule refhead, else bodies",
+      "keywordrefs/if keyword rule refhead, partial set",
+      "keywordrefs/if keyword rule refhead, partial object",
+      "keywordrefs/if keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-import.json",
+    "note": [
+      "keywordrefs/import keyword in package",
+      "keywordrefs/import keyword in package, import alias",
+      "keywordrefs/import keyword rule refhead",
+      "keywordrefs/import keyword rule refhead, else bodies",
+      "keywordrefs/import keyword rule refhead, partial set",
+      "keywordrefs/import keyword rule refhead, partial object",
+      "keywordrefs/import keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-in.json",
+    "note": [
+      "keywordrefs/in keyword in package",
+      "keywordrefs/in keyword in package, import alias",
+      "keywordrefs/in keyword rule refhead",
+      "keywordrefs/in keyword rule refhead, else bodies",
+      "keywordrefs/in keyword rule refhead, partial set",
+      "keywordrefs/in keyword rule refhead, partial object",
+      "keywordrefs/in keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-not.json",
+    "note": [
+      "keywordrefs/not keyword in package",
+      "keywordrefs/not keyword in package, import alias",
+      "keywordrefs/not keyword rule refhead",
+      "keywordrefs/not keyword rule refhead, else bodies",
+      "keywordrefs/not keyword rule refhead, partial set",
+      "keywordrefs/not keyword rule refhead, partial object",
+      "keywordrefs/not keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-null.json",
+    "note": [
+      "keywordrefs/null keyword in package",
+      "keywordrefs/null keyword in package, import alias",
+      "keywordrefs/null keyword rule refhead",
+      "keywordrefs/null keyword rule refhead, else bodies",
+      "keywordrefs/null keyword rule refhead, partial set",
+      "keywordrefs/null keyword rule refhead, partial object",
+      "keywordrefs/null keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-package.json",
+    "note": [
+      "keywordrefs/package keyword in package",
+      "keywordrefs/package keyword in package, import alias",
+      "keywordrefs/package keyword rule refhead",
+      "keywordrefs/package keyword rule refhead, else bodies",
+      "keywordrefs/package keyword rule refhead, partial set",
+      "keywordrefs/package keyword rule refhead, partial object",
+      "keywordrefs/package keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-some.json",
+    "note": [
+      "keywordrefs/some keyword in package",
+      "keywordrefs/some keyword in package, import alias",
+      "keywordrefs/some keyword rule refhead",
+      "keywordrefs/some keyword rule refhead, else bodies",
+      "keywordrefs/some keyword rule refhead, partial set",
+      "keywordrefs/some keyword rule refhead, partial object",
+      "keywordrefs/some keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-true.json",
+    "note": [
+      "keywordrefs/true keyword in package",
+      "keywordrefs/true keyword in package, import alias",
+      "keywordrefs/true keyword rule refhead",
+      "keywordrefs/true keyword rule refhead, else bodies",
+      "keywordrefs/true keyword rule refhead, partial set",
+      "keywordrefs/true keyword rule refhead, partial object",
+      "keywordrefs/true keyword function refhead"
+    ]
+  },
+  {
+    "file": "TestData/v1/keywordrefs/test-keyword-with.json",
+    "note": [
+      "keywordrefs/with keyword in package",
+      "keywordrefs/with keyword in package, import alias",
+      "keywordrefs/with keyword rule refhead",
+      "keywordrefs/with keyword rule refhead, else bodies",
+      "keywordrefs/with keyword rule refhead, partial set",
+      "keywordrefs/with keyword rule refhead, partial object",
+      "keywordrefs/with keyword function refhead"
     ]
   },
   {
@@ -4302,7 +4533,8 @@
       "numbersrangestep/negative",
       "numbersrangestep/memoryexample",
       "numbersrangestep/equal",
-      "numbersrangestep/notinrange"
+      "numbersrangestep/notinrange",
+      "numbersrangestep/big int step"
     ]
   },
   {
@@ -4876,7 +5108,9 @@
       "ir/call-dynamic with mixed partial rules, ref heads",
       "ir/call-dynamic with ref heads, issue 5839",
       "ir/call-dynamic with ref heads, issue 5839, penultimate",
-      "ir/call-dynamic target undefined"
+      "ir/call-dynamic with ref heads and unrelated rule (issue 7399)",
+      "ir/call-dynamic not used with ref heads and mixed-length rules (issue 7399)",
+      "ir/call-dynamic not used with ref heads and mixed-length rules (issue 7399), second rule"
     ]
   },
   {
@@ -5043,7 +5277,12 @@
   {
     "file": "TestData/v1/regexfind/test-regexfind-0334.json",
     "note": [
-      "regexfind/finds all match values"
+      "regexfind/finds all match values",
+      "regexfind/finds 2 matched values",
+      "regexfind/finds 0 matched values",
+      "regexfind/regex is anchored, start",
+      "regexfind/regex is anchored,end",
+      "regexfind/regex with overlapping matches"
     ]
   },
   {
@@ -5127,7 +5366,12 @@
   {
     "file": "TestData/v1/regexmatch/test-regexmatch-0861.json",
     "note": [
-      "regexmatch/regex.match"
+      "regexmatch/regex.match positive",
+      "regexmatch/regex.match empty anchored",
+      "regexmatch/regex.match empty string against empty string",
+      "regexmatch/regex.match empty string against non-empty string",
+      "regexmatch/regex.match negative",
+      "regexmatch/regex.match bad RE"
     ]
   },
   {
@@ -5147,13 +5391,25 @@
     "note": [
       "regex.replace: test pattern match and replace",
       "regex.replace: work with groups",
-      "regex.replace: bad regex pattern: Syntax error"
+      "regex.replace: bad regex pattern: Syntax error",
+      "regex.replace: anchored RE, start",
+      "regex.replace: anchored RE, start+end, no match",
+      "regex.replace: anchored RE, start+end, match",
+      "regex.replace: anchored RE, end",
+      "regex.replace: anchored RE, end, no match",
+      "regex.replace: per-character match",
+      "regex.replace: match with count",
+      "regex.replace: match with count, 2"
     ]
   },
   {
     "file": "TestData/v1/regexsplit/test-regexsplit-0862.json",
     "note": [
-      "regexsplit/regex.split: empty string"
+      "regexsplit/regex.split: empty string",
+      "regexsplit/regex.split: anchored RE, start",
+      "regexsplit/regex.split: anchored RE, end",
+      "regexsplit/regex.split: anchored RE, start+end",
+      "regexsplit/regex.split: anchored RE, start+end, match"
     ]
   },
   {
@@ -5201,7 +5457,8 @@
       "rendertemplate/simple",
       "rendertemplate/simpleint",
       "rendertemplate/complex",
-      "rendertemplate/missingkey"
+      "rendertemplate/missingkey",
+      "rendertemplate/missingmultiplekeys"
     ]
   },
   {
@@ -5311,32 +5568,10 @@
     ]
   },
   {
-    "file": "TestData/v1/stringinterpolation/test-string_interpolation_multi-line.json",
+    "file": "TestData/v1/sprintf/test-sprintf.json",
     "note": [
-      "string-interpolation/multi-line/empty string",
-      "string-interpolation/multi-line/no template expression",
-      "string-interpolation/multi-line/escaped template expressions",
-      "string-interpolation/multi-line/template expressions with primitive values",
-      "string-interpolation/multi-line/template expressions with collection values",
-      "string-interpolation/multi-line/template expression with array comprehension",
-      "string-interpolation/multi-line/template expression with set comprehension",
-      "string-interpolation/multi-line/template expression with object comprehension",
-      "string-interpolation/multi-line/template expressions with variables",
-      "string-interpolation/multi-line/template expressions with refs",
-      "string-interpolation/multi-line/nested template expressions",
-      "string-interpolation/multi-line/nested template expressions, undefined outer expression",
-      "string-interpolation/multi-line/nested template expressions, undefined inner expression",
-      "string-interpolation/multi-line/template expressions with infix operand call",
-      "string-interpolation/multi-line/template expressions with undefined values",
-      "string-interpolation/multi-line/inside array comprehension",
-      "string-interpolation/multi-line/inside set comprehension",
-      "string-interpolation/multi-line/inside map comprehension",
-      "string-interpolation/multi-line/inside map comprehension head",
-      "string-interpolation/multi-line/inside every expression, body",
-      "string-interpolation/multi-line/with in template expression",
-      "string-interpolation/multi-line/with outside template string",
-      "string-interpolation/multi-line/with outside template string, overrides",
-      "string-interpolation/multi-line/template-string function arg"
+      "sprintf/big_int",
+      "sprintf/big_int/max_cert_serial_number"
     ]
   },
   {
@@ -5368,6 +5603,47 @@
       "string-interpolation/with outside template string, overrides",
       "string-interpolation/template-string function arg",
       "string-interpolation/some"
+    ]
+  },
+  {
+    "file": "TestData/v1/stringinterpolation/test-string_interpolation_multi-line.json",
+    "note": [
+      "string-interpolation/multi-line/empty string",
+      "string-interpolation/multi-line/no template expression",
+      "string-interpolation/multi-line/escaped template expressions",
+      "string-interpolation/multi-line/template expressions with primitive values",
+      "string-interpolation/multi-line/template expressions with collection values",
+      "string-interpolation/multi-line/template expression with array comprehension",
+      "string-interpolation/multi-line/template expression with set comprehension",
+      "string-interpolation/multi-line/template expression with object comprehension",
+      "string-interpolation/multi-line/template expressions with variables",
+      "string-interpolation/multi-line/template expressions with refs",
+      "string-interpolation/multi-line/nested template expressions",
+      "string-interpolation/multi-line/nested template expressions, undefined outer expression",
+      "string-interpolation/multi-line/nested template expressions, undefined inner expression",
+      "string-interpolation/multi-line/template expressions with infix operand call",
+      "string-interpolation/multi-line/template expressions with undefined values",
+      "string-interpolation/multi-line/inside array comprehension",
+      "string-interpolation/multi-line/inside set comprehension",
+      "string-interpolation/multi-line/inside map comprehension",
+      "string-interpolation/multi-line/inside map comprehension head",
+      "string-interpolation/multi-line/inside every expression, body",
+      "string-interpolation/multi-line/with in template expression",
+      "string-interpolation/multi-line/with outside template string",
+      "string-interpolation/multi-line/with outside template string, overrides",
+      "string-interpolation/multi-line/template-string function arg"
+    ]
+  },
+  {
+    "file": "TestData/v1/stringinterpolation/test-string_interpolation_queries.json",
+    "note": [
+      "string-interpolation/query/empty template string",
+      "string-interpolation/query/non-empty template string with no expressions",
+      "string-interpolation/query/template string with value expressions",
+      "string-interpolation/query/template string with ref expressions (undefined)",
+      "string-interpolation/query/template string with var and ref expressions",
+      "string-interpolation/query/template string with call expressions",
+      "string-interpolation/query/template string with comprehension expressions"
     ]
   },
   {
@@ -5594,7 +5870,9 @@
   {
     "file": "TestData/v1/strings/test-strings-0903.json",
     "note": [
-      "strings/split: empty string"
+      "strings/split: empty text string",
+      "strings/split: empty delim string",
+      "strings/split: empty text and delim string"
     ]
   },
   {
@@ -5743,7 +6021,12 @@
     "note": [
       "strings/count_single_word_match",
       "strings/count_multiple_separate_matches",
-      "strings/count_n_no_match"
+      "strings/count_n_no_match",
+      "strings/count_empty_string",
+      "strings/count_empty_string_twice",
+      "strings/count_empty_haystack_non-empty_needle",
+      "strings/count_odd_even_case",
+      "strings/count_equal"
     ]
   },
   {
@@ -5932,6 +6215,12 @@
     "note": [
       "time/format",
       "time/format too big"
+    ]
+  },
+  {
+    "file": "TestData/v1/time/test-time-0972.json",
+    "note": [
+      "time.now_ns/consistent value for same evaluation"
     ]
   },
   {
@@ -6517,6 +6806,12 @@
       "uuid-parse/positive-v2",
       "uuid-parse/positive-v3",
       "uuid-parse/negative"
+    ]
+  },
+  {
+    "file": "TestData/v1/uuid/test-uuid-rfc4122.json",
+    "note": [
+      "uuid.rfc4122/consistent values for same arguments"
     ]
   },
   {
@@ -7121,6 +7416,12 @@
     ]
   },
   {
+    "file": "TestData/v1/walkbuiltin/test-walkbuiltin-issue-7656.json",
+    "note": [
+      "walkbuiltin/array path not overwritten"
+    ]
+  },
+  {
     "file": "TestData/v1/walkbuiltin/test-walkbuiltin-wildcard-path.json",
     "note": [
       "walkbuiltin/wildcard-path same values as when path provided"
@@ -7163,7 +7464,9 @@
       "withkeyword/builtin-builtin: arity 1, replacement is compound",
       "withkeyword/builtin-builtin: arity 1, replacement is simple",
       "withkeyword/builtin: direct call, arity 1, replacement is value that needs eval (array comprehension)",
-      "withkeyword/builtin: indirect call, arity 1, replacement is value that needs eval (array comprehension)"
+      "withkeyword/builtin: indirect call, arity 1, replacement is value that needs eval (array comprehension)",
+      "withkeyword/builtin: indirect call, arity 1, replacement is local variable via scan",
+      "withkeyword/builtin: indirect call, arity 1, multiple, nested replacements"
     ]
   },
   {
@@ -7178,7 +7481,10 @@
       "withkeyword/function: simple scope handling (no recursion here)",
       "withkeyword/function: rule indexing irrelevant",
       "withkeyword/function: direct call, arity 1, replacement is value that needs eval (array comprehension)",
-      "withkeyword/function: indirect call, arity 1, replacement is value that needs eval (array comprehension)"
+      "withkeyword/function: indirect call, arity 1, replacement is value that needs eval (array comprehension)",
+      "withkeyword/function: indirect call, arity 1, replacement is local variable",
+      "withkeyword/function: indirect call, arity 1, replacement is local variable via scan",
+      "withkeyword/function: indirect call, arity 1, multiple, nested replacements"
     ]
   },
   {

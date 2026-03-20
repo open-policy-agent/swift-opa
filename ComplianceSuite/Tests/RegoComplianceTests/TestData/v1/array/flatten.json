@@ -337,7 +337,8 @@
 				{
 					"x": []
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "array/flatten only arrays",
@@ -700,7 +701,8 @@
 						5
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "array/flatten single item array in array",
@@ -1053,7 +1055,8 @@
 						3
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "array/flatten has nesting depth 1",
@@ -1435,7 +1438,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "array/flatten mixed types",
@@ -1822,7 +1826,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "array/flatten type error",
@@ -2155,7 +2160,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

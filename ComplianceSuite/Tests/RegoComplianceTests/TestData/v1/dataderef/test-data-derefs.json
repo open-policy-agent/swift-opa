@@ -292,7 +292,8 @@
 				{
 					"x": "bar"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "data/nested integer",
@@ -608,7 +609,8 @@
 				{
 					"x": "bar"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "data/negative case: nested integer",
@@ -929,7 +931,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		}
 	]
 }

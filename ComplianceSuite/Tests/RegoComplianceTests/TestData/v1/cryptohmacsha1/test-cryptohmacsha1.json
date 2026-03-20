@@ -332,7 +332,8 @@
 						"85d155c55ed286a300bd1cf124de08d87e914f3a"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "cryptohmacsha1/crypto.hmac.sha1_unicode",
@@ -667,7 +668,8 @@
 						"81759c39013935fcf0de833d44c8018d7c1455dd"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

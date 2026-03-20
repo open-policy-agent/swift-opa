@@ -186,7 +186,8 @@
 				{
 					"x": {}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "defaultkeyword/function with var arg, ref head",
@@ -473,7 +474,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "defaultkeyword/function with var arg, ref head query",
@@ -916,7 +918,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

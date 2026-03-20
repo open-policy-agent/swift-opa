@@ -517,7 +517,8 @@
 						"5e65682e81c8de9c4cb4c3bf59138d3122731940cff690e3cbc269d3fb5d4576"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

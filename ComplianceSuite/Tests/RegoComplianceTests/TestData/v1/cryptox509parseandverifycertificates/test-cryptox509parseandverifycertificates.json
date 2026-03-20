@@ -973,7 +973,8 @@
 						"valid": true
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "cryptox509parseandverifycertificates/uri_strings",
@@ -1942,7 +1943,8 @@
 						"valid": true
 					}
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

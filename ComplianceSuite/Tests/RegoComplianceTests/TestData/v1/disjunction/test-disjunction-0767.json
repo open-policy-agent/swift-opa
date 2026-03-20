@@ -585,7 +585,8 @@
 						"hello"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

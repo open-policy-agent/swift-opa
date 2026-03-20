@@ -731,7 +731,8 @@
 						[]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "json_match_schema/success string document",
@@ -1428,7 +1429,8 @@
 						[]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "json_match_schema/success string schema",
@@ -2034,7 +2036,8 @@
 						[]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "json_match_schema/invalid document",
@@ -2771,7 +2774,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "json_match_schema/invalid schema",
@@ -3482,7 +3486,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

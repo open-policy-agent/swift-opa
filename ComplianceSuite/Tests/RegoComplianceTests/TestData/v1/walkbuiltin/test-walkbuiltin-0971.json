@@ -418,7 +418,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "walkbuiltin/arrays no path",
@@ -983,7 +984,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

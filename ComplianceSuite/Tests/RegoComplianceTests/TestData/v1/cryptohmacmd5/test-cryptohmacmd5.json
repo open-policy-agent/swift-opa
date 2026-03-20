@@ -332,7 +332,8 @@
 						"31b6db9e5eb4addb42f1a6ca07367adc"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "cryptohmacmd5/crypto.hmac.md5_unicode",
@@ -667,7 +668,8 @@
 						"20a8743c2157ac60b7e8b79c83651b8d"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

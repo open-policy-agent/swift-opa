@@ -623,7 +623,8 @@
 				{
 					"x": "[\n  1234567890,\n  2000000,\n  1000000000\n]"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonbuiltins/marshal_with_options-empty-object",
@@ -1225,7 +1226,8 @@
 				{
 					"x": "[1234567890,2000000,1000000000]"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonbuiltins/marshal_with_options-defaults",
@@ -1847,7 +1849,8 @@
 				{
 					"x": "[\n\t1234567890,\n\t2000000,\n\t1000000000\n]"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonbuiltins/marshal_with_options-explicit-disable",
@@ -2515,7 +2518,8 @@
 				{
 					"x": "[1234567890,2000000,1000000000]"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonbuiltins/marshal_with_options-prefix",
@@ -3140,7 +3144,8 @@
 				{
 					"x": "JSON =\u003e [\nJSON =\u003e \t1234567890,\nJSON =\u003e \t2000000,\nJSON =\u003e \t1000000000\nJSON =\u003e ]"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonbuiltins/marshal_with_options-object",
@@ -3526,7 +3531,8 @@
 				{
 					"x": "JSON =\u003e {\nJSON =\u003e \t\"bar\": \"baz\",\nJSON =\u003e \t\"foo\": \"bar\"\nJSON =\u003e }"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonbuiltins/marshal_with_options-empty-array",
@@ -3893,7 +3899,8 @@
 				{
 					"x": "---[]"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonbuiltins/marshal_with_options-deep-array",
@@ -4375,7 +4382,8 @@
 				{
 					"x": "[\n    [\n        [\n            [\n                [\n                    [\n                        []\n                    ]\n                ]\n            ]\n        ]\n    ]\n]"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonbuiltins/marshal_with_options-invalid-key",
@@ -4733,7 +4741,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

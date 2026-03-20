@@ -264,7 +264,8 @@
 				{
 					"x": 3
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/count_multiple_separate_matches",
@@ -530,7 +531,8 @@
 				{
 					"x": 3
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/count_n_no_match",
@@ -793,7 +795,8 @@
 				{
 					"x": 0
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/count_empty_string",
@@ -1059,7 +1062,8 @@
 				{
 					"x": 6
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/count_empty_string_twice",
@@ -1322,7 +1326,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/count_empty_haystack_non-empty_needle",
@@ -1585,7 +1590,8 @@
 				{
 					"x": 0
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/count_odd_even_case",
@@ -1851,7 +1857,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/count_equal",
@@ -2114,7 +2121,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

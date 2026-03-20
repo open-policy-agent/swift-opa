@@ -546,7 +546,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "partialiter/objects unique",
@@ -1136,7 +1137,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "partialiter/objects conflict",
@@ -1718,7 +1720,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

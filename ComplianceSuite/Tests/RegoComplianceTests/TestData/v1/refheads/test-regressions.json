@@ -428,7 +428,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/function refs and package extent",
@@ -1000,7 +1001,8 @@
 						"x": 3
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/rule refs and package extent",
@@ -1633,7 +1635,8 @@
 						"x": 3
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/rule refs and package extents, multiple modules",
@@ -2270,7 +2273,8 @@
 						"x": 3
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/type checking with ref rules",
@@ -2895,7 +2899,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/type checking with ref rules, number",
@@ -3141,7 +3146,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/type checking with ref rules, bool",
@@ -3364,7 +3370,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/full extent with partial object rule with empty indexer lookup result",
@@ -3729,7 +3736,8 @@
 						"p": {}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/obj in ref head query",
@@ -4010,7 +4018,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/full extent with non-string (number) last term",
@@ -4348,7 +4357,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/full extent with non-string last term, comparison",
@@ -4720,7 +4730,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/full extent with non-string (boolean) last term",
@@ -5045,7 +5056,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/full extent with non-string last term, comparison",
@@ -5371,7 +5383,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/virtual-cache key scope",
@@ -6342,7 +6355,8 @@
 						"two"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

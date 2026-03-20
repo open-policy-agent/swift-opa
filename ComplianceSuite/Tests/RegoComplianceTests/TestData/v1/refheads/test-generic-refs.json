@@ -406,7 +406,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, multiple vars",
@@ -811,7 +812,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, deep query",
@@ -1217,7 +1219,8 @@
 						"1": true
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, overlapping rule, no conflict",
@@ -1748,7 +1751,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, overlapping rule, different dynamic depths, no conflict",
@@ -2431,7 +2435,8 @@
 						"e": 4
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, self-conflict",
@@ -2907,7 +2912,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, overlapping rule, conflict",
@@ -3493,7 +3499,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, overlapping rule, deep override inside other rule object value, conflict",
@@ -4144,7 +4151,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, overlapping rule, deep injection into other rule object value, conflict",
@@ -4798,7 +4806,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, set leaf (shallow ref)",
@@ -5450,7 +5459,8 @@
 						]
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, set leaf (other rule defines dynamic ref portion)",
@@ -5927,7 +5937,8 @@
 						]
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, set leaf",
@@ -6754,7 +6765,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, set leaf, deep query",
@@ -7592,7 +7604,8 @@
 				{
 					"x": "c"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, input var",
@@ -7912,7 +7925,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, external non-ground var",
@@ -8737,7 +8751,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/general, multiple result-set entries",
@@ -9257,7 +9272,8 @@
 					"i": "bar",
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

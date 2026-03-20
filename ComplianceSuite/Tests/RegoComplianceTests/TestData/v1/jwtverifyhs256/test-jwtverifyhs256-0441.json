@@ -265,7 +265,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

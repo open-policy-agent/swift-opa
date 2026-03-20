@@ -301,7 +301,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member simple, array",
@@ -605,7 +606,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member simple, object",
@@ -915,7 +917,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member object with key",
@@ -1232,7 +1235,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member array with index",
@@ -1568,7 +1572,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member array with index, nested",
@@ -1978,7 +1983,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member array with index, nested, associativity without parens",
@@ -2375,7 +2381,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member object with key, nested, associativity without parens",
@@ -2765,7 +2772,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member object with key, nested",
@@ -3161,7 +3169,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member simple false, set",
@@ -3477,7 +3486,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member simple false, array",
@@ -3794,7 +3804,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member simple false, object",
@@ -4117,7 +4128,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member chained",
@@ -4570,7 +4582,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member with vars",
@@ -4896,7 +4909,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member with not",
@@ -5195,7 +5209,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member operator precedence with other infix operator (+)",
@@ -5566,7 +5581,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member operator precedence in list (set)",
@@ -5989,7 +6005,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member operator precedence in list with parens (set)",
@@ -6383,7 +6400,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member operator precedence in list (array)",
@@ -6903,7 +6921,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member operator precedence in list with parens (array)",
@@ -7364,7 +7383,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member operator precedence in list (fun args)",
@@ -7830,7 +7850,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member operator precedence in list with parens (fun args)",
@@ -8285,7 +8306,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member composite containee",
@@ -8699,7 +8721,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member non-collection string",
@@ -8983,7 +9006,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member non-collection number",
@@ -9267,7 +9291,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member with key in non-collection (number)",
@@ -9568,7 +9593,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some simple, array",
@@ -9908,7 +9934,8 @@
 						3
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some ground value",
@@ -10194,7 +10221,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some containee is call",
@@ -10594,7 +10622,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some non-ground composite containee",
@@ -11029,7 +11058,8 @@
 				{
 					"x": 100
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some non-ground composite containee, multiple bindings",
@@ -11472,7 +11502,8 @@
 				{
 					"x": 100
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some ground composite containee",
@@ -11875,7 +11906,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some ground composite containee (false)",
@@ -12273,7 +12305,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some+key non-ground value",
@@ -12584,7 +12617,8 @@
 				{
 					"x": 100
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some+key non-ground key",
@@ -12909,7 +12943,8 @@
 				{
 					"x": "what"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some+key non-ground key+value",
@@ -13228,7 +13263,8 @@
 						"what": "ever"
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some+key non-ground, composite key",
@@ -13627,7 +13663,8 @@
 				{
 					"x": 100
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some+ref",
@@ -14020,7 +14057,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some+key+ref",
@@ -14455,7 +14493,8 @@
 						2
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some+key+ref with other variable",
@@ -14935,7 +14974,8 @@
 						"array"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "aggregates/member+some+with",
@@ -15269,7 +15309,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

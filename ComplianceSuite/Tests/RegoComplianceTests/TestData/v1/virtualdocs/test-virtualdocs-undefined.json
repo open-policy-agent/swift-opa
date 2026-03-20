@@ -262,7 +262,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "virtualdocs/undefined: in set literal",
@@ -526,7 +527,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "virtualdocs/undefined: in set coprehension body",
@@ -815,7 +817,8 @@
 				{
 					"x": []
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "virtualdocs/undefined: in array coprehension body",
@@ -1105,7 +1108,8 @@
 				{
 					"x": []
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -339,7 +339,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: direct call, arity 1",
@@ -783,7 +784,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: indirect call, arity 1",
@@ -1356,7 +1358,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: indirect call, arity 0",
@@ -1826,7 +1829,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: indirect call, arity 0, rule queried with and without mock",
@@ -2487,7 +2491,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: indirect call, arity 0, query package",
@@ -3428,7 +3433,8 @@
 						"p": true
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: http.send example",
@@ -4582,7 +4588,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: nested, multiple mocks",
@@ -6536,7 +6543,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: indirect call through function",
@@ -7140,7 +7148,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: indirect call through function, rule with and without mock",
@@ -8069,7 +8078,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: indirect call through function, query package",
@@ -9278,7 +9288,8 @@
 						"p": true
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: mock function calls original",
@@ -10081,7 +10092,8 @@
 						4
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: mock function returns same result for both rule defs",
@@ -10799,7 +10811,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: nested, mock function calls original",
@@ -12183,7 +12196,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: multiple with",
@@ -12740,7 +12754,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: mock will not call other mock",
@@ -13417,7 +13432,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: nested scope handling",
@@ -14982,7 +14998,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin-value: arity-0, captured output",
@@ -15223,7 +15240,8 @@
 				{
 					"x": 12300
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin-value: arity-0, false",
@@ -15433,7 +15451,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin-value: arity-0",
@@ -15651,7 +15670,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin-value: arity-0, var",
@@ -15882,7 +15902,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin-value: arity-1",
@@ -16146,7 +16167,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin-value: arity-1, captured",
@@ -16397,7 +16419,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin-value: arity-1, input must still be defined",
@@ -16665,7 +16688,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin-builtin: arity 0",
@@ -16925,7 +16949,8 @@
 				{
 					"x": {}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin-builtin: arity 1, replacement is compound",
@@ -17291,7 +17316,8 @@
 						"foo": 3
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin-builtin: arity 1, replacement is simple",
@@ -17670,7 +17696,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: direct call, arity 1, replacement is value that needs eval (array comprehension)",
@@ -18102,7 +18129,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: indirect call, arity 1, replacement is value that needs eval (array comprehension)",
@@ -18655,7 +18683,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: indirect call, arity 1, replacement is local variable via scan",
@@ -19269,7 +19298,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/builtin: indirect call, arity 1, multiple, nested replacements",
@@ -19963,7 +19993,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

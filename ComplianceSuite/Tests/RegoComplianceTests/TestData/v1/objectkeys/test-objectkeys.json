@@ -341,7 +341,8 @@
 						"b"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectkeys/number_keys_found",
@@ -698,7 +699,8 @@
 						2
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectkeys/object_keys_found",
@@ -1121,7 +1123,8 @@
 						}
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectkeys/set_keys_found",
@@ -1516,7 +1519,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectkeys/array_keys_found",
@@ -1913,7 +1917,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectkeys/empty_result",
@@ -2184,7 +2189,8 @@
 				{
 					"x": []
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectkeys/error_on_non_object",
@@ -2474,7 +2480,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

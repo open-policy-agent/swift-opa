@@ -252,7 +252,8 @@
 				{
 					"x": "lorem ipsum"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -253,7 +253,8 @@
 				{
 					"x": "hello"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

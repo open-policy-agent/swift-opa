@@ -343,7 +343,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "globmatch/captured negative result, constant",
@@ -678,7 +679,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

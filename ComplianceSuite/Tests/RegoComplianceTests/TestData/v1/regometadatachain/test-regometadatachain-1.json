@@ -664,7 +664,8 @@
 						}
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regometadatachain/rule mixed scope",
@@ -1555,7 +1556,8 @@
 						}
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regometadatachain/package spanning modules",
@@ -2047,7 +2049,8 @@
 						}
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

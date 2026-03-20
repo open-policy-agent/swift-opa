@@ -405,7 +405,8 @@
 						"goodbye"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

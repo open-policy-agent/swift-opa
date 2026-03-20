@@ -292,7 +292,8 @@
 				{
 					"x": "Wednesday"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

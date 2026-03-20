@@ -264,7 +264,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexmatch/regex.match empty anchored",
@@ -530,7 +531,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexmatch/regex.match empty string against empty string",
@@ -793,7 +795,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexmatch/regex.match empty string against non-empty string",
@@ -1056,7 +1059,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexmatch/regex.match negative",
@@ -1322,7 +1326,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexmatch/regex.match bad RE",
@@ -1580,7 +1585,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		}
 	]
 }

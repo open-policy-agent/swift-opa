@@ -500,7 +500,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

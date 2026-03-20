@@ -286,7 +286,8 @@
 						true
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "globmatch/glob match single without default delimiter, glob non-empty",
@@ -574,7 +575,8 @@
 						true
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -572,7 +572,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/non-iter domain: string",
@@ -1136,7 +1137,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/non-iter domain: bool",
@@ -1697,7 +1699,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/non-iter domain: null",
@@ -2267,7 +2270,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/non-iter domain: built-in call",
@@ -2888,7 +2892,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/non-iter domain: function call",
@@ -3672,7 +3677,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/non-iter domain: rule ref",
@@ -4343,7 +4349,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/non-iter domain: data int",
@@ -4973,7 +4980,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/non-iter domain: input int",
@@ -5557,7 +5565,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/non-iter domain: input int (1st level)",
@@ -6128,7 +6137,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

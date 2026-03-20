@@ -710,7 +710,8 @@
 						"c"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonpatch/set-success basic-add",
@@ -1449,7 +1450,8 @@
 						"d"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonpatch/set-failure add-with-mismatched-key-value",
@@ -2169,7 +2171,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "jsonpatch/set-success basic-move",
@@ -3027,7 +3030,8 @@
 						"d"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonpatch/set-success add-to-nested-array",
@@ -3806,7 +3810,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

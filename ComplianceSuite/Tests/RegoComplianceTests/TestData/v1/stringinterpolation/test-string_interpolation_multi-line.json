@@ -274,7 +274,8 @@
 				{
 					"x": ""
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/no template expression",
@@ -550,7 +551,8 @@
 				{
 					"x": "foo\nbar\nbaz\n"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/escaped template expressions",
@@ -1553,7 +1555,8 @@
 						"d": "{42"
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/template expressions with primitive values",
@@ -1971,7 +1974,8 @@
 				{
 					"x": "42,\n13.37,\ntrue,\nfoo,\nnull"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/template expressions with collection values",
@@ -2954,7 +2958,8 @@
 				{
 					"x": "[],\n[42, 13.37, true, \"foo\", null],\nset(),\n{42},\n{},\n{\"a\": \"b\"}"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/template expression with array comprehension",
@@ -3525,7 +3530,8 @@
 				{
 					"x": "[\"a\", \"b\", \"c\"]"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/template expression with set comprehension",
@@ -4063,7 +4069,8 @@
 				{
 					"x": "{\"a\"}"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/template expression with object comprehension",
@@ -4605,7 +4612,8 @@
 				{
 					"x": "{\"a\": \"a\"}"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/template expressions with variables",
@@ -5183,7 +5191,8 @@
 				{
 					"x": "foo\nbar"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/template expressions with refs",
@@ -5865,7 +5874,8 @@
 				{
 					"x": "foo\nbar\nbaz"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/nested template expressions",
@@ -6801,7 +6811,8 @@
 				{
 					"x": "foo\nbar\nbaz"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/nested template expressions, undefined outer expression",
@@ -7720,7 +7731,8 @@
 				{
 					"x": "\u003cundefined\u003e\nbar\nbaz"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/nested template expressions, undefined inner expression",
@@ -8639,7 +8651,8 @@
 				{
 					"x": "foo\n\u003cundefined\u003e\nbaz"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/template expressions with infix operand call",
@@ -9199,7 +9212,8 @@
 				{
 					"x": "\u003csum\u003e\n  43\n\u003c/sum\u003e"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/template expressions with undefined values",
@@ -9708,7 +9722,8 @@
 				{
 					"x": "\u003cundefined\u003e,\n\u003cundefined\u003e"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/inside array comprehension",
@@ -10287,7 +10302,8 @@
 						"\u003cv\u003e\nbar\n\u003c/v\u003e"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/inside set comprehension",
@@ -10796,7 +10812,8 @@
 						"\u003cv\u003e\nfoo\n\u003c/v\u003e"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/inside map comprehension",
@@ -11491,7 +11508,8 @@
 						"\u003c1\u003e": "\u003cbar\u003e"
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/inside map comprehension head",
@@ -12160,7 +12178,8 @@
 						"\u003c1\u003e": "\u003cbar\u003e"
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/inside every expression, body",
@@ -12810,7 +12829,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/with in template expression",
@@ -13395,7 +13415,8 @@
 				{
 					"x": "foo 42"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/with outside template string",
@@ -14446,7 +14467,8 @@
 				{
 					"x": "foo 42 bar"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/with outside template string, overrides",
@@ -15689,7 +15711,8 @@
 				{
 					"x": "foo \u003cundefined\u003e bar"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/multi-line/template-string function arg",
@@ -16264,7 +16287,8 @@
 				{
 					"x": 42
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

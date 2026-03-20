@@ -261,7 +261,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/indexof: unicode chars not found",
@@ -527,7 +528,8 @@
 				{
 					"x": -1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/indexof: unicode string",
@@ -793,7 +795,8 @@
 				{
 					"x": 9
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/indexof: unicode string emoji",
@@ -1059,7 +1062,8 @@
 				{
 					"x": 4
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/indexof: unicode string emojis",
@@ -1322,7 +1326,8 @@
 				{
 					"x": 0
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

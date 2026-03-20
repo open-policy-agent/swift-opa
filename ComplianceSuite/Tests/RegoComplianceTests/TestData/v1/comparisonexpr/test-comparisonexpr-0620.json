@@ -242,7 +242,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "comparisonexpr/numbers: int and float array comparison",
@@ -486,7 +487,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "comparisonexpr/numbers: int and float object comparison",
@@ -730,7 +732,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "comparisonexpr/numbers: int and float nested object comparison",
@@ -1052,7 +1055,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

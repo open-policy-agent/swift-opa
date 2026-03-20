@@ -287,7 +287,8 @@
 						true
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

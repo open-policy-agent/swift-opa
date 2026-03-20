@@ -297,7 +297,8 @@
 						"al"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexfind/finds 2 matched values",
@@ -594,7 +595,8 @@
 						"an"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexfind/finds 0 matched values",
@@ -885,7 +887,8 @@
 				{
 					"x": []
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexfind/regex is anchored, start",
@@ -1180,7 +1183,8 @@
 						"ab"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexfind/regex is anchored,end",
@@ -1475,7 +1479,8 @@
 						"f"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexfind/regex with overlapping matches",
@@ -1778,7 +1783,8 @@
 						"af"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

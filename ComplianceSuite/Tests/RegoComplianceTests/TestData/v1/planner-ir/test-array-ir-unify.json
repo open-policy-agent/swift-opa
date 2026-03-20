@@ -364,7 +364,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ir/unification array comprehension and array",
@@ -730,7 +731,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ir/fixpoint key/value (negative)",
@@ -993,7 +995,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "ir/fixpoint key/value",
@@ -1266,7 +1269,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

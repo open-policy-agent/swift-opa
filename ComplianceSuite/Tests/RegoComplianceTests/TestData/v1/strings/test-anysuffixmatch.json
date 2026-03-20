@@ -372,7 +372,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/nomatch",
@@ -738,7 +739,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/match",
@@ -1112,7 +1114,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/match",
@@ -1486,7 +1489,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/match",
@@ -1860,7 +1864,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/nomatch",
@@ -2226,7 +2231,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/nomatch",
@@ -2591,7 +2597,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/nomatch",
@@ -2953,7 +2960,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/nomatch",
@@ -3316,7 +3324,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/nomatch",
@@ -3675,7 +3684,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/match",
@@ -4046,7 +4056,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/nomatch",
@@ -4409,7 +4420,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/match",
@@ -4779,7 +4791,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/nomatch",
@@ -5141,7 +5154,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/match",
@@ -5771,7 +5785,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/nomatch",
@@ -6393,7 +6408,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/type_error_nostrict",
@@ -6759,7 +6775,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/type_error_nostrict",
@@ -7121,7 +7138,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/type_error_nostrict",
@@ -7487,7 +7505,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/type_error_nostrict",
@@ -7850,7 +7869,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/type_error_strict",
@@ -8217,7 +8237,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/type_error_strict",
@@ -8580,7 +8601,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/type_error_strict",
@@ -8947,7 +8969,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "strings/any_suffix_match/type_error_strict",
@@ -9311,7 +9334,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

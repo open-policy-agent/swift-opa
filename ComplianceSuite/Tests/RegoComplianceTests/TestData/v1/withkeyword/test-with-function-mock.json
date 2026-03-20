@@ -239,7 +239,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: direct call, function replacement, arity 1",
@@ -598,7 +599,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: direct call, function replacement, arity 1, result captured",
@@ -957,7 +959,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: direct call, built-in replacement, arity 1",
@@ -1285,7 +1288,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: direct call, built-in replacement, arity 1, result captured",
@@ -1613,7 +1617,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: nested scope handling",
@@ -3440,7 +3445,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: simple scope handling (no recursion here)",
@@ -3943,7 +3949,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: rule indexing irrelevant",
@@ -4197,7 +4204,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: direct call, arity 1, replacement is value that needs eval (array comprehension)",
@@ -4629,7 +4637,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: indirect call, arity 1, replacement is value that needs eval (array comprehension)",
@@ -5182,7 +5191,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: indirect call, arity 1, replacement is local variable",
@@ -5701,7 +5711,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: indirect call, arity 1, replacement is local variable via scan",
@@ -6322,7 +6333,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/function: indirect call, arity 1, multiple, nested replacements",
@@ -7134,7 +7146,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

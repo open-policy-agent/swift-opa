@@ -281,7 +281,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "units_parse/exact comparison - regression case 2",
@@ -564,7 +565,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "units_parse/exact comparison - regression case 3",
@@ -847,7 +849,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

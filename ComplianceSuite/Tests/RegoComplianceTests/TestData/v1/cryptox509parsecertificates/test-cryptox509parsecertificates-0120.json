@@ -525,7 +525,8 @@
 						"openpolicyagent.org"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

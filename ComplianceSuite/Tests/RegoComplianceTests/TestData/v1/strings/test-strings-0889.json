@@ -297,7 +297,8 @@
 				{
 					"x": "cde"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/substring: unicode",
@@ -595,7 +596,8 @@
 				{
 					"x": "åä"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

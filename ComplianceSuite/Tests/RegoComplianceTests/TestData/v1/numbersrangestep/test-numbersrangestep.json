@@ -336,7 +336,8 @@
 						10
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "numbersrangestep/descending",
@@ -674,7 +675,8 @@
 						-10
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "numbersrangestep/descending (cheap optimization)",
@@ -1008,7 +1010,8 @@
 						4
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "numbersrangestep/negative",
@@ -1326,7 +1329,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "numbersrangestep/memoryexample",
@@ -1657,7 +1661,8 @@
 						4096
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "numbersrangestep/equal",
@@ -1979,7 +1984,8 @@
 						2
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "numbersrangestep/notinrange",
@@ -2306,7 +2312,8 @@
 						4
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "numbersrangestep/big int step",
@@ -2634,7 +2641,8 @@
 						0
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

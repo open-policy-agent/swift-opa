@@ -406,7 +406,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "reachable_paths/cycle_1022_2",
@@ -814,7 +815,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "reachable_paths/cycle_1022_3",
@@ -1234,7 +1236,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

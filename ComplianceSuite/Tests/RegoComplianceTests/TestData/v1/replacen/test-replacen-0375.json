@@ -330,7 +330,8 @@
 						"Everything is new1, new2"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -525,7 +525,8 @@
 						"mail.google.com"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -720,7 +720,8 @@
 						"foo"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ir/no call-dynamic with mixed partial rules",
@@ -1115,7 +1116,8 @@
 				{
 					"x": "C"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ir/call-dynamic with mixed partial rules",
@@ -1632,7 +1634,8 @@
 				{
 					"x": "C"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ir/no call-dynamic with mixed partial rules, ref heads",
@@ -2024,7 +2027,8 @@
 				{
 					"x": "C"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ir/call-dynamic with mixed partial rules, ref heads",
@@ -2639,7 +2643,8 @@
 				{
 					"x": "C"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ir/call-dynamic with ref heads, issue 5839",
@@ -4123,7 +4128,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ir/call-dynamic with ref heads, issue 5839, penultimate",
@@ -5530,7 +5536,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ir/call-dynamic with ref heads and unrelated rule (issue 7399)",
@@ -6239,7 +6246,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ir/call-dynamic not used with ref heads and mixed-length rules (issue 7399)",
@@ -7732,7 +7740,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ir/call-dynamic not used with ref heads and mixed-length rules (issue 7399), second rule",
@@ -9225,7 +9234,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

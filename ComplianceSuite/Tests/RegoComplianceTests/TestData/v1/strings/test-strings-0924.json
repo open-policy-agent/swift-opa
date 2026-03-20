@@ -331,7 +331,8 @@
 				{
 					"x": "rab"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/reverse_unicode_multi_char_emojii",
@@ -664,7 +665,8 @@
 				{
 					"x": "⃣️2"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/reverse_unicode",
@@ -997,7 +999,8 @@
 				{
 					"x": "𝛾😀1"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/reverse_empty",
@@ -1330,7 +1333,8 @@
 				{
 					"x": ""
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/reverse_number_error",
@@ -1657,7 +1661,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "strings/reverse_object_error",
@@ -1986,7 +1991,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

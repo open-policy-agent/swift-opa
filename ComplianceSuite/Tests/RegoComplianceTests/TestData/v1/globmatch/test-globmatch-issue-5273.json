@@ -364,7 +364,8 @@
 						true
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

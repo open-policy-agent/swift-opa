@@ -385,7 +385,8 @@
 						"title": "Testing annotations"
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regometadatarule/rule scope only",
@@ -751,7 +752,8 @@
 						"title": "Another annotation"
 					}
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

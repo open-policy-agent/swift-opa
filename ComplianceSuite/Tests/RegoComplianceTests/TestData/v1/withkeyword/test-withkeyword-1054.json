@@ -344,7 +344,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/rewrite declared variables nested in function call in with value",
@@ -1361,7 +1362,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/rewrite declared variables nested in array in with value",
@@ -1892,7 +1894,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/rewrite declared variables nested in object in with value",
@@ -2405,7 +2408,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "withkeyword/rewrite declared variables nested in function/array/object in with value",
@@ -2990,7 +2994,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

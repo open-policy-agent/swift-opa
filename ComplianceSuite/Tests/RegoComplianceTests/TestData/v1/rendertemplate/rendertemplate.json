@@ -527,7 +527,8 @@
 				{
 					"x": "hello world"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "rendertemplate/simpleint",
@@ -1066,7 +1067,8 @@
 				{
 					"x": "2023"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "rendertemplate/complex",
@@ -1634,7 +1636,8 @@
 				{
 					"x": "hello rohan,hello john doe"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "rendertemplate/missingkey",
@@ -2164,7 +2167,8 @@
 				{
 					"x": "\u003cundefined\u003e"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "rendertemplate/missingmultiplekeys",
@@ -2704,7 +2708,8 @@
 				{
 					"x": "test \u003cundefined\u003e \u003cundefined\u003e 1"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

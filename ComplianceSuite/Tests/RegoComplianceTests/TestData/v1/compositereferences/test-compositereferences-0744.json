@@ -955,7 +955,8 @@
 						"foo": "bar"
 					}
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -274,7 +274,8 @@
 				{
 					"x": ""
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/no template expression",
@@ -550,7 +551,8 @@
 				{
 					"x": "foo bar baz"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/escapes",
@@ -826,7 +828,8 @@
 				{
 					"x": "\t\n\""
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/escaped template expressions",
@@ -1829,7 +1832,8 @@
 						"d": "{42"
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/template expressions with primitive values",
@@ -2247,7 +2251,8 @@
 				{
 					"x": "42, 13.37, true, foo, null"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/template expressions with collection values",
@@ -3230,7 +3235,8 @@
 				{
 					"x": "[], [42, 13.37, true, \"foo\", null], set(), {42}, {}, {\"a\": \"b\"}"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/template expression with array comprehension",
@@ -3801,7 +3807,8 @@
 				{
 					"x": "[\"a\", \"b\", \"c\"]"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/template expression with set comprehension",
@@ -4339,7 +4346,8 @@
 				{
 					"x": "{\"a\"}"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/template expression with object comprehension",
@@ -4881,7 +4889,8 @@
 				{
 					"x": "{\"a\": \"a\"}"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/template expressions with variables",
@@ -5459,7 +5468,8 @@
 				{
 					"x": "foo bar"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/template expressions with refs",
@@ -6141,7 +6151,8 @@
 				{
 					"x": "foo bar baz"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/nested template expressions",
@@ -7077,7 +7088,8 @@
 				{
 					"x": "foo bar baz"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/nested template expressions, undefined outer expression",
@@ -7996,7 +8008,8 @@
 				{
 					"x": "\u003cundefined\u003e bar baz"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/nested template expressions, undefined inner expression",
@@ -8915,7 +8928,8 @@
 				{
 					"x": "foo \u003cundefined\u003e baz"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/template expressions with infix operand call",
@@ -9459,7 +9473,8 @@
 				{
 					"x": "sum: 43"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/template expressions with undefined values",
@@ -9968,7 +9983,8 @@
 				{
 					"x": "\u003cundefined\u003e, \u003cundefined\u003e"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/inside array comprehension",
@@ -10547,7 +10563,8 @@
 						"\u003cbar\u003e"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/inside set comprehension",
@@ -11056,7 +11073,8 @@
 						"\u003cfoo\u003e"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/inside map comprehension",
@@ -11751,7 +11769,8 @@
 						"\u003c1\u003e": "\u003cbar\u003e"
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/inside map comprehension head",
@@ -12420,7 +12439,8 @@
 						"\u003c1\u003e": "\u003cbar\u003e"
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/inside every expression, body",
@@ -13070,7 +13090,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/with in template expression",
@@ -13655,7 +13676,8 @@
 				{
 					"x": "foo 42"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/with outside template string",
@@ -14706,7 +14728,8 @@
 				{
 					"x": "foo 42 bar"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/with outside template string, overrides",
@@ -15949,7 +15972,8 @@
 				{
 					"x": "foo \u003cundefined\u003e bar"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/template-string function arg",
@@ -16524,7 +16548,8 @@
 				{
 					"x": 42
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/some",
@@ -17168,7 +17193,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

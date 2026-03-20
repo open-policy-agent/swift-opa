@@ -388,7 +388,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "walkbuiltin/objects no path",
@@ -943,7 +944,8 @@
 						}
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

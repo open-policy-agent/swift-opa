@@ -332,7 +332,8 @@
 						true
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "cryptohmacequal/crypto.hmac.equal_sha1",
@@ -666,7 +667,8 @@
 						true
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "cryptohmacequal/crypto.hmac.equal_sha256",
@@ -1000,7 +1002,8 @@
 						true
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "cryptohmacequal/crypto.hmac.equal_sha512",
@@ -1334,7 +1337,8 @@
 						true
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "cryptohmacequal/crypto.hmac.equal_false",
@@ -1668,7 +1672,8 @@
 						false
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -257,7 +257,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/failure-missing on in fragment",
@@ -629,7 +630,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/failure-missing name after alias",
@@ -1001,7 +1003,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/failure-not an operation",
@@ -1373,7 +1376,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/failure-a wild splat appears",
@@ -1745,7 +1749,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-variables are allowed in args",
@@ -3086,7 +3091,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/failure-variables are not allowed in default args",
@@ -3458,7 +3464,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-variables can have directives",
@@ -4585,7 +4592,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/failure-fragment can not be named 'on'",
@@ -4957,7 +4965,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/failure-fragment can not spread fragments called 'on'",
@@ -5329,7 +5338,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-encoding multibyte characters are supported",
@@ -6196,7 +6206,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-keywords-allowed-where-names-are on",
@@ -7588,7 +7599,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-keywords-allowed-where-names-are subscription",
@@ -8977,7 +8989,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-keywords-allowed-where-names-are true",
@@ -10366,7 +10379,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-operations anonymous mutation",
@@ -11056,7 +11070,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-operations named mutation",
@@ -11746,7 +11761,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-operations anonymous subscription",
@@ -12436,7 +12452,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-operations named subscription",
@@ -13126,7 +13143,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-ast simple query",
@@ -14135,7 +14153,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-ast nameless query with no variables",
@@ -14911,7 +14930,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-ast fragment defined variables",
@@ -16035,7 +16055,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-values null",
@@ -16902,7 +16923,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-values strings",
@@ -17898,7 +17920,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-values list",
@@ -19050,7 +19073,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-types common types",
@@ -20393,7 +20417,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-large-queries kitchen sink",
@@ -26453,7 +26478,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/failure-fuzzer 01",
@@ -26825,7 +26851,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/failure-fuzzer 02",
@@ -27197,7 +27224,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

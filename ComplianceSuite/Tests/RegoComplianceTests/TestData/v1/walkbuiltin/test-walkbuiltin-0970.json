@@ -390,7 +390,8 @@
 						]
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "walkbuiltin/scalar no path",
@@ -903,7 +904,8 @@
 						1
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

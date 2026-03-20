@@ -338,7 +338,8 @@
 				{
 					"x": "array"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

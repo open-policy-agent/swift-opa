@@ -277,7 +277,8 @@
 				{
 					"x": "foo,bar"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

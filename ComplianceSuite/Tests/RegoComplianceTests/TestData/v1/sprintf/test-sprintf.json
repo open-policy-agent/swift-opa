@@ -313,7 +313,8 @@
 				{
 					"x": "123456789123456789123"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "sprintf/big_int/max_cert_serial_number",
@@ -628,7 +629,8 @@
 				{
 					"x": "1208925819614629174706175"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

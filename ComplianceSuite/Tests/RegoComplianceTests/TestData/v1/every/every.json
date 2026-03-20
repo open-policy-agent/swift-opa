@@ -507,7 +507,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/empty domain (set)",
@@ -1015,7 +1016,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/empty domain (object)",
@@ -1523,7 +1525,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/empty domain (partial rule ref)",
@@ -2131,7 +2134,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/domain undefined (input)",
@@ -2572,7 +2576,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "every/domain undefined (data ref)",
@@ -3070,7 +3075,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "every/domain is call",
@@ -3664,7 +3670,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/simple key/val",
@@ -4248,7 +4255,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/simple key/val (set)",
@@ -4765,7 +4773,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/simple key/val (partial rule ref)",
@@ -5360,7 +5369,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/outer bindings",
@@ -6001,7 +6011,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/simple failure, first",
@@ -6564,7 +6575,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "every/simple failure, last",
@@ -7127,7 +7139,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "every/with: domain",
@@ -7861,7 +7874,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/with: body",
@@ -8745,7 +8759,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/followed by another query",
@@ -9403,7 +9418,8 @@
 						10
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/array with calls",
@@ -10139,7 +10155,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "every/array with calls (fail)",
@@ -11003,7 +11020,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -301,7 +301,8 @@
 						"192.0.128.0/24"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr duplicate",
@@ -617,7 +618,8 @@
 						"192.0.128.0/24"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr IPv4 zero address",
@@ -936,7 +938,8 @@
 						"0.0.0.0/0"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr merge subnets case 1",
@@ -1255,7 +1258,8 @@
 						"192.0.128.0/23"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr merge subnets case 2",
@@ -1590,7 +1594,8 @@
 						"192.0.2.112/29"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr no overlap case 1",
@@ -1911,7 +1916,8 @@
 						"192.0.130.0/24"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr no overlap case 2",
@@ -2251,7 +2257,8 @@
 						"192.0.2.118/31"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr mix case 1",
@@ -2588,7 +2595,8 @@
 						"192.0.2.116/30"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr mix case 2",
@@ -3167,7 +3175,8 @@
 						"192.0.3.0/28"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr IPv6 zero address case 1",
@@ -3486,7 +3495,8 @@
 						"::/0"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr IPv6 zero address case 2",
@@ -3821,7 +3831,8 @@
 						"::/0"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr IPv4 and IPv6",
@@ -4193,7 +4204,8 @@
 						"fe80::/120"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr empty",
@@ -4476,7 +4488,8 @@
 				{
 					"x": []
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr merge ip and subnets",
@@ -4811,7 +4824,8 @@
 						"192.0.2.0/24"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr merge ip addresses",
@@ -5130,7 +5144,8 @@
 						"192.0.128.0/23"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr merge subnets set",
@@ -5464,7 +5479,8 @@
 						"192.0.2.112/29"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "netcidrmerge/cidr invalid IP",
@@ -5756,7 +5772,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

@@ -276,7 +276,8 @@
 				{
 					"x": "-0-0-"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regex.replace: work with groups",
@@ -554,7 +555,8 @@
 				{
 					"x": "foofoo"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regex.replace: bad regex pattern: Syntax error",
@@ -824,7 +826,8 @@
 					]
 				}
 			},
-			"want_plan_result": []
+			"want_plan_result": [],
+			"ignore": false
 		},
 		{
 			"note": "regex.replace: anchored RE, start",
@@ -1102,7 +1105,8 @@
 				{
 					"x": "Foo"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regex.replace: anchored RE, start+end, no match",
@@ -1380,7 +1384,8 @@
 				{
 					"x": "foo"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regex.replace: anchored RE, start+end, match",
@@ -1658,7 +1663,8 @@
 				{
 					"x": "M"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regex.replace: anchored RE, end",
@@ -1936,7 +1942,8 @@
 				{
 					"x": "foF"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regex.replace: anchored RE, end, no match",
@@ -2214,7 +2221,8 @@
 				{
 					"x": "foo"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regex.replace: per-character match",
@@ -2492,7 +2500,8 @@
 				{
 					"x": "___ ___"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regex.replace: match with count",
@@ -2770,7 +2779,8 @@
 				{
 					"x": "_ _x"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regex.replace: match with count, 2",
@@ -3048,7 +3058,8 @@
 				{
 					"x": "_o __"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -661,7 +661,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-basic-ast with arguments",
@@ -2395,7 +2396,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-basic-ast inline fragments and type conditions",
@@ -3771,7 +3773,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse_query/success-basic-ast meta fields and introspection",
@@ -5105,7 +5108,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

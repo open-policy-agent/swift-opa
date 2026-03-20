@@ -171,7 +171,8 @@
 				{
 					"x": ""
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/query/non-empty template string with no expressions",
@@ -344,7 +345,8 @@
 				{
 					"x": "foo"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/query/template string with value expressions",
@@ -1056,7 +1058,8 @@
 				{
 					"x": "true null 42 1.2 foo [1, 2] {1} {\"a\": 1}"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/query/template string with ref expressions (undefined)",
@@ -1512,7 +1515,8 @@
 				{
 					"x": "\u003cundefined\u003e \u003cundefined\u003e"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/query/template string with var and ref expressions",
@@ -2188,7 +2192,8 @@
 					"x": 42,
 					"y": "42 true foo bar"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/query/template string with call expressions",
@@ -2864,7 +2869,8 @@
 				{
 					"x": "[1, 2] 3 true"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "string-interpolation/query/template string with comprehension expressions",
@@ -3759,7 +3765,8 @@
 				{
 					"x": "[\"a\"] {\"c\"} {\"a-c\": \"c\"}"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

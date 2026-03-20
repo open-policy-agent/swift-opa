@@ -330,7 +330,8 @@
 						"This is \u0026lt;b\u0026gt;HTML\u0026lt;/b\u0026gt;!"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "replacen/replace multiple patterns/overlapping",
@@ -654,7 +655,8 @@
 				{
 					"x": "xoobar"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "replacen/replace multiple patterns/overlapping/insertion order does not matter",
@@ -1451,7 +1453,8 @@
 				{
 					"x": "xoo"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

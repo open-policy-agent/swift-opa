@@ -356,7 +356,8 @@
 				{
 					"x": "bar"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/partial-object override, different key type, referenced in other rule",
@@ -845,7 +846,8 @@
 						"bar"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regression/dynamic object to static object comparison (https://github.com/open-policy-agent/opa/issues/6138)",
@@ -2790,7 +2792,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

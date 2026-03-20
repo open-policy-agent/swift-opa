@@ -549,7 +549,8 @@
 						"foo": "hello"
 					}
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

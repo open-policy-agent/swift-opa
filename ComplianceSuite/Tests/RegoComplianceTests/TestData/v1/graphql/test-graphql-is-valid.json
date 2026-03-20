@@ -525,7 +525,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_is_valid/success validation rules are independent case 1",
@@ -1062,7 +1063,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_is_valid/success validation rules are independent case 2",
@@ -1589,7 +1591,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_is_valid/success deprecating types",
@@ -2116,7 +2119,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_is_valid/success no unused variables",
@@ -2643,7 +2647,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_is_valid/success - AST objects - Employee example",
@@ -3280,7 +3285,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_is_valid/undefined argument",
@@ -3819,7 +3825,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_is_valid/undefined argument schema ast",
@@ -5243,7 +5250,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

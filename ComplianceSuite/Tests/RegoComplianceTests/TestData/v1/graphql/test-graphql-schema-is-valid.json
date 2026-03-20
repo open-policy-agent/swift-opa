@@ -384,7 +384,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success validation rules are independent case 1 and 2",
@@ -780,7 +781,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success deprecating types",
@@ -1166,7 +1168,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success no unused variables",
@@ -1552,7 +1555,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success - AST objects - Employee example",
@@ -1993,7 +1997,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-object-extensions simple",
@@ -2379,7 +2384,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-object-extensions with description",
@@ -2765,7 +2771,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-object-extensions with block description",
@@ -3151,7 +3158,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-object-extensions with field arg",
@@ -3537,7 +3545,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-object-extensions with field arg and default value",
@@ -3923,7 +3932,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-object-extensions with field list arg",
@@ -4309,7 +4319,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-object-extensions with two args",
@@ -4695,7 +4706,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-object-extensions must define one or more fields",
@@ -5091,7 +5103,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-type-extensions object extension",
@@ -5477,7 +5490,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-type-extensions without any fields",
@@ -5873,7 +5887,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-type-extensions without fields twice",
@@ -6269,7 +6284,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-type-extensions without anything errors",
@@ -6665,7 +6681,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-type-extensions can have descriptions",
@@ -7061,7 +7078,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-type-extensions can not have descriptions on types",
@@ -7457,7 +7475,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-type-extensions all can have directives",
@@ -7853,7 +7872,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-schema-definition simple",
@@ -8249,7 +8269,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-schema-extensions simple",
@@ -8645,7 +8666,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-schema-extensions directive only",
@@ -9031,7 +9053,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-schema-extensions without anything errors",
@@ -9427,7 +9450,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-inheritance single",
@@ -9823,7 +9847,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-inheritance multi",
@@ -10219,7 +10244,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-inheritance multi with leading amp",
@@ -10615,7 +10641,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-enums single value",
@@ -11001,7 +11028,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-enums double value",
@@ -11387,7 +11415,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-enums must define one or more unique enum values",
@@ -11783,7 +11812,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-interface simple",
@@ -12169,7 +12199,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-interface must define one or more fields",
@@ -12565,7 +12596,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-interface may define intermediate interfaces",
@@ -12961,7 +12993,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-unions simple",
@@ -13357,7 +13390,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-unions with two types",
@@ -13753,7 +13787,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-unions with leading pipe",
@@ -14149,7 +14184,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-unions cant be empty",
@@ -14545,7 +14581,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-unions cant double pipe",
@@ -14941,7 +14978,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-unions cant have trailing pipe",
@@ -15337,7 +15375,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-scalar simple",
@@ -15723,7 +15762,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-input-objects simple",
@@ -16109,7 +16149,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-input-objects can not have args",
@@ -16505,7 +16546,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-input-objects must define one or more input fields",
@@ -16901,7 +16943,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-directives simple",
@@ -17287,7 +17330,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-directives executable",
@@ -17673,7 +17717,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/success-directives repeatable",
@@ -18059,7 +18104,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/failure-directives invalid location",
@@ -18455,7 +18501,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_schema_is_valid/schema failure with object in input object",
@@ -18906,7 +18953,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

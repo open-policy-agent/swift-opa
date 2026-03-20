@@ -271,7 +271,8 @@
 						3
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/indexof_n_multiple_matches",
@@ -546,7 +547,8 @@
 						9
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/indexof_n_no_match",
@@ -815,7 +817,8 @@
 				{
 					"x": []
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/indexof_n_unicode_matches",
@@ -1092,7 +1095,8 @@
 						5
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/indexof_n_unicode_no_match",
@@ -1361,7 +1365,8 @@
 				{
 					"x": []
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

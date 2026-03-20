@@ -442,7 +442,8 @@
 						"v2": "goodbye"
 					}
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

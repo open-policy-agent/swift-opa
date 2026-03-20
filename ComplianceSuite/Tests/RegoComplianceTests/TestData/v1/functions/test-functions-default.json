@@ -481,7 +481,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "functions/non default",
@@ -964,7 +965,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "functions/only default",
@@ -1310,7 +1312,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "functions/wildcard args",
@@ -1765,7 +1768,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "functions/comprehensions",
@@ -2422,7 +2426,8 @@
 						3
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

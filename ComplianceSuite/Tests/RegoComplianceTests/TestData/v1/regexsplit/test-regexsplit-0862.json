@@ -271,7 +271,8 @@
 						""
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexsplit/regex.split: anchored RE, start",
@@ -546,7 +547,8 @@
 						" baz"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexsplit/regex.split: anchored RE, end",
@@ -821,7 +823,8 @@
 						""
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexsplit/regex.split: anchored RE, start+end",
@@ -1094,7 +1097,8 @@
 						"foobar baz"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "regexsplit/regex.split: anchored RE, start+end, match",
@@ -1369,7 +1373,8 @@
 						""
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

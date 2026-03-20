@@ -1160,7 +1160,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse/failure validation rules are independent case 1",
@@ -1705,7 +1706,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse/success validation rules are independent case 2",
@@ -3232,7 +3234,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse/success deprecating types",
@@ -3959,7 +3962,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse/success no unused variables",
@@ -5560,7 +5564,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "graphql_parse/success - AST objects - Employee example",
@@ -6431,7 +6436,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

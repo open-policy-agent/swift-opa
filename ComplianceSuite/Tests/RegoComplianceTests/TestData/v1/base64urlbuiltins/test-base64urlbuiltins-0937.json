@@ -252,7 +252,8 @@
 				{
 					"x": "hello"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "base64urlbuiltins/decode-2 non-padded string",
@@ -506,7 +507,8 @@
 				{
 					"x": "hello"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

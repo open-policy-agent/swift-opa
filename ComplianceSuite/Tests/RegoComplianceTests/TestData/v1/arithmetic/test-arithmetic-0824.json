@@ -263,7 +263,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ceil rounds up (2)",
@@ -528,7 +529,8 @@
 				{
 					"x": 2
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ceil rounds up (3)",
@@ -793,7 +795,8 @@
 				{
 					"x": 2223
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ceil integer",
@@ -1058,7 +1061,8 @@
 				{
 					"x": 1
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "ceil negative",
@@ -1323,7 +1327,8 @@
 				{
 					"x": -1
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

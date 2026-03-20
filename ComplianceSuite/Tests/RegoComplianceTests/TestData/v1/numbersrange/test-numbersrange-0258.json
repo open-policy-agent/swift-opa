@@ -315,7 +315,8 @@
 						-3
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "numbersrange/descending (cheap optimization)",
@@ -628,7 +629,8 @@
 						2
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

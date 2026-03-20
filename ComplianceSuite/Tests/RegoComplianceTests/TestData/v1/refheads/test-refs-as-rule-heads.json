@@ -547,7 +547,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/single-value, with var",
@@ -970,7 +971,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/single-value, with var, conflict",
@@ -1229,7 +1231,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		},
 		{
 			"note": "refheads/complete: direct query",
@@ -1434,7 +1437,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/complete: direct query q",
@@ -1649,7 +1653,8 @@
 				{
 					"x": 0
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/complete: full package extent",
@@ -2081,7 +2086,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/complete+mixed",
@@ -2705,7 +2711,8 @@
 				{
 					"x": true
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/single-value rule",
@@ -3083,7 +3090,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/multi-value",
@@ -3571,7 +3579,8 @@
 						]
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/single-value: previously partial object",
@@ -3915,7 +3924,8 @@
 						"3": 2
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/multi-value: same rule",
@@ -4383,7 +4393,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/single-value default rule",
@@ -4745,7 +4756,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/single-value example",
@@ -5103,7 +5115,8 @@
 						"7": true
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/single-value example, false",
@@ -5466,7 +5479,8 @@
 				{
 					"x": {}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/mixed example, multiple rules",
@@ -6402,7 +6416,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/website-example/partial-obj",
@@ -8204,7 +8219,8 @@
 				{
 					"x": "web"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/website-example/partial-set",
@@ -8539,7 +8555,8 @@
 						"n1"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "refheads/many-vars",
@@ -9806,7 +9823,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

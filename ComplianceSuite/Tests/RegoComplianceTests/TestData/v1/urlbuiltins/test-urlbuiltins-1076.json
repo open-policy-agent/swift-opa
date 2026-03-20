@@ -292,7 +292,8 @@
 						]
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "urlbuiltins/decode_object empty parameter",
@@ -584,7 +585,8 @@
 						]
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "urlbuiltins/decode_object empty string",
@@ -862,7 +864,8 @@
 				{
 					"x": {}
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -443,7 +443,8 @@
 						"spiffe://example.com/opa"
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "cryptox509parsecertificates/uri_strings_no_uris",
@@ -884,7 +885,8 @@
 				{
 					"x": null
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

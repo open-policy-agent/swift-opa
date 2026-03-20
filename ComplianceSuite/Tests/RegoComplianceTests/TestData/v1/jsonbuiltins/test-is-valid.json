@@ -507,7 +507,8 @@
 						true
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonbuiltins/json is_valid not string",
@@ -795,7 +796,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonbuiltins/yaml is_valid",
@@ -1304,7 +1306,8 @@
 						true
 					]
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "jsonbuiltins/yaml is_valid not string",
@@ -1592,7 +1595,8 @@
 				{
 					"x": false
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

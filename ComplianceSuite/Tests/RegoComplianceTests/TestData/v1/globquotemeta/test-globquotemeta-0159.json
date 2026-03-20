@@ -245,7 +245,8 @@
 						"\\*.github.com"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

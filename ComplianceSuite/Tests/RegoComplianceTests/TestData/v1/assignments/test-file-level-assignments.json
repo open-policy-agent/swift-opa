@@ -315,7 +315,8 @@
 						"a": 1
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "assignments/file-level/rule",
@@ -658,7 +659,8 @@
 						"b": 2
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "assignments/file-level/else_keyword",
@@ -1063,7 +1065,8 @@
 						"c": 4
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "assignments/file-level/partial_rule",
@@ -1547,7 +1550,8 @@
 						}
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "assignments/file-level/function_return_value",
@@ -2021,7 +2025,8 @@
 						"e": 6
 					}
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

@@ -292,7 +292,8 @@
 				{
 					"x": {}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectunionn/single item array",
@@ -613,7 +614,8 @@
 						"foo": "bar"
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectunionn/merge objects",
@@ -978,7 +980,8 @@
 						"x": "y"
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectunionn/merge objects conflict",
@@ -1341,7 +1344,8 @@
 						"foo": "baz"
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "objectunionn/merge objects extended",
@@ -1945,7 +1949,8 @@
 						"foo": "baz"
 					}
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "# 5073 regression test",
@@ -2223,7 +2228,8 @@
 					]
 				}
 			},
-			"want_plan_result": null
+			"want_plan_result": null,
+			"ignore": false
 		}
 	]
 }

@@ -258,7 +258,8 @@
 						"foo, bar"
 					]
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

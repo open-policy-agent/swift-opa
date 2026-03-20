@@ -297,7 +297,8 @@
 				{
 					"x": "cdefgh"
 				}
-			]
+			],
+			"ignore": false
 		},
 		{
 			"note": "strings/substring: remainder unicode",
@@ -595,7 +596,8 @@
 				{
 					"x": "äö"
 				}
-			]
+			],
+			"ignore": false
 		}
 	]
 }

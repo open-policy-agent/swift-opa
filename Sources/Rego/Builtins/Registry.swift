@@ -168,7 +168,12 @@ public struct BuiltinRegistry: Sendable {
             "time.add_date": BuiltinFuncs.timeAddDate,
             "time.clock": BuiltinFuncs.timeClock,
             "time.date": BuiltinFuncs.timeDate,
+            "time.diff": BuiltinFuncs.timeDiff,
+            "time.format": BuiltinFuncs.timeFormat,
             "time.now_ns": BuiltinFuncs.timeNowNanos,
+            "time.parse_duration_ns": BuiltinFuncs.timeParseDurationNanos,
+            "time.parse_ns": BuiltinFuncs.timeParseNanos,
+            "time.parse_rfc3339_ns": BuiltinFuncs.timeParseRFC3339Nanos,
             "time.weekday": BuiltinFuncs.timeWeekday,
 
             // Trace

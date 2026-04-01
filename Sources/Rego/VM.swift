@@ -94,7 +94,7 @@ extension VM {
 
         // Save current locals and install new frame
         let savedLocals = context.locals
-        let localsCount = function.maxLocal + 1
+        let localsCount = max(function.maxLocal + 1, 2)
         context.locals = context.allocateLocals(count: localsCount)
 
         // Assign parameters

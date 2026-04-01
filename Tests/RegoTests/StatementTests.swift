@@ -11,7 +11,11 @@ extension Locals {
     func merging(_ rhs: Locals?) -> Locals {
         guard let rhs else { return self }
         if rhs.isEmpty { return self }
-        var result = Locals(self.storage)
+        let resultCount = max(self.count, rhs.count)
+        var result = Locals(repeating: nil, count: resultCount)
+        for i in 0..<self.count {
+            result[Local(i)] = self.storage[i]
+        }
         for i in 0..<rhs.count {
             if let rhsValue = rhs[Local(i)] {
                 result[Local(i)] = rhsValue
@@ -87,7 +91,14 @@ struct StatementTests {
             planMaxLocal: plan.maxLocal,
             data: .undefined
         )
-        vmCtx.locals = locals
+        vmCtx.locals = {
+            let localsCount = max(vmCtx.locals.count, locals.count)
+            var merged = Locals(repeating: nil, count: localsCount)
+            for i in 0..<locals.count {
+                merged[Local(i)] = locals.storage[i]
+            }
+            return merged
+        }()
         return (vmCtx, VM(policy: policy))
     }
 
@@ -1376,15 +1387,11 @@ struct StatementTests {
         let blockResult = try result.get()
 
         var expectLocals = tc.locals.merging(tc.expectLocals)
-        var gotLocals = vmCtx.locals
+        var gotLocals = Locals(Array(vmCtx.locals.storage.prefix(expectLocals.count)))
 
         for idx in tc.ignoreLocals {
-            gotLocals[idx] = nil
-            expectLocals[idx] = nil
-        }
-
-        if case .scanStmt = tc.stmt {
-            gotLocals.resize(to: expectLocals.count)
+            if Int(idx) < gotLocals.count { gotLocals[idx] = nil }
+            if Int(idx) < expectLocals.count { expectLocals[idx] = nil }
         }
 
         #expect(gotLocals == expectLocals, "comparing locals")

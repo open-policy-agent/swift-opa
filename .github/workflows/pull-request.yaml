@@ -131,7 +131,7 @@ jobs:
           diff_and_print main-failed pr-failed 'failed (main vs PR)' >> $GITHUB_STEP_SUMMARY
 
   capabilities-check:
-    name: check capabilities.json unchanged
+    name: check generated files unchanged
     runs-on: macos-latest
     permissions:
       contents: read
@@ -140,17 +140,24 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
-      - name: generate capabilities
+      - name: generate
         run: make generate
-      - name: check for changes
+      - name: check capabilities.json
         run: |
           if git diff --exit-code capabilities.json; then
             echo "capabilities.json is up-to-date"
           else
-            echo "::error::capabilities.json needs to be updated"
-            echo "Run: swift run swift-opa-cli capabilities opa-capabilities.json > capabilities.json"
-            echo "Differences:"
+            echo "::error::capabilities.json needs to be updated — run: make generate"
             git diff capabilities.json
+            exit 1
+          fi
+      - name: check SyncPeers.swift
+        run: |
+          if git diff --exit-code Sources/Rego/Generated/SyncPeers.swift; then
+            echo "SyncPeers.swift is up-to-date"
+          else
+            echo "::error::SyncPeers.swift needs to be updated — run: make generate"
+            git diff Sources/Rego/Generated/SyncPeers.swift
             exit 1
           fi
 

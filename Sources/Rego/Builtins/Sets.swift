@@ -2,7 +2,7 @@ import AST
 import Foundation
 
 extension BuiltinFuncs {
-    static func and(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func and(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -22,7 +22,7 @@ extension BuiltinFuncs {
     // args
     // xs: set of sets to intersect
     // returns: the intersection of all `xs` sets
-    static func intersection(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func intersection(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -53,7 +53,7 @@ extension BuiltinFuncs {
         return .set(result)
     }
 
-    static func or(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func or(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -73,7 +73,7 @@ extension BuiltinFuncs {
     // args
     // xs: set of sets to merge
     // returns: the union of all `xs` sets
-    static func union(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func union(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }

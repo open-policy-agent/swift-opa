@@ -138,7 +138,7 @@ struct IREvaluatorValidationTests {
         // than throwing unknownQuery. A name from neither source must throw.
         let store = OPA.InMemoryStore(initialData: .object(["data": .object([:])]))
         func evaluate(_ query: String) async throws -> ResultSet {
-            let builtins = evaluator.policies.map { _ in [Builtin?]() }
+            let builtins = evaluator.policies.map { _ in [BuiltinImpl?]() }
             return try await evaluator.evaluate(
                 withContext: EvaluationContext(query: query, input: .object([:]), store: store),
                 builtins: builtins)

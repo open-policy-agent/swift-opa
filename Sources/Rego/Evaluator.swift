@@ -3,13 +3,14 @@ import AST
 import Foundation
 
 protocol Evaluator: Sendable {
-    func evaluate(withContext ctx: EvaluationContext, builtins: [[Builtin?]]) async throws -> ResultSet
+    func evaluate(withContext ctx: EvaluationContext, builtins: [[BuiltinImpl?]]) async throws -> ResultSet
+    func evaluate(withContext ctx: EvaluationContext, builtins: [[BuiltinImpl?]]) throws -> ResultSet
 }
 /// EvaluationContext is the common evaluation context that is passed to the common Engine.
 internal struct EvaluationContext {
     public let query: String
     public let input: AST.RegoValue
-    public var store: OPA.Store
+    public var store: any OPA.Store
     public var builtins: BuiltinRegistry
     public var tracer: OPA.Trace.QueryTracer?
     public var strictBuiltins: Bool = false
@@ -21,7 +22,7 @@ internal struct EvaluationContext {
     init(
         query: String,
         input: AST.RegoValue,
-        store: OPA.Store = NullStore(),
+        store: any OPA.Store = NullStore(),
         builtins: BuiltinRegistry = .defaultRegistry,
         tracer: OPA.Trace.QueryTracer? = nil,
         strictBuiltins: Bool = false,

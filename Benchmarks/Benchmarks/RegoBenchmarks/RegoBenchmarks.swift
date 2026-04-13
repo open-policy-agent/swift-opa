@@ -138,12 +138,58 @@ let benchmarks: @Sendable () -> Void = {
 
     for spec in allBenchmarkSpecs {
         let bundleURL = URL(fileURLWithPath: "\(bundlesPath)/\(spec.bundlePath)")
+
         Benchmark(
             spec.name,
             configuration: .init(metrics: [.wallClock, .mallocCountTotal, .objectAllocCount, .instructions])
         ) { benchmark in
             var engine = OPA.Engine(
                 bundlePaths: [OPA.Engine.BundlePath(name: spec.bundleName, url: bundleURL)])
+            var preparedQuery: OPA.Engine.PreparedQuery?
+            do {
+                preparedQuery = try await engine.prepareForEvaluation(query: spec.query)
+            } catch { fatalError("prepareForEvaluation failed: \(error)") }
+
+            benchmark.startMeasurement()
+            for _ in benchmark.scaledIterations {
+                do {
+                    let result = try await preparedQuery?.evaluate(input: spec.input)
+                    blackHole(result)
+                } catch {}
+            }
+            benchmark.stopMeasurement()
+        }
+
+        Benchmark(
+            "\(spec.name) (sync)",
+            configuration: .init(metrics: [.wallClock, .mallocCountTotal, .objectAllocCount, .instructions])
+        ) { benchmark in
+            var engine = OPA.Engine(
+                bundlePaths: [OPA.Engine.BundlePath(name: spec.bundleName, url: bundleURL)])
+            let preparedQuery: OPA.Engine.PreparedQuery
+            do {
+                preparedQuery = try await engine.prepareForEvaluation(query: spec.query)
+            } catch { fatalError("prepareForEvaluation failed: \(error)") }
+
+            benchmark.startMeasurement()
+            if preparedQuery.supportsSyncEvaluation {
+                for _ in benchmark.scaledIterations {
+                    do {
+                        let eval: () throws -> ResultSet = { try preparedQuery.evaluate(input: spec.input) }
+                        blackHole(try eval())
+                    } catch {}
+                }
+            }
+            benchmark.stopMeasurement()
+        }
+
+        Benchmark(
+            "\(spec.name) (async, no sync opts)",
+            configuration: .init(metrics: [.wallClock, .mallocCountTotal, .objectAllocCount, .instructions])
+        ) { benchmark in
+            var engine = OPA.Engine(
+                bundlePaths: [OPA.Engine.BundlePath(name: spec.bundleName, url: bundleURL)])
+            engine.optimizeAsync = false
             var preparedQuery: OPA.Engine.PreparedQuery?
             do {
                 preparedQuery = try await engine.prepareForEvaluation(query: spec.query)

@@ -78,6 +78,7 @@ extension VM {
 
     /// Block: [numBlocks: UInt32][offset1: UInt32][size1: UInt32]...
     /// Implements blockStmt semantics for 0 or 2+ sub-blocks
+    // @sync
     func execBlockStmt(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws
         -> BlockResult
     {
@@ -87,14 +88,23 @@ extension VM {
 
         for _ in 0..<numBlocks {
             let blockOffset = context.decodeUInt32(from: payload, at: offset)
-            let blockSize = context.decodeUInt32(from: payload, at: offset + 4)
+            let blockSizeRaw = context.decodeUInt32(from: payload, at: offset + 4)
             offset += 8
 
-            let result = try await self.executeBlock(
-                context: context,
-                offset: Int(blockOffset),
-                size: Int(blockSize)
-            )
+            let result: BlockResult
+            if blockSyncSafeBit(blockSizeRaw) {
+                result = try self.executeBlockSync(
+                    context: context,
+                    offset: Int(blockOffset),
+                    size: Int(decodeBlockSize(blockSizeRaw))
+                )
+            } else {
+                result = try await self.executeBlock(
+                    context: context,
+                    offset: Int(blockOffset),
+                    size: Int(decodeBlockSize(blockSizeRaw))
+                )
+            }
 
             if result.shouldBreak {
                 // Propagate break after decrementing
@@ -120,6 +130,7 @@ extension VM {
 
     /// Call: [result: Local][funcIndex: UInt32][argCount: UInt32][args: Operand...]
     /// funcIndex high bit: 0 = user function, 1 = builtin (lower bits = string table index)
+    // @sync
     func execCall(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws
         -> BlockResult
     {
@@ -129,7 +140,7 @@ extension VM {
 
         // Fast path: user function call with exactly 2 args (OPA rules: input + data).
         // Check the memo cache using the raw encoded operands as the key (no value hashing).
-        if encodedFuncIndex & 0x8000_0000 == 0 && argCount == 2 {
+        if !isBuiltinCall(encodedFuncIndex) && argCount == 2 {
             let (op0, op0Size) = EncodedOperand.decodeUnchecked(from: payload, at: start + 12)
             let (op1, _) = EncodedOperand.decodeUnchecked(from: payload, at: start + 12 + op0Size)
             let memoKey = CallKey(
@@ -143,7 +154,7 @@ extension VM {
                 return .success
             }
 
-            let funcIndex = Int(encodedFuncIndex)
+            let funcIndex = decodeFuncIndex(encodedFuncIndex)  // mask sync bit (bit 30)
             let function = policy.functions[funcIndex]
             let arg0 = context.resolveUnchecked(op0)
             let arg1 = context.resolveUnchecked(op1)
@@ -152,7 +163,12 @@ extension VM {
             memoArgs.append(arg0)
             memoArgs.append(arg1)
 
-            let returnValue = try await executeFunction(context: context, function: function, args: memoArgs)
+            let returnValue: AST.RegoValue
+            if instrSyncSafeBit(encodedFuncIndex) {
+                returnValue = try executeFunctionSync(context: context, function: function, args: memoArgs)
+            } else {
+                returnValue = try await executeFunction(context: context, function: function, args: memoArgs)
+            }
             context[memoKey] = returnValue
             if case .undefined = returnValue { return failWithUndefinedBytecode(context: context) }
             context.assignLocal(idx: result, value: returnValue)
@@ -177,14 +193,15 @@ extension VM {
         }
 
         // Check if this is a builtin call (high bit set)
-        if encodedFuncIndex & 0x8000_0000 != 0 {
+        if isBuiltinCall(encodedFuncIndex) {
             // Builtin call: fail immediately if any argument is undefined
             for argValue in args {
                 if case .undefined = argValue { return failWithUndefinedBytecode(context: context) }
             }
 
-            let stringIndex = Int(encodedFuncIndex & 0x7FFF_FFFF)
+            let stringIndex = builtinStringIndex(encodedFuncIndex)
 
+            // Create builtin context
             let builtinContext = BuiltinContext(
                 tracer: context.evaluationContext.tracer,
                 cache: context.evaluationContext.builtinsCache,
@@ -192,20 +209,27 @@ extension VM {
                 rand: context.builtinsRand
             )
 
+            // Prefer sync dispatch; fall back to async-only builtins.
             let returnValue: AST.RegoValue
-            guard stringIndex < context.builtins.count,
-                let builtin = context.builtins[stringIndex]
-            else {
-                return failWithUndefinedBytecode(context: context)
-            }
-            do {
-                returnValue = try await builtin(builtinContext, args)
-            } catch {
-                // Builtin error - fail with undefined unless strict mode
-                if context.evaluationContext.strictBuiltins {
-                    throw error
+            if context.syncSafeBuiltin(at: stringIndex) != nil {
+                do {
+                    returnValue = try context.syncSafeBuiltin(at: stringIndex)!(builtinContext, args)
+                } catch {
+                    if context.evaluationContext.strictBuiltins { throw error }
+                    return failWithUndefinedBytecode(context: context)
                 }
-                return failWithUndefinedBytecode(context: context)
+            } else {
+                guard stringIndex < context.builtins.count,
+                    case .some(.asyncOnly(let fn)) = context.builtins[stringIndex]
+                else {
+                    return failWithUndefinedBytecode(context: context)
+                }
+                do {
+                    returnValue = try await fn(builtinContext, args)
+                } catch {
+                    if context.evaluationContext.strictBuiltins { throw error }
+                    return failWithUndefinedBytecode(context: context)
+                }
             }
 
             // Store result
@@ -214,10 +238,15 @@ extension VM {
         }
 
         // User-defined function call with != 2 args (no memoization)
-        let funcIndex = Int(encodedFuncIndex)
+        let funcIndex = decodeFuncIndex(encodedFuncIndex)
         let function = policy.functions[funcIndex]
 
-        let returnValue = try await executeFunction(context: context, function: function, args: args)
+        let returnValue: AST.RegoValue
+        if instrSyncSafeBit(encodedFuncIndex) {
+            returnValue = try executeFunctionSync(context: context, function: function, args: args)
+        } else {
+            returnValue = try await executeFunction(context: context, function: function, args: args)
+        }
 
         if case .undefined = returnValue { return failWithUndefinedBytecode(context: context) }
         context.assignLocal(idx: result, value: returnValue)
@@ -225,6 +254,7 @@ extension VM {
     }
 
     /// CallDynamic: [result: Local][pathCount: UInt32][path: Operand...][argCount: UInt32][args: Local...]
+    // @sync
     func execCallDynamic(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws
         -> BlockResult
     {
@@ -508,15 +538,17 @@ extension VM {
     }
 
     /// Not: [block content inline]
+    // @sync
     func execNot(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws
         -> BlockResult
     {
         // Execute the nested block — block starts at payload start and fills the entire payload
-        let result = try await self.executeBlock(
-            context: context,
-            offset: start,
-            size: length
-        )
+        let result: BlockResult
+        if instrSyncSafeBit(context.decodeUInt32(from: payload, at: start - 4)) {
+            result = try self.executeBlockSync(context: context, offset: start, size: length)
+        } else {
+            result = try await self.executeBlock(context: context, offset: start, size: length)
+        }
 
         // Handle break statements
         if let breakCounter = result.breakCounter {
@@ -651,6 +683,7 @@ extension VM {
     // MARK: - Collection Operations
 
     /// Scan: [source: Local][key: Local][value: Local][block content inline]
+    // @sync
     func execScan(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws
         -> BlockResult
     {
@@ -677,11 +710,12 @@ extension VM {
             for element in arr {
                 context.assignLocal(idx: key, value: .number(RegoNumber(int: Int64(i))))
                 context.assignLocal(idx: value, value: element)
-                let blockResult = try await self.executeBlock(
-                    context: context,
-                    offset: blockOffset,
-                    size: blockSize
-                )
+                let blockResult: BlockResult
+                if instrSyncSafeBit(context.decodeUInt32(from: payload, at: start - 4)) {
+                    blockResult = try self.executeBlockSync(context: context, offset: blockOffset, size: blockSize)
+                } else {
+                    blockResult = try await self.executeBlock(context: context, offset: blockOffset, size: blockSize)
+                }
                 if blockResult.shouldBreak { return blockResult.breakByOne() }
                 if blockResult.functionReturnValue != nil { return blockResult }
                 i &+= 1
@@ -690,11 +724,12 @@ extension VM {
             for (k, v) in obj {
                 context.assignLocal(idx: key, value: k)
                 context.assignLocal(idx: value, value: v)
-                let blockResult = try await self.executeBlock(
-                    context: context,
-                    offset: blockOffset,
-                    size: blockSize
-                )
+                let blockResult: BlockResult
+                if instrSyncSafeBit(context.decodeUInt32(from: payload, at: start - 4)) {
+                    blockResult = try self.executeBlockSync(context: context, offset: blockOffset, size: blockSize)
+                } else {
+                    blockResult = try await self.executeBlock(context: context, offset: blockOffset, size: blockSize)
+                }
                 if blockResult.shouldBreak { return blockResult.breakByOne() }
                 if blockResult.functionReturnValue != nil { return blockResult }
             }
@@ -702,11 +737,12 @@ extension VM {
             for val in set {
                 context.assignLocal(idx: key, value: val)
                 context.assignLocal(idx: value, value: val)
-                let blockResult = try await self.executeBlock(
-                    context: context,
-                    offset: blockOffset,
-                    size: blockSize
-                )
+                let blockResult: BlockResult
+                if instrSyncSafeBit(context.decodeUInt32(from: payload, at: start - 4)) {
+                    blockResult = try self.executeBlockSync(context: context, offset: blockOffset, size: blockSize)
+                } else {
+                    blockResult = try await self.executeBlock(context: context, offset: blockOffset, size: blockSize)
+                }
                 if blockResult.shouldBreak { return blockResult.breakByOne() }
                 if blockResult.functionReturnValue != nil { return blockResult }
             }
@@ -738,6 +774,7 @@ extension VM {
     }
 
     /// With: [local: Local][value: Operand][pathCount: UInt32][pathIndices: UInt32...][block content inline]
+    // @sync
     func execWith(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws
         -> BlockResult
     {
@@ -778,11 +815,12 @@ extension VM {
             context.assignLocal(idx: local, value: toPatch)
         }
 
-        let result = try await self.executeBlock(
-            context: context,
-            offset: blockOffset,
-            size: blockSize
-        )
+        let result: BlockResult
+        if instrSyncSafeBit(context.decodeUInt32(from: payload, at: start - 4)) {
+            result = try self.executeBlockSync(context: context, offset: blockOffset, size: blockSize)
+        } else {
+            result = try await self.executeBlock(context: context, offset: blockOffset, size: blockSize)
+        }
 
         // Respect the break index from a sub block
         if result.shouldBreak {

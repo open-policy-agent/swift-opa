@@ -29,7 +29,7 @@ extension OPA.Engine {
     ///     implementation for a required builtin.
     static func verifyCapabilitiesAndBuiltIns(
         capabilities: CapabilitiesInput?,
-        builtins: [String: Builtin],
+        builtins: BuiltinRegistry,
         evaluator: IREvaluator
     ) async throws {
         let capabilities: Capabilities? = try {
@@ -88,7 +88,7 @@ extension OPA.Engine {
             // all builtins are defined as closures taking an arbitrary array of `AST.RegoValue`s.
             // The validity of the passed parameters can only be checked at runtime inside the builtin itself.
             // Therefore, we just check for matching builtin names.
-            let missingBuiltins = Set(requiredBuiltInsArray.map { $0.name }).subtracting(Set(builtins.map(\.0)))
+            let missingBuiltins = Set(requiredBuiltInsArray.map { $0.name }).subtracting(builtins.names)
             if !missingBuiltins.isEmpty {
                 throw RegoError(
                     code: .builtinUndefinedError,

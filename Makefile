@@ -43,8 +43,15 @@ endif
 install-release: build-release ensure-bindir
 	install $(shell swift build --show-bin-path -c release)/swift-opa-cli $(BINDIR)/
 
+SYNC_SOURCES = Sources/Rego/VM.swift Sources/Rego/VM+Instructions.swift \
+               Sources/Rego/Engine.swift Sources/Rego/IREvaluator.swift
+SYNC_OUTPUT  = Sources/Rego/Generated/SyncPeers.swift
+
 .PHONY: generate
 generate:
+	swift run --package-path tools/SyncGen SyncGen \
+	    $(SYNC_SOURCES) --output $(SYNC_OUTPUT)
+	swift format format -i $(SYNC_OUTPUT)
 	curl -o opa-capabilities.json https://raw.githubusercontent.com/open-policy-agent/opa/refs/tags/$(OPA_BASE_CAPS_VERSION)/capabilities.json
 	swift run swift-opa-cli capabilities opa-capabilities.json > capabilities.json
 

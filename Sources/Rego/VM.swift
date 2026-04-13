@@ -14,10 +14,11 @@ internal struct VM {
 
 extension VM {
     /// Execute a bytecode plan
+    // @sync
     func executePlan(
         withContext ctx: EvaluationContext,
         planIndex: Int,
-        builtins: [Builtin?] = []
+        builtins: [BuiltinImpl?] = []
     ) async throws -> ResultSet {
         guard planIndex < policy.plans.count else {
             throw Error.invalidPayloadLength
@@ -34,11 +35,12 @@ extension VM {
         )
 
         for block in plan.blocks {
-            let blockResult = try await executeBlock(
-                context: vmContext,
-                offset: block.offset,
-                size: block.size
-            )
+            let blockResult: BlockResult
+            if block.syncSafe {
+                blockResult = try executeBlockSync(context: vmContext, offset: block.offset, size: block.size)
+            } else {
+                blockResult = try await executeBlock(context: vmContext, offset: block.offset, size: block.size)
+            }
             guard !blockResult.shouldBreak else {
                 throw RegoError(code: .internalError, message: "break statement jumped out of frame")
             }
@@ -51,6 +53,7 @@ extension VM {
     }
 
     /// Execute multiple blocks, collecting function return values
+    // @sync
     internal func executeBlocks(
         context: VMContext,
         blocks: [(offset: Int, size: Int)]
@@ -81,6 +84,7 @@ extension VM {
     }
 
     /// Execute a user-defined function
+    // @sync
     internal func executeFunction(
         context: VMContext,
         function: Function,
@@ -124,6 +128,7 @@ extension VM {
     }
 
     /// Execute a single block (PC loop over instructions)
+    // @sync
     internal func executeBlock(
         context: VMContext,
         offset: Int,
@@ -272,7 +277,12 @@ extension VM {
                 result = try await execWith(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.block1.rawValue):
                 // Inline block1 to avoid an extra async activation record for the single sub-block call.
-                let innerResult = try await executeBlock(context: context, offset: payloadStart, size: length)
+                let innerResult: BlockResult
+                if instrSyncSafeBit(word) {
+                    innerResult = try executeBlockSync(context: context, offset: payloadStart, size: length)
+                } else {
+                    innerResult = try await executeBlock(context: context, offset: payloadStart, size: length)
+                }
                 if innerResult.shouldBreak {
                     result = innerResult.breakByOne()
                 }
@@ -291,6 +301,29 @@ extension VM {
         }
 
         return .success
+    }
+}
+
+// MARK: - Sync dispatch bridges
+
+extension VM {
+    /// Non-async bridge that forces Swift to call the codegen-generated non-async overload of
+    /// `executeBlock`.  From a non-async context, only the non-async overload is reachable
+    /// (calling async requires `await`), so Swift's overload resolution picks correctly.
+    /// Marked `@inline(__always)` so the extra call frame disappears after inlining.
+    @inline(__always)
+    func executeBlockSync(context: VMContext, offset: Int, size: Int) throws -> BlockResult {
+        return try executeBlock(context: context, offset: offset, size: size)
+    }
+
+    /// Non-async bridge for `executeFunction` — same rationale as `executeBlockSync`.
+    @inline(__always)
+    func executeFunctionSync(
+        context: VMContext,
+        function: Function,
+        args: [AST.RegoValue]
+    ) throws -> AST.RegoValue {
+        return try executeFunction(context: context, function: function, args: args)
     }
 }
 
@@ -341,12 +374,19 @@ internal final class VMContext {
     // Pool for reusing args arrays
     private var argsPool: [[AST.RegoValue]] = []
 
-    // Builtin functions pre-resolved by string table index at query prepare time.
-    let builtins: [Builtin?]
+    // Builtin implementations pre-resolved by string table index at query prepare time.
+    let builtins: [BuiltinImpl?]
+
+    /// Returns the sync implementation for the builtin at `index`, or nil if absent or async-only.
+    @inline(__always)
+    func syncSafeBuiltin(at index: Int) -> SyncBuiltin? {
+        guard index < builtins.count, case .sync(let fn) = builtins[index] else { return nil }
+        return fn
+    }
 
     init(
         evaluationContext: EvaluationContext, policy: Policy, planMaxLocal: Int,
-        data: AST.RegoValue, builtins: [Builtin?] = []
+        data: AST.RegoValue, builtins: [BuiltinImpl?] = []
     ) {
         self.evaluationContext = evaluationContext
         self.policy = policy

@@ -9,7 +9,7 @@ internal struct IREvaluator {
     /// Lookup table from a plan's entrypoint name (e.g. "foo/bar") to the
     /// (policy index, plan index) within `policies`. Built at construction
     /// time and guaranteed to be unique by ``init(bundles:userPolicies:)``.
-    private let planIndex: [String: (policyIdx: Int, planIdx: Int)]
+    let planIndex: [String: (policyIdx: Int, planIdx: Int)]
 
     /// Identifies which source claimed a given plan name during construction.
     /// Used only for plan-name uniqueness bookkeeping; instances are not
@@ -35,7 +35,12 @@ internal struct IREvaluator {
     ///   declared roots. User policies are not constrained to any roots.
     /// - Plan names must be unique across the entire union. A duplicate name
     ///   fails with `planNameConflictError`.
-    init(bundles: [String: OPA.Bundle], userPolicies: [IR.Policy] = []) throws {
+    init(
+        bundles: [String: OPA.Bundle],
+        userPolicies: [IR.Policy] = [],
+        builtinRegistry: BuiltinRegistry = .defaultRegistry,
+        optimizeAsync: Bool = true
+    ) throws {
         var compiled: [Bytecode.Policy] = []
         // Plan-name origin tracking. The common case is "each plan name has
         // exactly one owner". We keep a flat first-claim map for that case and
@@ -90,7 +95,11 @@ internal struct IREvaluator {
 
                 let bytecodePolicy: Bytecode.Policy
                 do {
-                    bytecodePolicy = try Converter.convert(parsed)
+                    let rawPolicy = try Converter.convert(parsed)
+                    bytecodePolicy =
+                        optimizeAsync
+                        ? SyncSafePatcher.patch(policy: rawPolicy, builtins: builtinRegistry)
+                        : rawPolicy
                 } catch {
                     throw RegoError(
                         code: .bundleInitializationError,
@@ -164,13 +173,31 @@ internal struct IREvaluator {
 }
 
 extension IREvaluator: Evaluator {
-    func evaluate(withContext ctx: EvaluationContext, builtins: [[Builtin?]]) async throws -> ResultSet {
+    // @sync
+    // swift-format-ignore: UseEarlyExits
+    func evaluate(withContext ctx: EvaluationContext, builtins: [[BuiltinImpl?]]) async throws -> ResultSet {
         let entrypoint = try queryToEntryPoint(ctx.query)
         guard let hit = planIndex[entrypoint] else {
             throw RegoError(code: .unknownQuery, message: "query not found in plan: \(ctx.query)")
         }
         let vm = VM(policy: policies[hit.policyIdx])
-        return try await vm.executePlan(withContext: ctx, planIndex: hit.planIdx, builtins: builtins[hit.policyIdx])
+        let plan = policies[hit.policyIdx].plans[hit.planIdx]
+        // The if/else structure is intentional: tools/SyncGen detects `plan.syncSafe`
+        // as a sync-dispatch condition and elides the else branch in the generated sync
+        // peer, leaving the inner guard as the runtime enforcement point.
+        if plan.syncSafe {
+            guard plan.syncSafe else {
+                throw RegoError(
+                    code: .requiresAsyncEvaluation,
+                    message: "plan '\(plan.name)' requires async evaluation"
+                )
+            }
+            return try await vm.executePlan(
+                withContext: ctx, planIndex: hit.planIdx, builtins: builtins[hit.policyIdx])
+        } else {
+            return try await vm.executePlan(
+                withContext: ctx, planIndex: hit.planIdx, builtins: builtins[hit.policyIdx])
+        }
     }
 }
 

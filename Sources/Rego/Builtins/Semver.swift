@@ -3,7 +3,7 @@ import Foundation
 
 extension BuiltinFuncs {
     // MARK: - semver.is_valid
-    static func semverIsValid(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func semverIsValid(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -14,7 +14,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - semver.compare
-    static func semverCompare(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func semverCompare(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }

@@ -5,7 +5,7 @@ extension BuiltinFuncs {
     // internal.member_2
     // memberOf is a membership check - memberOf(x: any, y: any) checks if y in x
     // For objects, we are checking the values, not the keys.
-    static func isMemberOf(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func isMemberOf(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -26,7 +26,7 @@ extension BuiltinFuncs {
     // memberOfWithKey is a membership check with key:
     // memberOfWithKey(k: any, x: any, y: any) checks if y has property or index k and it is equal to x
     // For objects, we are checking the keys AND the values.
-    static func isMemberOfWithKey(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func isMemberOfWithKey(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 3 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
         }

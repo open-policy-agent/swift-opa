@@ -8,7 +8,7 @@ extension BuiltinFuncs {
     /// In future implementations, this can become a custom UUID generation based on a random number generator
     /// correctly seeded with value derived from the key that is passed in the arguments.
     /// However, the spec just required UUID generation to be consistent *within* en evaluation, so caching the values is okay.
-    static func makeRfc4122UUID(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func makeRfc4122UUID(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -28,7 +28,7 @@ extension BuiltinFuncs {
         return existing
     }
 
-    static func parseUUID(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func parseUUID(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }

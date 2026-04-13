@@ -2,7 +2,7 @@ import AST
 import Foundation
 
 extension BuiltinFuncs {
-    static func numbersRange(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func numbersRange(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -10,7 +10,7 @@ extension BuiltinFuncs {
         return try generateSequence(args: args, withStep: false)
     }
 
-    static func numbersRangeStep(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func numbersRangeStep(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 3 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
         }

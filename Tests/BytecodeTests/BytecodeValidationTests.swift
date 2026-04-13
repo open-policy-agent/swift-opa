@@ -29,7 +29,7 @@ import Testing
                     maxLocal: maxLocal,
                     bytecodeOffset: blockOffset,
                     bytecodeSize: sz,
-                    blocks: [(offset: blockOffset, size: sz)]
+                    blocks: [(offset: blockOffset, size: sz, syncSafe: false)]
                 )
             ],
             bytecode: bytes
@@ -303,5 +303,19 @@ import Testing
         enc.appendUInt32(0)  // index 0
         enc.appendLocal(2)  // target
         try policy(bytes: enc.bytes, numbers: [RegoNumber(int: 42)], maxLocal: 2).validate()
+    }
+
+    @Test func testCallWithSyncBitValidates() throws {
+        // A call instruction with the sync-safety bit (bit 30) set in the func index must
+        // pass validation — the validator strips the bit before bounds-checking the index.
+        var enc = Encoder()
+        enc.appendHeader(.call, payloadLength: 12)
+        enc.appendLocal(0)
+        enc.appendUInt32(0x4000_0000 | 0)  // func index 0 with sync bit set
+        enc.appendUInt32(0)  // 0 args
+        let fn = Bytecode.Function(
+            name: "f", path: ["f"], params: [], returnVar: 0,
+            maxLocal: 0, bytecodeOffset: 0, bytecodeSize: 0, blocks: [])
+        try policy(bytes: enc.bytes, functions: [fn]).validate()
     }
 }

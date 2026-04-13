@@ -1,6 +1,36 @@
 import AST
 import Foundation
 
+/// Returns true if the sync-safety bit (bit 30, set by SyncSafePatcher) is set in `word`.
+@inline(__always)
+public func instrSyncSafeBit(_ word: UInt32) -> Bool { (word & 0x4000_0000) != 0 }
+
+/// Decodes a function index from an encoded func-index word, masking off the sync-safety bit (bit 30).
+@inline(__always)
+public func decodeFuncIndex(_ encoded: UInt32) -> Int { Int(encoded & 0x3FFF_FFFF) }
+
+/// Returns true if the builtin-call flag (bit 31) is set in an encoded func-index word.
+@inline(__always)
+public func isBuiltinCall(_ funcIdx: UInt32) -> Bool { (funcIdx & 0x8000_0000) != 0 }
+
+/// Extracts the builtin string-table index from an encoded func-index word (bits 0–30).
+@inline(__always)
+public func builtinStringIndex(_ funcIdx: UInt32) -> Int { Int(funcIdx & 0x7FFF_FFFF) }
+
+/// Sets the sync-safety bit (bit 30) in a bytecode word or encoded func-index word.
+@inline(__always)
+public func setInstrSyncSafeBit(_ word: UInt32) -> UInt32 { word | 0x4000_0000 }
+
+@inline(__always)
+public func setBlockSyncSafeBit(_ encodedSize: UInt32) -> UInt32 { encodedSize | 0x8000_0000 }
+
+@inline(__always)
+public func blockSyncSafeBit(_ encodedSize: UInt32) -> Bool { (encodedSize & 0x8000_0000) != 0 }
+
+/// Decodes the actual block size from an encoded block-size word, masking off the sync-safety bit (bit 31).
+@inline(__always)
+public func decodeBlockSize(_ encodedSize: UInt32) -> UInt32 { encodedSize & 0x7FFF_FFFF }
+
 /// Bytecode opcode representing an IR statement type
 public enum Opcode: UInt8, Sendable {
     // Assignment operations
@@ -73,7 +103,7 @@ public enum Opcode: UInt8, Sendable {
     case assignVar1 = 41
 
     /// True for compact opcodes whose operand is stored in the header length field (zero payload bytes).
-    var isCompact: Bool {
+    public var isCompact: Bool {
         switch self {
         case .isDefined1, .isUndefined1, .resetLocal1, .resultSetAdd1, .returnLocal1, .break1,
             .assignVar1:
@@ -273,7 +303,7 @@ public struct InstructionHeader: Sendable {
             for _ in 0..<numBlocks {
                 guard off + 8 <= start + length else { throw Error.invalidPayloadLength }
                 let blockOffset = Int(readUInt32(payload, at: off))
-                let blockSize = Int(readUInt32(payload, at: off + 4))
+                let blockSize = Int(decodeBlockSize(readUInt32(payload, at: off + 4)))
                 off += 8
                 nested.append((blockOffset, blockSize))
             }
@@ -290,12 +320,12 @@ public struct InstructionHeader: Sendable {
             try validateLocal(readUInt32(payload, at: start), maxLocal: maxLocal)
             let encodedFuncIndex = readUInt32(payload, at: start + 4)
             let argCount = Int(readUInt32(payload, at: start + 8))
-            if encodedFuncIndex & 0x8000_0000 != 0 {
+            if isBuiltinCall(encodedFuncIndex) {
                 // Builtin: lower 31 bits = string-table index of the builtin name
-                let stringIdx = Int(encodedFuncIndex & 0x7FFF_FFFF)
+                let stringIdx = builtinStringIndex(encodedFuncIndex)
                 guard stringIdx < strings.count else { throw Error.invalidPayloadLength }
             } else {
-                let funcIdx = Int(encodedFuncIndex)
+                let funcIdx = decodeFuncIndex(encodedFuncIndex)
                 guard funcIdx < functions.count else { throw Error.invalidPayloadLength }
             }
             var off = start + 12

@@ -175,11 +175,11 @@ import Testing
         let uint32 = UInt32(bytes[1]) | UInt32(bytes[2]) << 8 | UInt32(bytes[3]) << 16 | UInt32(bytes[4]) << 24
         #expect(uint32 == 0x1234_5678)
 
-        let unsignedLower: UInt64 =
+        let unsignedLo =
             UInt64(bytes[5]) | UInt64(bytes[6]) << 8 | UInt64(bytes[7]) << 16 | UInt64(bytes[8]) << 24
-        let unsignedUpper: UInt64 =
+        let unsignedHi =
             UInt64(bytes[9]) << 32 | UInt64(bytes[10]) << 40 | UInt64(bytes[11]) << 48 | UInt64(bytes[12]) << 56
-        let unsigned = unsignedLower | unsignedUpper
+        let unsigned = unsignedLo | unsignedHi
         #expect(Int64(bitPattern: unsigned) == -123_456_789)
     }
 
@@ -261,4 +261,60 @@ import Testing
 
     // Note: testInvalidOperandType() was removed because all 2-bit type values (0-3) are now valid
     // after adding numberIndex = 3. There's no way to encode an invalid 2-bit type value.
+
+    // MARK: - Sync-safety bit helpers
+
+    @Test func testInstrSyncSafeBit() {
+        #expect(instrSyncSafeBit(0x4000_0000))  // bit 30 set
+        #expect(instrSyncSafeBit(0x7FFF_FFFF))  // bit 30 set among others
+        #expect(!instrSyncSafeBit(0x0000_0000))  // clear
+        #expect(!instrSyncSafeBit(0x8000_0000))  // bit 31 set, bit 30 clear
+        #expect(!instrSyncSafeBit(0x3FFF_FFFF))  // bits 0-29 set, bit 30 clear
+    }
+
+    @Test func testDecodeFuncIndex() {
+        #expect(decodeFuncIndex(0x0000_0003) == 3)  // plain index
+        #expect(decodeFuncIndex(0x4000_0003) == 3)  // sync bit set — stripped
+        #expect(decodeFuncIndex(0x8000_0003) == 3)  // builtin bit set — stripped
+        #expect(decodeFuncIndex(0xC000_0003) == 3)  // both bits set — stripped
+        #expect(decodeFuncIndex(0x3FFF_FFFF) == 0x3FFF_FFFF)  // max 30-bit value preserved
+    }
+
+    @Test func testSetInstrSyncSafeBit() {
+        #expect(setInstrSyncSafeBit(0x0000_0000) == 0x4000_0000)  // sets bit 30
+        #expect(setInstrSyncSafeBit(0x4000_0000) == 0x4000_0000)  // idempotent
+        #expect(setInstrSyncSafeBit(0x0000_0005) == 0x4000_0005)  // preserves lower bits
+    }
+
+    @Test func testIsBuiltinCall() {
+        #expect(isBuiltinCall(0x8000_0000))  // bit 31 set
+        #expect(isBuiltinCall(0xFFFF_FFFF))  // all bits set
+        #expect(!isBuiltinCall(0x0000_0000))  // clear
+        #expect(!isBuiltinCall(0x4000_0000))  // sync bit set, builtin bit clear
+        #expect(!isBuiltinCall(0x7FFF_FFFF))  // bit 31 clear
+    }
+
+    @Test func testBuiltinStringIndex() {
+        #expect(builtinStringIndex(0x8000_0005) == 5)  // builtin bit set, index 5
+        #expect(builtinStringIndex(0x0000_0005) == 5)  // builtin bit clear, index 5
+        #expect(builtinStringIndex(0x7FFF_FFFF) == 0x7FFF_FFFF)  // max 31-bit value
+    }
+
+    @Test func testBlockSyncSafeBit() {
+        #expect(blockSyncSafeBit(0x8000_0000))  // bit 31 set
+        #expect(blockSyncSafeBit(0xFFFF_FFFF))  // all bits set
+        #expect(!blockSyncSafeBit(0x0000_0000))  // clear
+        #expect(!blockSyncSafeBit(0x7FFF_FFFF))  // bit 31 clear
+    }
+
+    @Test func testSetBlockSyncSafeBit() {
+        #expect(setBlockSyncSafeBit(0x0000_0100) == 0x8000_0100)  // sets bit 31, preserves size
+        #expect(setBlockSyncSafeBit(0x8000_0100) == 0x8000_0100)  // idempotent
+    }
+
+    @Test func testDecodeBlockSize() {
+        #expect(decodeBlockSize(0x0000_0100) == 0x0000_0100)  // no sync bit
+        #expect(decodeBlockSize(0x8000_0100) == 0x0000_0100)  // sync bit stripped
+        #expect(decodeBlockSize(0x7FFF_FFFF) == 0x7FFF_FFFF)  // max 31-bit value preserved
+    }
 }

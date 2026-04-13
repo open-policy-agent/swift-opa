@@ -42,7 +42,7 @@ struct BuiltinRegistryTests {
     // testRegistry is a registry for testing builtin error handling
     static var testRegistry: BuiltinRegistry {
         return BuiltinRegistry(builtins: [
-            "__error_throwing_builtin": testBuiltin
+            "__error_throwing_builtin": .asyncOnly(testBuiltin)
         ])
     }
 

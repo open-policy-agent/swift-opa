@@ -3,7 +3,7 @@ import Foundation
 
 extension BuiltinFuncs {
 
-    static func objectGet(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func objectGet(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 3 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
         }
@@ -60,7 +60,7 @@ extension BuiltinFuncs {
         }
     }
 
-    static func objectKeys(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func objectKeys(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -80,7 +80,7 @@ extension BuiltinFuncs {
     // right-hand object
     // returns: output (any) a new object which is the result of an asymmetric recursive union of two objects where conflicts
     // are resolved by choosing the key from the right-hand object b
-    static func objectUnion(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func objectUnion(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -107,7 +107,7 @@ extension BuiltinFuncs {
     // union_n creates a new object by merging all objects in the provided array of objects to merge (array[object[any: any]])
     // returns: output (any) a new object which is the result of an asymmetric recursive union of all objects
     // where conflicts are resolved by choosing the key from the right-hand object
-    static func objectUnionN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func objectUnionN(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }

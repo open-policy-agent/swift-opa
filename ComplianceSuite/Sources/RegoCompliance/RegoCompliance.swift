@@ -202,7 +202,114 @@ public struct ComplianceTesting {
         public var knownIssue: String?
     }
 
-    public static func runTest(config: TestConfig, _ tc: IRTestCase, _ customBuiltins: [String: Builtin] = [:]) async
+    /// Returns true when the test case references `test.sleep`, which is an async-only builtin
+    /// with no sync counterpart and therefore cannot run through the synchronous evaluation path.
+    public static func requiresAsyncBuiltins(_ tc: IRTestCase) -> Bool {
+        return (tc.base.modules ?? []).contains { $0.contains("test.sleep") }
+    }
+
+    /// Synchronous variant of ``runTestAsync(_:_:_:)``.
+    ///
+    /// Identical to ``runTestAsync(_:_:_:)`` except the final `evaluate` call goes through the
+    /// macro-generated synchronous overload (no `await`).  Test cases that rely on
+    /// async-only builtins (e.g. `test.sleep`) must be excluded before calling this —
+    /// use ``requiresAsyncBuiltins(_:)`` to filter them.
+    public static func runTestSync(config: TestConfig, _ tc: IRTestCase) async -> IRTestResult {
+        var testResult = IRTestResult(testCase: tc)
+
+        for knownIssue in config.knownIssues {
+            do {
+                let regex = try Regex(knownIssue.tests)
+                if try regex.firstMatch(in: tc.description) != nil {
+                    testResult.knownIssue = knownIssue.reason
+                    if config.skipKnownIssues {
+                        testResult.error = Error.skipped(reason: knownIssue.reason)
+                        return testResult
+                    }
+                    break
+                }
+            } catch {
+                // ignore the regex error, the test will probably fail
+            }
+        }
+
+        let store = OPA.InMemoryStore(
+            initialData: .object([
+                .string("data"): tc.base.data ?? [:]
+            ])
+        )
+
+        var engine = OPA.Engine(policies: [tc.base.plan], store: store)
+
+        let query = entrypointToQuery(tc.entrypoint)
+        let tracer = OPA.Trace.BufferedQueryTracer(level: config.traceLevel)
+        let wantError = (tc.base.wantError != nil) || (tc.base.wantErrorCode != nil)
+        let wantErrorMsg = "expected error \(tc.base.wantError ?? "") / \(tc.base.wantErrorCode ?? "")"
+
+        var input = tc.base.input ?? .undefined
+        if let inputTerm = tc.base.inputTerm {
+            let jsonData = inputTerm.data(using: .utf8)!
+            do {
+                input = try JSONDecoder().decode(RegoValue.self, from: jsonData)
+            } catch {
+                // ignore the error
+            }
+        }
+
+        testResult.trace = tracer
+
+        do {
+            let prepared = try await engine.prepareForEvaluation(query: query)
+            // Call through a non-async closure so Swift resolves to the sync overload.
+            let actualResult = try {
+                try prepared.evaluate(
+                    input: input,
+                    tracer: tracer,
+                    strictBuiltins: tc.base.strictError ?? false
+                )
+            }()
+
+            guard !wantError else {
+                testResult.error = Error.testFailed(reason: wantErrorMsg + " but got no error")
+                return testResult
+            }
+
+            let arr: [AST.RegoValue] = try actualResult.sorted().map { bindings in
+                try simplifyRegoToJson(bindings, sortTopLevel: tc.base.sortBindings ?? false)
+            }
+            let translated: AST.RegoValue = .array(arr)
+
+            guard let expected = tc.expected else {
+                throw Error.noResultExpectations
+            }
+
+            guard case .array(let expectedArray) = expected else {
+                throw Error.unexpectedExpectedResultType(got: expected.typeName, want: "array")
+            }
+
+            let expectedSorted: RegoValue = .array(expectedArray.sorted())
+
+            guard expectedSorted == translated else {
+                testResult.error = Error.testAssertionFailed(expected: expectedSorted, actual: translated)
+                return testResult
+            }
+        } catch {
+            guard wantError else {
+                testResult.error = Error.testFailed(
+                    reason: "unexpected evaluation error: \(String(describing: error))",
+                    error: error
+                )
+                return testResult
+            }
+            // success — got the expected error
+        }
+
+        return testResult
+    }
+
+    public static func runTestAsync(
+        config: TestConfig, _ tc: IRTestCase, _ customBuiltins: [String: AsyncBuiltin] = [:]
+    ) async
         -> IRTestResult
     {
         var testResult = IRTestResult(testCase: tc)
@@ -231,6 +338,8 @@ public struct ComplianceTesting {
         )
 
         var engine = OPA.Engine(policies: [tc.base.plan], store: store, customBuiltins: customBuiltins)
+        // Disable SyncSafePatcher so the async VM path is exercised (not the sync shortcut).
+        engine.optimizeAsync = false
 
         // The logic - ignore query and want.
         // We care about entrypoints and want_plan_result, which have been teased out to

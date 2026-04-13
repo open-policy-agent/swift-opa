@@ -13,7 +13,7 @@ extension BuiltinTests.CustomBuiltinTests {
     static let customPlusBuiltinRegistry: BuiltinRegistry =
         .init(
             builtins: [
-                "custom_plus": { ctx, args in
+                "custom_plus": .sync { ctx, args in
                     guard args.count == 2 else {
                         throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
                     }

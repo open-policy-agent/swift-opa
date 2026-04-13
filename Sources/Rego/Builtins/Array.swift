@@ -2,7 +2,7 @@ import AST
 import Foundation
 
 extension BuiltinFuncs {
-    static func arrayConcat(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func arrayConcat(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         // x: array - the first array
         // y: array - the second array
         guard args.count == 2 else {
@@ -18,7 +18,7 @@ extension BuiltinFuncs {
         return .array(x + y)
     }
 
-    static func arrayReverse(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func arrayReverse(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         // x: array
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
@@ -30,7 +30,7 @@ extension BuiltinFuncs {
         return .array(x.reversed())
     }
 
-    static func arraySlice(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func arraySlice(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         // x: array, start, stop: number
         guard args.count == 3 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)

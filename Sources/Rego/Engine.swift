@@ -21,7 +21,11 @@ extension OPA {
         private var capabilities: CapabilitiesInput? = nil
 
         // Custom builtins that are specified along the default builtins
-        private var customBuiltins: [String: Builtin] = [:]
+        private var customBuiltins: [String: AsyncBuiltin] = [:]
+
+        /// When `false`, skip `SyncSafePatcher` at load time so the async VM path is
+        /// always taken during evaluation.  Intended for testing only.
+        public var optimizeAsync = true
     }
 }
 
@@ -38,7 +42,7 @@ extension OPA.Engine {
     public init(
         bundlePaths: [BundlePath],
         capabilities: CapabilitiesInput? = nil,
-        customBuiltins: [String: Builtin] = [:]
+        customBuiltins: [String: AsyncBuiltin] = [:]
     ) {
         self.bundlePaths = bundlePaths
         self.capabilities = capabilities
@@ -57,7 +61,7 @@ extension OPA.Engine {
     public init(
         bundles: [String: OPA.Bundle],
         capabilities: CapabilitiesInput? = nil,
-        customBuiltins: [String: Builtin] = [:]
+        customBuiltins: [String: AsyncBuiltin] = [:]
     ) {
         self.bundles = bundles
         self.capabilities = capabilities
@@ -78,7 +82,7 @@ extension OPA.Engine {
         policies: [IR.Policy],
         store: any OPA.Store,
         capabilities: CapabilitiesInput? = nil,
-        customBuiltins: [String: Builtin] = [:]
+        customBuiltins: [String: AsyncBuiltin] = [:]
     ) {
         self.policies = policies
         self.store = store
@@ -103,6 +107,7 @@ extension OPA.Engine {
         ///   - tracer: (optional) The tracer to use for this evaluation.
         ///   - strictBuiltins: (optional) Whether to run in strict builtin evaluation mode.
         ///                     In strict mode, builtin errors abort evaluation, rather than returning undefined.
+        @sync
         public func evaluate(
             input: AST.RegoValue = .undefined,
             tracer: OPA.Trace.QueryTracer? = nil,
@@ -133,20 +138,7 @@ extension OPA.Engine {
     /// - Throws: `RegoError` if bundles fail to load, collide, or if capabilities/builtins validation fails.
     public mutating func prepareForEvaluation(query: String) async throws -> PreparedQuery {
         // Merge default and custom builtins, throw appropriate error in case of name conflict
-        let registryBuiltins = BuiltinRegistry.defaultRegistry.builtins
-        let conflictingBuiltins = Set(self.customBuiltins.keys).intersection(registryBuiltins.keys)
-        guard conflictingBuiltins.isEmpty else {
-            throw RegoError(
-                code: .ambiguousBuiltinError,
-                message:
-                    "encountered conflicting builtin names between custom and default builtins: \(conflictingBuiltins)"
-            )
-        }
-        let builtins = self.customBuiltins.merging(
-            registryBuiltins,
-            uniquingKeysWith: { $1 }  // should never happen, see guard above
-        )
-        let mergedBuiltinRegistry = BuiltinRegistry(builtins: builtins)
+        let mergedBuiltinRegistry = try BuiltinRegistry.merging(customBuiltins: self.customBuiltins)
 
         // Load all the bundles from disk
         // This includes parsing their data trees, etc.
@@ -186,9 +178,17 @@ extension OPA.Engine {
                 throw RegoError.init(code: .invalidArgumentError, message: "Cannot mix direct IR policies with bundles")
             }
 
-            evaluator = try IREvaluator(policies: self.policies)
+            evaluator = try IREvaluator(
+                policies: self.policies,
+                builtinRegistry: mergedBuiltinRegistry,
+                optimizeAsync: optimizeAsync
+            )
         } else {
-            evaluator = try IREvaluator(bundles: loadedBundles)
+            evaluator = try IREvaluator(
+                bundles: loadedBundles,
+                builtinRegistry: mergedBuiltinRegistry,
+                optimizeAsync: optimizeAsync
+            )
         }
 
         // TODO: Future improvement - validate local allocation assumptions (see Locals.swift)
@@ -199,7 +199,7 @@ extension OPA.Engine {
 
         // Verifies that builtins are available in the OPA capabilities and builtin registry
         try await Self.verifyCapabilitiesAndBuiltIns(
-            capabilities: self.capabilities, builtins: builtins, evaluator: evaluator)
+            capabilities: self.capabilities, builtins: mergedBuiltinRegistry, evaluator: evaluator)
 
         return PreparedQuery(
             query: query,

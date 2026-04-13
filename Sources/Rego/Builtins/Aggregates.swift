@@ -2,7 +2,7 @@ import AST
 import Foundation
 
 extension BuiltinFuncs {
-    static func count(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func count(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -15,7 +15,7 @@ extension BuiltinFuncs {
         return .number(RegoNumber(value: len))
     }
 
-    static func max(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func max(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -31,7 +31,7 @@ extension BuiltinFuncs {
         }
     }
 
-    static func min(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func min(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -47,7 +47,7 @@ extension BuiltinFuncs {
         }
     }
 
-    static func sort(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func sort(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -63,15 +63,15 @@ extension BuiltinFuncs {
         }
     }
 
-    static func sum(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func sum(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doReduce(args: args, initialValue: .number(0), op: BuiltinFuncs.doPlus)
     }
 
-    static func product(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func product(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doReduce(args: args, initialValue: .number(1), op: BuiltinFuncs.doMul)
     }
 
-    /// Returns reduction over an array or set of RegoValues with a given async Builtin being used as an reducer operation.
+    /// Returns reduction over an array or set of RegoValues with a given AsyncBuiltin being used as an reducer operation.
     /// Returns the normalized metric unit symbol for a given symbol.
     /// - Parameters:
     ///   - ctx: The builtin context.

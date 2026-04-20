@@ -174,9 +174,11 @@ import Testing
         let uint32 = UInt32(bytes[1]) | UInt32(bytes[2]) << 8 | UInt32(bytes[3]) << 16 | UInt32(bytes[4]) << 24
         #expect(uint32 == 0x1234_5678)
 
-        let unsigned: UInt64 =
-            UInt64(bytes[5]) | UInt64(bytes[6]) << 8 | UInt64(bytes[7]) << 16 | UInt64(bytes[8]) << 24 | UInt64(
-                bytes[9]) << 32 | UInt64(bytes[10]) << 40 | UInt64(bytes[11]) << 48 | UInt64(bytes[12]) << 56
+        let unsignedLower: UInt64 =
+            UInt64(bytes[5]) | UInt64(bytes[6]) << 8 | UInt64(bytes[7]) << 16 | UInt64(bytes[8]) << 24
+        let unsignedUpper: UInt64 =
+            UInt64(bytes[9]) << 32 | UInt64(bytes[10]) << 40 | UInt64(bytes[11]) << 48 | UInt64(bytes[12]) << 56
+        let unsigned = unsignedLower | unsignedUpper
         #expect(Int64(bitPattern: unsigned) == -123_456_789)
     }
 

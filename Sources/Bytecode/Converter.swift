@@ -1,5 +1,5 @@
-import Foundation
 import AST
+import Foundation
 import IR
 
 /// Converts IR.Policy to Policy
@@ -205,7 +205,8 @@ public struct Converter {
         context.encoder.appendLocal(stmt.target)
     }
 
-    private static func convertAssignVarOnce(_ stmt: IR.AssignVarOnceStatement, context: inout ConversionContext) throws {
+    private static func convertAssignVarOnce(_ stmt: IR.AssignVarOnceStatement, context: inout ConversionContext) throws
+    {
         let operand = try context.convertOperand(stmt.source)
         let payloadSize = 4 + operand.encodedSize  // target (4) + operand
 
@@ -219,8 +220,9 @@ public struct Converter {
         // Compact form: when source is a local and both indices fit in 12 bits,
         // pack [target:12 | source:12] into the header length field — zero payload.
         if operand.type == .local,
-           stmt.target <= 0xFFF,
-           operand.value <= 0xFFF {
+            stmt.target <= 0xFFF,
+            operand.value <= 0xFFF
+        {
             let packed = (UInt32(stmt.target) << 12) | operand.value
             context.encoder.appendHeader(.assignVar1, payloadLength: packed)
             return
@@ -256,7 +258,7 @@ public struct Converter {
         var offsetPositions: [(offsetPos: Int, sizePos: Int)] = []
         for _ in blocks {
             let offsetPos = context.encoder.reserveUInt32()  // Reserve offset
-            let sizePos = context.encoder.reserveUInt32()    // Reserve size
+            let sizePos = context.encoder.reserveUInt32()  // Reserve size
             offsetPositions.append((offsetPos, sizePos))
         }
 
@@ -310,7 +312,8 @@ public struct Converter {
         let args = stmt.args.map { EncodedOperand.local(UInt32($0)) }
         let pathSize = path.reduce(0) { $0 + $1.encodedSize }
         let argsSize = args.reduce(0) { $0 + $1.encodedSize }
-        let payloadSize = 4 + 4 + pathSize + 4 + argsSize  // result (4) + path count (4) + path + args count (4) + args
+        // result (4) + path count (4) + path + args count (4) + args
+        let payloadSize = 4 + 4 + pathSize + 4 + argsSize
 
         context.encoder.appendHeader(.callDynamic, payloadLength: UInt32(payloadSize))
         context.encoder.appendLocal(stmt.result)
@@ -397,7 +400,8 @@ public struct Converter {
         context.encoder.appendLocal(stmt.target)
     }
 
-    private static func convertMakeNumberInt(_ stmt: IR.MakeNumberIntStatement, context: inout ConversionContext) throws {
+    private static func convertMakeNumberInt(_ stmt: IR.MakeNumberIntStatement, context: inout ConversionContext) throws
+    {
         let payloadSize = 8 + 4  // value (8) + target (4)
 
         context.encoder.appendHeader(.makeNumberInt, payloadLength: UInt32(payloadSize))
@@ -405,7 +409,8 @@ public struct Converter {
         context.encoder.appendLocal(stmt.target)
     }
 
-    private static func convertMakeNumberRef(_ stmt: IR.MakeNumberRefStatement, context: inout ConversionContext) throws {
+    private static func convertMakeNumberRef(_ stmt: IR.MakeNumberRefStatement, context: inout ConversionContext) throws
+    {
         let payloadSize = 4 + 4  // index (4) + target (4)
 
         context.encoder.appendHeader(.makeNumberRef, payloadLength: UInt32(payloadSize))
@@ -455,7 +460,9 @@ public struct Converter {
         context.encoder.fillHeader(at: headerPosition, opcode: .not, payloadLength: UInt32(blockSize))
     }
 
-    private static func convertObjectInsertOnce(_ stmt: IR.ObjectInsertOnceStatement, context: inout ConversionContext) throws {
+    private static func convertObjectInsertOnce(_ stmt: IR.ObjectInsertOnceStatement, context: inout ConversionContext)
+        throws
+    {
         let key = try context.convertOperand(stmt.key)
         let value = try context.convertOperand(stmt.value)
         let payloadSize = 4 + key.encodedSize + value.encodedSize  // object (4) + key + value
@@ -588,4 +595,3 @@ public struct Converter {
         return numbers
     }
 }
-

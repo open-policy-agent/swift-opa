@@ -8,10 +8,6 @@ let localIdxData = Local(1)
 /// Bytecode Virtual Machine for executing compiled IR policies
 internal struct VM {
     let policy: Policy
-
-    init(policy: Policy) {
-        self.policy = policy
-    }
 }
 
 extension VM {
@@ -187,13 +183,15 @@ extension VM {
                 result = try execAssignVar(context: context, payload: bytecode, start: payloadStart, length: length)
             // Control flow
             case Int(Opcode.block.rawValue):
-                result = try await execBlockStmt(context: context, payload: bytecode, start: payloadStart, length: length)
+                result = try await execBlockStmt(
+                    context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.break.rawValue):
                 result = try execBreak(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.call.rawValue):
                 result = try await execCall(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.callDynamic.rawValue):
-                result = try await execCallDynamic(context: context, payload: bytecode, start: payloadStart, length: length)
+                result = try await execCallDynamic(
+                    context: context, payload: bytecode, start: payloadStart, length: length)
             // Operations
             case Int(Opcode.dot.rawValue):
                 result = try execDot(context: context, payload: bytecode, start: payloadStart, length: length)
@@ -235,7 +233,8 @@ extension VM {
                 result = try await execNot(context: context, payload: bytecode, start: payloadStart, length: length)
             // Object operations
             case Int(Opcode.objectInsertOnce.rawValue):
-                result = try execObjectInsertOnce(context: context, payload: bytecode, start: payloadStart, length: length)
+                result = try execObjectInsertOnce(
+                    context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.objectInsert.rawValue):
                 result = try execObjectInsert(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.objectMerge.rawValue):
@@ -260,9 +259,9 @@ extension VM {
                 if innerResult.shouldBreak {
                     result = innerResult.breakByOne()
                 }
-                // Inner undefined is intentionally ignored: block1 compiles from a single-sub-block
-                // IR form where an undefined body means "this alternative didn't match" and execution
-                // falls through to the next instruction, not propagated as undefined to the caller.
+            // Inner undefined is intentionally ignored: block1 compiles from a single-sub-block
+            // IR form where an undefined body means "this alternative didn't match" and execution
+            // falls through to the next instruction, not propagated as undefined to the caller.
             default:
                 preconditionFailure("unhandled opcode \(opcodeRaw)")
             }

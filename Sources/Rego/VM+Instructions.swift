@@ -10,7 +10,9 @@ extension VM {
     // MARK: - Assignment Operations
 
     /// ArrayAppend: [array: Local][value: Operand]
-    func execArrayAppend(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execArrayAppend(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let arrayIdx = context.decodeLocal(from: payload, at: start)
         let (valueOp, _) = context.decodeOperand(from: payload, at: start + 4)
         let value = context.resolveUnchecked(valueOp)
@@ -30,7 +32,9 @@ extension VM {
     }
 
     /// AssignInt: [value: Int64][target: Local]
-    func execAssignInt(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execAssignInt(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let signedValue = context.decodeInt64(from: payload, at: start)
         let target = context.decodeLocal(from: payload, at: start + 8)
         context.assignLocal(idx: target, value: .number(RegoNumber(int: signedValue)))
@@ -38,7 +42,9 @@ extension VM {
     }
 
     /// AssignVarOnce: [target: Local][source: Operand]
-    func execAssignVarOnce(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execAssignVarOnce(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let target = context.decodeLocal(from: payload, at: start)
         let (sourceOp, _) = context.decodeOperand(from: payload, at: start + 4)
         let source = context.resolveUnchecked(sourceOp)
@@ -57,7 +63,9 @@ extension VM {
     }
 
     /// AssignVar: [target: Local][source: Operand]
-    func execAssignVar(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execAssignVar(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let target = context.decodeLocal(from: payload, at: start)
         let (sourceOp, _) = context.decodeOperand(from: payload, at: start + 4)
         let source = context.resolveUnchecked(sourceOp)
@@ -70,7 +78,9 @@ extension VM {
 
     /// Block: [numBlocks: UInt32][offset1: UInt32][size1: UInt32]...
     /// Implements blockStmt semantics for 0 or 2+ sub-blocks
-    func execBlockStmt(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws -> BlockResult {
+    func execBlockStmt(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws
+        -> BlockResult
+    {
         let numBlocks = context.decodeUInt32(from: payload, at: start)
         guard numBlocks > 0 else { return .success }
         var offset = start + 4
@@ -110,7 +120,9 @@ extension VM {
 
     /// Call: [result: Local][funcIndex: UInt32][argCount: UInt32][args: Operand...]
     /// funcIndex high bit: 0 = user function, 1 = builtin (lower bits = string table index)
-    func execCall(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws -> BlockResult {
+    func execCall(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws
+        -> BlockResult
+    {
         let result = context.decodeLocal(from: payload, at: start)
         let encodedFuncIndex = context.decodeUInt32(from: payload, at: start + 4)
         let argCount = context.decodeUInt32(from: payload, at: start + 8)
@@ -225,7 +237,9 @@ extension VM {
     }
 
     /// CallDynamic: [result: Local][pathCount: UInt32][path: Operand...][argCount: UInt32][args: Local...]
-    func execCallDynamic(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws -> BlockResult {
+    func execCallDynamic(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws
+        -> BlockResult
+    {
         let result = context.decodeLocal(from: payload, at: start)
         let pathCount = context.decodeUInt32(from: payload, at: start + 4)
 
@@ -331,17 +345,17 @@ extension VM {
         let (bOp, _) = context.decodeOperand(from: payload, at: start + aSize)
         let b = context.resolveUnchecked(bOp)
 
-        if a == b {
-            return .success
-        } else {
+        guard a == b else {
             return failWithUndefinedBytecode(context: context)
         }
+        return .success
     }
 
     // MARK: - Type Checks
 
     /// IsArray: [source: Operand]
-    func execIsArray(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execIsArray(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult
+    {
         let (sourceOp, _) = context.decodeOperand(from: payload, at: start)
         let source = context.resolveUnchecked(sourceOp)
 
@@ -354,27 +368,29 @@ extension VM {
     }
 
     /// IsDefined: [source: Local]
-    func execIsDefined(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execIsDefined(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let source = context.decodeLocal(from: payload, at: start)
         let value = context.resolveLocal(idx: source)
 
-        if value != .undefined {
-            return .success
-        } else {
+        guard value != .undefined else {
             return failWithUndefinedBytecode(context: context)
         }
+        return .success
     }
 
     /// IsObject: [source: Operand]
-    func execIsObject(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execIsObject(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let (sourceOp, _) = context.decodeOperand(from: payload, at: start)
         let source = context.resolveUnchecked(sourceOp)
 
-        if case .object = source {
-            return .success
-        } else {
+        guard case .object = source else {
             return failWithUndefinedBytecode(context: context)
         }
+        return .success
     }
 
     /// IsSet: [source: Operand]
@@ -382,23 +398,23 @@ extension VM {
         let (sourceOp, _) = context.decodeOperand(from: payload, at: start)
         let source = context.resolveUnchecked(sourceOp)
 
-        if case .set = source {
-            return .success
-        } else {
+        guard case .set = source else {
             return failWithUndefinedBytecode(context: context)
         }
+        return .success
     }
 
     /// IsUndefined: [source: Local]
-    func execIsUndefined(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execIsUndefined(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let source = context.decodeLocal(from: payload, at: start)
         let value = context.resolveLocal(idx: source)
 
-        if value == .undefined {
-            return .success
-        } else {
+        guard value == .undefined else {
             return failWithUndefinedBytecode(context: context)
         }
+        return .success
     }
 
     // MARK: - Built-in Operations
@@ -432,7 +448,9 @@ extension VM {
     // MARK: - Value Construction
 
     /// MakeArray: [capacity: UInt32][target: Local]
-    func execMakeArray(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execMakeArray(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let capacity = context.decodeUInt32(from: payload, at: start)
         let target = context.decodeLocal(from: payload, at: start + 4)
 
@@ -444,14 +462,18 @@ extension VM {
     }
 
     /// MakeNull: [target: Local]
-    func execMakeNull(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execMakeNull(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let target = context.decodeLocal(from: payload, at: start)
         context.assignLocal(idx: target, value: .null)
         return .success
     }
 
     /// MakeNumberInt: [value: Int64][target: Local]
-    func execMakeNumberInt(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execMakeNumberInt(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let value = context.decodeInt64(from: payload, at: start)
         let target = context.decodeLocal(from: payload, at: start + 8)
         context.assignLocal(idx: target, value: .number(RegoNumber(int: value)))
@@ -459,7 +481,9 @@ extension VM {
     }
 
     /// MakeNumberRef: [index: UInt32][target: Local]
-    func execMakeNumberRef(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execMakeNumberRef(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let index = context.decodeUInt32(from: payload, at: start)
         let target = context.decodeLocal(from: payload, at: start + 4)
         let number = policy.numbers[Int(index)]!
@@ -468,14 +492,17 @@ extension VM {
     }
 
     /// MakeObject: [target: Local]
-    func execMakeObject(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execMakeObject(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let target = context.decodeLocal(from: payload, at: start)
         context.assignLocal(idx: target, value: .object([:]))
         return .success
     }
 
     /// MakeSet: [target: Local]
-    func execMakeSet(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execMakeSet(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult
+    {
         let target = context.decodeLocal(from: payload, at: start)
         context.assignLocal(idx: target, value: .set([]))
         return .success
@@ -484,7 +511,9 @@ extension VM {
     // MARK: - Comparison
 
     /// NotEqual: [a: Operand][b: Operand]
-    func execNotEqual(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execNotEqual(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let (aOp, aSize) = context.decodeOperand(from: payload, at: start)
         let a = context.resolveUnchecked(aOp)
         let (bOp, _) = context.decodeOperand(from: payload, at: start + aSize)
@@ -499,7 +528,9 @@ extension VM {
     }
 
     /// Not: [block content inline]
-    func execNot(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws -> BlockResult {
+    func execNot(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws
+        -> BlockResult
+    {
         // Execute the nested block — block starts at payload start and fills the entire payload
         let result = try await self.executeBlock(
             context: context,
@@ -524,7 +555,9 @@ extension VM {
     // MARK: - Object Operations
 
     /// ObjectInsertOnce: [object: Local][key: Operand][value: Operand]
-    func execObjectInsertOnce(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execObjectInsertOnce(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let object = context.decodeLocal(from: payload, at: start)
         let (keyOp, keySize) = context.decodeOperand(from: payload, at: start + 4)
         let key = context.resolveUnchecked(keyOp)
@@ -555,7 +588,9 @@ extension VM {
     }
 
     /// ObjectInsert: [object: Local][key: Operand][value: Operand]
-    func execObjectInsert(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execObjectInsert(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let object = context.decodeLocal(from: payload, at: start)
         let (keyOp, keySize) = context.decodeOperand(from: payload, at: start + 4)
         let key = context.resolveUnchecked(keyOp)
@@ -578,7 +613,9 @@ extension VM {
     }
 
     /// ObjectMerge: [target: Local][a: Local][b: Local]
-    func execObjectMerge(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execObjectMerge(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let target = context.decodeLocal(from: payload, at: start)
         let a = context.decodeLocal(from: payload, at: start + 4)
         let b = context.decodeLocal(from: payload, at: start + 8)
@@ -601,14 +638,18 @@ extension VM {
     // MARK: - Variable Management
 
     /// ResetLocal: [local: Local]
-    func execResetLocal(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execResetLocal(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let local = context.decodeLocal(from: payload, at: start)
         context.locals[local] = nil
         return .success
     }
 
     /// ResultSetAdd: [value: Local]
-    func execResultSetAdd(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execResultSetAdd(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let value = context.decodeLocal(from: payload, at: start)
         let regoValue = context.resolveLocal(idx: value)
 
@@ -621,7 +662,9 @@ extension VM {
     }
 
     /// ReturnLocal: [source: Local]
-    func execReturnLocal(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execReturnLocal(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws
+        -> BlockResult
+    {
         let source = context.decodeLocal(from: payload, at: start)
         let value = context.resolveLocal(idx: source)
         return BlockResult(functionReturnValue: value)
@@ -630,7 +673,9 @@ extension VM {
     // MARK: - Collection Operations
 
     /// Scan: [source: Local][key: Local][value: Local][block content inline]
-    func execScan(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws -> BlockResult {
+    func execScan(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws
+        -> BlockResult
+    {
         let source = context.decodeLocal(from: payload, at: start)
         let key = context.decodeLocal(from: payload, at: start + 4)
         let value = context.decodeLocal(from: payload, at: start + 8)
@@ -694,7 +739,8 @@ extension VM {
     }
 
     /// SetAdd: [set: Local][value: Operand]
-    func execSetAdd(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult {
+    func execSetAdd(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) throws -> BlockResult
+    {
         let set = context.decodeLocal(from: payload, at: start)
         let (valueOp, _) = context.decodeOperand(from: payload, at: start + 4)
         let value = context.resolveUnchecked(valueOp)
@@ -715,7 +761,9 @@ extension VM {
     }
 
     /// With: [local: Local][value: Operand][pathCount: UInt32][pathIndices: UInt32...][block content inline]
-    func execWith(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws -> BlockResult {
+    func execWith(context: VMContext, payload: ContiguousArray<UInt8>, start: Int, length: Int) async throws
+        -> BlockResult
+    {
         let local = context.decodeLocal(from: payload, at: start)
         let (valueOp, valueSize) = context.decodeOperand(from: payload, at: start + 4)
         let overlayValue = context.resolveUnchecked(valueOp)

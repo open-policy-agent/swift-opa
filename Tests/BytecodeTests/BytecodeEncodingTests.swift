@@ -1,6 +1,7 @@
 import AST
-import Testing
 import Foundation
+import Testing
+
 @testable import Bytecode
 
 @Suite struct BytecodeEncodingTests {
@@ -13,11 +14,11 @@ import Foundation
 
         // Opcode 1 (assignInt) in top 6 bits, length 12 in bottom 24 bits
         // 0x01000000 | 0x0000000C = 0x0100000C
-        #expect(encoded == 0x0100000C)
+        #expect(encoded == 0x0100_000C)
     }
 
     @Test func testHeaderDecoding() throws {
-        let encoded: UInt32 = 0x0100000C  // Opcode 1, length 12
+        let encoded: UInt32 = 0x0100_000C  // Opcode 1, length 12
         let header = try InstructionHeader.decode(encoded)
 
         #expect(header.opcode == .assignInt)
@@ -44,7 +45,7 @@ import Foundation
             .nop, .notEqual, .not,
             .objectInsertOnce, .objectInsert, .objectMerge,
             .resetLocal, .resultSetAdd, .returnLocal,
-            .scan, .setAdd, .with
+            .scan, .setAdd, .with,
         ]
 
         for opcode in opcodes {
@@ -132,7 +133,7 @@ import Foundation
             .stringIndex(0),
             .stringIndex(999),
             .numberIndex(0),
-            .numberIndex(999)
+            .numberIndex(999),
         ]
 
         for original in operands {
@@ -164,19 +165,19 @@ import Foundation
         var encoder = Encoder()
 
         encoder.appendUInt8(0x42)
-        encoder.appendUInt32(0x12345678)
-        encoder.appendInt64(-123456789)
+        encoder.appendUInt32(0x1234_5678)
+        encoder.appendInt64(-123_456_789)
 
         let bytes = encoder.bytes
         #expect(bytes[0] == 0x42)
 
         let uint32 = UInt32(bytes[1]) | UInt32(bytes[2]) << 8 | UInt32(bytes[3]) << 16 | UInt32(bytes[4]) << 24
-        #expect(uint32 == 0x12345678)
+        #expect(uint32 == 0x1234_5678)
 
-        let unsigned = UInt64(bytes[5])  | UInt64(bytes[6])  << 8  | UInt64(bytes[7])  << 16 |
-                       UInt64(bytes[8])  << 24 | UInt64(bytes[9])  << 32 | UInt64(bytes[10]) << 40 |
-                       UInt64(bytes[11]) << 48 | UInt64(bytes[12]) << 56
-        #expect(Int64(bitPattern: unsigned) == -123456789)
+        let unsigned: UInt64 =
+            UInt64(bytes[5]) | UInt64(bytes[6]) << 8 | UInt64(bytes[7]) << 16 | UInt64(bytes[8]) << 24 | UInt64(
+                bytes[9]) << 32 | UInt64(bytes[10]) << 40 | UInt64(bytes[11]) << 48 | UInt64(bytes[12]) << 56
+        #expect(Int64(bitPattern: unsigned) == -123_456_789)
     }
 
     @Test func testEncoderLocal() throws {
@@ -213,7 +214,7 @@ import Foundation
             .local(0),
             .bool(true),
             .stringIndex(5),
-            .local(10)
+            .local(10),
         ]
         encoder.appendOperandArray(operands)
 
@@ -232,12 +233,12 @@ import Foundation
     @Test func testEncoderReserveAndFillUInt32() throws {
         var encoder = Encoder()
 
-        encoder.appendUInt32(0x12345678)
+        encoder.appendUInt32(0x1234_5678)
 
         let position = encoder.reserveUInt32()
         #expect(encoder.offset == 8)  // 4 + 4
 
-        encoder.appendUInt32(0xABCDEF00)
+        encoder.appendUInt32(0xABCD_EF00)
 
         encoder.fillUInt32(at: position, value: 0x100)
 
@@ -249,7 +250,7 @@ import Foundation
     // MARK: - Error Cases
 
     @Test func testInvalidOpcodeError() throws {
-        let invalidEncoded: UInt32 = 0xFF000000  // Opcode 255 (invalid)
+        let invalidEncoded: UInt32 = 0xFF00_0000  // Opcode 255 (invalid)
         #expect(throws: Bytecode.Error.self) {
             try InstructionHeader.decode(invalidEncoded)
         }

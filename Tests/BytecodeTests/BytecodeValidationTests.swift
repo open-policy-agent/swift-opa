@@ -1,5 +1,6 @@
 import AST
 import Testing
+
 @testable import Bytecode
 
 // Tests for Policy.validate() — exercises all error paths that the VM hot loop
@@ -21,13 +22,15 @@ import Testing
             strings: strings,
             numbers: numbers,
             functions: functions,
-            plans: [Plan(
-                name: "test",
-                maxLocal: maxLocal,
-                bytecodeOffset: blockOffset,
-                bytecodeSize: sz,
-                blocks: [(offset: blockOffset, size: sz)]
-            )],
+            plans: [
+                Plan(
+                    name: "test",
+                    maxLocal: maxLocal,
+                    bytecodeOffset: blockOffset,
+                    bytecodeSize: sz,
+                    blocks: [(offset: blockOffset, size: sz)]
+                )
+            ],
             bytecode: bytes
         )
     }
@@ -104,7 +107,7 @@ import Testing
         var enc = Encoder()
         enc.appendHeader(.makeNumberRef, payloadLength: 8)
         enc.appendUInt32(5)  // index 5
-        enc.appendLocal(0)   // target
+        enc.appendLocal(0)  // target
         let p = policy(bytes: enc.bytes, numbers: [])  // index 5 OOB
         #expect(throws: Bytecode.Error.self) { try p.validate() }
     }
@@ -114,7 +117,7 @@ import Testing
         var enc = Encoder()
         enc.appendHeader(.makeNumberRef, payloadLength: 8)
         enc.appendUInt32(0)  // index 0
-        enc.appendLocal(0)   // target
+        enc.appendLocal(0)  // target
         let p = policy(bytes: enc.bytes, numbers: [nil])
         #expect(throws: Bytecode.Error.self) { try p.validate() }
     }
@@ -125,9 +128,9 @@ import Testing
         // User function index 5 with empty function table
         var enc = Encoder()
         enc.appendHeader(.call, payloadLength: 12)  // result(4)+funcIdx(4)+argCount(4)
-        enc.appendLocal(0)     // result
-        enc.appendUInt32(5)    // user func index 5 (high bit clear)
-        enc.appendUInt32(0)    // 0 args
+        enc.appendLocal(0)  // result
+        enc.appendUInt32(5)  // user func index 5 (high bit clear)
+        enc.appendUInt32(0)  // 0 args
         let p = policy(bytes: enc.bytes, functions: [])
         #expect(throws: Bytecode.Error.self) { try p.validate() }
     }
@@ -136,9 +139,9 @@ import Testing
         // Builtin with string index 5 but empty string table
         var enc = Encoder()
         enc.appendHeader(.call, payloadLength: 12)
-        enc.appendLocal(0)                   // result
-        enc.appendUInt32(0x8000_0000 | 5)    // builtin flag set, string index 5
-        enc.appendUInt32(0)                  // 0 args
+        enc.appendLocal(0)  // result
+        enc.appendUInt32(0x8000_0000 | 5)  // builtin flag set, string index 5
+        enc.appendUInt32(0)  // 0 args
         let p = policy(bytes: enc.bytes, strings: [])
         #expect(throws: Bytecode.Error.self) { try p.validate() }
     }
@@ -161,10 +164,10 @@ import Testing
         // with: local(4)+value_op(4)+pathCount(4)+pathIdx(4) = 16 bytes payload, empty block
         var enc = Encoder()
         enc.appendHeader(.with, payloadLength: 16)
-        enc.appendLocal(0)               // local
-        enc.appendOperand(.local(0))     // value
-        enc.appendUInt32(1)              // pathCount = 1
-        enc.appendUInt32(0)              // path[0] = string index 0
+        enc.appendLocal(0)  // local
+        enc.appendOperand(.local(0))  // value
+        enc.appendUInt32(1)  // pathCount = 1
+        enc.appendUInt32(0)  // path[0] = string index 0
         // Block content: empty (16 - 16 = 0 bytes)
         let p = policy(bytes: enc.bytes, strings: [])  // index 0 OOB
         #expect(throws: Bytecode.Error.self) { try p.validate() }
@@ -221,13 +224,17 @@ import Testing
         // call: argCount claims 10 args but payload has no room for them after the 12-byte header
         var enc = Encoder()
         enc.appendHeader(.call, payloadLength: 12)  // exactly the fixed header, no arg bytes
-        enc.appendLocal(0)       // result
-        enc.appendUInt32(0)      // user func 0
-        enc.appendUInt32(10)     // argCount = 10
+        enc.appendLocal(0)  // result
+        enc.appendUInt32(0)  // user func 0
+        enc.appendUInt32(10)  // argCount = 10
         // No arg operands follow — first guard trip should throw
-        let p = policy(bytes: enc.bytes, functions: [
-            Function(name: "f", path: [], params: [], returnVar: Local(0), maxLocal: 0, bytecodeOffset: 0, bytecodeSize: 0, blocks: [])
-        ])
+        let p = policy(
+            bytes: enc.bytes,
+            functions: [
+                Function(
+                    name: "f", path: [], params: [], returnVar: Local(0), maxLocal: 0, bytecodeOffset: 0,
+                    bytecodeSize: 0, blocks: [])
+            ])
         #expect(throws: Bytecode.Error.self) { try p.validate() }
     }
 
@@ -235,7 +242,7 @@ import Testing
         // callDynamic: pathCount claims 10 path elements but payload has no room after the 8-byte header
         var enc = Encoder()
         enc.appendHeader(.callDynamic, payloadLength: 8)  // result(4)+pathCount(4), no path bytes
-        enc.appendLocal(0)    // result
+        enc.appendLocal(0)  // result
         enc.appendUInt32(10)  // pathCount = 10
         let p = policy(bytes: enc.bytes)
         #expect(throws: Bytecode.Error.self) { try p.validate() }
@@ -246,9 +253,9 @@ import Testing
         var enc = Encoder()
         // local(4) + value_op(4) + pathCount(4) = 12 bytes, no indices
         enc.appendHeader(.with, payloadLength: 12)
-        enc.appendLocal(0)           // local
-        enc.appendOperand(.local(1)) // value
-        enc.appendUInt32(10)         // pathCount = 10
+        enc.appendLocal(0)  // local
+        enc.appendOperand(.local(1))  // value
+        enc.appendUInt32(10)  // pathCount = 10
         let p = policy(bytes: enc.bytes, strings: ["x"])
         #expect(throws: Bytecode.Error.self) { try p.validate() }
     }
@@ -272,13 +279,13 @@ import Testing
         // All compact opcodes: isDefined1, isUndefined1, resetLocal1,
         // resultSetAdd1, returnLocal1, break1, assignVar1
         var enc = Encoder()
-        enc.appendHeader(.isDefined1,    payloadLength: 2)
-        enc.appendHeader(.isUndefined1,  payloadLength: 3)
-        enc.appendHeader(.resetLocal1,   payloadLength: 4)
+        enc.appendHeader(.isDefined1, payloadLength: 2)
+        enc.appendHeader(.isUndefined1, payloadLength: 3)
+        enc.appendHeader(.resetLocal1, payloadLength: 4)
         enc.appendHeader(.resultSetAdd1, payloadLength: 5)
-        enc.appendHeader(.returnLocal1,  payloadLength: 6)
-        enc.appendHeader(.break1,        payloadLength: 1)
-        enc.appendHeader(.assignVar1,    payloadLength: (1 << 12) | 2)
+        enc.appendHeader(.returnLocal1, payloadLength: 6)
+        enc.appendHeader(.break1, payloadLength: 1)
+        enc.appendHeader(.assignVar1, payloadLength: (1 << 12) | 2)
         try policy(bytes: enc.bytes, maxLocal: 6).validate()
     }
 
@@ -293,7 +300,7 @@ import Testing
         var enc = Encoder()
         enc.appendHeader(.makeNumberRef, payloadLength: 8)
         enc.appendUInt32(0)  // index 0
-        enc.appendLocal(2)   // target
+        enc.appendLocal(2)  // target
         try policy(bytes: enc.bytes, numbers: [RegoNumber(int: 42)], maxLocal: 2).validate()
     }
 }

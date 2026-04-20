@@ -76,7 +76,7 @@ public enum Opcode: UInt8, Sendable {
     var isCompact: Bool {
         switch self {
         case .isDefined1, .isUndefined1, .resetLocal1, .resultSetAdd1, .returnLocal1, .break1,
-             .assignVar1:
+            .assignVar1:
             return true
         default:
             return false
@@ -183,7 +183,7 @@ public struct InstructionHeader: Sendable {
 
         case .objectMerge:
             // [target: Local (4)][a: Local (4)][b: Local (4)]
-            try validateLocal(readUInt32(payload, at: start),     maxLocal: maxLocal)
+            try validateLocal(readUInt32(payload, at: start), maxLocal: maxLocal)
             try validateLocal(readUInt32(payload, at: start + 4), maxLocal: maxLocal)
             try validateLocal(readUInt32(payload, at: start + 8), maxLocal: maxLocal)
             return []
@@ -273,7 +273,7 @@ public struct InstructionHeader: Sendable {
             for _ in 0..<numBlocks {
                 guard off + 8 <= start + length else { throw Error.invalidPayloadLength }
                 let blockOffset = Int(readUInt32(payload, at: off))
-                let blockSize   = Int(readUInt32(payload, at: off + 4))
+                let blockSize = Int(readUInt32(payload, at: off + 4))
                 off += 8
                 nested.append((blockOffset, blockSize))
             }
@@ -330,7 +330,7 @@ public struct InstructionHeader: Sendable {
         case .scan:
             // [source: Local (4)][key: Local (4)][value: Local (4)][block content inline]
             guard length >= 12 else { throw Error.invalidPayloadLength }
-            try validateLocal(readUInt32(payload, at: start),     maxLocal: maxLocal)
+            try validateLocal(readUInt32(payload, at: start), maxLocal: maxLocal)
             try validateLocal(readUInt32(payload, at: start + 4), maxLocal: maxLocal)
             try validateLocal(readUInt32(payload, at: start + 8), maxLocal: maxLocal)
             return [(start + 12, length - 12)]
@@ -394,8 +394,8 @@ public struct InstructionHeader: Sendable {
 
 /// Operand type for bytecode instructions
 public enum OperandType: UInt8, Sendable {
-    case local = 0      // Local variable reference (00)
-    case bool = 1       // Boolean constant (01)
+    case local = 0  // Local variable reference (00)
+    case bool = 1  // Boolean constant (01)
     case stringIndex = 2  // String table index (10)
     case numberIndex = 3  // Number table index (11)
 }
@@ -412,7 +412,7 @@ public struct EncodedOperand: Sendable {
 
     /// Local variable operand
     public static func local(_ index: UInt32) -> EncodedOperand {
-        assert(index <= 0x3FFFFFFF, "Local index must fit in 30 bits")
+        assert(index <= 0x3FFF_FFFF, "Local index must fit in 30 bits")
         return EncodedOperand(type: .local, value: index)
     }
 
@@ -423,25 +423,25 @@ public struct EncodedOperand: Sendable {
 
     /// String table index operand
     public static func stringIndex(_ index: UInt32) -> EncodedOperand {
-        assert(index <= 0x3FFFFFFF, "String index must fit in 30 bits")
+        assert(index <= 0x3FFF_FFFF, "String index must fit in 30 bits")
         return EncodedOperand(type: .stringIndex, value: index)
     }
 
     /// Number table index operand
     public static func numberIndex(_ index: UInt32) -> EncodedOperand {
-        assert(index <= 0x3FFFFFFF, "Number index must fit in 30 bits")
+        assert(index <= 0x3FFF_FFFF, "Number index must fit in 30 bits")
         return EncodedOperand(type: .numberIndex, value: index)
     }
 
     /// Encode operand
     /// All operand types encode to 4 bytes, little-endian: [Type:2 | Value:30]
     public func encode() -> [UInt8] {
-        let encoded = (UInt32(type.rawValue) << 30) | (value & 0x3FFFFFFF)
+        let encoded = (UInt32(type.rawValue) << 30) | (value & 0x3FFF_FFFF)
         return [
             UInt8(encoded & 0xFF),
             UInt8((encoded >> 8) & 0xFF),
             UInt8((encoded >> 16) & 0xFF),
-            UInt8((encoded >> 24) & 0xFF)
+            UInt8((encoded >> 24) & 0xFF),
         ]
     }
 
@@ -452,17 +452,19 @@ public struct EncodedOperand: Sendable {
     public static func decode(from bytes: Data, at offset: Int) -> (operand: EncodedOperand, size: Int) {
         let encoded = bytes.withUnsafeBytes { $0.loadUnaligned(fromByteOffset: offset, as: UInt32.self) }
         let type = OperandType(rawValue: UInt8(encoded >> 30))!
-        return (EncodedOperand(type: type, value: encoded & 0x3FFFFFFF), 4)
+        return (EncodedOperand(type: type, value: encoded & 0x3FFF_FFFF), 4)
     }
 
     /// Decode operand without bounds checking (for validated bytecode, little-endian)
     /// SAFETY: Caller must ensure offset is valid and bytes contain enough data
     @inline(__always)
-    public static func decodeUnchecked(from bytes: ContiguousArray<UInt8>, at offset: Int) -> (operand: EncodedOperand, size: Int) {
+    public static func decodeUnchecked(from bytes: ContiguousArray<UInt8>, at offset: Int) -> (
+        operand: EncodedOperand, size: Int
+    ) {
         let encoded = bytes.withUnsafeBytes {
             $0.load(fromByteOffset: offset, as: UInt32.self)
         }
-        return (EncodedOperand(type: OperandType(rawValue: UInt8(encoded >> 30))!, value: encoded & 0x3FFFFFFF), 4)
+        return (EncodedOperand(type: OperandType(rawValue: UInt8(encoded >> 30))!, value: encoded & 0x3FFF_FFFF), 4)
     }
 }
 

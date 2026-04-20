@@ -34,7 +34,7 @@ public struct Encoder {
     /// Reserve space for instruction header (returns position to fill later)
     public mutating func reserveHeader() -> Int {
         let position = buffer.count
-        appendUInt32(0) // Placeholder
+        appendUInt32(0)  // Placeholder
         return position
     }
 
@@ -110,7 +110,7 @@ public struct Encoder {
     /// Reserve space for a UInt32 (returns position to fill later)
     public mutating func reserveUInt32() -> Int {
         let position = buffer.count
-        appendUInt32(0) // Placeholder
+        appendUInt32(0)  // Placeholder
         return position
     }
 

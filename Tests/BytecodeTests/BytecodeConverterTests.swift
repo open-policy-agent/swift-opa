@@ -1,8 +1,9 @@
 import AST
 import Foundation
 import Testing
-@testable import IR
+
 @testable import Bytecode
+@testable import IR
 
 @Suite struct BytecodeConverterTests {
 
@@ -10,7 +11,7 @@ import Testing
 
     // Read a little-endian UInt32 from a ContiguousArray<UInt8>
     private func readLE32(_ bytes: ContiguousArray<UInt8>, at i: Int) -> UInt32 {
-        UInt32(bytes[i]) | UInt32(bytes[i+1]) << 8 | UInt32(bytes[i+2]) << 16 | UInt32(bytes[i+3]) << 24
+        UInt32(bytes[i]) | UInt32(bytes[i + 1]) << 8 | UInt32(bytes[i + 2]) << 16 | UInt32(bytes[i + 3]) << 24
     }
 
     // Read a little-endian Int64 from a ContiguousArray<UInt8>
@@ -26,11 +27,15 @@ import Testing
     }
 
     // Wrap one statement in a minimal single-block plan and convert it
-    private func convert(stmt: IR.Statement, staticStrings: [String] = [], staticStringNumbers: [Int] = [], funcs: [IR.Func] = []) throws -> Bytecode.Policy {
+    private func convert(
+        stmt: IR.Statement, staticStrings: [String] = [], staticStringNumbers: [Int] = [], funcs: [IR.Func] = []
+    ) throws -> Bytecode.Policy {
         var policy = IR.Policy(
-            staticData: staticStrings.isEmpty ? nil : IR.Static(
-                strings: staticStrings.map { IR.ConstString(value: $0) }
-            ),
+            staticData: staticStrings.isEmpty
+                ? nil
+                : IR.Static(
+                    strings: staticStrings.map { IR.ConstString(value: $0) }
+                ),
             plans: IR.Plans(plans: [
                 IR.Plan(name: "test", blocks: [IR.Block(statements: [stmt])])
             ]),
@@ -134,10 +139,12 @@ import Testing
 
     @Test func testConvertAssignVarCompact() throws {
         // Both target and source fit in 12 bits → assignVar1
-        let bc = try convert(stmt: .assignVarStmt(IR.AssignVarStatement(
-            source: IR.Operand(type: .local, value: .localIndex(3)),
-            target: 5
-        )))
+        let bc = try convert(
+            stmt: .assignVarStmt(
+                IR.AssignVarStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(3)),
+                    target: 5
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .assignVar1)
         // packed = target<<12 | source = 5<<12 | 3 = 0x5003
@@ -146,10 +153,12 @@ import Testing
 
     @Test func testConvertAssignVarNonCompact() throws {
         // Non-local source (bool) → full assignVar
-        let bc = try convert(stmt: .assignVarStmt(IR.AssignVarStatement(
-            source: IR.Operand(type: .bool, value: .bool(false)),
-            target: 1
-        )))
+        let bc = try convert(
+            stmt: .assignVarStmt(
+                IR.AssignVarStatement(
+                    source: IR.Operand(type: .bool, value: .bool(false)),
+                    target: 1
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .assignVar)
         #expect(header.length == 8)  // target(4) + operand(4)
@@ -164,10 +173,12 @@ import Testing
     // MARK: - Statement Conversion Tests
 
     @Test func testConvertArrayAppend() throws {
-        let bc = try convert(stmt: .arrayAppendStmt(IR.ArrayAppendStatement(
-            array: 2,
-            value: IR.Operand(type: .local, value: .localIndex(3))
-        )))
+        let bc = try convert(
+            stmt: .arrayAppendStmt(
+                IR.ArrayAppendStatement(
+                    array: 2,
+                    value: IR.Operand(type: .local, value: .localIndex(3))
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .arrayAppend)
         #expect(header.length == 8)  // array local(4) + operand(4)
@@ -190,10 +201,11 @@ import Testing
 
     @Test func testConvertAssignVarOnce() throws {
         let bc = try convert(
-            stmt: .assignVarOnceStmt(IR.AssignVarOnceStatement(
-                source: IR.Operand(type: .stringIndex, value: .stringIndex(0)),
-                target: 1
-            )),
+            stmt: .assignVarOnceStmt(
+                IR.AssignVarOnceStatement(
+                    source: IR.Operand(type: .stringIndex, value: .stringIndex(0)),
+                    target: 1
+                )),
             staticStrings: ["hello"]
         )
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
@@ -208,11 +220,12 @@ import Testing
 
     @Test func testConvertDot() throws {
         let bc = try convert(
-            stmt: .dotStmt(IR.DotStatement(
-                source: IR.Operand(type: .local, value: .localIndex(2)),
-                key: IR.Operand(type: .stringIndex, value: .stringIndex(0)),
-                target: 4
-            )),
+            stmt: .dotStmt(
+                IR.DotStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    key: IR.Operand(type: .stringIndex, value: .stringIndex(0)),
+                    target: 4
+                )),
             staticStrings: ["mykey"]
         )
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
@@ -228,10 +241,12 @@ import Testing
     }
 
     @Test func testConvertEqual() throws {
-        let bc = try convert(stmt: .equalStmt(IR.EqualStatement(
-            a: IR.Operand(type: .local, value: .localIndex(2)),
-            b: IR.Operand(type: .bool, value: .bool(true))
-        )))
+        let bc = try convert(
+            stmt: .equalStmt(
+                IR.EqualStatement(
+                    a: IR.Operand(type: .local, value: .localIndex(2)),
+                    b: IR.Operand(type: .bool, value: .bool(true))
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .equal)
         #expect(header.length == 8)  // a(4) + b(4)
@@ -244,9 +259,11 @@ import Testing
     }
 
     @Test func testConvertIsArray() throws {
-        let bc = try convert(stmt: .isArrayStmt(IR.IsArrayStatement(
-            source: IR.Operand(type: .local, value: .localIndex(3))
-        )))
+        let bc = try convert(
+            stmt: .isArrayStmt(
+                IR.IsArrayStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(3))
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .isArray)
         #expect(header.length == 4)
@@ -254,9 +271,11 @@ import Testing
     }
 
     @Test func testConvertIsObject() throws {
-        let bc = try convert(stmt: .isObjectStmt(IR.IsObjectStatement(
-            source: IR.Operand(type: .local, value: .localIndex(5))
-        )))
+        let bc = try convert(
+            stmt: .isObjectStmt(
+                IR.IsObjectStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(5))
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .isObject)
         #expect(header.length == 4)
@@ -264,9 +283,11 @@ import Testing
     }
 
     @Test func testConvertIsSet() throws {
-        let bc = try convert(stmt: .isSetStmt(IR.IsSetStatement(
-            source: IR.Operand(type: .local, value: .localIndex(7))
-        )))
+        let bc = try convert(
+            stmt: .isSetStmt(
+                IR.IsSetStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(7))
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .isSet)
         #expect(header.length == 4)
@@ -274,10 +295,12 @@ import Testing
     }
 
     @Test func testConvertLen() throws {
-        let bc = try convert(stmt: .lenStmt(IR.LenStatement(
-            source: IR.Operand(type: .local, value: .localIndex(2)),
-            target: 3
-        )))
+        let bc = try convert(
+            stmt: .lenStmt(
+                IR.LenStatement(
+                    source: IR.Operand(type: .local, value: .localIndex(2)),
+                    target: 3
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .len)
         #expect(header.length == 8)  // source(4) + target(4)
@@ -290,7 +313,7 @@ import Testing
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .makeArray)
         #expect(header.length == 8)  // capacity(4) + target(4)
-        #expect(readLE32(bc.bytecode, at: 4) == 8)   // capacity
+        #expect(readLE32(bc.bytecode, at: 4) == 8)  // capacity
         #expect(readOperand(bc.bytecode, at: 8).value == 2)  // target
     }
 
@@ -321,7 +344,7 @@ import Testing
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .makeNumberRef)
         #expect(header.length == 8)  // index(4) + target(4)
-        #expect(readLE32(bc.bytecode, at: 4) == 0)   // string index 0
+        #expect(readLE32(bc.bytecode, at: 4) == 0)  // string index 0
         #expect(readOperand(bc.bytecode, at: 8).value == 4)  // target local
         // Verify the number table was populated
         #expect(bc.numbers.count == 1)
@@ -353,10 +376,12 @@ import Testing
     }
 
     @Test func testConvertNotEqual() throws {
-        let bc = try convert(stmt: .notEqualStmt(IR.NotEqualStatement(
-            a: IR.Operand(type: .local, value: .localIndex(2)),
-            b: IR.Operand(type: .local, value: .localIndex(3))
-        )))
+        let bc = try convert(
+            stmt: .notEqualStmt(
+                IR.NotEqualStatement(
+                    a: IR.Operand(type: .local, value: .localIndex(2)),
+                    b: IR.Operand(type: .local, value: .localIndex(3))
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .notEqual)
         #expect(header.length == 8)
@@ -377,29 +402,33 @@ import Testing
     }
 
     @Test func testConvertObjectInsertOnce() throws {
-        let bc = try convert(stmt: .objectInsertOnceStmt(IR.ObjectInsertOnceStatement(
-            key: IR.Operand(type: .local, value: .localIndex(2)),
-            value: IR.Operand(type: .local, value: .localIndex(3)),
-            object: 4
-        )))
+        let bc = try convert(
+            stmt: .objectInsertOnceStmt(
+                IR.ObjectInsertOnceStatement(
+                    key: IR.Operand(type: .local, value: .localIndex(2)),
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    object: 4
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .objectInsertOnce)
         #expect(header.length == 12)  // object(4) + key(4) + value(4)
-        #expect(readOperand(bc.bytecode, at: 4).value == 4)   // object
-        #expect(readOperand(bc.bytecode, at: 8).value == 2)   // key
+        #expect(readOperand(bc.bytecode, at: 4).value == 4)  // object
+        #expect(readOperand(bc.bytecode, at: 8).value == 2)  // key
         #expect(readOperand(bc.bytecode, at: 12).value == 3)  // value
     }
 
     @Test func testConvertObjectInsert() throws {
-        let bc = try convert(stmt: .objectInsertStmt(IR.ObjectInsertStatement(
-            key: IR.Operand(type: .bool, value: .bool(true)),
-            value: IR.Operand(type: .local, value: .localIndex(5)),
-            object: 6
-        )))
+        let bc = try convert(
+            stmt: .objectInsertStmt(
+                IR.ObjectInsertStatement(
+                    key: IR.Operand(type: .bool, value: .bool(true)),
+                    value: IR.Operand(type: .local, value: .localIndex(5)),
+                    object: 6
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .objectInsert)
         #expect(header.length == 12)
-        #expect(readOperand(bc.bytecode, at: 4).value == 6)     // object
+        #expect(readOperand(bc.bytecode, at: 4).value == 6)  // object
         let keyOp = readOperand(bc.bytecode, at: 8)
         #expect(keyOp.type == .bool)
         #expect(keyOp.value == 1)
@@ -413,31 +442,35 @@ import Testing
         #expect(header.length == 12)  // target(4) + a(4) + b(4)
         #expect(readOperand(bc.bytecode, at: 4).value == 4)  // target
         #expect(readOperand(bc.bytecode, at: 8).value == 2)  // a
-        #expect(readOperand(bc.bytecode, at: 12).value == 3) // b
+        #expect(readOperand(bc.bytecode, at: 12).value == 3)  // b
     }
 
     @Test func testConvertScan() throws {
         let nop = try JSONDecoder().decode(IR.NopStatement.self, from: Data("{}".utf8))
-        let bc = try convert(stmt: .scanStmt(IR.ScanStatement(
-            source: 2, key: 3, value: 4,
-            block: IR.Block(statements: [.nopStmt(nop)])
-        )))
+        let bc = try convert(
+            stmt: .scanStmt(
+                IR.ScanStatement(
+                    source: 2, key: 3, value: 4,
+                    block: IR.Block(statements: [.nopStmt(nop)])
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .scan)
         // payload: source(4) + key(4) + value(4) + nop(4) = 16
         #expect(header.length == 16)
         #expect(readOperand(bc.bytecode, at: 4).value == 2)  // source
         #expect(readOperand(bc.bytecode, at: 8).value == 3)  // key
-        #expect(readOperand(bc.bytecode, at: 12).value == 4) // value
+        #expect(readOperand(bc.bytecode, at: 12).value == 4)  // value
         let innerHeader = try InstructionHeader.decode(readLE32(bc.bytecode, at: 16))
         #expect(innerHeader.opcode == .nop)
     }
 
     @Test func testConvertSetAdd() throws {
-        let bc = try convert(stmt: .setAddStmt(IR.SetAddStatement(
-            value: IR.Operand(type: .local, value: .localIndex(3)),
-            set: 2
-        )))
+        let bc = try convert(
+            stmt: .setAddStmt(
+                IR.SetAddStatement(
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    set: 2
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .setAdd)
         #expect(header.length == 8)  // set(4) + operand(4)
@@ -448,12 +481,13 @@ import Testing
     @Test func testConvertWith() throws {
         let nop = try JSONDecoder().decode(IR.NopStatement.self, from: Data("{}".utf8))
         let bc = try convert(
-            stmt: .withStmt(IR.WithStatement(
-                local: 5,
-                path: [0, 1],
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                block: IR.Block(statements: [.nopStmt(nop)])
-            )),
+            stmt: .withStmt(
+                IR.WithStatement(
+                    local: 5,
+                    path: [0, 1],
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    block: IR.Block(statements: [.nopStmt(nop)])
+                )),
             staticStrings: ["data", "foo"]
         )
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
@@ -476,9 +510,11 @@ import Testing
 
     @Test func testConvertBlockStmtSingleBlock() throws {
         let nop = try JSONDecoder().decode(IR.NopStatement.self, from: Data("{}".utf8))
-        let bc = try convert(stmt: .blockStmt(IR.BlockStatement(blocks: [
-            IR.Block(statements: [.nopStmt(nop)])
-        ])))
+        let bc = try convert(
+            stmt: .blockStmt(
+                IR.BlockStatement(blocks: [
+                    IR.Block(statements: [.nopStmt(nop)])
+                ])))
         // Single sub-block → block1 with payload = block content (nop = 4 bytes)
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .block1)
@@ -499,10 +535,12 @@ import Testing
 
     @Test func testConvertBlockStmtTwoBlocks() throws {
         let nop = try JSONDecoder().decode(IR.NopStatement.self, from: Data("{}".utf8))
-        let bc = try convert(stmt: .blockStmt(IR.BlockStatement(blocks: [
-            IR.Block(statements: [.nopStmt(nop)]),
-            IR.Block(statements: [.nopStmt(nop)])
-        ])))
+        let bc = try convert(
+            stmt: .blockStmt(
+                IR.BlockStatement(blocks: [
+                    IR.Block(statements: [.nopStmt(nop)]),
+                    IR.Block(statements: [.nopStmt(nop)]),
+                ])))
         // 2 sub-blocks → general block encoding
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .block)
@@ -537,14 +575,15 @@ import Testing
             blocks: [IR.Block(statements: [])]
         )
         let bc = try convert(
-            stmt: .callStmt(IR.CallStatement(
-                callFunc: "g0.f",
-                args: [
-                    IR.Operand(type: .local, value: .localIndex(0)),
-                    IR.Operand(type: .local, value: .localIndex(1)),
-                ],
-                result: 2
-            )),
+            stmt: .callStmt(
+                IR.CallStatement(
+                    callFunc: "g0.f",
+                    args: [
+                        IR.Operand(type: .local, value: .localIndex(0)),
+                        IR.Operand(type: .local, value: .localIndex(1)),
+                    ],
+                    result: 2
+                )),
             funcs: [fn]
         )
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
@@ -562,11 +601,13 @@ import Testing
     }
 
     @Test func testConvertCallBuiltin() throws {
-        let bc = try convert(stmt: .callStmt(IR.CallStatement(
-            callFunc: "data.test.builtin",
-            args: [IR.Operand(type: .local, value: .localIndex(3))],
-            result: 5
-        )))
+        let bc = try convert(
+            stmt: .callStmt(
+                IR.CallStatement(
+                    callFunc: "data.test.builtin",
+                    args: [IR.Operand(type: .local, value: .localIndex(3))],
+                    result: 5
+                )))
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .call)
         // result(4) + funcIndex(4) + count(4) + 1 operand(4) = 16
@@ -583,29 +624,30 @@ import Testing
 
     @Test func testConvertCallDynamic() throws {
         let bc = try convert(
-            stmt: .callDynamicStmt(IR.CallDynamicStatement(
-                path: [
-                    IR.Operand(type: .stringIndex, value: .stringIndex(0)),
-                    IR.Operand(type: .stringIndex, value: .stringIndex(1)),
-                ],
-                args: [Local(3), Local(4)],
-                result: 5
-            )),
+            stmt: .callDynamicStmt(
+                IR.CallDynamicStatement(
+                    path: [
+                        IR.Operand(type: .stringIndex, value: .stringIndex(0)),
+                        IR.Operand(type: .stringIndex, value: .stringIndex(1)),
+                    ],
+                    args: [Local(3), Local(4)],
+                    result: 5
+                )),
             staticStrings: ["data", "foo"]
         )
         let header = try InstructionHeader.decode(readLE32(bc.bytecode, at: 0))
         #expect(header.opcode == .callDynamic)
         // result(4) + pathCount(4) + 2 path ops(8) + argsCount(4) + 2 arg locals(8) = 28
         #expect(header.length == 28)
-        #expect(readOperand(bc.bytecode, at: 4).value == 5)   // result
-        #expect(readLE32(bc.bytecode, at: 8) == 2)             // path count
+        #expect(readOperand(bc.bytecode, at: 4).value == 5)  // result
+        #expect(readLE32(bc.bytecode, at: 8) == 2)  // path count
         let p0 = readOperand(bc.bytecode, at: 12)
         #expect(p0.type == .stringIndex)
         #expect(p0.value == 0)
         let p1 = readOperand(bc.bytecode, at: 16)
         #expect(p1.type == .stringIndex)
         #expect(p1.value == 1)
-        #expect(readLE32(bc.bytecode, at: 20) == 2)           // args count
+        #expect(readLE32(bc.bytecode, at: 20) == 2)  // args count
         #expect(readOperand(bc.bytecode, at: 24).value == 3)  // arg0
         #expect(readOperand(bc.bytecode, at: 28).value == 4)  // arg1
     }
@@ -673,7 +715,7 @@ import Testing
     @Test func testNumberTableUnparseable() throws {
         var policy = IR.Policy(
             staticData: IR.Static(strings: [
-                IR.ConstString(value: "definitely-not-a-number"),
+                IR.ConstString(value: "definitely-not-a-number")
             ]),
             plans: IR.Plans(plans: [IR.Plan(name: "test", blocks: [IR.Block(statements: [])])]),
             funcs: nil
@@ -686,11 +728,12 @@ import Testing
     }
 
     @Test func testNumberTableEmptyWhenNoStaticStrings() throws {
-        let bc = try Converter.convert(IR.Policy(
-            staticData: nil,
-            plans: IR.Plans(plans: [IR.Plan(name: "test", blocks: [IR.Block(statements: [])])]),
-            funcs: nil
-        ))
+        let bc = try Converter.convert(
+            IR.Policy(
+                staticData: nil,
+                plans: IR.Plans(plans: [IR.Plan(name: "test", blocks: [IR.Block(statements: [])])]),
+                funcs: nil
+            ))
         #expect(bc.numbers.isEmpty)
     }
 
@@ -700,13 +743,15 @@ import Testing
         let policy = IR.Policy(
             staticData: nil,
             plans: IR.Plans(plans: [
-                IR.Plan(name: "test", blocks: [
-                    IR.Block(statements: [
-                        .makeNullStmt(IR.MakeNullStatement(target: 0)),
-                        .makeSetStmt(IR.MakeSetStatement(target: 1)),
-                        .makeObjectStmt(IR.MakeObjectStatement(target: 2))
+                IR.Plan(
+                    name: "test",
+                    blocks: [
+                        IR.Block(statements: [
+                            .makeNullStmt(IR.MakeNullStatement(target: 0)),
+                            .makeSetStmt(IR.MakeSetStatement(target: 1)),
+                            .makeObjectStmt(IR.MakeObjectStatement(target: 2)),
+                        ])
                     ])
-                ])
             ]),
             funcs: nil
         )
@@ -731,11 +776,13 @@ import Testing
         let policy = IR.Policy(
             staticData: nil,
             plans: IR.Plans(plans: [
-                IR.Plan(name: "my_plan", blocks: [
-                    IR.Block(statements: [
-                        .makeNullStmt(IR.MakeNullStatement(target: 0))
+                IR.Plan(
+                    name: "my_plan",
+                    blocks: [
+                        IR.Block(statements: [
+                            .makeNullStmt(IR.MakeNullStatement(target: 0))
+                        ])
                     ])
-                ])
             ]),
             funcs: nil
         )
@@ -755,7 +802,7 @@ import Testing
                 strings: [
                     IR.ConstString(value: "foo"),
                     IR.ConstString(value: "bar"),
-                    IR.ConstString(value: "baz")
+                    IR.ConstString(value: "baz"),
                 ],
                 builtinFuncs: nil,
                 files: nil
@@ -780,17 +827,21 @@ import Testing
                 files: nil
             ),
             plans: IR.Plans(plans: [
-                IR.Plan(name: "plan1", blocks: [
-                    IR.Block(statements: [
-                        .makeNullStmt(IR.MakeNullStatement(target: 0)),
-                        .makeSetStmt(IR.MakeSetStatement(target: 1))
-                    ])
-                ]),
-                IR.Plan(name: "plan2", blocks: [
-                    IR.Block(statements: [
-                        .makeObjectStmt(IR.MakeObjectStatement(target: 0))
-                    ])
-                ])
+                IR.Plan(
+                    name: "plan1",
+                    blocks: [
+                        IR.Block(statements: [
+                            .makeNullStmt(IR.MakeNullStatement(target: 0)),
+                            .makeSetStmt(IR.MakeSetStatement(target: 1)),
+                        ])
+                    ]),
+                IR.Plan(
+                    name: "plan2",
+                    blocks: [
+                        IR.Block(statements: [
+                            .makeObjectStmt(IR.MakeObjectStatement(target: 0))
+                        ])
+                    ]),
             ]),
             funcs: nil
         )

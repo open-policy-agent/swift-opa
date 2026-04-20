@@ -85,10 +85,9 @@ public struct Policy: Sendable {
                 throw Error.unexpectedEndOfBytecode
             }
 
-            let headerValue = UInt32(bytecode[pc]) |
-                              UInt32(bytecode[pc + 1]) << 8 |
-                              UInt32(bytecode[pc + 2]) << 16 |
-                              UInt32(bytecode[pc + 3]) << 24
+            let headerValue =
+                UInt32(bytecode[pc]) | UInt32(bytecode[pc + 1]) << 8 | UInt32(bytecode[pc + 2]) << 16 | UInt32(
+                    bytecode[pc + 3]) << 24
             let rawOpcode = UInt8((headerValue >> 24) & 0x3F)
             guard Opcode(rawValue: rawOpcode) != nil else {
                 throw Error.invalidOpcode(rawOpcode)
@@ -98,8 +97,8 @@ public struct Policy: Sendable {
 
             let payloadStart = pc
             // Compact opcodes encode their operand in header.length; their payload is 0 bytes.
-            let payloadSize  = header.opcode.isCompact ? 0 : Int(header.length)
-            let payloadEnd   = pc + payloadSize
+            let payloadSize = header.opcode.isCompact ? 0 : Int(header.length)
+            let payloadEnd = pc + payloadSize
             guard payloadEnd <= bytecode.count else {
                 throw Error.unexpectedEndOfBytecode
             }

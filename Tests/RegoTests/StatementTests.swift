@@ -2,6 +2,7 @@ import AST
 import Bytecode
 import Foundation
 import Testing
+
 @testable import IR
 @testable import Rego
 
@@ -1003,18 +1004,20 @@ struct StatementTests {
     static let equalStmtTests: [TestCase] = [
         TestCase(
             description: "equal values succeeds",
-            stmt: .equalStmt(IR.EqualStatement(
-                a: IR.Operand(type: .local, value: .localIndex(2)),
-                b: IR.Operand(type: .local, value: .localIndex(3))
-            )),
+            stmt: .equalStmt(
+                IR.EqualStatement(
+                    a: IR.Operand(type: .local, value: .localIndex(2)),
+                    b: IR.Operand(type: .local, value: .localIndex(3))
+                )),
             locals: [2: "x", 3: "x"]
         ),
         TestCase(
             description: "unequal values is undefined",
-            stmt: .equalStmt(IR.EqualStatement(
-                a: IR.Operand(type: .local, value: .localIndex(2)),
-                b: IR.Operand(type: .local, value: .localIndex(3))
-            )),
+            stmt: .equalStmt(
+                IR.EqualStatement(
+                    a: IR.Operand(type: .local, value: .localIndex(2)),
+                    b: IR.Operand(type: .local, value: .localIndex(3))
+                )),
             locals: [2: "x", 3: "y"],
             expectUndefined: true
         ),
@@ -1023,27 +1026,30 @@ struct StatementTests {
     static let notEqualStmtTests: [TestCase] = [
         TestCase(
             description: "unequal values succeeds",
-            stmt: .notEqualStmt(IR.NotEqualStatement(
-                a: IR.Operand(type: .local, value: .localIndex(2)),
-                b: IR.Operand(type: .local, value: .localIndex(3))
-            )),
+            stmt: .notEqualStmt(
+                IR.NotEqualStatement(
+                    a: IR.Operand(type: .local, value: .localIndex(2)),
+                    b: IR.Operand(type: .local, value: .localIndex(3))
+                )),
             locals: [2: "x", 3: "y"]
         ),
         TestCase(
             description: "equal values is undefined",
-            stmt: .notEqualStmt(IR.NotEqualStatement(
-                a: IR.Operand(type: .local, value: .localIndex(2)),
-                b: IR.Operand(type: .local, value: .localIndex(3))
-            )),
+            stmt: .notEqualStmt(
+                IR.NotEqualStatement(
+                    a: IR.Operand(type: .local, value: .localIndex(2)),
+                    b: IR.Operand(type: .local, value: .localIndex(3))
+                )),
             locals: [2: "x", 3: "x"],
             expectUndefined: true
         ),
         TestCase(
             description: "undefined operand is undefined",
-            stmt: .notEqualStmt(IR.NotEqualStatement(
-                a: IR.Operand(type: .local, value: .localIndex(2)),
-                b: IR.Operand(type: .local, value: .localIndex(3))
-            )),
+            stmt: .notEqualStmt(
+                IR.NotEqualStatement(
+                    a: IR.Operand(type: .local, value: .localIndex(2)),
+                    b: IR.Operand(type: .local, value: .localIndex(3))
+                )),
             locals: [2: "x"],  // local 3 is undefined
             expectUndefined: true
         ),
@@ -1125,7 +1131,7 @@ struct StatementTests {
             stmt: .makeNullStmt(IR.MakeNullStatement(target: Local(2))),
             locals: [:],
             expectLocals: [2: .null]
-        ),
+        )
     ]
 
     static let makeNumberIntStmtTests: [TestCase] = [
@@ -1150,7 +1156,7 @@ struct StatementTests {
             locals: [:],
             staticStrings: ["99"],
             expectLocals: [2: 99]
-        ),
+        )
     ]
 
     static let makeArrayStmtTests: [TestCase] = [
@@ -1159,35 +1165,38 @@ struct StatementTests {
             stmt: .makeArrayStmt(IR.MakeArrayStatement(capacity: 4, target: Local(2))),
             locals: [:],
             expectLocals: [2: []]
-        ),
+        )
     ]
 
     static let arrayAppendStmtTests: [TestCase] = [
         TestCase(
             description: "append value to array",
-            stmt: .arrayAppendStmt(IR.ArrayAppendStatement(
-                array: Local(2),
-                value: IR.Operand(type: .local, value: .localIndex(3))
-            )),
+            stmt: .arrayAppendStmt(
+                IR.ArrayAppendStatement(
+                    array: Local(2),
+                    value: IR.Operand(type: .local, value: .localIndex(3))
+                )),
             locals: [2: [], 3: "x"],
             expectLocals: [2: ["x"]]
         ),
         TestCase(
             description: "append to non-array is undefined",
-            stmt: .arrayAppendStmt(IR.ArrayAppendStatement(
-                array: Local(2),
-                value: IR.Operand(type: .local, value: .localIndex(3))
-            )),
+            stmt: .arrayAppendStmt(
+                IR.ArrayAppendStatement(
+                    array: Local(2),
+                    value: IR.Operand(type: .local, value: .localIndex(3))
+                )),
             locals: [2: "not an array", 3: "x"],
             ignoreLocals: [2],
             expectUndefined: true
         ),
         TestCase(
             description: "append undefined value is undefined",
-            stmt: .arrayAppendStmt(IR.ArrayAppendStatement(
-                array: Local(2),
-                value: IR.Operand(type: .local, value: .localIndex(3))
-            )),
+            stmt: .arrayAppendStmt(
+                IR.ArrayAppendStatement(
+                    array: Local(2),
+                    value: IR.Operand(type: .local, value: .localIndex(3))
+                )),
             locals: [2: []],  // local 3 not set
             ignoreLocals: [2],
             expectUndefined: true
@@ -1200,7 +1209,7 @@ struct StatementTests {
             stmt: .makeObjectStmt(IR.MakeObjectStatement(target: Local(2))),
             locals: [:],
             expectLocals: [2: [:]]
-        ),
+        )
     ]
 
     static let makeSetStmtTests: [TestCase] = [
@@ -1209,35 +1218,38 @@ struct StatementTests {
             stmt: .makeSetStmt(IR.MakeSetStatement(target: Local(2))),
             locals: [:],
             expectLocals: [2: .set([])]
-        ),
+        )
     ]
 
     static let setAddStmtTests: [TestCase] = [
         TestCase(
             description: "add value to set",
-            stmt: .setAddStmt(IR.SetAddStatement(
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                set: Local(2)
-            )),
+            stmt: .setAddStmt(
+                IR.SetAddStatement(
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    set: Local(2)
+                )),
             locals: [2: .set([]), 3: "a"],
             expectLocals: [2: .set(["a"])]
         ),
         TestCase(
             description: "add to non-set is undefined",
-            stmt: .setAddStmt(IR.SetAddStatement(
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                set: Local(2)
-            )),
+            stmt: .setAddStmt(
+                IR.SetAddStatement(
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    set: Local(2)
+                )),
             locals: [2: "not a set", 3: "a"],
             ignoreLocals: [2],
             expectUndefined: true
         ),
         TestCase(
             description: "add undefined value is undefined",
-            stmt: .setAddStmt(IR.SetAddStatement(
-                value: IR.Operand(type: .local, value: .localIndex(99)),
-                set: Local(2)
-            )),
+            stmt: .setAddStmt(
+                IR.SetAddStatement(
+                    value: IR.Operand(type: .local, value: .localIndex(99)),
+                    set: Local(2)
+                )),
             locals: [2: .set([])],
             ignoreLocals: [2],
             expectUndefined: true
@@ -1247,22 +1259,28 @@ struct StatementTests {
     static let notStmtTests: [TestCase] = [
         TestCase(
             description: "inner block undefined → not succeeds",
-            stmt: .notStmt(IR.NotStatement(block: IR.Block(statements: [
-                .equalStmt(IR.EqualStatement(
-                    a: IR.Operand(type: .local, value: .localIndex(2)),
-                    b: IR.Operand(type: .local, value: .localIndex(3))
-                ))
-            ]))),
+            stmt: .notStmt(
+                IR.NotStatement(
+                    block: IR.Block(statements: [
+                        .equalStmt(
+                            IR.EqualStatement(
+                                a: IR.Operand(type: .local, value: .localIndex(2)),
+                                b: IR.Operand(type: .local, value: .localIndex(3))
+                            ))
+                    ]))),
             locals: [2: "a", 3: "b"]
         ),
         TestCase(
             description: "inner block succeeds → not is undefined",
-            stmt: .notStmt(IR.NotStatement(block: IR.Block(statements: [
-                .equalStmt(IR.EqualStatement(
-                    a: IR.Operand(type: .local, value: .localIndex(2)),
-                    b: IR.Operand(type: .local, value: .localIndex(3))
-                ))
-            ]))),
+            stmt: .notStmt(
+                IR.NotStatement(
+                    block: IR.Block(statements: [
+                        .equalStmt(
+                            IR.EqualStatement(
+                                a: IR.Operand(type: .local, value: .localIndex(2)),
+                                b: IR.Operand(type: .local, value: .localIndex(3))
+                            ))
+                    ]))),
             locals: [2: "a", 3: "a"],
             expectUndefined: true
         ),
@@ -1274,7 +1292,7 @@ struct StatementTests {
             stmt: .resetLocalStmt(IR.ResetLocalStatement(target: Local(2))),
             locals: [2: "value to clear"],
             ignoreLocals: [2]  // resetLocal1 stores nil; ignoreLocals avoids raw storage mismatch
-        ),
+        )
     ]
 
     static let returnLocalStmtTests: [TestCase] = [
@@ -1283,48 +1301,52 @@ struct StatementTests {
             stmt: .returnLocalStmt(IR.ReturnLocalStatement(source: Local(2))),
             locals: [2: "result"]
             // locals unchanged; block result is functionReturnValue (not undefined, no error)
-        ),
+        )
     ]
 
     static let objectInsertStmtTests: [TestCase] = [
         TestCase(
             description: "insert new key",
-            stmt: .objectInsertStmt(IR.ObjectInsertStatement(
-                key: IR.Operand(type: .local, value: .localIndex(2)),
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                object: Local(4)
-            )),
+            stmt: .objectInsertStmt(
+                IR.ObjectInsertStatement(
+                    key: IR.Operand(type: .local, value: .localIndex(2)),
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    object: Local(4)
+                )),
             locals: [2: "key", 3: "value", 4: [:]],
             expectLocals: [4: ["key": "value"]]
         ),
         TestCase(
             description: "overwrite existing key",
-            stmt: .objectInsertStmt(IR.ObjectInsertStatement(
-                key: IR.Operand(type: .local, value: .localIndex(2)),
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                object: Local(4)
-            )),
+            stmt: .objectInsertStmt(
+                IR.ObjectInsertStatement(
+                    key: IR.Operand(type: .local, value: .localIndex(2)),
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    object: Local(4)
+                )),
             locals: [2: "key", 3: "new_value", 4: ["key": "old_value"]],
             expectLocals: [4: ["key": "new_value"]]
         ),
         TestCase(
             description: "insert into non-object is undefined",
-            stmt: .objectInsertStmt(IR.ObjectInsertStatement(
-                key: IR.Operand(type: .local, value: .localIndex(2)),
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                object: Local(4)
-            )),
+            stmt: .objectInsertStmt(
+                IR.ObjectInsertStatement(
+                    key: IR.Operand(type: .local, value: .localIndex(2)),
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    object: Local(4)
+                )),
             locals: [2: "key", 3: "value", 4: "not an object"],
             ignoreLocals: [4],
             expectUndefined: true
         ),
         TestCase(
             description: "insert undefined value is undefined",
-            stmt: .objectInsertStmt(IR.ObjectInsertStatement(
-                key: IR.Operand(type: .local, value: .localIndex(2)),
-                value: IR.Operand(type: .local, value: .localIndex(3)),
-                object: Local(4)
-            )),
+            stmt: .objectInsertStmt(
+                IR.ObjectInsertStatement(
+                    key: IR.Operand(type: .local, value: .localIndex(2)),
+                    value: IR.Operand(type: .local, value: .localIndex(3)),
+                    object: Local(4)
+                )),
             locals: [2: "key", 4: [:]],  // local 3 is undefined
             ignoreLocals: [4],
             expectUndefined: true

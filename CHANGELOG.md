@@ -5,6 +5,22 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 0.0.4
+
+This release contains an overhaul to the IR evaluator that should improve performance significantly for many workloads.
+
+### New internal bytecode interpreter (#128)
+
+Swift OPA's [Rego IR](https://www.openpolicyagent.org/docs/ir) evaluator no longer uses a recursive tree-walking IR evaluator, and instead performs an internal IR-to-bytecode conversion step, so that it can interpret bytecode directly.
+The new core evaluation loop is much tighter as most validation checks are done at bytecode compilation time, and this results in far less branching and pointer chasing during evaluation.
+
+The bytecode VM is up to 25% faster in benchmarks, with the biggest gains on iteration and call-heavy workloads.
+
+This change is entirely internal to the evaluator, so users do not need to make any changes in order to take advantage of the performance improvements.
+
+Authored by @koponen
+
+
 ## 0.0.3
 
 This release contains bugfixes, performance improvements for the string builtins, and more!

@@ -190,7 +190,7 @@ extension OPA.Bundle {
     /// runs in O(N log N) for success cases, and O(N log (N+K)) in the worst
     /// case.
     ///
-    /// Inuition: We sort all paths lexicographically, then scan forward for
+    /// Intuition: We sort all paths lexicographically, then scan forward for
     /// prefix matches. Prefix matches == collisions. This works because
     /// shorter path prefixes will always be sorted ahead of any colliding
     /// longer paths.

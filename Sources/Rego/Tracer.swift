@@ -25,7 +25,7 @@ extension OPA.Trace {
         case note
     }
 
-    /// Describes the source location at which a trace event occured
+    /// Describes the source location at which a trace event occurred
     public struct Location: Codable, Hashable, Sendable {
         public var row: Int = 0
         public var col: Int = 0

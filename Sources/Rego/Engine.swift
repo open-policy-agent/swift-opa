@@ -172,10 +172,10 @@ extension OPA.Engine {
         }
 
         // Verify correctness of this bundle set
-        try checkBundlesForOverlap(bundleSet: loadedBundles)
+        try OPA.Bundle.checkBundlesForOverlap(bundleSet: loadedBundles)
 
         // Patch all the bundle data into the data tree on the store
-        for (_, bundle) in loadedBundles {
+        for (_, bundle) in loadedBundles.sorted(by: { $0.key < $1.key }) {
             try await store.write(to: StoreKeyPath(["data"]), value: bundle.data)
         }
 

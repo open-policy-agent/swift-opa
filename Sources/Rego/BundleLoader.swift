@@ -78,10 +78,8 @@ struct BundleLoader {
         manifest = manifest ?? OPA.Manifest()  // Default manifest if none was provided
         let bundle = try OPA.Bundle(manifest: manifest!, planFiles: planFiles, regoFiles: regoFiles, data: data)
 
-        // Validate the data paths are all under the declared roots
-        if !bundle.rootsTrie.contains(dataTree: data) {
-            throw LoadError.dataEscapedRoot
-        }
+        // Ensure the bundle's data is contained under the bundle roots.
+        try bundle.validate()
 
         return bundle
     }

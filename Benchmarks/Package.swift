@@ -18,13 +18,27 @@ let package = Package(
                 .product(name: "SwiftOPA", package: "swift-opa"),
                 .product(name: "Benchmark", package: "package-benchmark"),
             ],
-            path: "Sources",
+            path: "Benchmarks/RegoBenchmarks",
             swiftSettings: [
                 .enableExperimentalFeature("AccessLevelOnImport")
             ],
             plugins: [
                 .plugin(name: "BenchmarkPlugin", package: "package-benchmark")
             ]
-        )
+        ),
+        .executableTarget(
+            name: "BundleOverlapBenchmarks",
+            dependencies: [
+                .product(name: "SwiftOPA", package: "swift-opa"),
+                .product(name: "Benchmark", package: "package-benchmark"),
+            ],
+            path: "Benchmarks/BundleOverlapBenchmarks",
+            swiftSettings: [
+                .enableExperimentalFeature("AccessLevelOnImport")
+            ],
+            plugins: [
+                .plugin(name: "BenchmarkPlugin", package: "package-benchmark")
+            ]
+        ),
     ]
 )

@@ -639,8 +639,6 @@ public struct Func: Codable, Hashable, Sendable {
     }
 }
 
-public typealias Local = UInt32
-
 public struct Operand: Hashable, Sendable {
     public enum OpType: String, Codable, Hashable, Sendable {
         case local = "local"

@@ -1,6 +1,5 @@
 import AST
 import Foundation
-import IR
 
 /// Array-based storage for IR local variables.
 ///
@@ -19,17 +18,6 @@ import IR
 /// 3. **No Register Collision**: Functions don't overwrite each other's locals. Each function
 ///    call frame uses its own set of local indices, so values don't need to be saved and
 ///    restored across function calls.
-///
-/// ## Growth Strategy
-///
-/// The array grows automatically when accessing out-of-bounds indices via the subscript setter.
-/// After initial growth during the first few statements, the array typically reaches a stable
-/// size and requires no further allocation for the remainder of evaluation.
-///
-/// ## Future Improvement
-///
-/// These assumptions could be validated during the `prepare` phase if violations lead
-/// to incorrect behavior or excessive memory usage.
 internal struct Locals: Equatable, Sendable, Encodable {
     var storage: [AST.RegoValue?]
 
@@ -48,34 +36,14 @@ internal struct Locals: Equatable, Sendable, Encodable {
         self.storage = Array(repeating: value, count: count)
     }
 
-    // Create Locals sized to accommodate given local indices
-    // Used for function call frames where we need to pre-size for parameters
-    // The O(N) max() scan is acceptable since functions typically have few parameters
-    init(accommodating locals: [IR.Local], minimumSize: Int = 0) {
-        let maxLocal = locals.max() ?? IR.Local(0)
-        let requiredSize = Int(maxLocal) + 1 + minimumSize
-        self.storage = Array(repeating: nil, count: requiredSize)
-    }
-
-    subscript(index: IR.Local) -> AST.RegoValue? {
+    subscript(index: Local) -> AST.RegoValue? {
         get {
             let idx = Int(index)
-            // Return nil if out of bounds. This happens when:
-            // - The local hasn't been written to yet (treated as undefined)
-            // - In tests that don't go through evalPlan pre-allocation
-            guard idx < storage.count else {
-                return nil
-            }
             return storage[idx]
         }
         set {
             let idx = Int(index)
-            // Grow array if needed to accommodate the index.
-            // After pre-allocation this should rarely trigger, but is needed
-            // for tests and as a safety net.
-            if idx >= storage.count {
-                storage.append(contentsOf: repeatElement(nil, count: idx - storage.count + 1))
-            }
+            precondition(idx < storage.count, "local index \(idx) out of bounds (size \(storage.count))")
             storage[idx] = newValue
         }
     }
@@ -91,18 +59,6 @@ internal struct Locals: Equatable, Sendable, Encodable {
         }
 
         return storage
-    }
-
-    // Resize array to specific size, truncating or extending with nil as needed
-    mutating func resize(to size: Int) {
-        guard size >= 0 else {
-            return
-        }
-        if size < storage.count {
-            storage.removeLast(storage.count - size)
-        } else if size > storage.count {
-            storage.append(contentsOf: repeatElement(nil, count: size - storage.count))
-        }
     }
 
     static func == (lhs: Locals, rhs: Locals) -> Bool {

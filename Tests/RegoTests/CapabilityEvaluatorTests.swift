@@ -13,10 +13,10 @@ struct CapabilityEvaluatorTests {
             bundlePaths: [
                 .init(
                     name: "policy",
-                    url: IREvaluatorTests.relPath("TestData/Bundles/full-capabilities-bundle")
+                    url: relPath("TestData/Bundles/full-capabilities-bundle")
                 )
             ],
-            capabilities: .path(IREvaluatorTests.relPath("TestData/Bundles/full-capabilities-bundle/capabilities.json"))
+            capabilities: .path(relPath("TestData/Bundles/full-capabilities-bundle/capabilities.json"))
         )
         _ = try await engine.prepareForEvaluation(query: "policy")
     }
@@ -29,11 +29,11 @@ struct CapabilityEvaluatorTests {
             bundlePaths: [
                 .init(
                     name: "policy",
-                    url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
+                    url: relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
                 )
             ],
             capabilities: .path(
-                IREvaluatorTests.relPath(
+                relPath(
                     "TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-passing.json"
                 ))
         )
@@ -46,11 +46,11 @@ struct CapabilityEvaluatorTests {
             bundlePaths: [
                 .init(
                     name: "policy",
-                    url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
+                    url: relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
                 )
             ],
             capabilities: .path(
-                IREvaluatorTests.relPath(
+                relPath(
                     "TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-rejected-missing.json"
                 ))
         )
@@ -68,11 +68,11 @@ struct CapabilityEvaluatorTests {
             bundlePaths: [
                 .init(
                     name: "policy",
-                    url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
+                    url: relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
                 )
             ],
             capabilities: .path(
-                IREvaluatorTests.relPath(
+                relPath(
                     "TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-rejected-signature-mismatch.json"
                 ))
         )
@@ -92,11 +92,11 @@ struct CapabilityEvaluatorTests {
             bundlePaths: [
                 .init(
                     name: "policy",
-                    url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins")
+                    url: relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins")
                 )
             ],
             capabilities: .path(
-                IREvaluatorTests.relPath(
+                relPath(
                     "TestData/Bundles/simple-capabilities-bundle-custom-builtins/capabilities/capabilities-passing.json"
                 )),
             customBuiltins: [
@@ -114,11 +114,11 @@ struct CapabilityEvaluatorTests {
             bundlePaths: [
                 .init(
                     name: "policy",
-                    url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins")
+                    url: relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins")
                 )
             ],
             capabilities: .path(
-                IREvaluatorTests.relPath(
+                relPath(
                     "TestData/Bundles/simple-capabilities-bundle-custom-builtins/capabilities/capabilities-rejected-missing.json"
                 )),
             customBuiltins: [
@@ -140,11 +140,11 @@ struct CapabilityEvaluatorTests {
             bundlePaths: [
                 .init(
                     name: "policy",
-                    url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins")
+                    url: relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins")
                 )
             ],
             capabilities: .path(
-                IREvaluatorTests.relPath(
+                relPath(
                     "TestData/Bundles/simple-capabilities-bundle-custom-builtins/capabilities/capabilities-rejected-signature-mismatch.json"
                 )),
             customBuiltins: [
@@ -167,11 +167,11 @@ struct CapabilityEvaluatorTests {
             bundlePaths: [
                 .init(
                     name: "policy",
-                    url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins")
+                    url: relPath("TestData/Bundles/simple-capabilities-bundle-custom-builtins")
                 )
             ],
             capabilities: .path(
-                IREvaluatorTests.relPath(
+                relPath(
                     "TestData/Bundles/simple-capabilities-bundle-custom-builtins/capabilities/capabilities-passing.json"
                 )),
             customBuiltins: [:]  // not specifying the builtin
@@ -191,11 +191,11 @@ struct CapabilityEvaluatorTests {
             bundlePaths: [
                 .init(
                     name: "policy",
-                    url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
+                    url: relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
                 )
             ],
             // Non-existent file to trigger read error
-            capabilities: .path(IREvaluatorTests.relPath("TestData/Capabilities/does-not-exist.json"))
+            capabilities: .path(relPath("TestData/Capabilities/does-not-exist.json"))
         )
 
         let error = try await requireThrows(throws: RegoError.self, "Unreadable capabilities file must raise error") {
@@ -210,11 +210,11 @@ struct CapabilityEvaluatorTests {
             bundlePaths: [
                 .init(
                     name: "policy",
-                    url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
+                    url: relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
                 )
             ],
             // Invalid JSON to trigger decode error
-            capabilities: .path(IREvaluatorTests.relPath("TestData/Capabilities/invalid.json"))
+            capabilities: .path(relPath("TestData/Capabilities/invalid.json"))
         )
 
         let error = try await requireThrows(throws: RegoError.self, "Invalid capabilities JSON must raise error") {
@@ -229,12 +229,12 @@ struct CapabilityEvaluatorTests {
             bundlePaths: [
                 .init(
                     name: "policy",
-                    url: IREvaluatorTests.relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
+                    url: relPath("TestData/Bundles/simple-capabilities-bundle-default-builtins")
                 )
             ],
             // Capabilities are unrelated to the name conflict; any passing file works
             capabilities: .path(
-                IREvaluatorTests.relPath(
+                relPath(
                     "TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-passing.json"
                 )),
             customBuiltins: [

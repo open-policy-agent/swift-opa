@@ -58,7 +58,7 @@ extension Statement {
 }
 
 extension Plan {
-    mutating func computeMaxLocal() {
+    public mutating func computeMaxLocal() {
         var maxLocal = -1
         for i in blocks.indices {
             blocks[i].walk { statement in
@@ -70,7 +70,7 @@ extension Plan {
 }
 
 extension Func {
-    mutating func computeMaxLocal() {
+    public mutating func computeMaxLocal() {
         var maxLocal = -1
 
         for i in blocks.indices {

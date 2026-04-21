@@ -30,7 +30,7 @@ let package = Package(
         // Targets can depend on other targets in this package and products from dependencies.
         .target(
             name: "SwiftOPA",
-            dependencies: ["AST", "IR", "Rego"]
+            dependencies: ["AST", "IR", "Bytecode", "Rego"]
         ),
         .target(name: "AST"),
         .target(
@@ -38,10 +38,15 @@ let package = Package(
             dependencies: ["AST"]
         ),
         .target(
+            name: "Bytecode",
+            dependencies: ["AST", "IR"]
+        ),
+        .target(
             name: "Rego",
             dependencies: [
                 "AST",
                 "IR",
+                "Bytecode",
                 .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
             ]
         ),
@@ -52,8 +57,12 @@ let package = Package(
         ),
         .testTarget(
             name: "IRTests",
-            dependencies: ["IR"],
+            dependencies: ["AST", "IR"],
             resources: [.copy("Fixtures")]
+        ),
+        .testTarget(
+            name: "BytecodeTests",
+            dependencies: ["AST", "IR", "Bytecode"]
         ),
         .testTarget(
             name: "RegoTests",

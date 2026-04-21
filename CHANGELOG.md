@@ -5,11 +5,57 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 0.0.3
+
+This release contains bugfixes, performance improvements for the string builtins, and more!
+
+### Performance improvements in `string` builtins (#112)
+
+In this release [`strings.contains`](https://www.openpolicyagent.org/docs/policy-reference/builtins/strings#builtin-strings-contains), [`strings.endswith`](https://www.openpolicyagent.org/docs/policy-reference/builtins/strings#builtin-strings-endswith), and [`strings.startswith`](https://www.openpolicyagent.org/docs/policy-reference/builtins/strings#builtin-strings-startswith) builtins now use direct UTF-8 byte comparisons instead of Swift's default `String` methods.
+This mirrors the behavior of OPA's Golang implementation, and offers a nice speedup for Rego policies using those builtins.
+
+Authored by @arirubinstein
+
+### New `time` builtins (#120, #127)
+
+Swift OPA now supports all of the `time` builtins from OPA, including:
+ - [`time.clock`](https://www.openpolicyagent.org/docs/policy-reference/builtins/time#builtin-time-timeclock)
+ - [`time.date`](https://www.openpolicyagent.org/docs/policy-reference/builtins/time#builtin-time-timedate)
+ - [`time.diff`](https://www.openpolicyagent.org/docs/policy-reference/builtins/time#builtin-time-timediff)
+ - [`time.parse_duration_ns`](https://www.openpolicyagent.org/docs/policy-reference/builtins/time#builtin-time-timeparse_duration_ns)
+ - [`time.parse_ns`](https://www.openpolicyagent.org/docs/policy-reference/builtins/time#builtin-time-timeparse_ns)
+ - [`time.parse_rfc3339_ns`](https://www.openpolicyagent.org/docs/policy-reference/builtins/time#builtin-time-timeparse_rfc3339_ns)
+ - [`time.format`](https://www.openpolicyagent.org/docs/policy-reference/builtins/time#builtin-time-timeformat)
+ - [`time.weekday`](https://www.openpolicyagent.org/docs/policy-reference/builtins/time#builtin-time-timeweekday)
+
+See the [OPA `time` docs](https://www.openpolicyagent.org/docs/policy-reference/builtins/time) for usage examples.
+
+Authored by @DFrenkel
+
+### Better support for multiple bundles (#110)
+
+Swift OPA can now detect conflicts between multiple bundles correctly.
+This resolves issues reported in #14 and #18.
+The new algorithm is based on OPA's bundle roots overlap algorithm, and rolls in a few algorithmic improvements to efficiently handle large numbers of loaded bundles and roots.
+
+The `Bundle` type now includes methods for validating that a bundle's `data` members are contained under the bundle's roots.
+
+Authored by @philipaconrad
+
+### Miscellaneous
+
+- Rego/Bundle: Add public inits for Bundle, BundleFile, and Manifest. (#114) authored by @philipaconrad
+- Rego/Manifest: Add Codable implementation. (#125) authored by @philipaconrad
+- builtins: implement semver (#123) authored by @DFrenkel
+- ci: Fix wrong path for release notes script. (#121) authored by @philipaconrad
+- ci(perf): Refactor benchmarks to run in CI, and add memo benchmark (#113) authored by @arirubinstein
+
+
 ## 0.0.2
 
 This release contains bugfixes, performance improvements for the IR evaluator, and several new builtins!
 
-## Performance improvements
+### Performance improvements (#101)
 
 The IR evaluator is now more efficient when creating aggregate Rego values. (#101, authored by @koponen)
 In particular, `ArrayAppend`, `ObjectInsert`/`ObjectInsertOnce`, and `SetAdd` IR instructions run around 7-11% faster and allocate less memory in our benchmarks.

@@ -12,7 +12,7 @@ struct BenchmarkSpec {
 }
 
 // Bundle paths are relative to the Benchmarks directory
-let bundlesPath = "../../Tests/RegoTests/TestData/Bundles"
+let bundlesPath = "../Tests/RegoTests/TestData/Bundles"
 
 let allBenchmarkSpecs: [BenchmarkSpec] =
     [
@@ -140,7 +140,7 @@ let benchmarks: @Sendable () -> Void = {
             var preparedQuery: OPA.Engine.PreparedQuery?
             do {
                 preparedQuery = try await engine.prepareForEvaluation(query: spec.query)
-            } catch {}
+            } catch { fatalError("prepareForEvaluation failed: \(error)") }
 
             benchmark.startMeasurement()
             for _ in benchmark.scaledIterations {

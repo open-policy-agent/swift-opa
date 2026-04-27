@@ -1544,6 +1544,108 @@
       "decl" : {
         "args" : [
           {
+            "of" : [
+              {
+                "type" : "string"
+              },
+              {
+                "dynamic" : {
+                  "type" : "string"
+                },
+                "type" : "array"
+              },
+              {
+                "of" : {
+                  "type" : "string"
+                },
+                "type" : "set"
+              }
+            ],
+            "type" : "any"
+          },
+          {
+            "of" : [
+              {
+                "type" : "string"
+              },
+              {
+                "dynamic" : {
+                  "type" : "string"
+                },
+                "type" : "array"
+              },
+              {
+                "of" : {
+                  "type" : "string"
+                },
+                "type" : "set"
+              }
+            ],
+            "type" : "any"
+          }
+        ],
+        "result" : {
+          "type" : "boolean"
+        },
+        "type" : "function"
+      },
+      "name" : "strings.any_prefix_match"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "of" : [
+              {
+                "type" : "string"
+              },
+              {
+                "dynamic" : {
+                  "type" : "string"
+                },
+                "type" : "array"
+              },
+              {
+                "of" : {
+                  "type" : "string"
+                },
+                "type" : "set"
+              }
+            ],
+            "type" : "any"
+          },
+          {
+            "of" : [
+              {
+                "type" : "string"
+              },
+              {
+                "dynamic" : {
+                  "type" : "string"
+                },
+                "type" : "array"
+              },
+              {
+                "of" : {
+                  "type" : "string"
+                },
+                "type" : "set"
+              }
+            ],
+            "type" : "any"
+          }
+        ],
+        "result" : {
+          "type" : "boolean"
+        },
+        "type" : "function"
+      },
+      "name" : "strings.any_suffix_match"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
             "type" : "string"
           },
           {
@@ -1556,6 +1658,56 @@
         "type" : "function"
       },
       "name" : "strings.count"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "string"
+          },
+          {
+            "dynamic" : {
+              "key" : {
+                "type" : "string"
+              },
+              "value" : {
+                "type" : "any"
+              }
+            },
+            "type" : "object"
+          }
+        ],
+        "result" : {
+          "type" : "string"
+        },
+        "type" : "function"
+      },
+      "name" : "strings.render_template"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "dynamic" : {
+              "key" : {
+                "type" : "string"
+              },
+              "value" : {
+                "type" : "string"
+              }
+            },
+            "type" : "object"
+          },
+          {
+            "type" : "string"
+          }
+        ],
+        "result" : {
+          "type" : "string"
+        },
+        "type" : "function"
+      },
+      "name" : "strings.replace_n"
     },
     {
       "decl" : {

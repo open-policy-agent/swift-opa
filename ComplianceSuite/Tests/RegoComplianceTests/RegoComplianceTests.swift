@@ -88,6 +88,14 @@ struct ComplianceTests {
         }
     }
 
+    /// Subset of ``allCases`` that can run through the synchronous evaluation path.
+    /// Excludes cases that rely on async-only builtins (e.g. `test.sleep`).
+    static var syncCases: [ComplianceTesting.IRTestCase] {
+        get throws {
+            try allCases.filter { !ComplianceTesting.requiresAsyncBuiltins($0) }
+        }
+    }
+
     @Test(arguments: try allCases)
     func testCompliance(tc: ComplianceTesting.IRTestCase) async throws {
         let testConfig = try ComplianceTests.testConfig
@@ -96,7 +104,7 @@ struct ComplianceTests {
         // be it an unexpected error, an expected error that wasn't there, or some other expectation
         // mismatch.
         print("\t🧬 executing \(tc.testDescription)")
-        let result = try await ComplianceTesting.runTest(
+        let result = try await ComplianceTesting.runTestAsync(
             config: ComplianceTests.testConfig, tc, ComplianceTests.customBuiltins)
         if testConfig.traceLevel != .none && result.trace != nil {
             result.trace!.prettyPrint(to: .standardOutput)
@@ -123,7 +131,35 @@ struct ComplianceTests {
         return
     }
 
-    fileprivate static var customBuiltins: [String: Builtin] {
+    @Test(arguments: try syncCases)
+    func testComplianceSync(tc: ComplianceTesting.IRTestCase) async throws {
+        let testConfig = try ComplianceTests.testConfig
+
+        print("\t🧬 executing (sync) \(tc.testDescription)")
+        let result = await ComplianceTesting.runTestSync(config: testConfig, tc)
+        if testConfig.traceLevel != .none && result.trace != nil {
+            result.trace!.prettyPrint(to: .standardOutput)
+        }
+
+        guard let err = result.error else {
+            print("\t✅ \(tc.testDescription)")
+            return
+        }
+
+        if let knownIssue = result.knownIssue {
+            withKnownIssue(Comment(stringLiteral: "\t⏭️ \(knownIssue)")) {
+                throw err
+            }
+            return
+        }
+
+        #expect(throws: Never.self, Comment(stringLiteral: "\t❌ \(tc.testDescription): \(err)")) {
+            throw err
+        }
+        return
+    }
+
+    fileprivate static var customBuiltins: [String: AsyncBuiltin] {
         return [
             "test.sleep": TestBuiltins.testSleep
         ]

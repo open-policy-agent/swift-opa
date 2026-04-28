@@ -8,7 +8,7 @@ let _ceil = ceil
 let _floor = floor
 
 extension BuiltinFuncs {
-    static func plus(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func plus(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doPlus(args: args)
     }
 
@@ -28,7 +28,7 @@ extension BuiltinFuncs {
         return .number(x + y)
     }
 
-    static func minus(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func minus(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -51,7 +51,7 @@ extension BuiltinFuncs {
 
     // Multiplies two numbers.
     // Returns: the product of `x` and `y`
-    static func mul(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func mul(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doMul(args: args)
     }
 
@@ -73,7 +73,7 @@ extension BuiltinFuncs {
 
     // Divides the first number by the second number.
     // Returns: the result of `x` divided by `y`
-    static func div(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func div(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -93,7 +93,7 @@ extension BuiltinFuncs {
         return .number(x / y)
     }
 
-    static func round(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func round(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -109,7 +109,7 @@ extension BuiltinFuncs {
         return .number(RegoNumber(value: _round(x.doubleValue)))
     }
 
-    static func ceil(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func ceil(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -125,7 +125,7 @@ extension BuiltinFuncs {
         return .number(RegoNumber(value: _ceil(x.doubleValue)))
     }
 
-    static func floor(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func floor(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -141,7 +141,7 @@ extension BuiltinFuncs {
         return .number(RegoNumber(value: _floor(x.doubleValue)))
     }
 
-    static func abs(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func abs(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -154,7 +154,7 @@ extension BuiltinFuncs {
     }
 
     // Returns the remainder for of `x` divided by `y`, for `y != 0`.
-    static func rem(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func rem(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }

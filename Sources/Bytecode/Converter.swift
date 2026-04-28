@@ -55,12 +55,12 @@ public struct Converter {
         var plan = plan
         plan.computeMaxLocal()
         let startOffset = context.currentOffset
-        var blocks: [(offset: Int, size: Int)] = []
+        var blocks: [(offset: Int, size: Int, syncSafe: Bool)] = []
 
         for block in plan.blocks {
             let blockStart = context.currentOffset
             try convertBlock(block, context: &context)
-            blocks.append((offset: blockStart, size: context.currentOffset - blockStart))
+            blocks.append((offset: blockStart, size: context.currentOffset - blockStart, syncSafe: false))
         }
 
         return Plan(

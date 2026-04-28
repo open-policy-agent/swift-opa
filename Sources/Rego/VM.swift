@@ -12,6 +12,7 @@ internal struct VM {
 
 extension VM {
     /// Execute a bytecode plan
+    @sync
     func executePlan(
         withContext ctx: EvaluationContext,
         planIndex: Int
@@ -30,11 +31,12 @@ extension VM {
         )
 
         for block in plan.blocks {
-            let blockResult = try await executeBlock(
-                context: vmContext,
-                offset: block.offset,
-                size: block.size
-            )
+            let blockResult: BlockResult
+            if block.syncSafe {
+                blockResult = try executeBlockSync(context: vmContext, offset: block.offset, size: block.size)
+            } else {
+                blockResult = try await executeBlock(context: vmContext, offset: block.offset, size: block.size)
+            }
             guard !blockResult.shouldBreak else {
                 throw RegoError(code: .internalError, message: "break statement jumped out of frame")
             }
@@ -47,6 +49,7 @@ extension VM {
     }
 
     /// Execute multiple blocks, collecting function return values
+    @sync
     internal func executeBlocks(
         context: VMContext,
         blocks: [(offset: Int, size: Int)]
@@ -77,6 +80,7 @@ extension VM {
     }
 
     /// Execute a user-defined function
+    @sync
     internal func executeFunction(
         context: VMContext,
         function: Function,
@@ -120,6 +124,7 @@ extension VM {
     }
 
     /// Execute a single block (PC loop over instructions)
+    @sync
     internal func executeBlock(
         context: VMContext,
         offset: Int,
@@ -255,7 +260,13 @@ extension VM {
                 result = try await execWith(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.block1.rawValue):
                 // Inline block1 to avoid an extra async activation record for the single sub-block call.
-                let innerResult = try await executeBlock(context: context, offset: payloadStart, size: length)
+                let innerResult: BlockResult
+                let syncSafe = (word & 0x4000_0000) != 0
+                if syncSafe {
+                    innerResult = try executeBlockSync(context: context, offset: payloadStart, size: length)
+                } else {
+                    innerResult = try await executeBlock(context: context, offset: payloadStart, size: length)
+                }
                 if innerResult.shouldBreak {
                     result = innerResult.breakByOne()
                 }
@@ -274,6 +285,45 @@ extension VM {
         }
 
         return .success
+    }
+}
+
+// MARK: - Sync dispatch bridges
+
+extension VM {
+    /// Non-async bridge for `executePlan` — same rationale as `executeBlockSync`.
+    ///
+    /// Throws `requiresAsyncEvaluation` if the plan is not sync-safe (e.g. contains
+    /// `callDynamic`).  This is the single enforcement point: both the `@sync`-generated
+    /// peer of `evaluate` and direct callers go through here.
+    @inline(__always)
+    func executePlanSync(withContext ctx: EvaluationContext, planIndex: Int) throws -> ResultSet {
+        guard policy.plans[planIndex].syncSafe else {
+            throw RegoError(
+                code: .requiresAsyncEvaluation,
+                message: "plan '\(policy.plans[planIndex].name)' requires async evaluation"
+            )
+        }
+        return try executePlan(withContext: ctx, planIndex: planIndex)
+    }
+
+    /// Non-async bridge that forces Swift to call the @sync-generated non-async overload of
+    /// `executeBlock`.  From a non-async context, only the non-async overload is reachable
+    /// (calling async requires `await`), so Swift's overload resolution picks correctly.
+    /// Marked `@inline(__always)` so the extra call frame disappears after inlining.
+    @inline(__always)
+    func executeBlockSync(context: VMContext, offset: Int, size: Int) throws -> BlockResult {
+        return try executeBlock(context: context, offset: offset, size: size)
+    }
+
+    /// Non-async bridge for `executeFunction` — same rationale as `executeBlockSync`.
+    @inline(__always)
+    func executeFunctionSync(
+        context: VMContext,
+        function: Function,
+        args: [AST.RegoValue]
+    ) throws -> AST.RegoValue {
+        return try executeFunction(context: context, function: function, args: args)
     }
 }
 

@@ -1,6 +1,7 @@
 // swift-tools-version: 6.0
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
+import CompilerPluginSupport
 import PackageDescription
 
 import class Foundation.ProcessInfo
@@ -24,6 +25,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
         .package(url: "https://github.com/apple/swift-crypto.git", "1.0.0"..<"5.0.0"),
+        .package(url: "https://github.com/swiftlang/swift-syntax.git", from: "600.0.0"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -41,12 +43,21 @@ let package = Package(
             name: "Bytecode",
             dependencies: ["AST", "IR"]
         ),
+        .macro(
+            name: "SyncMacroPlugin",
+            dependencies: [
+                .product(name: "SwiftDiagnostics", package: "swift-syntax"),
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+            ]
+        ),
         .target(
             name: "Rego",
             dependencies: [
                 "AST",
                 "IR",
                 "Bytecode",
+                "SyncMacroPlugin",
                 .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
             ]
         ),

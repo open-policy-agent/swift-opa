@@ -69,7 +69,7 @@ private struct FractionalSecondsInfo {
 
 extension BuiltinFuncs {
     // MARK: - time.now_ns
-    static func timeNowNanos(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func timeNowNanos(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 0 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 0)
         }
@@ -82,7 +82,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - time.add_date
-    static func timeAddDate(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func timeAddDate(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 4 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 4)
         }
@@ -137,7 +137,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - time.clock
-    static func timeClock(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func timeClock(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -151,7 +151,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - time.date
-    static func timeDate(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func timeDate(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -165,7 +165,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - time.diff
-    static func timeDiff(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func timeDiff(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -228,7 +228,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - time.format
-    static func timeFormat(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func timeFormat(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -281,7 +281,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - time.parse_duration_ns
-    static func timeParseDurationNanos(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func timeParseDurationNanos(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -298,7 +298,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - time.parse_ns
-    static func timeParseNanos(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func timeParseNanos(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -333,7 +333,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - time.parse_rfc3339_ns
-    static func timeParseRFC3339Nanos(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func timeParseRFC3339Nanos(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -355,7 +355,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - time.weekday
-    static func timeWeekday(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func timeWeekday(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }

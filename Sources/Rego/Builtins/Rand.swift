@@ -4,7 +4,7 @@ import Foundation
 private let randNamespace: String = "rand"
 
 extension BuiltinFuncs {
-    static func numbersRandIntN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func numbersRandIntN(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }

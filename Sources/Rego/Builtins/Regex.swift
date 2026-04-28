@@ -178,6 +178,76 @@ extension BuiltinFuncs {
         return .array(parts)
     }
 
+    // MARK: - regex.find_n
+
+    static func regexFindN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 3 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
+        }
+        guard case .string(let pattern) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "pattern", got: args[0].typeName, want: "string")
+        }
+        guard case .string(let value) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[1].typeName, want: "string")
+        }
+        guard case .number(let num) = args[2] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "number", got: args[2].typeName, want: "number")
+        }
+        let n = num.intValue
+
+        guard n != 0 else {
+            return .array([])
+        }
+
+        let regex = try regexCache.compile(pattern)
+        let allMatches = value.matches(of: regex)
+        let limited = n < 0 ? allMatches : Array(allMatches.prefix(n))
+
+        return .array(
+            limited.map { match in
+                .string(String(value[match.range]))
+            })
+    }
+
+    // MARK: - regex.find_all_string_submatch_n
+
+    static func regexFindAllStringSubmatchN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 3 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
+        }
+        guard case .string(let pattern) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "pattern", got: args[0].typeName, want: "string")
+        }
+        guard case .string(let value) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[1].typeName, want: "string")
+        }
+        guard case .number(let num) = args[2] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "number", got: args[2].typeName, want: "number")
+        }
+        let n = num.intValue
+
+        guard n != 0 else {
+            return .array([])
+        }
+
+        let regex = try regexCache.compile(pattern)
+        let allMatches = value.matches(of: regex)
+        let limited = n < 0 ? allMatches : Array(allMatches.prefix(n))
+
+        return .array(
+            limited.map { match in
+                var groups: [AST.RegoValue] = []
+                for i in 0..<match.output.count {
+                    if let sub = match.output[i].substring {
+                        groups.append(.string(String(sub)))
+                    } else {
+                        groups.append(.string(""))
+                    }
+                }
+                return .array(groups)
+            })
+    }
+
     // MARK: - Private helpers
 
     /// Expand `$N` capture group references in a replacement template.

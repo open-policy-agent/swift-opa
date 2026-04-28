@@ -128,6 +128,8 @@ public struct BuiltinRegistry: Sendable {
             "object.union_n": BuiltinFuncs.objectUnionN,
 
             // Regex
+            "regex.find_all_string_submatch_n": BuiltinFuncs.regexFindAllStringSubmatchN,
+            "regex.find_n": BuiltinFuncs.regexFindN,
             "regex.is_valid": BuiltinFuncs.regexIsValid,
             "regex.match": BuiltinFuncs.regexMatch,
             "regex.replace": BuiltinFuncs.regexReplace,

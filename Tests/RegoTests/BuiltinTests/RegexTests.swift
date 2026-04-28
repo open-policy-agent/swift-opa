@@ -264,6 +264,143 @@ extension BuiltinTests.RegexTests {
         ),
     ]
 
+    // MARK: - regex.find_n
+
+    static let regexFindNTests: [BuiltinTests.TestCase] = [
+        // Compliance-inspired
+        BuiltinTests.TestCase(
+            description: "find all matches (n=-1)",
+            name: "regex.find_n",
+            args: ["a.", "paranormal", -1],
+            expected: .success([.string("ar"), .string("an"), .string("al")])
+        ),
+        BuiltinTests.TestCase(
+            description: "find 2 matches",
+            name: "regex.find_n",
+            args: ["a.", "paranormal", 2],
+            expected: .success([.string("ar"), .string("an")])
+        ),
+        BuiltinTests.TestCase(
+            description: "find 0 matches",
+            name: "regex.find_n",
+            args: ["a.", "paranormal", 0],
+            expected: .success(.array([]))
+        ),
+        BuiltinTests.TestCase(
+            description: "anchored start",
+            name: "regex.find_n",
+            args: ["^a.", "abacadaeaf", -1],
+            expected: .success([.string("ab")])
+        ),
+        BuiltinTests.TestCase(
+            description: "anchored end",
+            name: "regex.find_n",
+            args: [".$", "abacadaeaf", -1],
+            expected: .success([.string("f")])
+        ),
+        BuiltinTests.TestCase(
+            description: "non-overlapping character class matches",
+            name: "regex.find_n",
+            args: ["[abcdef]{2}", "abacadaeaf", -1],
+            expected: .success([.string("ab"), .string("ac"), .string("ad"), .string("ae"), .string("af")])
+        ),
+        BuiltinTests.TestCase(
+            description: "no matches returns empty array",
+            name: "regex.find_n",
+            args: ["[0-9]+", "hello", -1],
+            expected: .success(.array([]))
+        ),
+        BuiltinTests.TestCase(
+            description: "n=1 returns first match only",
+            name: "regex.find_n",
+            args: ["a.", "paranormal", 1],
+            expected: .success([.string("ar")])
+        ),
+        BuiltinTests.TestCase(
+            description: "n larger than matches returns all",
+            name: "regex.find_n",
+            args: ["a.", "paranormal", 100],
+            expected: .success([.string("ar"), .string("an"), .string("al")])
+        ),
+        BuiltinTests.TestCase(
+            description: "empty string input",
+            name: "regex.find_n",
+            args: ["a.", "", -1],
+            expected: .success(.array([]))
+        ),
+        BuiltinTests.TestCase(
+            description: "invalid pattern throws error",
+            name: "regex.find_n",
+            args: ["[", "hello", -1],
+            expected: .failure(
+                BuiltinError.evalError(msg: "invalid regex pattern: ["))
+        ),
+    ]
+
+    // MARK: - regex.find_all_string_submatch_n
+
+    static let regexFindAllStringSubmatchNTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "single match without captures",
+            name: "regex.find_all_string_submatch_n",
+            args: ["a(x*)b", "ab", -1],
+            expected: .success([.array([.string("ab"), .string("")])])
+        ),
+        BuiltinTests.TestCase(
+            description: "single match with capture",
+            name: "regex.find_all_string_submatch_n",
+            args: ["a(x*)b", "axxb", -1],
+            expected: .success([.array([.string("axxb"), .string("xx")])])
+        ),
+        BuiltinTests.TestCase(
+            description: "multiple matches with captures",
+            name: "regex.find_all_string_submatch_n",
+            args: ["a(x*)b", "axxb ab", -1],
+            expected: .success([
+                .array([.string("axxb"), .string("xx")]),
+                .array([.string("ab"), .string("")]),
+            ])
+        ),
+        BuiltinTests.TestCase(
+            description: "no matches returns empty array",
+            name: "regex.find_all_string_submatch_n",
+            args: ["a(x*)b", "zzz", -1],
+            expected: .success(.array([]))
+        ),
+        BuiltinTests.TestCase(
+            description: "limited to n=1 match",
+            name: "regex.find_all_string_submatch_n",
+            args: ["a(x*)b", "axxb ab", 1],
+            expected: .success([.array([.string("axxb"), .string("xx")])])
+        ),
+        BuiltinTests.TestCase(
+            description: "n=0 returns empty array",
+            name: "regex.find_all_string_submatch_n",
+            args: ["a(x*)b", "axxb ab", 0],
+            expected: .success(.array([]))
+        ),
+        // Multiple capture groups (compliance: s(.)(.) → ["som", "o", "m"])
+        BuiltinTests.TestCase(
+            description: "multiple capture groups",
+            name: "regex.find_all_string_submatch_n",
+            args: ["s(.)(.*?)", "something", -1],
+            expected: .success([.array([.string("so"), .string("o"), .string("")])])
+        ),
+        BuiltinTests.TestCase(
+            description: "empty string input",
+            name: "regex.find_all_string_submatch_n",
+            args: ["a(x*)b", "", -1],
+            expected: .success(.array([]))
+        ),
+        BuiltinTests.TestCase(
+            description: "invalid pattern throws error",
+            name: "regex.find_all_string_submatch_n",
+            args: ["[", "hello", -1],
+            expected: .failure(
+                BuiltinError.evalError(msg: "invalid regex pattern: ["))
+        ),
+    ]
+
     // MARK: - All tests
 
     static var allTests: [BuiltinTests.TestCase] {
@@ -302,6 +439,30 @@ extension BuiltinTests.RegexTests {
                 builtinName: "regex.split", sampleArgs: ["pattern", "value"], argIndex: 1,
                 argName: "value", allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
             regexSplitTests,
+
+            // regex.find_n
+            BuiltinTests.generateFailureTests(
+                builtinName: "regex.find_n", sampleArgs: ["pattern", "value", 1], argIndex: 0,
+                argName: "pattern", allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "regex.find_n", sampleArgs: ["pattern", "value", 1], argIndex: 1,
+                argName: "value", allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            BuiltinTests.generateFailureTests(
+                builtinName: "regex.find_n", sampleArgs: ["pattern", "value", 1], argIndex: 2,
+                argName: "number", allowedArgTypes: ["number"], generateNumberOfArgsTest: false),
+            regexFindNTests,
+
+            // regex.find_all_string_submatch_n
+            BuiltinTests.generateFailureTests(
+                builtinName: "regex.find_all_string_submatch_n", sampleArgs: ["pattern", "value", 1], argIndex: 0,
+                argName: "pattern", allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "regex.find_all_string_submatch_n", sampleArgs: ["pattern", "value", 1], argIndex: 1,
+                argName: "value", allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            BuiltinTests.generateFailureTests(
+                builtinName: "regex.find_all_string_submatch_n", sampleArgs: ["pattern", "value", 1], argIndex: 2,
+                argName: "number", allowedArgTypes: ["number"], generateNumberOfArgsTest: false),
+            regexFindAllStringSubmatchNTests,
         ].flatMap { $0 }
     }
 

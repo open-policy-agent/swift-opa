@@ -127,6 +127,12 @@ public struct BuiltinRegistry: Sendable {
             "object.union": BuiltinFuncs.objectUnion,
             "object.union_n": BuiltinFuncs.objectUnionN,
 
+            // Regex
+            "regex.is_valid": BuiltinFuncs.regexIsValid,
+            "regex.match": BuiltinFuncs.regexMatch,
+            "regex.replace": BuiltinFuncs.regexReplace,
+            "regex.split": BuiltinFuncs.regexSplit,
+
             // Rand
             "rand.intn": BuiltinFuncs.numbersRandIntN,
 

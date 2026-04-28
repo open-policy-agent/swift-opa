@@ -9,6 +9,68 @@ extension BuiltinFuncs {
         [UnicodeScalar(0x0B), UnicodeScalar(0x0C), UnicodeScalar(0x85), UnicodeScalar(0xA0)]
     )
 
+    static func anyPrefixMatch(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
+        }
+
+        let strs = try extractStrings(from: args[0], argName: "search")
+        let prefixes = try extractStrings(from: args[1], argName: "base")
+
+        guard !strs.isEmpty, !prefixes.isEmpty else {
+            return .boolean(false)
+        }
+
+        // Fast path: single string on each side — direct memcmp
+        if strs.count == 1, prefixes.count == 1 {
+            return .boolean(utf8HasPrefix(strs[0], prefixes[0]))
+        }
+
+        // Build a byte trie from strs, query with each prefix.
+        // matchSubtree(prefix) returns true if any inserted key starts with prefix.
+        var trie = ByteTrie()
+        for str in strs {
+            trie.insert(utf8Of: str)
+        }
+        for prefix in prefixes {
+            if trie.matchSubtree(utf8Of: prefix) {
+                return .boolean(true)
+            }
+        }
+        return .boolean(false)
+    }
+
+    static func anySuffixMatch(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
+        }
+
+        let strs = try extractStrings(from: args[0], argName: "search")
+        let suffixes = try extractStrings(from: args[1], argName: "base")
+
+        guard !strs.isEmpty, !suffixes.isEmpty else {
+            return .boolean(false)
+        }
+
+        // Fast path: single string on each side — direct memcmp
+        if strs.count == 1, suffixes.count == 1 {
+            return .boolean(utf8HasSuffix(strs[0], suffixes[0]))
+        }
+
+        // Reverse all strings at byte level, then reuse prefix trie.
+        // "str ends with suffix" ⟺ "reversed(str) starts with reversed(suffix)"
+        var trie = ByteTrie()
+        for str in strs {
+            trie.insertReversed(utf8Of: str)
+        }
+        for suffix in suffixes {
+            if trie.matchSubtreeReversed(utf8Of: suffix) {
+                return .boolean(true)
+            }
+        }
+        return .boolean(false)
+    }
+
     static func concat(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
@@ -125,9 +187,9 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "substring", got: args[1].typeName, want: "string")
         }
 
-        // Handle empty substring case - should return 0 per OPA behavior
+        // Go's strings.Count(s, "") returns utf8.RuneCountInString(s) + 1
         guard !substring.isEmpty else {
-            return .number(0)
+            return .number(RegoNumber(value: search.unicodeScalars.count + 1))
         }
 
         let occurrences = search.allRanges(of: substring).count
@@ -310,6 +372,67 @@ extension BuiltinFuncs {
         }
 
         return .string(x.replacingOccurrences(of: old, with: new))
+    }
+
+    static func replaceN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
+        }
+
+        guard case .object(let patterns) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "patterns", got: args[0].typeName, want: "object")
+        }
+
+        guard case .string(let value) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[1].typeName, want: "string")
+        }
+
+        // Extract and validate pattern pairs, sorted by key lexicographically (matching Go)
+        var pairs: [(old: [UInt8], new: String)] = []
+        for (k, v) in patterns.sorted(by: { $0.key < $1.key }) {
+            guard case .string(let oldStr) = k else {
+                throw BuiltinError.argumentTypeMismatch(
+                    arg: "patterns", got: "non-string key \(k.typeName)", want: "object[string: string]")
+            }
+            guard case .string(let newStr) = v else {
+                throw BuiltinError.argumentTypeMismatch(
+                    arg: "patterns", got: "non-string value \(v.typeName)", want: "object[string: string]")
+            }
+            pairs.append((old: Array(oldStr.utf8), new: newStr))
+        }
+
+        guard !pairs.isEmpty else {
+            return .string(value)
+        }
+
+        // Pairs are already sorted by key lexicographically (matching Go's
+        // ast.TermValueCompare ordering). Go's strings.NewReplacer uses insertion-order
+        // priority, so the lex-first key that matches at each position wins.
+
+        let input = Array(value.utf8)
+        var result: [UInt8] = []
+        result.reserveCapacity(input.count)
+        var i = 0
+
+        while i < input.count {
+            var matched = false
+            for pair in pairs {
+                let patLen = pair.old.count
+                guard patLen > 0, i + patLen <= input.count else { continue }
+                if input[i..<(i + patLen)].elementsEqual(pair.old) {
+                    result.append(contentsOf: pair.new.utf8)
+                    i += patLen
+                    matched = true
+                    break
+                }
+            }
+            if !matched {
+                result.append(input[i])
+                i += 1
+            }
+        }
+
+        return .string(String(bytes: result, encoding: .utf8) ?? value)
     }
 
     static func reverse(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
@@ -558,6 +681,111 @@ extension BuiltinFuncs {
                     throw BuiltinError.halt(reason: "illegal argument type: " + $0.typeName)
                 }
             }.joined())
+    }
+
+    static func renderTemplate(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 2 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
+        }
+
+        guard case .string(let templateStr) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[0].typeName, want: "string")
+        }
+
+        guard case .object(let varsObj) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "vars", got: args[1].typeName, want: "object")
+        }
+
+        var vars: [String: Any] = [:]
+        for (k, v) in varsObj {
+            guard case .string(let key) = k else { continue }
+            vars[key] = templateValue(from: v)
+        }
+
+        let tmpl = try TextTemplate(templateStr)
+        let result = try tmpl.execute(with: vars)
+        return .string(result.replacingOccurrences(of: "<no value>", with: "<undefined>"))
+    }
+
+    // MARK: - Private helpers (alphabetized)
+
+    private static let extractStringsWant = "any<string, array[string], set[string]>"
+
+    private static func extractStrings(
+        from value: AST.RegoValue, argName: String
+    ) throws -> [String] {
+        switch value {
+        case .string(let s):
+            return [s]
+        case .array(let arr):
+            return try arr.map { elem in
+                guard case .string(let s) = elem else {
+                    throw BuiltinError.argumentTypeMismatch(
+                        arg: argName,
+                        got: "array containing \(elem.typeName)",
+                        want: extractStringsWant
+                    )
+                }
+                return s
+            }
+        case .set(let s):
+            return try s.map { elem in
+                guard case .string(let str) = elem else {
+                    throw BuiltinError.argumentTypeMismatch(
+                        arg: argName,
+                        got: "set containing \(elem.typeName)",
+                        want: extractStringsWant
+                    )
+                }
+                return str
+            }
+        default:
+            throw BuiltinError.argumentTypeMismatch(
+                arg: argName,
+                got: value.typeName,
+                want: extractStringsWant
+            )
+        }
+    }
+
+    /// Byte-level prefix check matching Go's `strings.HasPrefix()`.
+    private static func utf8HasPrefix(_ s: String, _ prefix: String) -> Bool {
+        let prefixCount = prefix.utf8.count
+        guard prefixCount <= s.utf8.count else { return false }
+        if prefixCount == 0 { return true }
+
+        if let result = s.utf8.withContiguousStorageIfAvailable({ sBuf in
+            prefix.utf8.withContiguousStorageIfAvailable({ pBuf in
+                guard let sBase = sBuf.baseAddress, let pBase = pBuf.baseAddress else {
+                    return false
+                }
+                return memcmp(sBase, pBase, pBuf.count) == 0
+            })
+        }), let inner = result {
+            return inner
+        }
+
+        return s.utf8.starts(with: prefix.utf8)
+    }
+
+    /// Byte-level suffix check matching Go's `strings.HasSuffix()`.
+    private static func utf8HasSuffix(_ s: String, _ suffix: String) -> Bool {
+        let suffixCount = suffix.utf8.count
+        guard suffixCount <= s.utf8.count else { return false }
+        if suffixCount == 0 { return true }
+
+        if let result = s.utf8.withContiguousStorageIfAvailable({ sBuf in
+            suffix.utf8.withContiguousStorageIfAvailable({ xBuf in
+                guard let sBase = sBuf.baseAddress, let xBase = xBuf.baseAddress else {
+                    return false
+                }
+                return memcmp(sBase + (sBuf.count - xBuf.count), xBase, xBuf.count) == 0
+            })
+        }), let inner = result {
+            return inner
+        }
+
+        return s.utf8.suffix(suffixCount).elementsEqual(suffix.utf8)
     }
 }
 

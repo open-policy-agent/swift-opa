@@ -1385,8 +1385,709 @@ extension BuiltinTests.StringsTests {
         ),
     ]
 
+    // MARK: - strings.count
+
+    static let stringsCountTests: [BuiltinTests.TestCase] = [
+        // Compliance: count single character
+        BuiltinTests.TestCase(
+            description: "count single character occurrences",
+            name: "strings.count",
+            args: ["cheese", "e"],
+            expected: .success(3)
+        ),
+        // Compliance: count multi-word substring
+        BuiltinTests.TestCase(
+            description: "count multi-word substring",
+            name: "strings.count",
+            args: ["hello hello hello world", "hello"],
+            expected: .success(3)
+        ),
+        // Compliance: no match
+        BuiltinTests.TestCase(
+            description: "count no match",
+            name: "strings.count",
+            args: ["dummy", "x"],
+            expected: .success(0)
+        ),
+        // Compliance: empty substring returns rune count + 1 (Go semantics)
+        BuiltinTests.TestCase(
+            description: "empty substring returns unicode scalar count + 1",
+            name: "strings.count",
+            args: ["dummy", ""],
+            expected: .success(6)
+        ),
+        // Compliance: both empty
+        BuiltinTests.TestCase(
+            description: "empty search with empty substring",
+            name: "strings.count",
+            args: ["", ""],
+            expected: .success(1)
+        ),
+        // Compliance: empty haystack non-empty needle
+        BuiltinTests.TestCase(
+            description: "empty search with non-empty substring",
+            name: "strings.count",
+            args: ["", "x"],
+            expected: .success(0)
+        ),
+        // Compliance: non-overlapping count
+        BuiltinTests.TestCase(
+            description: "non-overlapping count",
+            name: "strings.count",
+            args: ["11111", "11"],
+            expected: .success(2)
+        ),
+        // Compliance: equal strings
+        BuiltinTests.TestCase(
+            description: "equal strings",
+            name: "strings.count",
+            args: ["11111", "11111"],
+            expected: .success(1)
+        ),
+    ]
+
+    // MARK: - strings.any_prefix_match
+
+    static let anyPrefixMatchTests: [BuiltinTests.TestCase] = [
+        // Compliance: array search, array prefixes — match
+        BuiltinTests.TestCase(
+            description: "array match with multiple prefixes",
+            name: "strings.any_prefix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], ["a/", "d/"]],
+            expected: .success(true)
+        ),
+        // Compliance: no match
+        BuiltinTests.TestCase(
+            description: "array no match",
+            name: "strings.any_prefix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], ["f/", "d/"]],
+            expected: .success(false)
+        ),
+        // Compliance: multiple overlapping prefixes
+        BuiltinTests.TestCase(
+            description: "multiple overlapping prefixes",
+            name: "strings.any_prefix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], ["a/b/", "a/"]],
+            expected: .success(true)
+        ),
+        // Compliance: prefix equals full string
+        BuiltinTests.TestCase(
+            description: "prefix equals full string",
+            name: "strings.any_prefix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], ["d/", "e/f/g"]],
+            expected: .success(true)
+        ),
+        // Compliance: partial prefix not at boundary
+        BuiltinTests.TestCase(
+            description: "partial prefix match on longer strings",
+            name: "strings.any_prefix_match",
+            args: [["aa/bb/cc", "aa/bb/dd", "ee/ff/gg"], ["aa/b", "e/f"]],
+            expected: .success(true)
+        ),
+        // Compliance: prefix substring but not prefix of any string
+        BuiltinTests.TestCase(
+            description: "non-prefix substring no match",
+            name: "strings.any_prefix_match",
+            args: [["aa/bb/cc", "aa/bb/dd", "ee/ff/gg"], ["a/b", "e/f"]],
+            expected: .success(false)
+        ),
+        // Compliance: middle substring is not a prefix
+        BuiltinTests.TestCase(
+            description: "middle substring is not a prefix",
+            name: "strings.any_prefix_match",
+            args: [["aa/bb/cc", "aa/bb/dd", "ee/ff/gg"], ["b/cc"]],
+            expected: .success(false)
+        ),
+        // Compliance: single string search with array base
+        BuiltinTests.TestCase(
+            description: "single string search with array base match",
+            name: "strings.any_prefix_match",
+            args: ["a/b/c", ["a/", "d/"]],
+            expected: .success(true)
+        ),
+        // Compliance: single string search no match
+        BuiltinTests.TestCase(
+            description: "single string search no match",
+            name: "strings.any_prefix_match",
+            args: ["a/b/c", ["g/", "d/"]],
+            expected: .success(false)
+        ),
+        // Compliance: array search with single string base
+        BuiltinTests.TestCase(
+            description: "single string base match",
+            name: "strings.any_prefix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], "a/"],
+            expected: .success(true)
+        ),
+        // Compliance: single string base no match
+        BuiltinTests.TestCase(
+            description: "single string base no match",
+            name: "strings.any_prefix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], "d/"],
+            expected: .success(false)
+        ),
+        // Compliance: set inputs
+        BuiltinTests.TestCase(
+            description: "set inputs match",
+            name: "strings.any_prefix_match",
+            args: [.set(["a/b/c", "a/b/d", "e/f/g"]), .set(["a/", "d/"])],
+            expected: .success(true)
+        ),
+        // Compliance: set inputs no match
+        BuiltinTests.TestCase(
+            description: "set inputs no match",
+            name: "strings.any_prefix_match",
+            args: [.set(["a/b/c", "a/b/d", "e/f/g"]), .set(["f/", "d/"])],
+            expected: .success(false)
+        ),
+        // Compliance: empty arrays
+        BuiltinTests.TestCase(
+            description: "empty search returns false",
+            name: "strings.any_prefix_match",
+            args: [[], ["a/b", "e/f"]],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "empty prefixes returns false",
+            name: "strings.any_prefix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], []],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "both empty returns false",
+            name: "strings.any_prefix_match",
+            args: [[], []],
+            expected: .success(false)
+        ),
+        // RBAC-style: API path prefixes
+        BuiltinTests.TestCase(
+            description: "API paths match versioned prefix",
+            name: "strings.any_prefix_match",
+            args: [
+                ["/api/v1/users/123", "/api/v1/roles/admin", "/health"],
+                ["/api/v1/", "/api/v2/"],
+            ],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "API paths no match for v3 prefix",
+            name: "strings.any_prefix_match",
+            args: [
+                ["/api/v1/users/123", "/api/v1/roles/admin"],
+                ["/api/v3/", "/internal/"],
+            ],
+            expected: .success(false)
+        ),
+        // Mixed: array search with set base
+        BuiltinTests.TestCase(
+            description: "array paths with set prefixes",
+            name: "strings.any_prefix_match",
+            args: [
+                ["/api/v1/users", "/api/v2/roles"],
+                .set(["/api/v1/", "/admin/"]),
+            ],
+            expected: .success(true)
+        ),
+        // Mixed: set search with single string base
+        BuiltinTests.TestCase(
+            description: "set paths with single prefix string",
+            name: "strings.any_prefix_match",
+            args: [.set(["/api/v1/users", "/health/ready"]), "/health/"],
+            expected: .success(true)
+        ),
+        // Type errors
+        BuiltinTests.TestCase(
+            description: "type error: array with non-string element in search",
+            name: "strings.any_prefix_match",
+            args: [[1, 2, 3], ["/api/"]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "search", got: "array containing number", want: "any<string, array[string], set[string]>"))
+        ),
+        BuiltinTests.TestCase(
+            description: "type error: mixed array with string and number in search",
+            name: "strings.any_prefix_match",
+            args: [["/api/v1/users", 1], ["/api/"]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "search", got: "array containing number", want: "any<string, array[string], set[string]>"))
+        ),
+        BuiltinTests.TestCase(
+            description: "type error: array with non-string element in base",
+            name: "strings.any_prefix_match",
+            args: [["/api/v1/users"], [1, 2]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "base", got: "array containing number", want: "any<string, array[string], set[string]>"))
+        ),
+        BuiltinTests.TestCase(
+            description: "type error: set with non-string element in search",
+            name: "strings.any_prefix_match",
+            args: [.set([1, 2, 3]), ["/api/"]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "search", got: "set containing number", want: "any<string, array[string], set[string]>"))
+        ),
+        BuiltinTests.TestCase(
+            description: "type error: set with non-string element in base",
+            name: "strings.any_prefix_match",
+            args: [["/api/v1/users"], .set([1, 2])],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "base", got: "set containing number", want: "any<string, array[string], set[string]>"))
+        ),
+    ]
+
+    // MARK: - strings.any_suffix_match
+
+    static let anySuffixMatchTests: [BuiltinTests.TestCase] = [
+        // Compliance: array search, array suffixes — match
+        BuiltinTests.TestCase(
+            description: "array match with multiple suffixes",
+            name: "strings.any_suffix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], ["/c", "/a"]],
+            expected: .success(true)
+        ),
+        // Compliance: no match
+        BuiltinTests.TestCase(
+            description: "array no match",
+            name: "strings.any_suffix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], ["/f", "/a"]],
+            expected: .success(false)
+        ),
+        // Compliance: multi-level suffix
+        BuiltinTests.TestCase(
+            description: "multi-level suffix match",
+            name: "strings.any_suffix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], ["/b/c", "/d"]],
+            expected: .success(true)
+        ),
+        // Compliance: suffix equals full string
+        BuiltinTests.TestCase(
+            description: "suffix equals full string",
+            name: "strings.any_suffix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], ["/a", "e/f/g"]],
+            expected: .success(true)
+        ),
+        // Compliance: partial suffix on longer strings
+        BuiltinTests.TestCase(
+            description: "partial suffix match on longer strings",
+            name: "strings.any_suffix_match",
+            args: [["aa/bb/cc", "aa/bb/dd", "ee/ff/gg"], ["b/cc", "f/g"]],
+            expected: .success(true)
+        ),
+        // Compliance: not a suffix
+        BuiltinTests.TestCase(
+            description: "non-suffix substring no match",
+            name: "strings.any_suffix_match",
+            args: [["aa/bb/cc", "aa/bb/dd", "ee/ff/gg"], ["b/c", "f/g"]],
+            expected: .success(false)
+        ),
+        // Compliance: prefix is not a suffix
+        BuiltinTests.TestCase(
+            description: "prefix is not a suffix",
+            name: "strings.any_suffix_match",
+            args: [["aa/bb/cc", "aa/bb/dd", "ee/ff/gg"], ["aa/b"]],
+            expected: .success(false)
+        ),
+        // Compliance: single string search
+        BuiltinTests.TestCase(
+            description: "single string search match",
+            name: "strings.any_suffix_match",
+            args: ["a/b/c", ["/c", "/a"]],
+            expected: .success(true)
+        ),
+        // Compliance: single string search no match
+        BuiltinTests.TestCase(
+            description: "single string search no match",
+            name: "strings.any_suffix_match",
+            args: ["a/b/g", ["/c", "/a"]],
+            expected: .success(false)
+        ),
+        // Compliance: single string base
+        BuiltinTests.TestCase(
+            description: "single string base match",
+            name: "strings.any_suffix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], "/c"],
+            expected: .success(true)
+        ),
+        // Compliance: single string base no match
+        BuiltinTests.TestCase(
+            description: "single string base no match",
+            name: "strings.any_suffix_match",
+            args: [["a/b/c", "a/b/d", "e/f/g"], "/h"],
+            expected: .success(false)
+        ),
+        // Compliance: set inputs
+        BuiltinTests.TestCase(
+            description: "set inputs match",
+            name: "strings.any_suffix_match",
+            args: [.set(["a/b/c", "a/b/d", "e/f/g"]), .set(["/c", "/a"])],
+            expected: .success(true)
+        ),
+        // Compliance: set inputs no match
+        BuiltinTests.TestCase(
+            description: "set inputs no match",
+            name: "strings.any_suffix_match",
+            args: [.set(["a/b/c", "a/b/d", "e/f/g"]), .set(["/f", "/a"])],
+            expected: .success(false)
+        ),
+        // Compliance: empty arrays
+        BuiltinTests.TestCase(
+            description: "empty search returns false",
+            name: "strings.any_suffix_match",
+            args: [[], ["/c"]],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "empty suffixes returns false",
+            name: "strings.any_suffix_match",
+            args: [["a/b/c"], []],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "both empty returns false",
+            name: "strings.any_suffix_match",
+            args: [[], []],
+            expected: .success(false)
+        ),
+        // File extension matching
+        BuiltinTests.TestCase(
+            description: "file extensions match",
+            name: "strings.any_suffix_match",
+            args: [
+                ["db.prod", "cache.prod", "api.dev"],
+                [".prod", ".staging"],
+            ],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "file extensions no match",
+            name: "strings.any_suffix_match",
+            args: [
+                ["db.prod", "cache.prod", "api.dev"],
+                [".test", ".staging"],
+            ],
+            expected: .success(false)
+        ),
+        // Mixed: array search with set base
+        BuiltinTests.TestCase(
+            description: "array paths with set suffixes",
+            name: "strings.any_suffix_match",
+            args: [
+                ["/api/v1/users/list", "/api/v2/roles/get"],
+                .set(["/list", "/delete"]),
+            ],
+            expected: .success(true)
+        ),
+        // Mixed: set search with single string base
+        BuiltinTests.TestCase(
+            description: "set paths with single suffix string",
+            name: "strings.any_suffix_match",
+            args: [.set(["resource.prod", "resource.dev"]), ".dev"],
+            expected: .success(true)
+        ),
+        // Type errors
+        BuiltinTests.TestCase(
+            description: "type error: array with non-string element in search",
+            name: "strings.any_suffix_match",
+            args: [[1, 2, 3], [".prod"]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "search", got: "array containing number", want: "any<string, array[string], set[string]>"))
+        ),
+        BuiltinTests.TestCase(
+            description: "type error: mixed array with string and number in search",
+            name: "strings.any_suffix_match",
+            args: [["resource.prod", 1], [".prod"]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "search", got: "array containing number", want: "any<string, array[string], set[string]>"))
+        ),
+        BuiltinTests.TestCase(
+            description: "type error: array with non-string element in base",
+            name: "strings.any_suffix_match",
+            args: [["resource.prod"], [1, 2]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "base", got: "array containing number", want: "any<string, array[string], set[string]>"))
+        ),
+        BuiltinTests.TestCase(
+            description: "type error: set with non-string element in search",
+            name: "strings.any_suffix_match",
+            args: [.set([1, 2, 3]), [".prod"]],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "search", got: "set containing number", want: "any<string, array[string], set[string]>"))
+        ),
+        BuiltinTests.TestCase(
+            description: "type error: set with non-string element in base",
+            name: "strings.any_suffix_match",
+            args: [["resource.prod"], .set([1, 2])],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "base", got: "set containing number", want: "any<string, array[string], set[string]>"))
+        ),
+    ]
+
+    // MARK: - strings.replace_n
+
+    static let replaceNTests: [BuiltinTests.TestCase] = [
+        // Compliance: HTML escaping
+        BuiltinTests.TestCase(
+            description: "replace multiple patterns (HTML escaping)",
+            name: "strings.replace_n",
+            args: [
+                .object([.string("<"): .string("&lt;"), .string(">"): .string("&gt;")]),
+                "This is <b>HTML</b>!",
+            ],
+            expected: .success("This is &lt;b&gt;HTML&lt;/b&gt;!")
+        ),
+        // Compliance: overlapping — lex-first key wins (Go strings.NewReplacer priority)
+        BuiltinTests.TestCase(
+            description: "overlapping patterns lex-first key wins",
+            name: "strings.replace_n",
+            args: [
+                .object([.string("f"): .string("x"), .string("foo"): .string("xxx")]),
+                "foobar",
+            ],
+            expected: .success("xoobar")
+        ),
+        // Compliance: insertion order does not matter (sorted lex)
+        BuiltinTests.TestCase(
+            description: "overlapping patterns same result regardless of map order",
+            name: "strings.replace_n",
+            args: [
+                .object([.string("foo"): .string("xxx"), .string("f"): .string("x")]),
+                "foo",
+            ],
+            expected: .success("xoo")
+        ),
+        // Compliance: no patterns found
+        BuiltinTests.TestCase(
+            description: "no patterns found",
+            name: "strings.replace_n",
+            args: [
+                .object([.string("old1"): .string("new1"), .string("old2"): .string("new2")]),
+                "Everything is new1, new2",
+            ],
+            expected: .success("Everything is new1, new2")
+        ),
+        // Empty patterns object
+        BuiltinTests.TestCase(
+            description: "empty patterns",
+            name: "strings.replace_n",
+            args: [.object([:]), "hello world"],
+            expected: .success("hello world")
+        ),
+        // Single pattern replacement
+        BuiltinTests.TestCase(
+            description: "single pattern replacement",
+            name: "strings.replace_n",
+            args: [
+                .object([.string("world"): .string("universe")]),
+                "hello world",
+            ],
+            expected: .success("hello universe")
+        ),
+        // Empty value string
+        BuiltinTests.TestCase(
+            description: "empty value string",
+            name: "strings.replace_n",
+            args: [
+                .object([.string("a"): .string("b")]),
+                "",
+            ],
+            expected: .success("")
+        ),
+        // Replace with empty string (deletion)
+        BuiltinTests.TestCase(
+            description: "replace with empty string deletes pattern",
+            name: "strings.replace_n",
+            args: [
+                .object([.string("o"): .string("")]),
+                "foobar",
+            ],
+            expected: .success("fbar")
+        ),
+        // Multiple non-overlapping replacements
+        BuiltinTests.TestCase(
+            description: "multiple non-overlapping replacements",
+            name: "strings.replace_n",
+            args: [
+                .object([.string("a"): .string("1"), .string("b"): .string("2"), .string("c"): .string("3")]),
+                "abc abc",
+            ],
+            expected: .success("123 123")
+        ),
+        // Non-string key error
+        BuiltinTests.TestCase(
+            description: "non-string key in patterns",
+            name: "strings.replace_n",
+            args: [
+                .object([.number(2): .string("x")]),
+                "foo",
+            ],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "patterns", got: "non-string key number", want: "object[string: string]"))
+        ),
+        // Non-string value error
+        BuiltinTests.TestCase(
+            description: "non-string value in patterns",
+            name: "strings.replace_n",
+            args: [
+                .object([.string("a"): .number(1)]),
+                "foo",
+            ],
+            expected: .failure(
+                BuiltinError.argumentTypeMismatch(
+                    arg: "patterns", got: "non-string value number", want: "object[string: string]"))
+        ),
+    ]
+
+    // MARK: - strings.render_template
+
+    static let renderTemplateTests: [BuiltinTests.TestCase] = [
+        // Compliance: simple variable substitution
+        BuiltinTests.TestCase(
+            description: "simple variable substitution",
+            name: "strings.render_template",
+            args: [
+                "{{.test}}",
+                .object([.string("test"): .string("hello world")]),
+            ],
+            expected: .success("hello world")
+        ),
+        // Compliance: integer value
+        BuiltinTests.TestCase(
+            description: "integer value substitution",
+            name: "strings.render_template",
+            args: [
+                "{{.test}}",
+                .object([.string("test"): .number(2023)]),
+            ],
+            expected: .success("2023")
+        ),
+        // Compliance: range with if
+        BuiltinTests.TestCase(
+            description: "range with conditional (complex template)",
+            name: "strings.render_template",
+            args: [
+                "{{range $i, $name := .hellonames}}{{if $i}},{{end}}hello {{$name}}{{end}}",
+                .object([.string("hellonames"): .array(["rohan", "john doe"])]),
+            ],
+            expected: .success("hello rohan,hello john doe")
+        ),
+        // Compliance: missing key
+        BuiltinTests.TestCase(
+            description: "missing key produces undefined",
+            name: "strings.render_template",
+            args: [
+                "{{.testvarnotprovided}}",
+                .object([.string("test"): .string("hello world")]),
+            ],
+            expected: .success("<undefined>")
+        ),
+        // Compliance: multiple missing keys
+        BuiltinTests.TestCase(
+            description: "multiple missing keys produce undefined",
+            name: "strings.render_template",
+            args: [
+                "test {{.foo}} {{.bar}} {{.baz}}",
+                .object([.string("baz"): .number(1)]),
+            ],
+            expected: .success("test <undefined> <undefined> 1")
+        ),
+        // Template with no variables
+        BuiltinTests.TestCase(
+            description: "template with no variables",
+            name: "strings.render_template",
+            args: [
+                "hello world",
+                .object([:]),
+            ],
+            expected: .success("hello world")
+        ),
+        // Empty template
+        BuiltinTests.TestCase(
+            description: "empty template",
+            name: "strings.render_template",
+            args: [
+                "",
+                .object([:]),
+            ],
+            expected: .success("")
+        ),
+        // Multiple variables in one template
+        BuiltinTests.TestCase(
+            description: "multiple variables",
+            name: "strings.render_template",
+            args: [
+                "{{.greeting}}, {{.name}}!",
+                .object([.string("greeting"): .string("Hello"), .string("name"): .string("world")]),
+            ],
+            expected: .success("Hello, world!")
+        ),
+        // Boolean value
+        BuiltinTests.TestCase(
+            description: "boolean value substitution",
+            name: "strings.render_template",
+            args: [
+                "flag={{.enabled}}",
+                .object([.string("enabled"): .boolean(true)]),
+            ],
+            expected: .success("flag=true")
+        ),
+        // Null value produces <nil> (not <undefined> — only missing keys become <undefined>)
+        BuiltinTests.TestCase(
+            description: "null value produces nil not undefined",
+            name: "strings.render_template",
+            args: [
+                "val={{.key}}",
+                .object([.string("key"): .null]),
+            ],
+            expected: .success("val=<nil>")
+        ),
+        // Mix of present, null, and missing
+        BuiltinTests.TestCase(
+            description: "present vs null vs missing",
+            name: "strings.render_template",
+            args: [
+                "a={{.a}} b={{.b}} c={{.c}}",
+                .object([.string("a"): .string("ok"), .string("b"): .null]),
+            ],
+            expected: .success("a=ok b=<nil> c=<undefined>")
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
+            anyPrefixMatchTests,
+            anySuffixMatchTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "strings.any_prefix_match", sampleArgs: [["a"], ["b"]], argIndex: 0,
+                argName: "search", allowedArgTypes: ["string", "array", "set"],
+                wantArgs: "any<string, array[string], set[string]>",
+                generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "strings.any_prefix_match", sampleArgs: [["a"], ["b"]], argIndex: 1,
+                argName: "base", allowedArgTypes: ["string", "array", "set"],
+                wantArgs: "any<string, array[string], set[string]>",
+                generateNumberOfArgsTest: false),
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "strings.any_suffix_match", sampleArgs: [["a"], ["b"]], argIndex: 0,
+                argName: "search", allowedArgTypes: ["string", "array", "set"],
+                wantArgs: "any<string, array[string], set[string]>",
+                generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "strings.any_suffix_match", sampleArgs: [["a"], ["b"]], argIndex: 1,
+                argName: "base", allowedArgTypes: ["string", "array", "set"],
+                wantArgs: "any<string, array[string], set[string]>",
+                generateNumberOfArgsTest: false),
+
             concatTests,
             containsTests,
             endsWithTests,
@@ -1404,6 +2105,7 @@ extension BuiltinTests.StringsTests {
             BuiltinTests.generateFailureTests(
                 builtinName: "strings.count", sampleArgs: ["search", "substring"], argIndex: 1,
                 argName: "substring", allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            stringsCountTests,
 
             BuiltinTests.generateFailureTests(
                 builtinName: "startswith", sampleArgs: ["a", "b"], argIndex: 0, argName: "search",
@@ -1439,6 +2141,30 @@ extension BuiltinTests.StringsTests {
                 builtinName: "replace", sampleArgs: ["s", "old", "new"], argIndex: 2, argName: "new",
                 allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
             replaceTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "strings.replace_n",
+                sampleArgs: [.object([.string("a"): .string("b")]), "value"],
+                argIndex: 0, argName: "patterns",
+                allowedArgTypes: ["object"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "strings.replace_n",
+                sampleArgs: [.object([.string("a"): .string("b")]), "value"],
+                argIndex: 1, argName: "value",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            replaceNTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "strings.render_template",
+                sampleArgs: ["template", .object([:])],
+                argIndex: 0, argName: "value",
+                allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "strings.render_template",
+                sampleArgs: ["template", .object([:])],
+                argIndex: 1, argName: "vars",
+                allowedArgTypes: ["object"], generateNumberOfArgsTest: false),
+            renderTemplateTests,
 
             BuiltinTests.generateFailureTests(
                 builtinName: "strings.reverse", sampleArgs: ["value"], argIndex: 0, argName: "value",

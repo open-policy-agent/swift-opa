@@ -134,6 +134,7 @@ public struct BuiltinRegistry: Sendable {
             "regex.match": BuiltinFuncs.regexMatch,
             "regex.replace": BuiltinFuncs.regexReplace,
             "regex.split": BuiltinFuncs.regexSplit,
+            "regex.template_match": BuiltinFuncs.regexTemplateMatch,
 
             // Rand
             "rand.intn": BuiltinFuncs.numbersRandIntN,

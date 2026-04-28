@@ -26,33 +26,57 @@ import Foundation
 /// - `pthread_rwlock_t` for shared-reader/exclusive-writer semantics, with
 ///   `#if os(Windows)` conditional for `SRWLOCK`.
 final class RegexCache: @unchecked Sendable {
-    private var cache: [String: Regex<AnyRegexOutput>] = [:]
+    private var patterns: [String: Regex<AnyRegexOutput>] = [:]
+    private var templates: [String: Regex<AnyRegexOutput>] = [:]
     private let lock = NSLock()
     private let maxSize = 100
 
-    func get(_ pattern: String) -> Regex<AnyRegexOutput>? {
-        lock.withLock { cache[pattern] }
-    }
-
-    func put(_ pattern: String, _ regex: Regex<AnyRegexOutput>) {
-        lock.withLock {
-            if cache.count >= maxSize {
-                if let key = cache.keys.randomElement() {
-                    cache.removeValue(forKey: key)
-                }
-            }
-            cache[pattern] = regex
-        }
-    }
-
     func compile(_ pattern: String) throws -> Regex<AnyRegexOutput> {
-        if let cached = get(pattern) { return cached }
+        if let cached = lock.withLock({ patterns[pattern] }) { return cached }
         do {
             let regex = try Regex(pattern)
-            put(pattern, regex)
+            lock.withLock {
+                if patterns.count >= maxSize {
+                    if let key = patterns.keys.randomElement() {
+                        patterns.removeValue(forKey: key)
+                    }
+                }
+                patterns[pattern] = regex
+            }
             return regex
         } catch {
             throw BuiltinError.evalError(msg: "invalid regex pattern: \(pattern)")
+        }
+    }
+
+    /// Compile a template pattern, caching by the original template string.
+    /// Matches Go's `getRegexpTemplate` which caches `pat` → compiled regex,
+    /// so `compileRegexTemplate` only runs on cache miss.
+    ///
+    /// Templates and raw patterns are stored in separate dictionaries to avoid
+    /// key collisions — the same string can produce different compiled regexes
+    /// depending on whether it's treated as a raw pattern or a template.
+    func compileTemplate(
+        _ template: String,
+        build: (String) throws -> String
+    ) throws -> Regex<AnyRegexOutput> {
+        if let cached = lock.withLock({ templates[template] }) { return cached }
+        do {
+            let regexPattern = try build(template)
+            let regex = try Regex(regexPattern)
+            lock.withLock {
+                if templates.count >= maxSize {
+                    if let key = templates.keys.randomElement() {
+                        templates.removeValue(forKey: key)
+                    }
+                }
+                templates[template] = regex
+            }
+            return regex
+        } catch let error as RegoError {
+            throw error
+        } catch {
+            throw BuiltinError.evalError(msg: "invalid regex in template: \(template)")
         }
     }
 }
@@ -248,7 +272,136 @@ extension BuiltinFuncs {
             })
     }
 
+    // MARK: - regex.template_match
+
+    static func regexTemplateMatch(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+        guard args.count == 4 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 4)
+        }
+        guard case .string(let pattern) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "pattern", got: args[0].typeName, want: "string")
+        }
+        guard case .string(let value) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "value", got: args[1].typeName, want: "string")
+        }
+        guard case .string(let delimStart) = args[2] else {
+            throw BuiltinError.argumentTypeMismatch(
+                arg: "delimiter_start", got: args[2].typeName, want: "string")
+        }
+        guard case .string(let delimEnd) = args[3] else {
+            throw BuiltinError.argumentTypeMismatch(
+                arg: "delimiter_end", got: args[3].typeName, want: "string")
+        }
+
+        guard delimStart.count == 1 else {
+            throw BuiltinError.evalError(
+                msg: "start delimiter must be exactly one character, got \(delimStart.count)")
+        }
+        guard delimEnd.count == 1 else {
+            throw BuiltinError.evalError(
+                msg: "end delimiter must be exactly one character, got \(delimEnd.count)")
+        }
+
+        let regex = try regexCache.compileTemplate(pattern) { template in
+            try compileTemplatePattern(
+                template, delimStart: Character(delimStart), delimEnd: Character(delimEnd))
+        }
+        return .boolean(value.wholeMatch(of: regex) != nil)
+    }
+
     // MARK: - Private helpers
+
+    /// Build an anchored regex from a template pattern with configurable delimiters.
+    ///
+    /// Text outside delimiters is escaped as literal. Text inside delimiters
+    /// becomes a capture group. The result is anchored with `^...$`.
+    ///
+    /// Ported from Go OPA's `compileRegexTemplate` (originally from Gorilla Mux).
+    ///
+    ///     compileTemplatePattern("urn:foo:{.*}", delimStart: "{", delimEnd: "}")
+    ///     // → "^urn\\:foo\\:(.*)$"
+    ///
+    /// ## Performance
+    ///
+    /// Uses `NSRegularExpression.escapedPattern(for:)` for escaping literal segments,
+    /// which bridges through NSString. Also uses `+=` to assemble the pattern string.
+    /// Both are acceptable here because this runs once per unique template — the
+    /// compiled regex is cached in `RegexCache`, so subsequent calls with the same
+    /// template skip this entirely.
+    private static func compileTemplatePattern(
+        _ template: String, delimStart: Character, delimEnd: Character
+    ) throws -> String {
+        let indices = try delimiterIndices(template, start: delimStart, end: delimEnd)
+
+        var pattern = "^"
+        var pos = template.startIndex
+
+        for i in stride(from: 0, to: indices.count, by: 2) {
+            let openIdx = indices[i]
+            let closeIdx = indices[i + 1]
+
+            let literal = template[pos..<openIdx]
+            let inner = template[template.index(after: openIdx)..<template.index(before: closeIdx)]
+
+            pattern += NSRegularExpression.escapedPattern(for: String(literal))
+            pattern += "(\(inner))"
+            pos = closeIdx
+        }
+
+        pattern += NSRegularExpression.escapedPattern(for: String(template[pos...]))
+        pattern += "$"
+
+        return pattern
+    }
+
+    /// Find balanced delimiter pairs in a template string.
+    ///
+    /// Returns indices as alternating `[open, close, open, close, ...]` pairs,
+    /// where `open` is the index of the start delimiter and `close` is one past
+    /// the end delimiter. Only top-level pairs are returned; nested delimiters
+    /// are consumed but not emitted.
+    ///
+    /// Example with `{` and `}`:
+    ///
+    ///     "urn:{.*}:end"
+    ///      ^   ^   ^
+    ///      |   |   └── close (index of character after "}")
+    ///      |   └────── open  (index of "{")
+    ///      └────────── not a delimiter, skipped
+    ///
+    ///     Returns: [index of "{", index after "}"]
+    ///
+    /// Nested delimiters increment/decrement a depth counter. Only when depth
+    /// returns to zero is a pair recorded. Throws on unbalanced delimiters
+    /// (e.g. `"urn:{foo"` or `"urn:}foo"`).
+    private static func delimiterIndices(
+        _ s: String, start: Character, end: Character
+    ) throws -> [String.Index] {
+        var level = 0
+        var idx = s.startIndex
+        var indices: [String.Index] = []
+
+        for i in s.indices {
+            if s[i] == start {
+                level += 1
+                if level == 1 { idx = i }
+            } else if s[i] == end {
+                level -= 1
+                if level == 0 {
+                    indices.append(idx)
+                    indices.append(s.index(after: i))
+                } else if level < 0 {
+                    throw BuiltinError.evalError(msg: "unbalanced delimiters in \"\(s)\"")
+                }
+            }
+        }
+
+        if level != 0 {
+            throw BuiltinError.evalError(msg: "unbalanced delimiters in \"\(s)\"")
+        }
+
+        return indices
+    }
 
     /// Expand `$N` capture group references in a replacement template.
     ///

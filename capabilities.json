@@ -1493,6 +1493,29 @@
       "decl" : {
         "args" : [
           {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          }
+        ],
+        "result" : {
+          "type" : "boolean"
+        },
+        "type" : "function"
+      },
+      "name" : "regex.template_match"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
             "type" : "number"
           },
           {

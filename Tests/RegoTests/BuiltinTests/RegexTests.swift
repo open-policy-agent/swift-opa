@@ -199,6 +199,20 @@ extension BuiltinTests.RegexTests {
             args: ["hello world", "[0-9]+", "X"],
             expected: .success("hello world")
         ),
+        // $0 whole match reference
+        BuiltinTests.TestCase(
+            description: "$0 expands to whole match",
+            name: "regex.replace",
+            args: ["foo", "[a-z]+", "[$0]"],
+            expected: .success("[foo]")
+        ),
+        // $$ literal dollar sign
+        BuiltinTests.TestCase(
+            description: "$$ produces literal dollar sign",
+            name: "regex.replace",
+            args: ["100", "[0-9]+", "$$$$"],
+            expected: .success("$$")
+        ),
         // Invalid pattern
         BuiltinTests.TestCase(
             description: "invalid pattern throws error",
@@ -261,6 +275,14 @@ extension BuiltinTests.RegexTests {
             name: "regex.split",
             args: ["[0-9]+", "hello"],
             expected: .success(["hello"])
+        ),
+        // Invalid pattern
+        BuiltinTests.TestCase(
+            description: "invalid pattern throws error",
+            name: "regex.split",
+            args: ["[", "hello"],
+            expected: .failure(
+                BuiltinError.evalError(msg: "invalid regex pattern: ["))
         ),
     ]
 
@@ -401,6 +423,97 @@ extension BuiltinTests.RegexTests {
         ),
     ]
 
+    // MARK: - regex.template_match
+
+    static let regexTemplateMatchTests: [BuiltinTests.TestCase] = [
+        // Compliance-inspired
+        BuiltinTests.TestCase(
+            description: "matches wildcard with curly braces",
+            name: "regex.template_match",
+            args: ["urn:foo:{.*}", "urn:foo:bar:baz", "{", "}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "matches wildcard with angle brackets",
+            name: "regex.template_match",
+            args: ["urn:foo:<.*>", "urn:foo:bar:baz", "<", ">"],
+            expected: .success(true)
+        ),
+        // Additional coverage
+        BuiltinTests.TestCase(
+            description: "no match",
+            name: "regex.template_match",
+            args: ["urn:foo:{[0-9]+}", "urn:foo:bar", "{", "}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "literal pattern without delimiters",
+            name: "regex.template_match",
+            args: ["exact", "exact", "{", "}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "literal pattern no match",
+            name: "regex.template_match",
+            args: ["exact", "other", "{", "}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "multiple template segments",
+            name: "regex.template_match",
+            args: ["{[a-z]+}:{[0-9]+}", "foo:123", "{", "}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "special regex chars in literal parts are escaped",
+            name: "regex.template_match",
+            args: ["foo.bar:{.*}", "foo.bar:baz", "{", "}"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "dot in literal is not a wildcard",
+            name: "regex.template_match",
+            args: ["foo.bar:{.*}", "fooXbar:baz", "{", "}"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "unbalanced delimiters",
+            name: "regex.template_match",
+            args: ["urn:{foo", "urn:foo", "{", "}"],
+            expected: .failure(
+                BuiltinError.evalError(msg: "unbalanced delimiters in \"urn:{foo\""))
+        ),
+        BuiltinTests.TestCase(
+            description: "start delimiter must be one character",
+            name: "regex.template_match",
+            args: ["pattern", "value", "{{", "}"],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "start delimiter must be exactly one character, got 2"))
+        ),
+        BuiltinTests.TestCase(
+            description: "end delimiter must be one character",
+            name: "regex.template_match",
+            args: ["pattern", "value", "{", "}}"],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "end delimiter must be exactly one character, got 2"))
+        ),
+        BuiltinTests.TestCase(
+            description: "invalid regex inside delimiters",
+            name: "regex.template_match",
+            args: ["urn:{[}", "urn:x", "{", "}"],
+            expected: .failure(
+                BuiltinError.evalError(msg: "invalid regex in template: urn:{[}"))
+        ),
+        BuiltinTests.TestCase(
+            description: "nested delimiters",
+            name: "regex.template_match",
+            args: ["urn:{{.*}}", "urn:{foo}", "{", "}"],
+            expected: .success(true)
+        ),
+    ]
+
     // MARK: - All tests
 
     static var allTests: [BuiltinTests.TestCase] {
@@ -463,11 +576,65 @@ extension BuiltinTests.RegexTests {
                 builtinName: "regex.find_all_string_submatch_n", sampleArgs: ["pattern", "value", 1], argIndex: 2,
                 argName: "number", allowedArgTypes: ["number"], generateNumberOfArgsTest: false),
             regexFindAllStringSubmatchNTests,
+
+            // regex.template_match
+            BuiltinTests.generateFailureTests(
+                builtinName: "regex.template_match",
+                sampleArgs: ["pattern", "value", "{", "}"], argIndex: 0,
+                argName: "pattern", allowedArgTypes: ["string"], generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "regex.template_match",
+                sampleArgs: ["pattern", "value", "{", "}"], argIndex: 1,
+                argName: "value", allowedArgTypes: ["string"], generateNumberOfArgsTest: false),
+            BuiltinTests.generateFailureTests(
+                builtinName: "regex.template_match",
+                sampleArgs: ["pattern", "value", "{", "}"], argIndex: 2,
+                argName: "delimiter_start", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: false),
+            BuiltinTests.generateFailureTests(
+                builtinName: "regex.template_match",
+                sampleArgs: ["pattern", "value", "{", "}"], argIndex: 3,
+                argName: "delimiter_end", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: false),
+            regexTemplateMatchTests,
         ].flatMap { $0 }
     }
 
     @Test(arguments: allTests)
     func testBuiltins(tc: BuiltinTests.TestCase) async throws {
         try await BuiltinTests.testBuiltin(tc: tc)
+    }
+
+    // MARK: - Template/regex cache namespace isolation
+
+    /// Verify that the same string used as both a raw regex and a template
+    /// produces different results. "foo.*" as a regex matches "fooXXX"
+    /// (unanchored wildcard), but as a template it becomes "^foo\.\*$"
+    /// (literal dots and stars, anchored) and does NOT match "fooXXX".
+    @Test func templateAndRegexCacheDoNotCollide() async throws {
+        let registry = BuiltinRegistry.defaultRegistry
+        let ctx = BuiltinContext()
+
+        // First: use "foo.*" as a raw regex — matches "fooXXX"
+        let matchResult = try await registry.invoke(
+            withContext: ctx, name: "regex.match",
+            args: [.string("foo.*"), .string("fooXXX")], strict: true)
+        #expect(matchResult == .boolean(true))
+
+        // Then: use the same "foo.*" as a template with { } delimiters.
+        // No delimiters in the string, so the entire thing is literal.
+        // "^foo\.\*$" should NOT match "fooXXX".
+        let templateResult = try await registry.invoke(
+            withContext: ctx, name: "regex.template_match",
+            args: [.string("foo.*"), .string("fooXXX"), .string("{"), .string("}")],
+            strict: true)
+        #expect(templateResult == .boolean(false))
+
+        // But it should match the literal string "foo.*"
+        let templateLiteral = try await registry.invoke(
+            withContext: ctx, name: "regex.template_match",
+            args: [.string("foo.*"), .string("foo.*"), .string("{"), .string("}")],
+            strict: true)
+        #expect(templateLiteral == .boolean(true))
     }
 }

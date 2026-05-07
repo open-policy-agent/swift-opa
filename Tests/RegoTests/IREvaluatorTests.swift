@@ -106,15 +106,14 @@ struct IREvaluatorTests {
         ]
     }
 
+    // NOTE: Coverage for ad-hoc data-lookup queries (queries that don't match
+    // any compiled plan, including data-only bundles and the bare `data`
+    // query) lives in EngineMiniPlannerTests. Those cases used to surface as
+    // `unknownQuery` / `noPlansFoundError` here but are now valid evaluations
+    // returning either a wrapped value or an empty result set.
+
     static var errorTestCases: [ErrorCase] {
         return [
-            ErrorCase(
-                description: "query not found in valid bundle",
-                sourceBundles: [relPath("TestData/Bundles/simple-directory-bundle")],
-                query: "data.not.found.query",
-                input: [:],
-                expectedError: Rego.RegoError.Code.unknownQuery
-            ),
             ErrorCase(
                 description: "duplicate valid bundles",
                 sourceBundles: [
@@ -126,20 +125,9 @@ struct IREvaluatorTests {
                 expectedError: Rego.RegoError.Code.bundleNameConflictError
             ),
             ErrorCase(
-                description: "bundle with rego but no plan json",
-                sourceBundles: [relPath("TestData/Bundles/simple-directory-no-plan-bundle")],
-                expectedError: Rego.RegoError.Code.noPlansFoundError
-            ),
-            ErrorCase(
-                description: "all data no plan",
-                sourceBundles: [
-                    relPath("TestData/Bundles/nested-data-trees")
-                ],
-                expectedError: Rego.RegoError.Code.noPlansFoundError
-            ),
-            ErrorCase(
                 description: "bundle with invalid plan json",
                 sourceBundles: [relPath("TestData/Bundles/invalid-plan-json-bundle")],
+                query: "data.app.rbac.allow",
                 expectedError: Rego.RegoError.Code.bundleInitializationError
             ),
         ]

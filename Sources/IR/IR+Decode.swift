@@ -15,15 +15,31 @@ extension Policy {
     /// Prepare the policy for execution by running static analysis passes.
     /// This computes properties like maxLocal that are used for optimization.
     public mutating func prepareForExecution() throws {
-        // Compute maxLocal for all plans
+        // Renumber locals in every plan and func to compact contiguous ranges.
+        if var plans = self.plans {
+            for i in plans.plans.indices {
+                plans.plans[i].renumberLocals()
+            }
+            self.plans = plans
+        }
+        if var funcs = self.funcs {
+            if var funcList = funcs.funcs {
+                for i in funcList.indices {
+                    funcList[i].renumberLocals()
+                }
+                funcs.funcs = funcList
+            }
+            self.funcs = funcs
+        }
+
+        // Compute maxLocal after renumbering so the cached value reflects the
+        // compacted range used by the evaluator.
         if var plans = self.plans {
             for i in plans.plans.indices {
                 plans.plans[i].computeMaxLocal()
             }
             self.plans = plans
         }
-
-        // Compute maxLocal for all functions
         if var funcs = self.funcs {
             if var funcList = funcs.funcs {
                 for i in funcList.indices {

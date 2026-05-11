@@ -116,6 +116,13 @@ extension Block: Codable {
         case innerStatement = "stmt"
     }
 
+    // Matches the encoded statement wrapper: {"type": "<name>", "stmt": {...}}.
+    // Used by encode(to:) (decode(from:) still uses PartialStatement + InnerCodingKeys).
+    enum WrapperCodingKeys: String, CodingKey {
+        case type
+        case innerStatement = "stmt"
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         var iter = try container.nestedUnkeyedContainer(forKey: .statements)
@@ -243,8 +250,21 @@ extension Block: Codable {
     }
 
     public func encode(to encoder: any Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode("block(stmt_count=\(statements.count))")
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        var stmts = container.nestedUnkeyedContainer(forKey: .statements)
+        for statement in self.statements {
+            var wrapper = stmts.nestedContainer(keyedBy: WrapperCodingKeys.self)
+            guard let typeName = statement.typeName else {
+                throw EncodingError.invalidValue(
+                    statement,
+                    EncodingError.Context(
+                        codingPath: wrapper.codingPath,
+                        debugDescription: "Cannot encode Statement.unknown"
+                    ))
+            }
+            try wrapper.encode(typeName, forKey: .type)
+            try statement.encodeInner(to: wrapper.superEncoder(forKey: .innerStatement))
+        }
     }
 }
 
@@ -577,6 +597,113 @@ extension Statement {
     }
 }
 
+extension Statement {
+    /// Stringified type name for this statement, mirroring `PartialStatement.KnownStatements`.
+    /// Returns `nil` for `.unknown`, which has no serialized representation.
+    var typeName: String? {
+        switch self {
+        case .arrayAppendStmt: return "ArrayAppendStmt"
+        case .assignIntStmt: return "AssignIntStmt"
+        case .assignVarOnceStmt: return "AssignVarOnceStmt"
+        case .assignVarStmt: return "AssignVarStmt"
+        case .blockStmt: return "BlockStmt"
+        case .breakStmt: return "BreakStmt"
+        case .callDynamicStmt: return "CallDynamicStmt"
+        case .callStmt: return "CallStmt"
+        case .dotStmt: return "DotStmt"
+        case .equalStmt: return "EqualStmt"
+        case .isArrayStmt: return "IsArrayStmt"
+        case .isDefinedStmt: return "IsDefinedStmt"
+        case .isObjectStmt: return "IsObjectStmt"
+        case .isSetStmt: return "IsSetStmt"
+        case .isUndefinedStmt: return "IsUndefinedStmt"
+        case .lenStmt: return "LenStmt"
+        case .makeArrayStmt: return "MakeArrayStmt"
+        case .makeNullStmt: return "MakeNullStmt"
+        case .makeNumberIntStmt: return "MakeNumberIntStmt"
+        case .makeNumberRefStmt: return "MakeNumberRefStmt"
+        case .makeObjectStmt: return "MakeObjectStmt"
+        case .makeSetStmt: return "MakeSetStmt"
+        case .nopStmt: return "NopStmt"
+        case .notEqualStmt: return "NotEqualStmt"
+        case .notStmt: return "NotStmt"
+        case .objectInsertOnceStmt: return "ObjectInsertOnceStmt"
+        case .objectInsertStmt: return "ObjectInsertStmt"
+        case .objectMergeStmt: return "ObjectMergeStmt"
+        case .resetLocalStmt: return "ResetLocalStmt"
+        case .resultSetAddStmt: return "ResultSetAddStmt"
+        case .returnLocalStmt: return "ReturnLocalStmt"
+        case .scanStmt: return "ScanStmt"
+        case .setAddStmt: return "SetAddStmt"
+        case .withStmt: return "WithStmt"
+        case .unknown: return nil
+        }
+    }
+
+    fileprivate enum LocationCodingKeys: String, CodingKey {
+        case row
+        case col
+        case file
+    }
+
+    // Encodes the body of a statement's `stmt` object: the concrete statement's own
+    // fields plus the inline `row`, `col`, `file` location fields the OPA IR expects.
+    // The two writes share the encoder's top-level keyed container, matching the
+    // decoder — which pulls location via `PartialStatement` and the other fields via
+    // the concrete type.
+    func encodeInner(to encoder: Encoder) throws {
+        switch self {
+        case .arrayAppendStmt(let s): try s.encode(to: encoder)
+        case .assignIntStmt(let s): try s.encode(to: encoder)
+        case .assignVarOnceStmt(let s): try s.encode(to: encoder)
+        case .assignVarStmt(let s): try s.encode(to: encoder)
+        case .blockStmt(let s): try s.encode(to: encoder)
+        case .breakStmt(let s): try s.encode(to: encoder)
+        case .callDynamicStmt(let s): try s.encode(to: encoder)
+        case .callStmt(let s): try s.encode(to: encoder)
+        case .dotStmt(let s): try s.encode(to: encoder)
+        case .equalStmt(let s): try s.encode(to: encoder)
+        case .isArrayStmt(let s): try s.encode(to: encoder)
+        case .isDefinedStmt(let s): try s.encode(to: encoder)
+        case .isObjectStmt(let s): try s.encode(to: encoder)
+        case .isSetStmt(let s): try s.encode(to: encoder)
+        case .isUndefinedStmt(let s): try s.encode(to: encoder)
+        case .lenStmt(let s): try s.encode(to: encoder)
+        case .makeArrayStmt(let s): try s.encode(to: encoder)
+        case .makeNullStmt(let s): try s.encode(to: encoder)
+        case .makeNumberIntStmt(let s): try s.encode(to: encoder)
+        case .makeNumberRefStmt(let s): try s.encode(to: encoder)
+        case .makeObjectStmt(let s): try s.encode(to: encoder)
+        case .makeSetStmt(let s): try s.encode(to: encoder)
+        case .nopStmt(let s): try s.encode(to: encoder)
+        case .notEqualStmt(let s): try s.encode(to: encoder)
+        case .notStmt(let s): try s.encode(to: encoder)
+        case .objectInsertOnceStmt(let s): try s.encode(to: encoder)
+        case .objectInsertStmt(let s): try s.encode(to: encoder)
+        case .objectMergeStmt(let s): try s.encode(to: encoder)
+        case .resetLocalStmt(let s): try s.encode(to: encoder)
+        case .resultSetAddStmt(let s): try s.encode(to: encoder)
+        case .returnLocalStmt(let s): try s.encode(to: encoder)
+        case .scanStmt(let s): try s.encode(to: encoder)
+        case .setAddStmt(let s): try s.encode(to: encoder)
+        case .withStmt(let s): try s.encode(to: encoder)
+        case .unknown:
+            throw EncodingError.invalidValue(
+                self,
+                EncodingError.Context(
+                    codingPath: encoder.codingPath,
+                    debugDescription: "Cannot encode Statement.unknown"
+                ))
+        }
+
+        let loc = self.location
+        var container = encoder.container(keyedBy: LocationCodingKeys.self)
+        try container.encode(loc.row, forKey: .row)
+        try container.encode(loc.col, forKey: .col)
+        try container.encode(loc.file, forKey: .file)
+    }
+}
+
 // AnyInnerStatement represents the generic stmt field, which should always contain location fields.
 public struct AnyInnerStatement: Codable, Hashable {
     public var row: Int = 0
@@ -685,6 +812,22 @@ extension Operand: Codable {
         case .stringIndex:
             let v = try container.decode(Int.self, forKey: .value)
             self.value = Value.stringIndex(v)
+        }
+    }
+
+    // The synthesized encoder for `Value` (an enum with associated values) would emit
+    // something like {"localIndex": {"_0": 7}}, which does not roundtrip through our
+    // custom decoder. Encode `value` as a bare Int/Bool alongside the `type` tag.
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(self.type, forKey: .type)
+        switch self.value {
+        case .localIndex(let v):
+            try container.encode(v, forKey: .value)
+        case .bool(let v):
+            try container.encode(v, forKey: .value)
+        case .stringIndex(let v):
+            try container.encode(v, forKey: .value)
         }
     }
 }

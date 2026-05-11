@@ -200,8 +200,9 @@ extension OPA.Engine {
         // writes below cannot collide — each bundle contributes only within
         // the subtree it "owns".
         //
-        // A bundle with no data under one of its roots writes nothing
-        // for that root.
+        // A bundle with no data under one of its roots simply writes nothing
+        // for that root (e.g. a policy-only bundle whose roots describe
+        // decision paths rather than data paths).
         try await store.write(to: StoreKeyPath(["data"]), value: .object([:]))
         for (_, bundle) in loadedBundles.sorted(by: { $0.key < $1.key }) {
             let roots = bundle.manifest.roots
@@ -231,16 +232,16 @@ extension OPA.Engine {
             }
         }
 
-        let baseEvaluator: IREvaluator
+        let evaluator: IREvaluator
 
         if !self.policies.isEmpty {
             guard loadedBundles.isEmpty else {
                 throw RegoError(code: .invalidArgumentError, message: "Cannot mix direct IR policies with bundles")
             }
 
-            baseEvaluator = try IREvaluator(policies: self.policies)
+            evaluator = try IREvaluator(policies: self.policies)
         } else {
-            baseEvaluator = try IREvaluator(bundles: loadedBundles)
+            evaluator = try IREvaluator(bundles: loadedBundles)
         }
 
         // TODO: Future improvement - validate local allocation assumptions (see Locals.swift)
@@ -251,25 +252,7 @@ extension OPA.Engine {
 
         // Verifies that builtins are available in the OPA capabilities and builtin registry
         try await Self.verifyCapabilitiesAndBuiltIns(
-            capabilities: self.capabilities, builtins: builtins, evaluator: baseEvaluator)
-
-        // If no loaded plan exactly matches the query's entrypoint, generate
-        // a tiny data lookup plan via ``MiniPlanner`` so that direct
-        // `data.x.y`-style queries (and the bare `data` query) work without
-        // a hand-authored plan. Plans from bundles (or user-supplied raw IR
-        // policies) always win on query path conflicts.
-        let entrypoint = try queryToEntryPoint(query)
-        let planExists = baseEvaluator.policies.contains { policy in
-            policy.plans.contains { $0.name == entrypoint }
-        }
-
-        let evaluator: IREvaluator
-        if planExists {
-            evaluator = baseEvaluator
-        } else {
-            let ir = try MiniPlanner.generate(query: query)
-            evaluator = try IREvaluator(baseEvaluator, adHocPolicies: [ir])
-        }
+            capabilities: self.capabilities, builtins: builtins, evaluator: evaluator)
 
         return PreparedQuery(
             query: query,

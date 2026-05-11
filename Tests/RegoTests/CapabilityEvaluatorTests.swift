@@ -18,11 +18,7 @@ struct CapabilityEvaluatorTests {
             ],
             capabilities: .path(relPath("TestData/Bundles/full-capabilities-bundle/capabilities.json"))
         )
-        // The query string is incidental here — we only care that capability
-        // validation runs through prepareForEvaluation. Any valid query works;
-        // bare `data` is satisfied by the mini-planner without depending on
-        // bundle internals.
-        _ = try await engine.prepareForEvaluation(query: "data")
+        _ = try await engine.prepareForEvaluation(query: "policy")
     }
 
     // Default builtins
@@ -41,7 +37,7 @@ struct CapabilityEvaluatorTests {
                     "TestData/Bundles/simple-capabilities-bundle-default-builtins/capabilities/capabilities-passing.json"
                 ))
         )
-        _ = try await engine.prepareForEvaluation(query: "data")
+        _ = try await engine.prepareForEvaluation(query: "policy")
     }
 
     @Test("Failing capabilities when required default builtin is missing")
@@ -108,7 +104,7 @@ struct CapabilityEvaluatorTests {
             ]
         )
         _ = try await engine.prepareForEvaluation(
-            query: "data"
+            query: "policy"
         )
     }
 

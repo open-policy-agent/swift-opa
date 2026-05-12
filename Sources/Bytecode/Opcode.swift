@@ -73,7 +73,7 @@ public enum Opcode: UInt8, Sendable {
     case assignVar1 = 41
 
     /// True for compact opcodes whose operand is stored in the header length field (zero payload bytes).
-    var isCompact: Bool {
+    public var isCompact: Bool {
         switch self {
         case .isDefined1, .isUndefined1, .resetLocal1, .resultSetAdd1, .returnLocal1, .break1,
             .assignVar1:
@@ -273,7 +273,7 @@ public struct InstructionHeader: Sendable {
             for _ in 0..<numBlocks {
                 guard off + 8 <= start + length else { throw Error.invalidPayloadLength }
                 let blockOffset = Int(readUInt32(payload, at: off))
-                let blockSize = Int(readUInt32(payload, at: off + 4))
+                let blockSize = Int(readUInt32(payload, at: off + 4) & 0x7FFF_FFFF)  // mask sync-safety bit (bit 31)
                 off += 8
                 nested.append((blockOffset, blockSize))
             }
@@ -295,7 +295,7 @@ public struct InstructionHeader: Sendable {
                 let stringIdx = Int(encodedFuncIndex & 0x7FFF_FFFF)
                 guard stringIdx < strings.count else { throw Error.invalidPayloadLength }
             } else {
-                let funcIdx = Int(encodedFuncIndex)
+                let funcIdx = Int(encodedFuncIndex & 0x3FFF_FFFF)  // mask off sync-safety bit (bit 30)
                 guard funcIdx < functions.count else { throw Error.invalidPayloadLength }
             }
             var off = start + 12

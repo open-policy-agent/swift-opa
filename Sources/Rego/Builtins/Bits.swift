@@ -2,7 +2,7 @@ import AST
 import Foundation
 
 extension BuiltinFuncs {
-    static func bitsShiftLeft(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func bitsShiftLeft(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -42,7 +42,7 @@ extension BuiltinFuncs {
         return AST.RegoValue.number(RegoNumber(value: Int64(intA &<< intB)))
     }
 
-    static func bitsShiftRight(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func bitsShiftRight(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -71,7 +71,7 @@ extension BuiltinFuncs {
         return AST.RegoValue.number(RegoNumber(value: Int64(intA >> intB)))
     }
 
-    static func bitsNegate(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func bitsNegate(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -85,15 +85,15 @@ extension BuiltinFuncs {
         return AST.RegoValue.number(RegoNumber(value: Int64(~intX)))
     }
 
-    static func bitsAnd(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func bitsAnd(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try bitwiseOperation(ctx: ctx, args: args, op: &)
     }
 
-    static func bitsOr(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func bitsOr(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try bitwiseOperation(ctx: ctx, args: args, op: |)
     }
 
-    static func bitsXor(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func bitsXor(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try bitwiseOperation(ctx: ctx, args: args, op: ^)
     }
 

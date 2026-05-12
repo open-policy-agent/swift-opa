@@ -7,7 +7,7 @@ extension BuiltinFuncs {
     // "path not used" cases, like what is done in upstream OPA, because
     // in the IR we don't get any information at the callsite about
     // wildcard/"don't care" values in the output array.
-    static func walk(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func walk(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }

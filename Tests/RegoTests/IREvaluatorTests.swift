@@ -146,9 +146,11 @@ struct IREvaluatorTests {
     }
 
     @Test(arguments: validTestCases)
-    func testValidEvaluations(tc: TestCase) async throws {
+    func testValidEvaluationsAsync(tc: TestCase) async throws {
         var engine = OPA.Engine(
             bundlePaths: tc.sourceBundles.map({ OPA.Engine.BundlePath(name: $0.lastPathComponent, url: $0) }))
+        // Disable SyncSafePatcher so the async VM path is exercised (not the sync shortcut).
+        engine.optimizeAsync = false
         let bufferTracer = OPA.Trace.BufferedQueryTracer(level: .full)
         let actual = try await engine.prepareForEvaluation(query: tc.query).evaluate(
             input: tc.input,
@@ -170,6 +172,19 @@ struct IREvaluatorTests {
                 print("Debug Trace: \(tempFileURL.path)")
             }
         }
+        #expect(tc.expectedResult == actual)
+    }
+
+    /// Same valid cases exercised through the macro-generated synchronous VM path.
+    ///
+    /// The store is read synchronously via the ``OPA/Store`` sync overload; async-only stores
+    /// throw ``RegoError/Code/storeSyncNotSupported`` at evaluation time.
+    @Test(arguments: validTestCases)
+    func testValidEvaluationsSync(tc: TestCase) async throws {
+        var engine = OPA.Engine(
+            bundlePaths: tc.sourceBundles.map({ OPA.Engine.BundlePath(name: $0.lastPathComponent, url: $0) }))
+        let prepared = try await engine.prepareForEvaluation(query: tc.query)
+        let actual = try { try prepared.evaluate(input: tc.input) }()
         #expect(tc.expectedResult == actual)
     }
 

@@ -160,20 +160,26 @@ public struct Plan: Sendable {
     public let maxLocal: Int
     public let bytecodeOffset: Int
     public let bytecodeSize: Int
-    /// Individual block (offset, size) pairs — mirrors IR.Plan.blocks
-    public let blocks: [(offset: Int, size: Int)]
+    /// Individual block (offset, size, syncSafe) triples — mirrors IR.Plan.blocks.
+    /// `syncSafe` is set by `SyncSafePatcher`; defaults to `false` until then.
+    public let blocks: [(offset: Int, size: Int, syncSafe: Bool)]
+    /// `true` when every block in this plan is sync-safe.
+    /// Populated by `SyncSafePatcher`; `false` until then.
+    public let syncSafe: Bool
 
     public init(
         name: String,
         maxLocal: Int,
         bytecodeOffset: Int,
         bytecodeSize: Int,
-        blocks: [(offset: Int, size: Int)]
+        blocks: [(offset: Int, size: Int, syncSafe: Bool)] = [],
+        syncSafe: Bool = false
     ) {
         self.name = name
         self.maxLocal = maxLocal
         self.bytecodeOffset = bytecodeOffset
         self.bytecodeSize = bytecodeSize
         self.blocks = blocks
+        self.syncSafe = syncSafe
     }
 }

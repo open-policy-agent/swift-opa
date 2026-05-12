@@ -8,35 +8,35 @@ import Foundation
 #endif
 
 extension BuiltinFuncs {
-    static func sha256Hash(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func sha256Hash(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doHash(ctx: ctx, args: args, h: SHA256())
     }
 
-    static func insecureSHA1Hash(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func insecureSHA1Hash(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doHash(ctx: ctx, args: args, h: Insecure.SHA1())
     }
 
-    static func insecureMD5Hash(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func insecureMD5Hash(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doHash(ctx: ctx, args: args, h: Insecure.MD5())
     }
 
-    static func sha256HMAC(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func sha256HMAC(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doHMAC(ctx: ctx, args: args, h: SHA256())
     }
 
-    static func sha512HMAC(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func sha512HMAC(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doHMAC(ctx: ctx, args: args, h: SHA512())
     }
 
-    static func insecureSha1HMAC(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func insecureSha1HMAC(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doHMAC(ctx: ctx, args: args, h: Insecure.SHA1())
     }
 
-    static func insecureMD5HMAC(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func insecureMD5HMAC(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doHMAC(ctx: ctx, args: args, h: Insecure.MD5())
     }
 
-    static func hmacsEqual(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func hmacsEqual(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }

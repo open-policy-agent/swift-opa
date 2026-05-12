@@ -2,19 +2,35 @@ import AST
 
 extension OPA {
     /// An abstraction over a store providing keyed access to data used in policy evaluation.
+    ///
+    /// Stores that support synchronous evaluation must override ``read(from:)-throws``;
+    /// the default implementation throws ``RegoError/Code/storeSyncNotSupported``.
     public protocol Store: Sendable {
-        /// Returns the value at the specified key path.
-        /// - Parameter from: The path from which to return the value.
-        /// - Throws: an error if the path is not found in the store.
+        /// Returns the value at the specified key path asynchronously.
         func read(from: StoreKeyPath) async throws -> AST.RegoValue
+        /// Returns the value at the specified key path synchronously.
+        ///
+        /// The default implementation throws ``RegoError/Code/storeSyncNotSupported``.
+        /// Override this method to support the synchronous evaluation path.
+        func read(from: StoreKeyPath) throws -> AST.RegoValue
         /// Writes a value at the specified key path.
-        /// - Parameter to: The path at which to return the value.
         mutating func write(to: StoreKeyPath, value: AST.RegoValue) async throws
     }
 
     /// InMemoryStore is an in-memory implementation of ``OPA/Store``
     public struct InMemoryStore {
         private var data: AST.RegoValue = AST.RegoValue.object([:])
+    }
+}
+
+extension OPA.Store {
+    /// Default sync read: throws ``RegoError/Code/storeSyncNotSupported``.
+    /// Stores that support synchronous evaluation should override this.
+    public func read(from path: StoreKeyPath) throws -> AST.RegoValue {
+        throw RegoError(
+            code: .storeSyncNotSupported,
+            message: "store does not support synchronous reads"
+        )
     }
 }
 
@@ -46,6 +62,14 @@ extension OPA.InMemoryStore: OPA.Store {
     }
 
     public func read(from path: StoreKeyPath) async throws -> AST.RegoValue {
+        try readValue(from: path)
+    }
+
+    public func read(from path: StoreKeyPath) throws -> AST.RegoValue {
+        try readValue(from: path)
+    }
+
+    private func readValue(from path: StoreKeyPath) throws -> AST.RegoValue {
         var current: AST.RegoValue = data
         for segment in path.segments {
             guard case .object(let object) = current else {
@@ -56,7 +80,6 @@ extension OPA.InMemoryStore: OPA.Store {
             }
             current = next
         }
-
         return current
     }
 

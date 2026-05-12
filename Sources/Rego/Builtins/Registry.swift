@@ -1,9 +1,19 @@
 import AST
 import Foundation
 
-public typealias Builtin = @Sendable (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
+public typealias AsyncBuiltin = @Sendable (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
 
-public struct BuiltinContext {
+/// Non-async variant of `AsyncBuiltin` for use in the synchronous VM path.
+public typealias SyncBuiltin = @Sendable (BuiltinContext, [AST.RegoValue]) throws -> AST.RegoValue
+
+/// Whether a builtin is synchronous (usable on both the async and sync VM paths)
+/// or async-only (usable on the async path only, e.g. because it performs network I/O).
+public enum BuiltinImpl: Sendable {
+    case sync(SyncBuiltin)
+    case asyncOnly(AsyncBuiltin)
+}
+
+public struct BuiltinContext: @unchecked Sendable {
     public let location: OPA.Trace.Location
     public var tracer: OPA.Trace.QueryTracer?
     /// Date and Time of Context creation
@@ -36,16 +46,54 @@ public struct BuiltinContext {
 }
 
 public struct BuiltinRegistry: Sendable {
-    let builtins: [String: Builtin]
+    // Precomputed callables to avoid a closure allocation on every lookup.
+    private let asyncCallables: [String: AsyncBuiltin]
+    private let syncCallables: [String: SyncBuiltin]
 
-    // defaultRegistry is the BuiltinRegistry with all capabilities enabled
-    public static var defaultRegistry: BuiltinRegistry {
-        BuiltinRegistry(
-            builtins: BuiltinRegistry.defaultBuiltins
-        )
+    init(builtins: [String: BuiltinImpl]) {
+        var asyncImpls: [String: AsyncBuiltin] = Dictionary(minimumCapacity: builtins.count)
+        var syncImpls: [String: SyncBuiltin] = Dictionary(minimumCapacity: builtins.count)
+        for (name, impl) in builtins {
+            switch impl {
+            case .sync(let f):
+                // Use Swift's implicit throws→async throws widening (static thunk, no allocation).
+                asyncImpls[name] = f
+                syncImpls[name] = f
+            case .asyncOnly(let f):
+                asyncImpls[name] = f
+            }
+        }
+        self.asyncCallables = asyncImpls
+        self.syncCallables = syncImpls
     }
 
-    internal static var defaultBuiltins: [String: Builtin] {
+    /// Names of all registered builtins.
+    public var names: Set<String> { Set(asyncCallables.keys) }
+
+    /// The default registry containing all built-in Rego functions.
+    public static var defaultRegistry: BuiltinRegistry {
+        BuiltinRegistry(builtins: defaultBuiltins.mapValues { .sync($0) })
+    }
+
+    /// Creates a registry by merging custom async-only builtins with the default sync builtins.
+    /// Custom builtins are available on the async path only.
+    /// Throws `RegoError.ambiguousBuiltinError` if any custom builtin name conflicts with a default one.
+    static func merging(customBuiltins: [String: AsyncBuiltin]) throws -> BuiltinRegistry {
+        let conflicting = Set(customBuiltins.keys).intersection(defaultBuiltins.keys)
+        guard conflicting.isEmpty else {
+            throw RegoError(
+                code: .ambiguousBuiltinError,
+                message: "encountered conflicting builtin names between custom and default builtins: \(conflicting)"
+            )
+        }
+        var impls: [String: BuiltinImpl] = defaultBuiltins.mapValues { .sync($0) }
+        for (name, impl) in customBuiltins {
+            impls[name] = .asyncOnly(impl)
+        }
+        return BuiltinRegistry(builtins: impls)
+    }
+
+    internal static var defaultBuiltins: [String: SyncBuiltin] {
         return [
             // Aggregates
             "count": BuiltinFuncs.count,
@@ -206,9 +254,13 @@ public struct BuiltinRegistry: Sendable {
         ]
     }
 
-    public subscript(name: String) -> Builtin? {
-        self.builtins[name]
+    public subscript(name: String) -> AsyncBuiltin? {
+        asyncCallables[name]
     }
+
+    func asyncLookup(_ name: String) -> AsyncBuiltin? { asyncCallables[name] }
+
+    func syncLookup(_ name: String) -> SyncBuiltin? { syncCallables[name] }
 
     func invoke(
         withContext ctx: BuiltinContext,

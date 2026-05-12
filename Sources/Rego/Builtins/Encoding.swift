@@ -3,7 +3,7 @@ import Foundation
 
 extension BuiltinFuncs {
     // MARK: - base64.encode
-    static func base64Encode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func base64Encode(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -16,7 +16,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - base64.decode
-    static func base64Decode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func base64Decode(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -33,7 +33,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - base64.is_valid
-    static func base64IsValid(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func base64IsValid(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -46,7 +46,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - base64url.encode
-    static func base64UrlEncode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func base64UrlEncode(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -63,7 +63,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - base64url.encode_no_pad
-    static func base64UrlEncodeNoPad(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func base64UrlEncodeNoPad(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -81,7 +81,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - base64url.decode
-    static func base64UrlDecode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func base64UrlDecode(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -105,7 +105,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - hex.encode
-    static func hexEncode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func hexEncode(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -118,7 +118,7 @@ extension BuiltinFuncs {
     }
 
     // MARK: - hex.decode
-    static func hexDecode(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func hexDecode(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -139,7 +139,7 @@ extension BuiltinFuncs {
 
     // MARK: - json.is_valid
     /// Verifies the input string is a valid JSON document.
-    public static func jsonIsValid(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    public static func jsonIsValid(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -156,7 +156,7 @@ extension BuiltinFuncs {
 
     // MARK: - json.marshal
     /// Serializes the input term to JSON.
-    public static func jsonMarshal(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    public static func jsonMarshal(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -177,7 +177,7 @@ extension BuiltinFuncs {
 
     // MARK: - json.unmarshal
     /// Deserializes the input JSON string to a term.
-    public static func jsonUnmarshal(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    public static func jsonUnmarshal(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }

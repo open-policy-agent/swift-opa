@@ -61,6 +61,11 @@ struct StatementTests {
         var expectError: Bool = false
         var expectResult: ResultSet? = nil
         var expectUndefined: Bool = false
+        /// When true, the test case is skipped for the synchronous evaluation path.
+        /// Use this for cases that rely on async stack unwinding (e.g. deep recursion
+        /// guarded only by the call-depth limit, which would crash the thread stack
+        /// before the check fires in the fully-synchronous path).
+        var skipSync: Bool = false
     }
 
     func prepareFrame(
@@ -134,6 +139,11 @@ struct StatementTests {
         returnLocalStmtTests,
         scanStmtTests,
     ].flatMap { $0 }
+
+    /// Subset of `allTests` that are safe to run through the synchronous VM path.
+    /// Cases with `skipSync: true` are excluded (e.g. infinite-recursion tests that would
+    /// overflow the thread stack before the call-depth guard fires synchronously).
+    static var syncTests: [TestCase] { allTests.filter { !$0.skipSync } }
 
     static let assignVarStmtTests: [TestCase] = [
         TestCase(
@@ -346,7 +356,8 @@ struct StatementTests {
                     ]
                 )
             ],
-            expectError: true
+            expectError: true,
+            skipSync: true
         )
     ]
 
@@ -1376,7 +1387,7 @@ struct StatementTests {
     ]
 
     @Test(arguments: allTests)
-    func testStatementEvaluation(tc: TestCase) async throws {
+    func testStatementEvaluationAsync(tc: TestCase) async throws {
         let (vmCtx, vm) = try prepareFrame(
             forStatement: tc.stmt,
             withLocals: tc.locals,
@@ -1389,6 +1400,57 @@ struct StatementTests {
 
         let result = await Result {
             try await vm.executeBlock(
+                context: vmCtx,
+                offset: block.offset,
+                size: block.size
+            )
+        }
+
+        guard !tc.expectError else {
+            var didThrow = false
+            do {
+                _ = try result.get()
+            } catch {
+                didThrow = true
+            }
+            #expect(didThrow, "expected an error to be thrown")
+            return
+        }
+
+        let blockResult = try result.get()
+
+        var expectLocals = tc.locals.merging(tc.expectLocals)
+        var gotLocals = Locals(Array(vmCtx.locals.storage.prefix(expectLocals.count)))
+
+        for idx in tc.ignoreLocals {
+            if Int(idx) < gotLocals.count { gotLocals[idx] = nil }
+            if Int(idx) < expectLocals.count { expectLocals[idx] = nil }
+        }
+
+        #expect(gotLocals == expectLocals, "comparing locals")
+
+        let expectResult = tc.expectResult ?? .empty
+        #expect(vmCtx.results == expectResult, "comparing results")
+
+        #expect(blockResult.isUndefined == tc.expectUndefined, "comparing undefined")
+    }
+
+    /// Same test cases exercised through the macro-generated synchronous VM path.
+    @Test(arguments: syncTests)
+    func testStatementEvaluationSync(tc: TestCase) throws {
+        // Fresh context — VMContext is a class, so we can't reuse the async test's instance.
+        let (vmCtx, vm) = try prepareFrame(
+            forStatement: tc.stmt,
+            withLocals: tc.locals,
+            withFuncs: tc.funcs,
+            withStaticStrings: tc.staticStrings
+        )
+
+        let plan = vmCtx.policy.plans[0]
+        let block = plan.blocks[0]
+
+        let result = Result {
+            try vm.executeBlock(
                 context: vmCtx,
                 offset: block.offset,
                 size: block.size

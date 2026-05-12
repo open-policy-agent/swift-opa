@@ -28,7 +28,7 @@ import Testing
                     maxLocal: maxLocal,
                     bytecodeOffset: blockOffset,
                     bytecodeSize: sz,
-                    blocks: [(offset: blockOffset, size: sz)]
+                    blocks: [(offset: blockOffset, size: sz, syncSafe: false)]
                 )
             ],
             bytecode: bytes

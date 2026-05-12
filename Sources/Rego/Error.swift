@@ -25,12 +25,14 @@ public struct RegoError: Sendable, Swift.Error {
             case maxCallDepthExceeded
             case noPlansFoundError
             case objectInsertOnceError
+            case requiresAsyncEvaluation
             case unknownDynamicFunction
             case unknownQuery
             case unsupportedQuery
 
             // Store errors
             case storePathNotFound
+            case storeSyncNotSupported
 
             // Builtin errors
             case builtinUndefinedError
@@ -66,12 +68,14 @@ public struct RegoError: Sendable, Swift.Error {
         public static let maxCallDepthExceeded = Code(.maxCallDepthExceeded)
         public static let noPlansFoundError = Code(.noPlansFoundError)
         public static let objectInsertOnceError = Code(.objectInsertOnceError)
+        public static let requiresAsyncEvaluation = Code(.requiresAsyncEvaluation)
         public static let unknownDynamicFunction = Code(.unknownDynamicFunction)
         public static let unknownQuery = Code(.unknownQuery)
         public static let unsupportedQuery = Code(.unsupportedQuery)
 
         // Store errors
         public static let storePathNotFound = Code(.storePathNotFound)
+        public static let storeSyncNotSupported = Code(.storeSyncNotSupported)
 
         // Builtin errors
         public static let builtinUndefinedError = Code(.builtinUndefinedError)

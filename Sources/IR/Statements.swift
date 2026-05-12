@@ -325,6 +325,13 @@ public struct NopStatement: Sendable, Codable, Hashable {
     // and do nothing.
     public init(from decoder: Decoder) throws {
     }
+
+    public init() {}
+
+    // Mirror the decoder: emit no fields. Block's encoder writes row/col/file into
+    // the lazily created, keyed container on this encoder afterward.
+    public func encode(to encoder: Encoder) throws {
+    }
 }
 
 public struct NotStatement: Sendable, Codable, Hashable {

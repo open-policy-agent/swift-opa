@@ -1373,6 +1373,149 @@
       "decl" : {
         "args" : [
           {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "number"
+          }
+        ],
+        "result" : {
+          "dynamic" : {
+            "dynamic" : {
+              "type" : "string"
+            },
+            "type" : "array"
+          },
+          "type" : "array"
+        },
+        "type" : "function"
+      },
+      "name" : "regex.find_all_string_submatch_n"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "number"
+          }
+        ],
+        "result" : {
+          "dynamic" : {
+            "type" : "string"
+          },
+          "type" : "array"
+        },
+        "type" : "function"
+      },
+      "name" : "regex.find_n"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "string"
+          }
+        ],
+        "result" : {
+          "type" : "boolean"
+        },
+        "type" : "function"
+      },
+      "name" : "regex.is_valid"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          }
+        ],
+        "result" : {
+          "type" : "boolean"
+        },
+        "type" : "function"
+      },
+      "name" : "regex.match"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          }
+        ],
+        "result" : {
+          "type" : "string"
+        },
+        "type" : "function"
+      },
+      "name" : "regex.replace"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          }
+        ],
+        "result" : {
+          "dynamic" : {
+            "type" : "string"
+          },
+          "type" : "array"
+        },
+        "type" : "function"
+      },
+      "name" : "regex.split"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          },
+          {
+            "type" : "string"
+          }
+        ],
+        "result" : {
+          "type" : "boolean"
+        },
+        "type" : "function"
+      },
+      "name" : "regex.template_match"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
             "type" : "number"
           },
           {

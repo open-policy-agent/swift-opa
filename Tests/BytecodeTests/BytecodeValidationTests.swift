@@ -2,6 +2,7 @@ import AST
 import Testing
 
 @testable import Bytecode
+@testable import IR
 
 // Tests for Policy.validate() — exercises all error paths that the VM hot loop
 // skips because validation has already run at load time.

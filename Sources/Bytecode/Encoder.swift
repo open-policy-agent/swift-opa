@@ -1,6 +1,8 @@
 import AST
 import Foundation
 
+import typealias IR.Local
+
 /// Utilities for encoding bytecode primitives
 public struct Encoder {
     private var buffer: ContiguousArray<UInt8> = []

@@ -1,6 +1,8 @@
 import AST
 import Foundation
 
+import typealias IR.Local
+
 /// Array-based storage for IR local variables.
 ///
 /// # Implementation Assumptions

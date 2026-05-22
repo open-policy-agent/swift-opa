@@ -3,6 +3,7 @@ import Foundation
 import Testing
 
 @testable import Bytecode
+@testable import IR
 
 @Suite struct BytecodeEncodingTests {
 

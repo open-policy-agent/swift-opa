@@ -2,6 +2,8 @@ import AST
 import Bytecode
 import Foundation
 
+import typealias IR.Local
+
 let localIdxInput = Local(0)
 let localIdxData = Local(1)
 

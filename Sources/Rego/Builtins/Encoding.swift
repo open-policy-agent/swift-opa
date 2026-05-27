@@ -165,15 +165,83 @@ extension BuiltinFuncs {
         encoder.outputFormatting = [.sortedKeys]
 
         let data = try encoder.encode(args[0])
-        guard let json = String(data: data, encoding: .utf8) else {
-            throw Rego.RegoError(code: .internalError, message: "json.marshal: failed to encode JSON as utf-8")
-        }
-
-        return AST.RegoValue(stringLiteral: json)
+        return .string(htmlEscapeJSON(String(decoding: data, as: UTF8.self)))
     }
 
     // MARK: - json.marshal_with_options
-    // TODO: Implement this JSON encoding builtin.
+    /// Serializes the input term to JSON, with additional formatting options.
+    ///
+    /// Pretty-printed output mimics Go's `json.MarshalIndent` style.
+    ///
+    /// Known discrepancies (may also apply to `json.marshal`):
+    /// - Special line terminator unicode characters are not escaped.
+    /// - Floating-point formatting may diverge at the edges (very large
+    ///   magnitudes, scientific-notation thresholds, trailing-zero handling)
+    ///   between Swift's `JSONEncoder` and Go's `strconv.AppendFloat`.
+    public static func jsonMarshalWithOptions(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue
+    {
+        guard args.count == 2 else {
+            throw Rego.BuiltinError.argumentCountMismatch(got: args.count, want: 2)
+        }
+
+        guard case .object(let options) = args[1] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "opts", got: args[1].typeName, want: "object")
+        }
+
+        var indentWith = "\t"
+        var prefixWith = ""
+        var sawIndentOrPrefix = false
+        var explicitPretty: Bool? = nil
+
+        for (key, val) in options {
+            guard case .string(let keyStr) = key else {
+                throw BuiltinError.argumentTypeMismatch(arg: "opts.key", got: key.typeName, want: "string")
+            }
+
+            switch keyStr {
+            case "prefix":
+                guard case .string(let prefixOpt) = val else {
+                    throw BuiltinError.argumentTypeMismatch(arg: "opts.prefix", got: val.typeName, want: "string")
+                }
+                prefixWith = prefixOpt
+                sawIndentOrPrefix = true
+
+            case "indent":
+                guard case .string(let indentOpt) = val else {
+                    throw BuiltinError.argumentTypeMismatch(arg: "opts.indent", got: val.typeName, want: "string")
+                }
+                indentWith = indentOpt
+                sawIndentOrPrefix = true
+
+            case "pretty":
+                guard case .boolean(let b) = val else {
+                    throw BuiltinError.argumentTypeMismatch(arg: "opts.pretty", got: val.typeName, want: "boolean")
+                }
+                explicitPretty = b
+
+            default:
+                throw Rego.RegoError(
+                    code: .internalError, message: "json.marshal_with_options: unknown key '\(keyStr)'")
+            }
+        }
+
+        // If the user didn't explicitly set "pretty", infer from whether
+        // "prefix" or "indent" was provided (matching Go behavior).
+        let shouldPrettyPrint = explicitPretty ?? sawIndentOrPrefix
+
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+
+        let data = try encoder.encode(args[0])
+        let json = htmlEscapeJSON(String(decoding: data, as: UTF8.self))
+
+        guard shouldPrettyPrint else {
+            return .string(json)
+        }
+
+        // Reformat compact JSON into Golang's MarshalIndent style.
+        return .string(prettyPrintGolangStyle(json: json, indentWith: indentWith, prefixWith: prefixWith))
+    }
 
     // MARK: - json.unmarshal
     /// Deserializes the input JSON string to a term.
@@ -229,4 +297,130 @@ extension Data {
     func hexEncodedWithSeparator(separator: String = "") -> String {
         self.map { String(format: "%02x", $0) }.joined(separator: separator)
     }
+}
+
+/// Post-processes JSON output to match Go's default HTML escaping.
+/// Characters `<`, `>`, `&` are rewritten to their JSON Unicode-escape forms.
+private func htmlEscapeJSON(_ json: String) -> String {
+    var out = [UInt8]()
+    out.reserveCapacity(json.utf8.count)
+    for b in json.utf8 {
+        switch b {
+        case UInt8(ascii: "&"):
+            out.append(contentsOf: [0x5c, 0x75, 0x30, 0x30, 0x32, 0x36])  // "&" -> "\u0026"
+        case UInt8(ascii: "<"):
+            out.append(contentsOf: [0x5c, 0x75, 0x30, 0x30, 0x33, 0x63])  // "<" -> "\u003c"
+        case UInt8(ascii: ">"):
+            out.append(contentsOf: [0x5c, 0x75, 0x30, 0x30, 0x33, 0x65])  // ">" -> "\u003e"
+        default:
+            out.append(b)
+        }
+    }
+    return String(decoding: out, as: UTF8.self)
+}
+
+/// Single-pass pretty-printer over compact JSON.
+/// Emits Go-style indented output, with no extra space before colon,
+/// empty collections collapsed, prefix on every line.
+///
+/// Warning: This function does not validate the structure of the incoming
+/// JSON text. It presumes that validation is done beforehand for speed.
+private func prettyPrintGolangStyle(json: String, indentWith: String, prefixWith: String) -> String {
+    let utf8 = json.utf8
+    var out = [UInt8]()
+    out.reserveCapacity(utf8.count * 2)  // rough estimate
+
+    let quote = UInt8(ascii: "\"")
+    let backslash = UInt8(ascii: "\\")
+    let colon = UInt8(ascii: ":")
+    let comma = UInt8(ascii: ",")
+    let lbrace = UInt8(ascii: "{")
+    let rbrace = UInt8(ascii: "}")
+    let lbracket = UInt8(ascii: "[")
+    let rbracket = UInt8(ascii: "]")
+    let newline = UInt8(ascii: "\n")
+
+    let indentBytes = Array(indentWith.utf8)
+    let prefixBytes = Array(prefixWith.utf8)
+
+    @inline(__always)
+    func writeNewlineAndIndent(depth: Int) {
+        out.append(newline)
+        out.append(contentsOf: prefixBytes)
+        for _ in 0..<depth {
+            out.append(contentsOf: indentBytes)
+        }
+    }
+
+    var depth = 0
+    var inString = false
+    var i = utf8.startIndex
+
+    // Append prefix before the first line's content.
+    out.append(contentsOf: prefixBytes)
+
+    while i < utf8.endIndex {
+        let byte = utf8[i]
+
+        // Inside a JSON string: pass through, respecting escapes.
+        if inString {
+            out.append(byte)
+            if byte == backslash {
+                // Skip the escaped character verbatim
+                let next = utf8.index(after: i)
+                if next < utf8.endIndex {
+                    out.append(utf8[next])
+                    i = utf8.index(after: next)
+                    continue
+                }
+            } else if byte == quote {
+                inString = false
+            }
+            i = utf8.index(after: i)
+            continue
+        }
+
+        // Outside a string: process lexical elements, tracking depth.
+        switch byte {
+        case quote:
+            inString = true
+            out.append(byte)
+
+        case lbrace, lbracket:
+            // Peek ahead: if the very next char is the matching close,
+            // emit the pair collapsed (e.g. `{}` or `[]`).
+            let next = utf8.index(after: i)
+            let closeByte = (byte == lbrace) ? rbrace : rbracket
+            if next < utf8.endIndex && utf8[next] == closeByte {
+                out.append(byte)
+                out.append(closeByte)
+                i = utf8.index(after: next)
+                continue
+            }
+            depth += 1
+            out.append(byte)
+            writeNewlineAndIndent(depth: depth)
+
+        case rbrace, rbracket:
+            depth -= 1
+            writeNewlineAndIndent(depth: depth)
+            out.append(byte)
+
+        case comma:
+            out.append(byte)
+            writeNewlineAndIndent(depth: depth)
+
+        case colon:
+            out.append(byte)
+            out.append(UInt8(ascii: " "))
+
+        default:
+            // digits, true/false/null literals, etc.
+            out.append(byte)
+        }
+
+        i = utf8.index(after: i)
+    }
+
+    return String(decoding: out, as: UTF8.self)
 }

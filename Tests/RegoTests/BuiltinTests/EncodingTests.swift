@@ -266,11 +266,92 @@ extension BuiltinTests.EncodingTests {
             ],
             expected: .success(.string("[1234567890,2000000,1000000000]"))
         ),
+        BuiltinTests.TestCase(
+            description: "marshal HTML-unsafe characters are unicode-escaped",
+            name: "json.marshal",
+            args: [
+                ["html": "<a&b>"]
+            ],
+            expected: .success(.string("{\"html\":\"\\u003ca\\u0026b\\u003e\"}"))
+        ),
     ]
 
     // MARK: - json.marshal_with_options Tests
     static let jsonMarshalWithOptionsTests: [BuiltinTests.TestCase] = [
-        // TODO: Add test cases from: v1/test/cases/testdata/v0/jsonbuiltins/test-json-marshal-with-options.yaml
+        BuiltinTests.TestCase(
+            description: "marshal large integers",
+            name: "json.marshal_with_options",
+            args: [
+                .array([.number(1_234_500_000 + 67890), .number(1e6 * 2), .number(1e109 / 1e100)]),
+                ["indent": "  ", "prefix": ">>> "],
+            ],
+            expected: .success(
+                .string(
+                    """
+                    >>> [
+                    >>>   1234567890,
+                    >>>   2000000,
+                    >>>   1000000000
+                    >>> ]
+                    """))
+        ),
+        // TODO: Add other cases from: v1/test/cases/testdata/v1/jsonbuiltins/test-json-marshal-with-options.yaml
+        BuiltinTests.TestCase(
+            description: "marshal deep array",
+            name: "json.marshal_with_options",
+            args: [
+                [[[[[[[]]]]]]],
+                ["indent": "    "],
+            ],
+            expected: .success(
+                .string(
+                    "[\n    [\n        [\n            [\n                [\n                    [\n                        []\n                    ]\n                ]\n            ]\n        ]\n    ]\n]"
+                ))
+        ),
+        BuiltinTests.TestCase(
+            description: "marshal object",
+            name: "json.marshal_with_options",
+            args: [
+                ["foo": "bar", "bar": "baz"],
+                ["prefix": "JSON =\u{003e} "],
+            ],
+            expected: .success(
+                .string(
+                    "JSON =\u{003e} {\nJSON =\u{003e} \t\"bar\": \"baz\",\nJSON =\u{003e} \t\"foo\": \"bar\"\nJSON =\u{003e} }"
+                ))
+        ),
+        BuiltinTests.TestCase(
+            description: "marshal object with escaped strings",
+            name: "json.marshal_with_options",
+            args: [
+                ["foo\" :and friends": "\"bar\"", "\"bar\"": "baz"],
+                ["prefix": ">>> "],
+            ],
+            expected: .success(
+                .string(
+                    ">>> {\n>>> \t\"\\\"bar\\\"\": \"baz\",\n>>> \t\"foo\\\" :and friends\": \"\\\"bar\\\"\"\n>>> }"
+                ))
+        ),
+        BuiltinTests.TestCase(
+            description: "marshal with pretty=true uses default tab indent and no prefix",
+            name: "json.marshal_with_options",
+            args: [
+                ["a": 1, "b": 2],
+                ["pretty": true],
+            ],
+            expected: .success(
+                .string("{\n\t\"a\": 1,\n\t\"b\": 2\n}"))
+        ),
+        BuiltinTests.TestCase(
+            description: "marshal with HTML-unsafe characters escaped inside pretty output",
+            name: "json.marshal_with_options",
+            args: [
+                ["html": "<a&b>"],
+                ["pretty": true],
+            ],
+            expected: .success(
+                .string("{\n\t\"html\": \"\\u003ca\\u0026b\\u003e\"\n}"))
+        ),
     ]
 
     // MARK: - json.unmarshal Tests
@@ -361,6 +442,19 @@ extension BuiltinTests.EncodingTests {
                 allowedArgTypes: ["undefined", "null", "boolean", "number", "string", "object", "array", "set"],
                 generateNumberOfArgsTest: true),
             jsonMarshalTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "json.marshal_with_options", sampleArgs: ["", [:]],
+                argIndex: 0, argName: "x",
+                allowedArgTypes: ["undefined", "null", "boolean", "number", "string", "object", "array", "set"],
+                generateNumberOfArgsTest: true),
+            BuiltinTests.generateFailureTests(
+                builtinName: "json.marshal_with_options",
+                sampleArgs: ["", ["prefix": "", "pretty": false, "indent": "  "]],
+                argIndex: 1, argName: "opts",
+                allowedArgTypes: ["undefined", "null", "boolean", "number", "string", "object", "array", "set"],
+                generateNumberOfArgsTest: true),
+            jsonMarshalWithOptionsTests,
 
             BuiltinTests.generateFailureTests(
                 builtinName: "json.unmarshal", sampleArgs: [""],

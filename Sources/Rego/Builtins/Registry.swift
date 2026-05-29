@@ -115,6 +115,7 @@ public struct BuiltinRegistry: Sendable {
             "hex.decode": BuiltinFuncs.hexDecode,
             "json.is_valid": BuiltinFuncs.jsonIsValid,
             "json.marshal": BuiltinFuncs.jsonMarshal,
+            "json.marshal_with_options": BuiltinFuncs.jsonMarshalWithOptions,
             "json.unmarshal": BuiltinFuncs.jsonUnmarshal,
 
             // Numbers

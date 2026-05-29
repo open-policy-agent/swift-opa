@@ -22,6 +22,13 @@ extension OPA {
 
         // Custom builtins that are specified along the default builtins
         private var customBuiltins: [String: Builtin] = [:]
+
+        // Bundle-owned `/data` subtrees written by the most recent
+        // `prepareForEvaluation(query:)` call. The next prepare call uses
+        // this set (along with the new prepare's roots) to decide which
+        // subtrees to erase before writing fresh bundle data into the store.
+        // User data outside this set survives across prepare calls.
+        private var lastWrittenBundleRoots: Set<StoreKeyPath> = []
     }
 }
 
@@ -128,8 +135,19 @@ extension OPA.Engine {
     /// Uses default + custom builtins (specified at ``OPA/Engine`` initialization) to validate and evaluate builtin calls.
     ///
     /// ## Store Behavior
-    /// When this method is called, any data in the store will be overwritten with the current combined
-    /// data tree available from the loaded bundles (including anything from bundles loaded from disk).
+    /// Bundle-owned `/data` subtrees are refreshed on every call: the union
+    /// of the previously written bundle roots + currently declared bundle roots
+    /// is erased before fresh bundle data is written. Anything outside that
+    /// union is preserved across calls. user-supplied data sitting at paths
+    /// outside by any bundle roots survives a prepare call.
+    ///
+    /// ## Bundles + raw IR policies
+    /// If the engine was constructed with a mix of bundles and raw user IR
+    /// policies (via ``init(policies:store:capabilities:customBuiltins:)``
+    /// alongside ``init(bundles:capabilities:customBuiltins:)``-style
+    /// inputs), the union is composed at preparation time. Plan names must
+    /// be unique across the entire union, and bundle plan names must lie
+    /// under one of their bundle's declared roots.
     ///
     /// - Parameters:
     ///   - query: The query to prepare evaluation for.
@@ -194,6 +212,41 @@ extension OPA.Engine {
             loadedBundles = try workingCache.validated()
         }
 
+        // Compute the set of `/data/...` subtrees the current bundle set
+        // claims. We erase only the union of the previously written roots +
+        // newly declared roots, which leaves user data outside both sets
+        // untouched across prepare calls.
+        var newRoots: Set<StoreKeyPath> = []
+        for (_, bundle) in loadedBundles {
+            for root in bundle.manifest.roots {
+                let segments = root.split(separator: "/").map(String.init)
+                newRoots.insert(StoreKeyPath(["data"] + segments))
+            }
+        }
+
+        // Erase old + new bundle-owned subtrees in lexicographic order so an
+        // ancestor is removed before any of its descendants.
+        // A missing path is not an error here — the subtree simply wasn't
+        // present (e.g. first prepare on a fresh store), so we skip it.
+        // The recovery block below re-establishes the `data` root as an
+        // empty object whenever a removal leaves it absent.
+        let toErase = lastWrittenBundleRoots.union(newRoots)
+        for path in toErase.sorted(by: { $0.segments.lexicographicallyPrecedes($1.segments) }) {
+            do {
+                try await store.remove(at: path)
+            } catch let err as RegoError where err.code == .storePathNotFound {
+                // Already absent — nothing to erase.
+            }
+        }
+
+        // Ensure the root `data` node exists; removal of the whole `data`
+        // subtree (e.g. a bundle with root "") leaves it absent.
+        do {
+            _ = try await store.read(from: StoreKeyPath(["data"]))
+        } catch {
+            try await store.write(to: StoreKeyPath(["data"]), value: .object([:]))
+        }
+
         // Write each bundle's data into the store at paths corresponding to
         // the bundle's declared roots. `checkBundlesForOverlap` guarantees
         // these root paths are disjoint across bundles, so the per-root
@@ -203,7 +256,6 @@ extension OPA.Engine {
         // A bundle with no data under one of its roots simply writes nothing
         // for that root (e.g. a policy-only bundle whose roots describe
         // decision paths rather than data paths).
-        try await store.write(to: StoreKeyPath(["data"]), value: .object([:]))
         for (_, bundle) in loadedBundles.sorted(by: { $0.key < $1.key }) {
             let roots = bundle.manifest.roots
             for root in roots.sorted() {
@@ -232,17 +284,23 @@ extension OPA.Engine {
             }
         }
 
-        let evaluator: IREvaluator
+        // Remember what we wrote so the next prepare knows what to erase.
+        self.lastWrittenBundleRoots = newRoots
 
-        if !self.policies.isEmpty {
-            guard loadedBundles.isEmpty else {
-                throw RegoError(code: .invalidArgumentError, message: "Cannot mix direct IR policies with bundles")
-            }
-
-            evaluator = try IREvaluator(policies: self.policies)
-        } else {
-            evaluator = try IREvaluator(bundles: loadedBundles)
+        // User-supplied IR policies share the plan-name namespace with
+        // bundles. The IREvaluator already enforces global plan-name
+        // uniqueness. Here we also reject user plans whose names fall
+        // under any bundle's declared roots, because that subtree is
+        // owned by the bundle even if the bundle itself does not currently
+        // define a plan at that exact name.
+        if !self.policies.isEmpty && !loadedBundles.isEmpty {
+            try Self.checkUserPoliciesAgainstBundleRoots(
+                userPolicies: self.policies,
+                bundles: loadedBundles
+            )
         }
+
+        let evaluator = try IREvaluator(bundles: loadedBundles, userPolicies: self.policies)
 
         // TODO: Future improvement - validate local allocation assumptions (see Locals.swift)
         // Could add validation to check:

@@ -182,6 +182,31 @@ extension OPA.Bundle {
         }
     }
 
+    /// Returns true if `path` falls under at least one of the declared `roots`.
+    ///
+    /// Both `roots` and `path` are slash-separated. An empty root (`""` or
+    /// `"/"`) matches everything.
+    ///
+    /// Implementation: paths are canonicalized to `"/<trimmed>/"` form (or
+    /// `"/"` for the empty roots).
+    public static func rootPathsContain(_ roots: [String], _ path: String) -> Bool {
+        // Trim slashes, then add leading/trailing "/" so byte-prefix comparison
+        // matches segment-prefix semantics. e.g. canonical "/a/b/" is a prefix
+        // of "/a/b/c/" but not of "/a/bc/".
+        let canonicalPath: String = {
+            let trimmed = path.trimmingCharacters(in: ["/"])
+            return trimmed.isEmpty ? "/" : "/" + trimmed + "/"
+        }()
+        for raw in roots {
+            let trimmed = raw.trimmingCharacters(in: ["/"])
+            let canonicalRoot = trimmed.isEmpty ? "/" : "/" + trimmed + "/"
+            if canonicalPath.hasPrefix(canonicalRoot) {
+                return true
+            }
+        }
+        return false
+    }
+
     /// checkBundlesForOverlap verifies whether a set of bundles is valid
     /// together, in that there are no overlaps of their reserved roots
     /// space within the logical data tree.

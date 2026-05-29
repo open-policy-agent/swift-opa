@@ -100,4 +100,49 @@ extension OPA.Engine {
             }
         }
     }
+
+    /// Rejects user-supplied IR policies whose plan names fall under any
+    /// bundle's declared roots.
+    ///
+    /// ``IREvaluator`` ensures a bundle's plans must lie under its roots,
+    /// and that plan-names are globally unique. Roots overlap between
+    /// bundles is prevented by the bundle cache. This check prevents
+    /// user IR policies from having plan names that overlap with any
+    /// existing bundle roots.
+    ///
+    /// - Throws: `RegoError.planNameConflictError` listing every offending
+    ///   user plan and the bundles whose roots claim it.
+    static func checkUserPoliciesAgainstBundleRoots(
+        userPolicies: [IR.Policy],
+        bundles: [String: OPA.Bundle]
+    ) throws {
+        // Collect (bundleName, root) pairs.
+        let bundleRoots: [(name: String, roots: [String])] =
+            bundles
+            .sorted(by: { $0.key < $1.key })
+            .map { ($0.key, $0.value.manifest.roots) }
+
+        // planName -> sorted list of bundles whose roots claim it.
+        var conflicts: [String: [String]] = [:]
+        for (i, policy) in userPolicies.enumerated() {
+            for plan in policy.plans?.plans ?? [] {
+                for (bundleName, roots) in bundleRoots
+                where OPA.Bundle.rootPathsContain(roots, plan.name) {
+                    let key = "user:#\(i) '\(plan.name)'"
+                    conflicts[key, default: []].append("bundle:\(bundleName)")
+                }
+            }
+        }
+
+        guard !conflicts.isEmpty else { return }
+
+        let parts = conflicts.keys.sorted().map { key in
+            let owners = conflicts[key]!.sorted()
+            return "\(key) falls under roots of [\(owners.joined(separator: ", "))]"
+        }
+        throw RegoError(
+            code: .planNameConflictError,
+            message: "user IR policy plan names conflict with bundle roots: \(parts.joined(separator: "; "))"
+        )
+    }
 }

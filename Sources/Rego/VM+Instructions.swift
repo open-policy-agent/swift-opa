@@ -17,9 +17,7 @@ extension VM {
         let (valueOp, _) = context.decodeOperand(from: payload, at: start + 4)
         let value = context.resolveUnchecked(valueOp)
 
-        guard value != .undefined else {
-            return failWithUndefinedBytecode(context: context)
-        }
+        if case .undefined = value { return failWithUndefinedBytecode(context: context) }
 
         let array = context.resolveLocal(idx: arrayIdx)
         context.locals[arrayIdx] = nil  // drop reference before var binding to avoid CoW copy
@@ -49,16 +47,18 @@ extension VM {
         let (sourceOp, _) = context.decodeOperand(from: payload, at: start + 4)
         let source = context.resolveUnchecked(sourceOp)
 
-        let currentValue = context.resolveLocal(idx: target)
-        guard currentValue == .undefined else {
-            // Repeated assignments can only be of the same value, otherwise error
-            if currentValue != source {
+        // Direct locals read (not resolveLocal): the raw Optional distinguishes unbound (nil
+        // or .undefined) from a previously bound value in one switch, without needing to
+        // coalesce nil first and then compare again.
+        switch context.locals[target] {
+        case nil, .some(.undefined):
+            context.assignLocal(idx: target, value: source)
+        case .some(let v):
+            if v != source {
+                // Repeated assignments can only be of the same value, otherwise error
                 throw RegoError(code: .assignOnceError, message: "local already assigned with different value")
             }
-            return .success
         }
-
-        context.assignLocal(idx: target, value: source)
         return .success
     }
 
@@ -138,9 +138,7 @@ extension VM {
                 op1: (UInt32(op1.type.rawValue) << 30) | op1.value
             )
             if let cached = context[memoKey] {
-                guard cached != .undefined else {
-                    return failWithUndefinedBytecode(context: context)
-                }
+                if case .undefined = cached { return failWithUndefinedBytecode(context: context) }
                 context.assignLocal(idx: result, value: cached)
                 return .success
             }
@@ -156,9 +154,7 @@ extension VM {
 
             let returnValue = try await executeFunction(context: context, function: function, args: memoArgs)
             context[memoKey] = returnValue
-            guard returnValue != .undefined else {
-                return failWithUndefinedBytecode(context: context)
-            }
+            if case .undefined = returnValue { return failWithUndefinedBytecode(context: context) }
             context.assignLocal(idx: result, value: returnValue)
             return .success
         }
@@ -184,9 +180,7 @@ extension VM {
         if encodedFuncIndex & 0x8000_0000 != 0 {
             // Builtin call: fail immediately if any argument is undefined
             for argValue in args {
-                guard argValue != .undefined else {
-                    return failWithUndefinedBytecode(context: context)
-                }
+                if case .undefined = argValue { return failWithUndefinedBytecode(context: context) }
             }
 
             let stringIndex = Int(encodedFuncIndex & 0x7FFF_FFFF)
@@ -228,10 +222,7 @@ extension VM {
 
         let returnValue = try await executeFunction(context: context, function: function, args: args)
 
-        guard returnValue != .undefined else {
-            return failWithUndefinedBytecode(context: context)
-        }
-
+        if case .undefined = returnValue { return failWithUndefinedBytecode(context: context) }
         context.assignLocal(idx: result, value: returnValue)
         return .success
     }
@@ -291,9 +282,7 @@ extension VM {
 
         let returnValue = try await executeFunction(context: context, function: function, args: args)
 
-        guard returnValue != .undefined else {
-            return failWithUndefinedBytecode(context: context)
-        }
+        if case .undefined = returnValue { return failWithUndefinedBytecode(context: context) }
         context.assignLocal(idx: result, value: returnValue)
 
         return .success
@@ -330,9 +319,7 @@ extension VM {
             result = .undefined
         }
 
-        guard result != .undefined else {
-            return failWithUndefinedBytecode(context: context)
-        }
+        if case .undefined = result { return failWithUndefinedBytecode(context: context) }
 
         context.assignLocal(idx: target, value: result)
         return .success
@@ -374,9 +361,7 @@ extension VM {
         let source = context.decodeLocal(from: payload, at: start)
         let value = context.resolveLocal(idx: source)
 
-        guard value != .undefined else {
-            return failWithUndefinedBytecode(context: context)
-        }
+        if case .undefined = value { return failWithUndefinedBytecode(context: context) }
         return .success
     }
 
@@ -411,7 +396,7 @@ extension VM {
         let source = context.decodeLocal(from: payload, at: start)
         let value = context.resolveLocal(idx: source)
 
-        guard value == .undefined else {
+        guard case .undefined = value else {
             return failWithUndefinedBytecode(context: context)
         }
         return .success
@@ -520,9 +505,9 @@ extension VM {
         let b = context.resolveUnchecked(bOp)
 
         // This statement is undefined if either operand is undefined or if a equals b
-        if a == .undefined || b == .undefined || a == b {
-            return failWithUndefinedBytecode(context: context)
-        }
+        if case .undefined = a { return failWithUndefinedBytecode(context: context) }
+        if case .undefined = b { return failWithUndefinedBytecode(context: context) }
+        if a == b { return failWithUndefinedBytecode(context: context) }
 
         return .success
     }
@@ -564,9 +549,8 @@ extension VM {
         let (valueOp, _) = context.decodeOperand(from: payload, at: start + 4 + keySize)
         let value = context.resolveUnchecked(valueOp)
 
-        guard key != .undefined, value != .undefined else {
-            return failWithUndefinedBytecode(context: context)
-        }
+        if case .undefined = key { return failWithUndefinedBytecode(context: context) }
+        if case .undefined = value { return failWithUndefinedBytecode(context: context) }
 
         let objectValue = context.resolveLocal(idx: object)
         context.locals[object] = nil  // drop reference before var binding to avoid CoW copy
@@ -597,9 +581,7 @@ extension VM {
         let (valueOp, _) = context.decodeOperand(from: payload, at: start + 4 + keySize)
         let value = context.resolveUnchecked(valueOp)
 
-        guard value != .undefined else {
-            return failWithUndefinedBytecode(context: context)
-        }
+        if case .undefined = value { return failWithUndefinedBytecode(context: context) }
 
         let objectValue = context.resolveLocal(idx: object)
         context.locals[object] = nil  // drop reference before var binding to avoid CoW copy
@@ -653,9 +635,7 @@ extension VM {
         let value = context.decodeLocal(from: payload, at: start)
         let regoValue = context.resolveLocal(idx: value)
 
-        guard regoValue != .undefined else {
-            return failWithUndefinedBytecode(context: context)
-        }
+        if case .undefined = regoValue { return failWithUndefinedBytecode(context: context) }
 
         context.results.insert(regoValue)
         return .success
@@ -686,9 +666,8 @@ extension VM {
         let sourceValue = context.resolveLocal(idx: source)
 
         // Ensure source is defined and is a collection
-        guard sourceValue != .undefined, sourceValue.isCollection else {
-            return failWithUndefinedBytecode(context: context)
-        }
+        if case .undefined = sourceValue { return failWithUndefinedBytecode(context: context) }
+        guard sourceValue.isCollection else { return failWithUndefinedBytecode(context: context) }
 
         // Iterate over the collection, propagating break and return from the scan body.
         // OPA semantics: break exits the scan loop (consuming one nesting level),
@@ -745,9 +724,7 @@ extension VM {
         let (valueOp, _) = context.decodeOperand(from: payload, at: start + 4)
         let value = context.resolveUnchecked(valueOp)
 
-        guard value != .undefined else {
-            return failWithUndefinedBytecode(context: context)
-        }
+        if case .undefined = value { return failWithUndefinedBytecode(context: context) }
 
         let setValue = context.resolveLocal(idx: set)
         context.locals[set] = nil  // drop reference before var binding to avoid CoW copy

@@ -107,3 +107,41 @@ extension RegoValue {
         }
     }
 }
+
+// MARK: - Equatable
+
+extension RegoValue {
+    /// Explicit Equatable implementation, marked @inline(__always) so every intra-module call site
+    /// gets a direct discriminant tag comparison rather than a non-inlined
+    /// `__derived_enum_equals` dispatch. Semantically identical to the synthesized
+    /// conformance and consistent with the synthesized Hashable implementation.
+    @inline(__always)
+    public static func == (lhs: RegoValue, rhs: RegoValue) -> Bool {
+        switch lhs {
+        case .undefined:
+            if case .undefined = rhs { return true }
+            return false
+        case .null:
+            if case .null = rhs { return true }
+            return false
+        case .boolean(let a):
+            if case .boolean(let b) = rhs { return a == b }
+            return false
+        case .number(let a):
+            if case .number(let b) = rhs { return a == b }
+            return false
+        case .string(let a):
+            if case .string(let b) = rhs { return a == b }
+            return false
+        case .array(let a):
+            if case .array(let b) = rhs { return a == b }
+            return false
+        case .object(let a):
+            if case .object(let b) = rhs { return a == b }
+            return false
+        case .set(let a):
+            if case .set(let b) = rhs { return a == b }
+            return false
+        }
+    }
+}

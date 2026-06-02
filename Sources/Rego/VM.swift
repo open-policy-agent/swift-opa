@@ -152,19 +152,30 @@ extension VM {
             switch opcodeRaw {
             // ── Compact opcodes (rawValues 35–41): operand encoded in `length` field ─────────
             case Int(Opcode.isDefined1.rawValue):
-                if context.resolveLocal(idx: Local(UInt32(length))) == .undefined { return .undefined }
-                continue
+                // Direct locals access (not resolveLocal): a single switch on the raw Optional
+                // handles nil and .some(.undefined) in one step, avoiding nil-coalescing.
+                // See resolveLocal docs for why this exception exists.
+                switch context.locals[Local(UInt32(length))] {
+                case nil, .some(.undefined): return .undefined
+                default: continue
+                }
             case Int(Opcode.isUndefined1.rawValue):
-                if context.resolveLocal(idx: Local(UInt32(length))) != .undefined { return .undefined }
-                continue
+                // Direct locals access — same rationale as isDefined1 above.
+                switch context.locals[Local(UInt32(length))] {
+                case nil, .some(.undefined): continue
+                default: return .undefined
+                }
             case Int(Opcode.resetLocal1.rawValue):
                 context.locals[Local(UInt32(length))] = nil
                 continue
             case Int(Opcode.resultSetAdd1.rawValue):
-                let val = context.resolveLocal(idx: Local(UInt32(length)))
-                if val == .undefined { return .undefined }
-                context.results.insert(val)
-                continue
+                // Direct locals access — same rationale as isDefined1 above.
+                switch context.locals[Local(UInt32(length))] {
+                case nil, .some(.undefined): return .undefined
+                case .some(let v):
+                    context.results.insert(v)
+                    continue
+                }
             case Int(Opcode.returnLocal1.rawValue):
                 return BlockResult(functionReturnValue: context.resolveLocal(idx: Local(UInt32(length))))
             case Int(Opcode.break1.rawValue):
@@ -329,7 +340,10 @@ internal final class VMContext {
     /// Resolve a local variable.
     /// `nil` and `.undefined` in the locals array are equivalent — both represent an unbound
     /// variable.  All reads must go through this function; direct `locals[idx]` access is only
-    /// permitted for writes (assignment, CoW nil-before-rebind, resetLocal).
+    /// permitted for writes (assignment, CoW nil-before-rebind, resetLocal) and in the compact
+    /// opcode hot path (isDefined1, isUndefined1, resultSetAdd1), where a direct switch on the
+    /// raw Optional handles nil and .some(.undefined) in one step without nil-coalescing.
+    /// Wrapping that pattern in a helper function (even @inline(__always)) degrades codegen.
     @inline(__always)
     func resolveLocal(idx: Local) -> AST.RegoValue {
         return locals[idx] ?? .undefined

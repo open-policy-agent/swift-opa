@@ -16,6 +16,8 @@ public struct RegoError: Sendable, Swift.Error {
             case bundleRootConflictError
             case bundleUnpreparedError
             case invalidArgumentError
+            case planEscapedBundleRoots
+            case planNameConflictError
 
             // Evaluation errors
             case assignOnceError
@@ -57,6 +59,8 @@ public struct RegoError: Sendable, Swift.Error {
         public static let bundleUnpreparedError = Code(.bundleUnpreparedError)
         public static let internalError = Code(.internalError)
         public static let invalidArgumentError = Code(.invalidArgumentError)
+        public static let planEscapedBundleRoots = Code(.planEscapedBundleRoots)
+        public static let planNameConflictError = Code(.planNameConflictError)
 
         // Evaluation errors
         public static let assignOnceError = Code(.assignOnceError)

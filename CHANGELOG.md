@@ -5,6 +5,35 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Improved plan validation in Engine
+
+The `Engine` now validates that plans are contained under the roots of their parent bundles.
+We also now support loading user-provided raw IR policies alongside bundles.
+The improved validation ensures that plan names are unique across all sources, and that user-supplied plans don't conflict with plans or paths under the roots of any bundles.
+
+The new validation is done at `prepareForEvaluation` time, and will throw descriptive errors if anything is amiss.
+
+### Improved store behavior
+
+In previous versions, the `Engine` would wipe out the store on each call to `prepareForEvaluation`, and would write only bundle contents back into the store.
+This was acceptable for bundle-centric workflows, but limited many other use cases OPA supports.
+
+We now modify the store at `prepareForEvaluation` in a manner much closer to OPA's bundle activation flow.
+First, all old bundle roots are erased.
+Then, all new/retained bundle roots are written to, ensuring the live set of bundles will always have consistent state written to the store.
+Any user-modified locations in the store that are outside of those paths will be unmodified.
+
+### `OPA.Store` protocol gains `remove(at:)`
+
+The `OPA.Store` protocol now requires `mutating func remove(at: StoreKeyPath) async throws`.
+This method removes the value at the given path, including the leaf key from its parent object.
+A non-existent path is a no-op.
+Removing the root path resets the store to an empty object.
+
+This new API moves us closer to supporting the range of store functionality that OPA provides.
+
+Authored by @philipaconrad
+
 ## 0.0.5
 
 This release contains bugfixes for multi-bundle use cases, performance improvements, and new builtin implementations!

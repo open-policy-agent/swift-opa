@@ -39,13 +39,14 @@ internal struct Locals: Equatable, Sendable, Encodable {
     }
 
     subscript(index: Local) -> AST.RegoValue? {
+        @inline(__always)
         get {
             let idx = Int(index)
             return storage[idx]
         }
+        @inline(__always)
         set {
             let idx = Int(index)
-            precondition(idx < storage.count, "local index \(idx) out of bounds (size \(storage.count))")
             storage[idx] = newValue
         }
     }

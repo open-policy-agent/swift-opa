@@ -330,11 +330,13 @@ internal final class VMContext {
     /// `nil` and `.undefined` in the locals array are equivalent — both represent an unbound
     /// variable.  All reads must go through this function; direct `locals[idx]` access is only
     /// permitted for writes (assignment, CoW nil-before-rebind, resetLocal).
+    @inline(__always)
     func resolveLocal(idx: Local) -> AST.RegoValue {
         return locals[idx] ?? .undefined
     }
 
     /// Assign a value to a local variable
+    @inline(__always)
     func assignLocal(idx: Local, value: AST.RegoValue) {
         locals[idx] = value
     }

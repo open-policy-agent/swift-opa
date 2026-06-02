@@ -313,7 +313,12 @@ internal final class VMContext {
 
     var maxCallDepth: Int = 16_384
     var callDepth: Int = 0
-    var memoStack: [MemoCache] = []
+    // Flat memo cache for the current scope; only pushed/popped by `with` opcodes.
+    // Keeping it as a direct field avoids the isEmpty guard and array index arithmetic
+    // on every 2-arg function call in execCall's fast path.
+    var memoCache: MemoCache = [:]
+    // Stack used only when `with` opcodes are active (rare); empty in the common case.
+    private var memoStack: [MemoCache] = []
     var results: ResultSet
     var locals: Locals
 
@@ -396,29 +401,18 @@ internal final class VMContext {
 
     // Memoization support
     subscript(key: CallKey) -> AST.RegoValue? {
-        get {
-            guard !memoStack.isEmpty else {
-                return nil
-            }
-            return memoStack[memoStack.count - 1][key]
-        }
-        set {
-            if memoStack.isEmpty {
-                memoStack.append(MemoCache())
-            }
-            memoStack[memoStack.count - 1][key] = newValue
-        }
+        get { memoCache[key] }
+        set { memoCache[key] = newValue }
     }
 
     func pushMemoCache() {
-        memoStack.append(MemoCache())
+        memoStack.append(memoCache)
+        memoCache = [:]
     }
 
     func popMemoCache() {
-        guard !memoStack.isEmpty else {
-            return
-        }
-        memoStack.removeLast()
+        guard !memoStack.isEmpty else { return }
+        memoCache = memoStack.removeLast()
     }
 
     // Locals pool management

@@ -39,8 +39,36 @@ extension Decimal {
         guard !self.isNaN && self.isFinite else { return nil }
         guard self >= Self.int64Min && self <= Self.int64Max else { return nil }
 
-        let intValue = Int64(truncating: self as NSNumber)
-        guard Decimal(intValue) == self else { return nil }
-        return intValue
+        // exponent >= 0 means the value is already a whole number; bridge directly.
+        // For exponent < 0, check integrality before bridging to NSNumber.
+        if exponent < 0 {
+            #if canImport(ObjectiveC)
+                // On Apple platforms, NSDecimalCompact strips trailing zeros from the
+                // significand. If the exponent is still negative after compaction the value
+                // is genuinely fractional — return nil without allocating NSNumber.
+                // NSDecimalCompact is documented as normalising a decimal "so that
+                // calculations using it will take up as little memory as possible" and is a
+                // prerequisite for all NSDecimal arithmetic functions.
+                //
+                // Examples (significand × 10^exponent):
+                //   100   = 1    × 10^ 2  → exponent already > 0, bridge directly
+                //   10    = 10   × 10^ 0  → exponent already 0, bridge directly
+                //   10.0  = 100  × 10^-1  → compact → 1 × 10^1   (exponent >= 0 → integer)
+                //   10.23 = 1023 × 10^-2  → compact → 1023 × 10^-2  (no trailing zeros → nil)
+                //   10.20 = 1020 × 10^-2  → compact → 102  × 10^-1  (exponent < 0 → nil)
+                var copy = self
+                NSDecimalCompact(&copy)
+                guard copy.exponent >= 0 else { return nil }
+                return Int64(truncating: copy as NSNumber)
+            #else
+                // On non-Apple platforms fall back to the truncation+equality check which
+                // is correct regardless of internal representation.
+                let intValue = Int64(truncating: self as NSNumber)
+                guard Decimal(intValue) == self else { return nil }
+                return intValue
+            #endif
+        }
+
+        return Int64(truncating: self as NSNumber)
     }
 }

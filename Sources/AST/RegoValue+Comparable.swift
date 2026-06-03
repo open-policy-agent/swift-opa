@@ -91,6 +91,21 @@ extension RegoValue: Comparable {
     }
 
     public static func compare(_ lhs: RegoValue, _ rhs: RegoValue) -> ComparisonResult {
+        // Fast path: number–number comparison using a single NSDecimalCompare call.
+        // The generic path calls `<` twice (orderedAscending check, then orderedDescending),
+        // invoking NSDecimalCompare twice for decimal values. This fast path does it once.
+        if case .number(let lNum) = lhs, case .number(let rNum) = rhs {
+            switch (lNum.storage, rNum.storage) {
+            case (.int(let l), .int(let r)):
+                if l < r { return .orderedAscending }
+                if l > r { return .orderedDescending }
+                return .orderedSame
+            default:
+                var lDec = lNum.decimalValue
+                var rDec = rNum.decimalValue
+                return NSDecimalCompare(&lDec, &rDec)
+            }
+        }
         if lhs < rhs {
             return .orderedAscending
         } else if lhs > rhs {

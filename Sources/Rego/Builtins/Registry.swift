@@ -33,6 +33,23 @@ public struct BuiltinContext {
         // See https://developer.apple.com/documentation/swift/systemrandomnumbergenerator/
         self.rand = rand ?? Ptr<RandomNumberGenerator>(toCopyOf: SystemRandomNumberGenerator())
     }
+
+    /// Fast path init for the VM hot path: takes non-optional Ptr fields directly,
+    /// bypassing the `??` conditional branches of the general init.
+    /// Eliminates per-call branch overhead when constructing inline in execCall.
+    @inline(__always)
+    init(
+        tracer: OPA.Trace.QueryTracer?,
+        cache: Ptr<BuiltinsCache>,
+        timestamp: Date,
+        rand: Ptr<RandomNumberGenerator>
+    ) {
+        self.location = .init()
+        self.tracer = tracer
+        self.cache = cache
+        self.timestamp = timestamp
+        self.rand = rand
+    }
 }
 
 public struct BuiltinRegistry: Sendable {

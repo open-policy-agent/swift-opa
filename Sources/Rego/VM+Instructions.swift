@@ -192,11 +192,13 @@ extension VM {
                 return failWithUndefinedBytecode(context: context)
             }
 
-            // Create builtin context
+            // Use the fast-path init; builtinsRand is guaranteed non-nil here
+            // because we only reach this branch when the policy has builtins.
             let builtinContext = BuiltinContext(
                 tracer: context.evaluationContext.tracer,
                 cache: context.evaluationContext.builtinsCache,
-                timestamp: context.evaluationContext.timestamp
+                timestamp: context.evaluationContext.timestamp,
+                rand: context.builtinsRand
             )
 
             // Invoke builtin

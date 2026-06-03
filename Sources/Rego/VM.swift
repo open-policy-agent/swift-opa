@@ -322,6 +322,17 @@ internal final class VMContext {
     var results: ResultSet
     var locals: Locals
 
+    // Sentinel used for policies with no builtin calls — never dereferenced at runtime,
+    // exists only so builtinsRand can be non-optional and carry no Optional overhead.
+    // nonisolated(unsafe): the sentinel is write-once at startup and never mutated;
+    // the suppression is safe because no builtin-free policy ever reads through it.
+    private nonisolated(unsafe) static let noopRand: Ptr<RandomNumberGenerator> =
+        Ptr<RandomNumberGenerator>(toCopyOf: SystemRandomNumberGenerator())
+
+    // Per-evaluation RNG for builtin calls. Points to noopRand for policies that have
+    // no builtins (policy.hasBuiltins == false), avoiding any allocation.
+    let builtinsRand: Ptr<RandomNumberGenerator>
+
     // Pool for reusing storage arrays across function calls
     private var localsPool: [[AST.RegoValue?]] = []
 
@@ -340,6 +351,12 @@ internal final class VMContext {
         // Initialize input and data locals
         self.locals[localIdxInput] = evaluationContext.input
         self.locals[localIdxData] = data
+
+        // Only allocate a fresh RNG if this policy calls builtins; otherwise share the sentinel.
+        self.builtinsRand =
+            policy.hasBuiltins
+            ? Ptr<RandomNumberGenerator>(toCopyOf: SystemRandomNumberGenerator())
+            : VMContext.noopRand
     }
 
     /// Resolve a local variable.

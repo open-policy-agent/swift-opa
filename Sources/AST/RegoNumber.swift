@@ -83,26 +83,34 @@ public struct RegoNumber: Sendable, Hashable {
     }
 
     /// Get as Int (may overflow for large Int64 values)
+    /// Fast path for .int storage is inlined; decimal conversion is a separate outlined call.
+    @inline(__always)
     public var intValue: Int {
         switch storage {
         case .int(let v):
             return Int(clamping: v)
-        case .decimal(let v):
-            let doubleValue = v.doubleValue
-            if let safeInt64 = doubleValue.toInt64Safe() {
-                return Int(clamping: safeInt64)
-            }
-            if doubleValue.isNaN {
-                return 0
-            }
-            if doubleValue >= Double(Int.max) {
-                return Int.max
-            }
-            if doubleValue <= Double(Int.min) {
-                return Int.min
-            }
-            return Int(doubleValue)
+        case .decimal:
+            return _intValueDecimalSlow()
         }
+    }
+
+    @inline(never)
+    internal func _intValueDecimalSlow() -> Int {
+        guard case .decimal(let v) = storage else { return 0 }
+        let doubleValue = v.doubleValue
+        if let safeInt64 = doubleValue.toInt64Safe() {
+            return Int(clamping: safeInt64)
+        }
+        if doubleValue.isNaN {
+            return 0
+        }
+        if doubleValue >= Double(Int.max) {
+            return Int.max
+        }
+        if doubleValue <= Double(Int.min) {
+            return Int.min
+        }
+        return Int(doubleValue)
     }
 
     /// Get the decimal value

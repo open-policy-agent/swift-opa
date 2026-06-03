@@ -21,6 +21,10 @@ public struct Policy: Sendable {
     /// Builtin functions required by this policy (from IR static data)
     public let builtinFuncs: [IR.BuiltinFunc]
 
+    /// True if this policy references any builtin functions.
+    /// Used to skip allocating a RandomNumberGenerator for pure user-function policies.
+    public var hasBuiltins: Bool { !builtinFuncs.isEmpty }
+
     public init(
         strings: [String],
         numbers: [RegoNumber?],

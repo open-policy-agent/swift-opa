@@ -3,9 +3,8 @@ import AST
 import Foundation
 
 protocol Evaluator: Sendable {
-    func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet
+    func evaluate(withContext ctx: EvaluationContext, builtins: [[Builtin?]]) async throws -> ResultSet
 }
-
 /// EvaluationContext is the common evaluation context that is passed to the common Engine.
 internal struct EvaluationContext {
     public let query: String

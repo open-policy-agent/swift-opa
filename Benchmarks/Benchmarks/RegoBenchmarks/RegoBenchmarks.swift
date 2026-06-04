@@ -80,6 +80,13 @@ let allBenchmarkSpecs: [BenchmarkSpec] =
             input: ["value": "__nomatch__"]
         ),
         BenchmarkSpec(
+            name: "Build Literal Object (100 inserts)",
+            bundleName: "object100",
+            bundlePath: "object-build-100-bundle",
+            query: "data.benchmark.object100.matched",
+            input: ["value": "__nomatch__"]
+        ),
+        BenchmarkSpec(
             name: "Build Literal Set (10 adds)",
             bundleName: "set",
             bundlePath: "set-build-bundle",

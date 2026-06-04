@@ -551,8 +551,11 @@ extension VM {
         let (valueOp, _) = context.decodeOperand(from: payload, at: start + 4 + keySize)
         let value = context.resolveUnchecked(valueOp)
 
-        if case .undefined = key { return failWithUndefinedBytecode(context: context) }
-        if case .undefined = value { return failWithUndefinedBytecode(context: context) }
+        switch (key, value) {
+        case (.undefined, _), (_, .undefined):
+            return failWithUndefinedBytecode(context: context)
+        default: break
+        }
 
         let objectValue = context.resolveLocal(idx: object)
         context.locals[object] = nil  // drop reference before var binding to avoid CoW copy
@@ -677,9 +680,10 @@ extension VM {
         // didn't match / completed — continue to the next element.
         switch sourceValue {
         case .array(let arr):
-            for (i, val) in arr.enumerated() {
+            var i = 0
+            for element in arr {
                 context.assignLocal(idx: key, value: .number(RegoNumber(int: Int64(i))))
-                context.assignLocal(idx: value, value: val)
+                context.assignLocal(idx: value, value: element)
                 let blockResult = try await self.executeBlock(
                     context: context,
                     offset: blockOffset,
@@ -687,6 +691,7 @@ extension VM {
                 )
                 if blockResult.shouldBreak { return blockResult.breakByOne() }
                 if blockResult.functionReturnValue != nil { return blockResult }
+                i &+= 1
             }
         case .object(let obj):
             for (k, v) in obj {

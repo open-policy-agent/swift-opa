@@ -561,15 +561,15 @@ extension VM {
             return failWithUndefinedBytecode(context: context)
         }
 
-        // Check if key already exists with different value
-        if let existing = obj[key], existing != value {
+        // Insert key; if a value was already present, verify it matches.
+        // No need to restore obj on mismatch — we throw immediately and obj is abandoned.
+        if let existing = obj.updateValue(value, forKey: key), existing != value {
             throw RegoError(
                 code: .objectInsertOnceError,
                 message: "key '\(key)' already exists in object with different value"
             )
         }
 
-        obj[key] = value
         context.assignLocal(idx: object, value: .object(obj))
         return .success
     }

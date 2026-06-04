@@ -275,10 +275,8 @@ extension VM {
             args.append(argValue)
         }
 
-        // Find function by path (joined with ".").
-        // Both the callDynamic path segments and the Function.path array use the same naming
-        // convention (no "data" prefix), so joining with "." gives a directly comparable key.
-        guard let function = policy.functions.first(where: { $0.path.joined(separator: ".") == funcName }) else {
+        // Find function by path.
+        guard let function = policy.functions.first(where: { $0.path == funcName }) else {
             return failWithUndefinedBytecode(context: context)
         }
 

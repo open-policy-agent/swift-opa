@@ -128,7 +128,9 @@ public struct Policy: Sendable {
 /// Bytecode function metadata
 public struct Function: Sendable {
     public let name: String
-    public let path: [String]
+    /// Function path as a dot-joined string (e.g. "benchmark.iteration"), computed once at
+    /// init time. Used by execCallDynamic for function lookup.
+    public let path: String
     public let params: [Local]
     public let returnVar: Local
     public let maxLocal: Int
@@ -148,7 +150,7 @@ public struct Function: Sendable {
         blocks: [(offset: Int, size: Int)]
     ) {
         self.name = name
-        self.path = path
+        self.path = path.joined(separator: ".")
         self.params = params
         self.returnVar = returnVar
         self.maxLocal = maxLocal

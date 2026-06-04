@@ -164,13 +164,13 @@ internal struct IREvaluator {
 }
 
 extension IREvaluator: Evaluator {
-    func evaluate(withContext ctx: EvaluationContext) async throws -> ResultSet {
+    func evaluate(withContext ctx: EvaluationContext, builtins: [[Builtin?]]) async throws -> ResultSet {
         let entrypoint = try queryToEntryPoint(ctx.query)
         guard let hit = planIndex[entrypoint] else {
             throw RegoError(code: .unknownQuery, message: "query not found in plan: \(ctx.query)")
         }
         let vm = VM(policy: policies[hit.policyIdx])
-        return try await vm.executePlan(withContext: ctx, planIndex: hit.planIdx)
+        return try await vm.executePlan(withContext: ctx, planIndex: hit.planIdx, builtins: builtins[hit.policyIdx])
     }
 }
 

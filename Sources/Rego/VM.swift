@@ -16,7 +16,8 @@ extension VM {
     /// Execute a bytecode plan
     func executePlan(
         withContext ctx: EvaluationContext,
-        planIndex: Int
+        planIndex: Int,
+        builtins: [Builtin?] = []
     ) async throws -> ResultSet {
         guard planIndex < policy.plans.count else {
             throw Error.invalidPayloadLength
@@ -28,7 +29,8 @@ extension VM {
             evaluationContext: ctx,
             policy: policy,
             planMaxLocal: plan.maxLocal,
-            data: data
+            data: data,
+            builtins: builtins
         )
 
         for block in plan.blocks {
@@ -339,9 +341,16 @@ internal final class VMContext {
     // Pool for reusing args arrays
     private var argsPool: [[AST.RegoValue]] = []
 
-    init(evaluationContext: EvaluationContext, policy: Policy, planMaxLocal: Int, data: AST.RegoValue) {
+    // Builtin functions pre-resolved by string table index at query prepare time.
+    let builtins: [Builtin?]
+
+    init(
+        evaluationContext: EvaluationContext, policy: Policy, planMaxLocal: Int,
+        data: AST.RegoValue, builtins: [Builtin?] = []
+    ) {
         self.evaluationContext = evaluationContext
         self.policy = policy
+        self.builtins = builtins
         self.tracingEnabled = evaluationContext.tracer != nil
         self.results = ResultSet.empty
 

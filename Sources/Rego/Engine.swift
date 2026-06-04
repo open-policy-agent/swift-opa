@@ -102,6 +102,8 @@ extension OPA.Engine {
         let evaluator: any Evaluator
         let store: any OPA.Store
         let builtinRegistry: BuiltinRegistry
+        /// Builtin functions pre-resolved by string table index for each policy.
+        let builtins: [[Builtin?]]
 
         /// Returns the result of evaluating the prepared query against the given input.
         ///
@@ -123,8 +125,7 @@ extension OPA.Engine {
                 tracer: tracer,
                 strictBuiltins: strictBuiltins
             )
-
-            return try await self.evaluator.evaluate(withContext: ctx)
+            return try await self.evaluator.evaluate(withContext: ctx, builtins: self.builtins)
         }
     }
 
@@ -316,7 +317,8 @@ extension OPA.Engine {
             query: query,
             evaluator: evaluator,
             store: self.store,
-            builtinRegistry: mergedBuiltinRegistry
+            builtinRegistry: mergedBuiltinRegistry,
+            builtins: evaluator.policies.map { policy in policy.strings.map { mergedBuiltinRegistry[$0] } }
         )
     }
 

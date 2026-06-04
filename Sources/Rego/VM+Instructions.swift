@@ -184,16 +184,7 @@ extension VM {
             }
 
             let stringIndex = Int(encodedFuncIndex & 0x7FFF_FFFF)
-            let builtinName = policy.strings[stringIndex]
 
-            // Look up builtin in registry using subscript
-            guard let builtin = context.evaluationContext.builtins[builtinName] else {
-                // Builtin not found - fail with undefined
-                return failWithUndefinedBytecode(context: context)
-            }
-
-            // Use the fast-path init; builtinsRand is guaranteed non-nil here
-            // because we only reach this branch when the policy has builtins.
             let builtinContext = BuiltinContext(
                 tracer: context.evaluationContext.tracer,
                 cache: context.evaluationContext.builtinsCache,
@@ -201,8 +192,12 @@ extension VM {
                 rand: context.builtinsRand
             )
 
-            // Invoke builtin
             let returnValue: AST.RegoValue
+            guard stringIndex < context.builtins.count,
+                let builtin = context.builtins[stringIndex]
+            else {
+                return failWithUndefinedBytecode(context: context)
+            }
             do {
                 returnValue = try await builtin(builtinContext, args)
             } catch {

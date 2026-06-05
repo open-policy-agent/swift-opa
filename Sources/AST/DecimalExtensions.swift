@@ -37,10 +37,11 @@ extension Decimal {
     /// Safely extract Int64 value if Decimal represents a whole number within range
     public var safeInt64Value: Int64? {
         guard !self.isNaN && self.isFinite else { return nil }
-        guard self >= Self.int64Min && self <= Self.int64Max else { return nil }
 
         // exponent >= 0 means the value is already a whole number; bridge directly.
-        // For exponent < 0, check integrality before bridging to NSNumber.
+        // For exponent < 0, check integrality before the range guard — non-integer
+        // decimals return nil without paying the two NSDecimalCompare calls in
+        // `self >= int64Min && self <= int64Max`.
         if exponent < 0 {
             #if canImport(ObjectiveC)
                 // On Apple platforms, NSDecimalCompact strips trailing zeros from the
@@ -59,6 +60,7 @@ extension Decimal {
                 var copy = self
                 NSDecimalCompact(&copy)
                 guard copy.exponent >= 0 else { return nil }
+                guard copy >= Self.int64Min && copy <= Self.int64Max else { return nil }
                 return Int64(truncating: copy as NSNumber)
             #else
                 // On non-Apple platforms fall back to the truncation+equality check which
@@ -69,6 +71,7 @@ extension Decimal {
             #endif
         }
 
+        guard self >= Self.int64Min && self <= Self.int64Max else { return nil }
         return Int64(truncating: self as NSNumber)
     }
 }

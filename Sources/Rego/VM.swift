@@ -2,10 +2,45 @@ import AST
 import Bytecode
 import Foundation
 
+#if canImport(Darwin)
+import Darwin
+#elseif canImport(Glibc)
+import Glibc
+#endif
+
 import typealias IR.Local
 
 let localIdxInput = Local(0)
 let localIdxData = Local(1)
+
+/// Lowest stack address the VM may safely touch, computed for the current thread. Returns 0 when
+/// the platform exposes no stack bounds, which disables the guard (`maxCallDepth` still applies).
+func computeStackLowWaterMark(headroom: Int) -> UInt {
+    #if canImport(Darwin)
+    let top = UInt(bitPattern: pthread_get_stackaddr_np(pthread_self()))  // highest address
+    let size = pthread_get_stacksize_np(pthread_self())
+    return top - UInt(size) + UInt(headroom)
+    #elseif canImport(Glibc)
+    var attr = pthread_attr_t()
+    guard pthread_getattr_np(pthread_self(), &attr) == 0 else { return 0 }
+    defer { pthread_attr_destroy(&attr) }
+    var base: UnsafeMutableRawPointer?
+    var size = 0
+    guard pthread_attr_getstack(&attr, &base, &size) == 0 else { return 0 }
+    return UInt(bitPattern: base) + UInt(headroom)  // base is the lowest address
+    #else
+    return 0
+    #endif
+}
+
+/// True if the current stack pointer is still above `lowWaterMark` (or the guard is disabled).
+@inline(__always)
+func hasStackHeadroom(_ lowWaterMark: UInt) -> Bool {
+    guard lowWaterMark != 0 else { return true }
+    var probe = 0
+    let sp = withUnsafePointer(to: &probe) { UInt(bitPattern: $0) }
+    return sp > lowWaterMark
+}
 
 /// Bytecode Virtual Machine for executing compiled IR policies
 internal struct VM {
@@ -13,17 +48,19 @@ internal struct VM {
 }
 
 extension VM {
-    /// Execute a bytecode plan
-    func executePlan(
+    /// Execute a bytecode plan synchronously. `data` is the `/data` document, read by the caller.
+    /// Synchronous builtins run inline; asynchronous builtins block the current thread (see
+    /// `execCall`), so callers that may hit one must run this off the cooperative pool.
+    func executeSync(
         withContext ctx: EvaluationContext,
-        planIndex: Int
-    ) async throws -> ResultSet {
+        planIndex: Int,
+        data: AST.RegoValue
+    ) throws -> ResultSet {
         guard planIndex < policy.plans.count else {
             throw Error.invalidPayloadLength
         }
 
         let plan = policy.plans[planIndex]
-        let data = try await ctx.store.read(from: StoreKeyPath(["data"]))
         let vmContext = VMContext(
             evaluationContext: ctx,
             policy: policy,
@@ -32,7 +69,7 @@ extension VM {
         )
 
         for block in plan.blocks {
-            let blockResult = try await executeBlock(
+            let blockResult = try executeBlock(
                 context: vmContext,
                 offset: block.offset,
                 size: block.size
@@ -52,11 +89,11 @@ extension VM {
     internal func executeBlocks(
         context: VMContext,
         blocks: [(offset: Int, size: Int)]
-    ) async throws -> BlockResult {
+    ) throws -> BlockResult {
         var functionReturnValue: AST.RegoValue?
 
         for block in blocks {
-            let blockResult = try await executeBlock(
+            let blockResult = try executeBlock(
                 context: context,
                 offset: block.offset,
                 size: block.size
@@ -83,9 +120,9 @@ extension VM {
         context: VMContext,
         function: Function,
         args: [AST.RegoValue]
-    ) async throws -> AST.RegoValue {
+    ) throws -> AST.RegoValue {
         context.callDepth += 1
-        guard context.callDepth <= context.maxCallDepth else {
+        guard context.callDepth <= context.maxCallDepth, hasStackHeadroom(context.stackLowWaterMark) else {
             context.callDepth -= 1
             throw RegoError(code: .internalError, message: "max call depth exceeded")
         }
@@ -113,7 +150,7 @@ extension VM {
         }
 
         // Execute function blocks
-        let result = try await executeBlocks(context: context, blocks: function.blocks)
+        let result = try executeBlocks(context: context, blocks: function.blocks)
 
         // Return explicit ReturnLocal value; undefined if none
         let returnValue = result.functionReturnValue ?? .undefined
@@ -126,7 +163,7 @@ extension VM {
         context: VMContext,
         offset: Int,
         size: Int
-    ) async throws -> BlockResult {
+    ) throws -> BlockResult {
         let bytecode = policy.bytecode
         var pc = offset
         let endOffset = offset + size
@@ -198,14 +235,14 @@ extension VM {
                 result = try execAssignVar(context: context, payload: bytecode, start: payloadStart, length: length)
             // Control flow
             case Int(Opcode.block.rawValue):
-                result = try await execBlockStmt(
+                result = try execBlockStmt(
                     context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.break.rawValue):
                 result = try execBreak(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.call.rawValue):
-                result = try await execCall(context: context, payload: bytecode, start: payloadStart, length: length)
+                result = try execCall(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.callDynamic.rawValue):
-                result = try await execCallDynamic(
+                result = try execCallDynamic(
                     context: context, payload: bytecode, start: payloadStart, length: length)
             // Operations
             case Int(Opcode.dot.rawValue):
@@ -245,7 +282,7 @@ extension VM {
             case Int(Opcode.notEqual.rawValue):
                 result = try execNotEqual(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.not.rawValue):
-                result = try await execNot(context: context, payload: bytecode, start: payloadStart, length: length)
+                result = try execNot(context: context, payload: bytecode, start: payloadStart, length: length)
             // Object operations
             case Int(Opcode.objectInsertOnce.rawValue):
                 result = try execObjectInsertOnce(
@@ -263,14 +300,14 @@ extension VM {
                 result = try execReturnLocal(context: context, payload: bytecode, start: payloadStart, length: length)
             // Collection operations
             case Int(Opcode.scan.rawValue):
-                result = try await execScan(context: context, payload: bytecode, start: payloadStart, length: length)
+                result = try execScan(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.setAdd.rawValue):
                 result = try execSetAdd(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.with.rawValue):
-                result = try await execWith(context: context, payload: bytecode, start: payloadStart, length: length)
+                result = try execWith(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.block1.rawValue):
                 // Inline block1 to avoid an extra async activation record for the single sub-block call.
-                let innerResult = try await executeBlock(context: context, offset: payloadStart, size: length)
+                let innerResult = try executeBlock(context: context, offset: payloadStart, size: length)
                 if innerResult.shouldBreak {
                     result = innerResult.breakByOne()
                 }
@@ -313,6 +350,9 @@ internal final class VMContext {
 
     var maxCallDepth: Int = 16_384
     var callDepth: Int = 0
+    /// Lowest stack address the VM may touch before throwing (guards native-recursion overflow).
+    /// 0 disables the guard (non-pthread platforms), leaving `maxCallDepth` as the only bound.
+    let stackLowWaterMark: UInt
     // Flat memo cache for the current scope; only pushed/popped by `with` opcodes.
     // Keeping it as a direct field avoids the isEmpty guard and array index arithmetic
     // on every 2-arg function call in execCall's fast path.
@@ -357,6 +397,9 @@ internal final class VMContext {
             policy.hasBuiltins
             ? Ptr<RandomNumberGenerator>(toCopyOf: SystemRandomNumberGenerator())
             : VMContext.noopRand
+
+        // Computed on the executing thread so the guard adapts to its actual stack size.
+        self.stackLowWaterMark = computeStackLowWaterMark(headroom: 256 * 1024)
     }
 
     /// Resolve a local variable.

@@ -23,6 +23,9 @@ extension OPA {
         // Custom builtins that are specified along the default builtins
         private var customBuiltins: [String: Builtin] = [:]
 
+        // Custom synchronous builtins. These can run on the synchronous eval path.
+        private var customSyncBuiltins: [String: SyncBuiltin] = [:]
+
         // Bundle-owned `/data` subtrees written by the most recent
         // `prepareForEvaluation(query:)` call. The next prepare call uses
         // this set (along with the new prepare's roots) to decide which
@@ -45,11 +48,13 @@ extension OPA.Engine {
     public init(
         bundlePaths: [BundlePath],
         capabilities: CapabilitiesInput? = nil,
-        customBuiltins: [String: Builtin] = [:]
+        customBuiltins: [String: Builtin] = [:],
+        customSyncBuiltins: [String: SyncBuiltin] = [:]
     ) {
         self.bundlePaths = bundlePaths
         self.capabilities = capabilities
         self.customBuiltins = customBuiltins
+        self.customSyncBuiltins = customSyncBuiltins
     }
 
     /// Initializes the OPA engine with in-memory bundles.
@@ -64,11 +69,13 @@ extension OPA.Engine {
     public init(
         bundles: [String: OPA.Bundle],
         capabilities: CapabilitiesInput? = nil,
-        customBuiltins: [String: Builtin] = [:]
+        customBuiltins: [String: Builtin] = [:],
+        customSyncBuiltins: [String: SyncBuiltin] = [:]
     ) {
         self.bundles = BundleCache(bundles: bundles)
         self.capabilities = capabilities
         self.customBuiltins = customBuiltins
+        self.customSyncBuiltins = customSyncBuiltins
     }
 
     /// Initializes the OPA engine with raw IR policies and a data store, useful for testing.
@@ -85,12 +92,14 @@ extension OPA.Engine {
         policies: [IR.Policy],
         store: any OPA.Store,
         capabilities: CapabilitiesInput? = nil,
-        customBuiltins: [String: Builtin] = [:]
+        customBuiltins: [String: Builtin] = [:],
+        customSyncBuiltins: [String: SyncBuiltin] = [:]
     ) {
         self.policies = policies
         self.store = store
         self.capabilities = capabilities
         self.customBuiltins = customBuiltins
+        self.customSyncBuiltins = customSyncBuiltins
     }
 
     /// A PreparedQuery represents a query that has been prepared for evaluation.
@@ -102,6 +111,8 @@ extension OPA.Engine {
         let evaluator: any Evaluator
         let store: any OPA.Store
         let builtinRegistry: BuiltinRegistry
+        /// True if the prepared policies reference any async builtin. When false, ``evaluateSync(input:tracer:strictBuiltins:)`` is available.
+        let hasAsyncBuiltins: Bool
 
         /// Returns the result of evaluating the prepared query against the given input.
         ///
@@ -121,10 +132,49 @@ extension OPA.Engine {
                 store: self.store,
                 builtins: self.builtinRegistry,
                 tracer: tracer,
-                strictBuiltins: strictBuiltins
+                strictBuiltins: strictBuiltins,
+                hasAsyncBuiltins: self.hasAsyncBuiltins
             )
 
             return try await self.evaluator.evaluate(withContext: ctx)
+        }
+
+        /// Synchronously evaluates the prepared query against the given input.
+        ///
+        /// This avoids all async overhead and is callable from synchronous code. It requires
+        /// that the prepared policies use no async builtins and that the store conforms to
+        /// ``OPA/SyncStore`` (the default ``OPA/InMemoryStore`` does). Otherwise it throws
+        /// ``RegoError/Code/syncEvaluationUnsupported``; use ``evaluate(input:tracer:strictBuiltins:)`` instead.
+        ///
+        /// - Parameters:
+        ///   - input: The input data to evaluate the query against.
+        ///   - tracer: (optional) The tracer to use for this evaluation.
+        ///   - strictBuiltins: (optional) Whether to run in strict builtin evaluation mode.
+        public func evaluateSync(
+            input: AST.RegoValue = .undefined,
+            tracer: OPA.Trace.QueryTracer? = nil,
+            strictBuiltins: Bool = false
+        ) throws -> ResultSet {
+            guard !self.hasAsyncBuiltins else {
+                throw RegoError(
+                    code: .syncEvaluationUnsupported,
+                    message: "query references async builtins; use evaluate(...) instead")
+            }
+            guard let syncStore = self.store as? any OPA.SyncStore else {
+                throw RegoError(
+                    code: .syncEvaluationUnsupported,
+                    message: "store does not support synchronous reads; use evaluate(...) instead")
+            }
+            let data = try syncStore.readSync(from: StoreKeyPath(["data"]))
+            let ctx = EvaluationContext(
+                query: self.query,
+                input: input,
+                store: self.store,
+                builtins: self.builtinRegistry,
+                tracer: tracer,
+                strictBuiltins: strictBuiltins
+            )
+            return try self.evaluator.evaluateSync(withContext: ctx, data: data)
         }
     }
 
@@ -154,9 +204,13 @@ extension OPA.Engine {
     /// - Returns: A PreparedQuery that can be used to evaluate the given query.
     /// - Throws: `RegoError` if bundles fail to load, collide, or if capabilities/builtins validation fails.
     public mutating func prepareForEvaluation(query: String) async throws -> PreparedQuery {
-        // Merge default and custom builtins, throw appropriate error in case of name conflict
+        // Merge default and custom builtins, throw appropriate error in case of name conflict.
+        // Custom names must not collide with the defaults or with each other (sync vs async).
         let registryBuiltins = BuiltinRegistry.defaultRegistry.builtins
-        let conflictingBuiltins = Set(self.customBuiltins.keys).intersection(registryBuiltins.keys)
+        let customNames = Set(self.customBuiltins.keys).union(self.customSyncBuiltins.keys)
+        let conflictingBuiltins =
+            customNames.intersection(registryBuiltins.keys)
+            .union(Set(self.customBuiltins.keys).intersection(self.customSyncBuiltins.keys))
         guard conflictingBuiltins.isEmpty else {
             throw RegoError(
                 code: .ambiguousBuiltinError,
@@ -164,10 +218,9 @@ extension OPA.Engine {
                     "encountered conflicting builtin names between custom and default builtins: \(conflictingBuiltins)"
             )
         }
-        let builtins = self.customBuiltins.merging(
-            registryBuiltins,
-            uniquingKeysWith: { $1 }  // should never happen, see guard above
-        )
+        var builtins: [String: AnyBuiltin] = registryBuiltins
+        for (name, builtin) in self.customBuiltins { builtins[name] = .async(builtin) }
+        for (name, builtin) in self.customSyncBuiltins { builtins[name] = .sync(builtin) }
         let mergedBuiltinRegistry = BuiltinRegistry(builtins: builtins)
 
         // Bundles supplied via `init(bundles:)` live in `self.bundles` and are
@@ -312,11 +365,23 @@ extension OPA.Engine {
         try await Self.verifyCapabilitiesAndBuiltIns(
             capabilities: self.capabilities, builtins: builtins, evaluator: evaluator)
 
+        // Determine whether any referenced builtin is async; gates the synchronous eval path.
+        var hasAsyncBuiltins = false
+        asyncScan: for policy in evaluator.policies {
+            for fn in policy.builtinFuncs {
+                if case .async? = builtins[fn.name] {
+                    hasAsyncBuiltins = true
+                    break asyncScan
+                }
+            }
+        }
+
         return PreparedQuery(
             query: query,
             evaluator: evaluator,
             store: self.store,
-            builtinRegistry: mergedBuiltinRegistry
+            builtinRegistry: mergedBuiltinRegistry,
+            hasAsyncBuiltins: hasAsyncBuiltins
         )
     }
 

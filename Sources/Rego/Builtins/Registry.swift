@@ -1,7 +1,17 @@
 import AST
 import Foundation
 
+/// An asynchronous builtin. Use for custom builtins that perform async work; default builtins are synchronous.
 public typealias Builtin = @Sendable (BuiltinContext, [AST.RegoValue]) async throws -> AST.RegoValue
+
+/// A synchronous builtin. All default builtins are synchronous and run inline on the fast path.
+public typealias SyncBuiltin = @Sendable (BuiltinContext, [AST.RegoValue]) throws -> AST.RegoValue
+
+/// A registered builtin, either synchronous (invoked inline) or asynchronous (suspends evaluation).
+enum AnyBuiltin: Sendable {
+    case sync(SyncBuiltin)
+    case async(Builtin)
+}
 
 public struct BuiltinContext {
     public let location: OPA.Trace.Location
@@ -53,16 +63,28 @@ public struct BuiltinContext {
 }
 
 public struct BuiltinRegistry: Sendable {
-    let builtins: [String: Builtin]
+    let builtins: [String: AnyBuiltin]
+
+    init(builtins: [String: AnyBuiltin]) {
+        self.builtins = builtins
+    }
+
+    /// Builds a registry from synchronous builtins.
+    init(syncBuiltins: [String: SyncBuiltin]) {
+        self.builtins = syncBuiltins.mapValues(AnyBuiltin.sync)
+    }
+
+    /// Builds a registry from asynchronous builtins. Retained for source compatibility.
+    init(builtins: [String: Builtin]) {
+        self.builtins = builtins.mapValues(AnyBuiltin.async)
+    }
 
     // defaultRegistry is the BuiltinRegistry with all capabilities enabled
     public static var defaultRegistry: BuiltinRegistry {
-        BuiltinRegistry(
-            builtins: BuiltinRegistry.defaultBuiltins
-        )
+        BuiltinRegistry(syncBuiltins: BuiltinRegistry.defaultBuiltins)
     }
 
-    internal static var defaultBuiltins: [String: Builtin] {
+    internal static var defaultBuiltins: [String: SyncBuiltin] {
         return [
             // Aggregates
             "count": BuiltinFuncs.count,
@@ -224,7 +246,7 @@ public struct BuiltinRegistry: Sendable {
         ]
     }
 
-    public subscript(name: String) -> Builtin? {
+    subscript(name: String) -> AnyBuiltin? {
         self.builtins[name]
     }
 
@@ -238,7 +260,12 @@ public struct BuiltinRegistry: Sendable {
             throw RegistryError.builtinNotFound(name: name)
         }
         do {
-            return try await builtin(ctx, args)
+            switch builtin {
+            case .sync(let f):
+                return try f(ctx, args)
+            case .async(let f):
+                return try await f(ctx, args)
+            }
         } catch {
             if BuiltinError.isHaltError(error) {
                 // halt errors mean we propagate, always.

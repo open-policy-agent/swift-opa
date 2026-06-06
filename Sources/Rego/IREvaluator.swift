@@ -170,7 +170,35 @@ extension IREvaluator: Evaluator {
             throw RegoError(code: .unknownQuery, message: "query not found in plan: \(ctx.query)")
         }
         let vm = VM(policy: policies[hit.policyIdx])
-        return try await vm.executePlan(withContext: ctx, planIndex: hit.planIdx)
+        let data = try await ctx.store.read(from: StoreKeyPath(["data"]))
+
+        // Sync-builtin policies run inline. Async-builtin policies block on `blockingInvoke`,
+        // so run them on a dedicated thread to keep the cooperative pool free.
+        if ctx.hasAsyncBuiltins {
+            let payload = UncheckedSendable((vm, ctx, hit.planIdx, data))
+            return try await withCheckedThrowingContinuation { (cont: CheckedContinuation<ResultSet, Swift.Error>) in
+                let thread = Thread {
+                    let (vm, ctx, planIdx, data) = payload.value
+                    do {
+                        cont.resume(returning: try vm.executeSync(withContext: ctx, planIndex: planIdx, data: data))
+                    } catch {
+                        cont.resume(throwing: error)
+                    }
+                }
+                thread.stackSize = 16 << 20
+                thread.start()
+            }
+        }
+        return try vm.executeSync(withContext: ctx, planIndex: hit.planIdx, data: data)
+    }
+
+    func evaluateSync(withContext ctx: EvaluationContext, data: AST.RegoValue) throws -> ResultSet {
+        let entrypoint = try queryToEntryPoint(ctx.query)
+        guard let hit = planIndex[entrypoint] else {
+            throw RegoError(code: .unknownQuery, message: "query not found in plan: \(ctx.query)")
+        }
+        let vm = VM(policy: policies[hit.policyIdx])
+        return try vm.executeSync(withContext: ctx, planIndex: hit.planIdx, data: data)
     }
 }
 

@@ -9,7 +9,7 @@ extension BuiltinFuncs {
         [UnicodeScalar(0x0B), UnicodeScalar(0x0C), UnicodeScalar(0x85), UnicodeScalar(0xA0)]
     )
 
-    static func anyPrefixMatch(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func anyPrefixMatch(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -40,7 +40,7 @@ extension BuiltinFuncs {
         return .boolean(false)
     }
 
-    static func anySuffixMatch(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func anySuffixMatch(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -71,7 +71,7 @@ extension BuiltinFuncs {
         return .boolean(false)
     }
 
-    static func concat(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func concat(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -104,7 +104,7 @@ extension BuiltinFuncs {
         }
     }
 
-    static func contains(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func contains(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -174,7 +174,7 @@ extension BuiltinFuncs {
         return false
     }
 
-    static func stringsCount(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func stringsCount(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -196,7 +196,7 @@ extension BuiltinFuncs {
         return .number(RegoNumber(value: occurrences))
     }
 
-    static func endsWith(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func endsWith(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -235,7 +235,7 @@ extension BuiltinFuncs {
         return .boolean(search.utf8.suffix(baseCount).elementsEqual(base.utf8))
     }
 
-    static func formatInt(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func formatInt(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -269,7 +269,7 @@ extension BuiltinFuncs {
         return .string(String(roundedNum, radix: Int(radix)))
     }
 
-    static func indexOf(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func indexOf(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -294,7 +294,7 @@ extension BuiltinFuncs {
         return .number(RegoNumber(value: haystack.distance(from: haystack.startIndex, to: range.lowerBound)))
     }
 
-    static func indexOfN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func indexOfN(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -317,7 +317,7 @@ extension BuiltinFuncs {
             ranges.map({ .number(RegoNumber(value: haystack.distance(from: haystack.startIndex, to: $0.lowerBound))) }))
     }
 
-    static func lower(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func lower(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -330,7 +330,7 @@ extension BuiltinFuncs {
     }
 
     // split returns an array containing elements of the input string split on a delimiter
-    static func split(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func split(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -354,7 +354,7 @@ extension BuiltinFuncs {
         return .array(parts.map { .string(String($0)) })
     }
 
-    static func replace(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func replace(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 3 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
         }
@@ -374,7 +374,7 @@ extension BuiltinFuncs {
         return .string(x.replacingOccurrences(of: old, with: new))
     }
 
-    static func replaceN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func replaceN(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -435,7 +435,7 @@ extension BuiltinFuncs {
         return .string(String(bytes: result, encoding: .utf8) ?? value)
     }
 
-    static func reverse(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func reverse(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -447,7 +447,7 @@ extension BuiltinFuncs {
         return .string(String(String.UnicodeScalarView(value.unicodeScalars.reversed())))
     }
 
-    static func sprintf(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func sprintf(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -463,7 +463,7 @@ extension BuiltinFuncs {
         return .string(sprintfRegoValuesMostlyLikeHowGoDoes(format, values))
     }
 
-    static func startsWith(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func startsWith(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -480,7 +480,7 @@ extension BuiltinFuncs {
         return .boolean(search.utf8.starts(with: base.utf8))
     }
 
-    static func substring(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func substring(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 3 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
         }
@@ -523,7 +523,7 @@ extension BuiltinFuncs {
     }
 
     // trim returns value with all leading or trailing instances of the cutset characters removed.
-    static func trim(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func trim(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -540,7 +540,7 @@ extension BuiltinFuncs {
         return .string(trimmedValue)
     }
 
-    static func trimLeft(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func trimLeft(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -562,7 +562,7 @@ extension BuiltinFuncs {
         return .string(String(trimmedValue))
     }
 
-    static func trimPrefix(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func trimPrefix(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -581,7 +581,7 @@ extension BuiltinFuncs {
         return .string(String(value.dropFirst(prefix.count)))
     }
 
-    static func trimRight(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func trimRight(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -609,7 +609,7 @@ extension BuiltinFuncs {
         return .string(String(value[..<idx]))
     }
 
-    static func trimSpace(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func trimSpace(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -622,7 +622,7 @@ extension BuiltinFuncs {
         return .string(trimmedValue)
     }
 
-    static func trimSuffix(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func trimSuffix(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -641,7 +641,7 @@ extension BuiltinFuncs {
         return .string(String(value.dropLast(suffix.count)))
     }
 
-    static func upper(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func upper(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -653,7 +653,7 @@ extension BuiltinFuncs {
         return .string(x.uppercased())
     }
 
-    static func templateString(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func templateString(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -683,7 +683,7 @@ extension BuiltinFuncs {
             }.joined())
     }
 
-    static func renderTemplate(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func renderTemplate(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }

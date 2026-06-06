@@ -1387,12 +1387,16 @@ struct StatementTests {
         let plan = vmCtx.policy.plans[0]
         let block = plan.blocks[0]
 
-        let result = await Result {
-            try await vm.executeBlock(
-                context: vmCtx,
-                offset: block.offset,
-                size: block.size
-            )
+        let result: Result<BlockResult, Swift.Error>
+        do {
+            result = .success(
+                try vm.executeBlock(
+                    context: vmCtx,
+                    offset: block.offset,
+                    size: block.size
+                ))
+        } catch {
+            result = .failure(error)
         }
 
         guard !tc.expectError else {

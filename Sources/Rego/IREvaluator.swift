@@ -164,13 +164,38 @@ internal struct IREvaluator {
 }
 
 extension IREvaluator: Evaluator {
-    func evaluate(withContext ctx: EvaluationContext, builtins: [[Builtin?]]) async throws -> ResultSet {
+    func evaluate(withContext ctx: EvaluationContext, builtins: [[AnyBuiltin?]]) async throws -> ResultSet {
         let entrypoint = try queryToEntryPoint(ctx.query)
         guard let hit = planIndex[entrypoint] else {
             throw RegoError(code: .unknownQuery, message: "query not found in plan: \(ctx.query)")
         }
         let vm = VM(policy: policies[hit.policyIdx])
-        return try await vm.executePlan(withContext: ctx, planIndex: hit.planIdx, builtins: builtins[hit.policyIdx])
+        let resolved = builtins[hit.policyIdx]
+        let data = try await ctx.store.read(from: StoreKeyPath(["data"]))
+
+        // Sync-builtin policies run inline. Async-builtin policies block on `blockingInvoke`,
+        // so run them on a dedicated thread to keep the cooperative pool free.
+        if ctx.hasAsyncBuiltins {
+            return try await vm.executeSyncOnDedicatedThread(
+                withContext: ctx, planIndex: hit.planIdx, data: data, builtins: resolved)
+        }
+        // Inline on the calling task's thread; honor its cancellation. (`evaluateSync` keeps the
+        // zero-cost default since a synchronous caller cannot cancel mid-call.)
+        return try vm.executeSync(
+            withContext: ctx, planIndex: hit.planIdx, data: data, builtins: resolved,
+            isCancelled: { Task.isCancelled })
+    }
+
+    func evaluateSync(withContext ctx: EvaluationContext, data: AST.RegoValue, builtins: [[AnyBuiltin?]]) throws
+        -> ResultSet
+    {
+        let entrypoint = try queryToEntryPoint(ctx.query)
+        guard let hit = planIndex[entrypoint] else {
+            throw RegoError(code: .unknownQuery, message: "query not found in plan: \(ctx.query)")
+        }
+        let vm = VM(policy: policies[hit.policyIdx])
+        return try vm.executeSync(
+            withContext: ctx, planIndex: hit.planIdx, data: data, builtins: builtins[hit.policyIdx])
     }
 }
 

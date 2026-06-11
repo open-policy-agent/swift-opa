@@ -30,6 +30,7 @@ public struct RegoError: Sendable, Swift.Error {
             case unknownDynamicFunction
             case unknownQuery
             case unsupportedQuery
+            case syncEvaluationUnsupported
 
             // Store errors
             case storePathNotFound
@@ -73,6 +74,9 @@ public struct RegoError: Sendable, Swift.Error {
         public static let unknownDynamicFunction = Code(.unknownDynamicFunction)
         public static let unknownQuery = Code(.unknownQuery)
         public static let unsupportedQuery = Code(.unsupportedQuery)
+        /// `evaluateSync` was called for a query that cannot run synchronously: it references an
+        /// async builtin, or its store does not conform to ``OPA/SyncStore``.
+        public static let syncEvaluationUnsupported = Code(.syncEvaluationUnsupported)
 
         // Store errors
         public static let storePathNotFound = Code(.storePathNotFound)

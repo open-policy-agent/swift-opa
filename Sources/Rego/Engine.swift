@@ -23,12 +23,21 @@ extension OPA {
         // Custom builtins that are specified along the default builtins
         private var customBuiltins: [String: Builtin] = [:]
 
+        // Custom synchronous builtins. These can run on the synchronous eval path.
+        private var customSyncBuiltins: [String: SyncBuiltin] = [:]
+
         // Bundle-owned `/data` subtrees written by the most recent
         // `prepareForEvaluation(query:)` call. The next prepare call uses
         // this set (along with the new prepare's roots) to decide which
         // subtrees to erase before writing fresh bundle data into the store.
         // User data outside this set survives across prepare calls.
         private var lastWrittenBundleRoots: Set<StoreKeyPath> = []
+
+        private var maxCallDepth: Int = OPA.Engine.defaultMaxCallDepth
+
+        /// Default recursion limit. Conservative so evaluation stays safe on small caller stacks
+        /// (e.g. a `Task` on the cooperative pool); raise it for deeply-recursive policies.
+        public static let defaultMaxCallDepth = 32
     }
 }
 
@@ -42,14 +51,21 @@ extension OPA.Engine {
     ///   - customBuiltins: Additional builtins to register alongside the default Rego builtins.
     ///                     See https://www.openpolicyagent.org/docs/policy-reference/builtins
     ///                     Conflicts are validated during ``prepareForEvaluation(query:)``.
+    ///   - customSyncBuiltins: Additional synchronous builtins (usable on the ``PreparedQuery/evaluateSync(input:tracer:strictBuiltins:)``
+    ///                     path). A name may not appear in both `customBuiltins` and `customSyncBuiltins`,
+    ///                     nor collide with a default builtin; such conflicts throw during ``prepareForEvaluation(query:)``.
     public init(
         bundlePaths: [BundlePath],
         capabilities: CapabilitiesInput? = nil,
-        customBuiltins: [String: Builtin] = [:]
+        customBuiltins: [String: Builtin] = [:],
+        customSyncBuiltins: [String: SyncBuiltin] = [:],
+        maxCallDepth: Int = OPA.Engine.defaultMaxCallDepth
     ) {
         self.bundlePaths = bundlePaths
         self.capabilities = capabilities
         self.customBuiltins = customBuiltins
+        self.customSyncBuiltins = customSyncBuiltins
+        self.maxCallDepth = maxCallDepth
     }
 
     /// Initializes the OPA engine with in-memory bundles.
@@ -61,14 +77,21 @@ extension OPA.Engine {
     ///   - customBuiltins: Additional builtins to register alongside the default Rego builtins.
     ///                     See https://www.openpolicyagent.org/docs/policy-reference/builtins
     ///                     Conflicts are validated during ``prepareForEvaluation(query:)``.
+    ///   - customSyncBuiltins: Additional synchronous builtins (usable on the ``PreparedQuery/evaluateSync(input:tracer:strictBuiltins:)``
+    ///                     path). A name may not appear in both `customBuiltins` and `customSyncBuiltins`,
+    ///                     nor collide with a default builtin; such conflicts throw during ``prepareForEvaluation(query:)``.
     public init(
         bundles: [String: OPA.Bundle],
         capabilities: CapabilitiesInput? = nil,
-        customBuiltins: [String: Builtin] = [:]
+        customBuiltins: [String: Builtin] = [:],
+        customSyncBuiltins: [String: SyncBuiltin] = [:],
+        maxCallDepth: Int = OPA.Engine.defaultMaxCallDepth
     ) {
         self.bundles = BundleCache(bundles: bundles)
         self.capabilities = capabilities
         self.customBuiltins = customBuiltins
+        self.customSyncBuiltins = customSyncBuiltins
+        self.maxCallDepth = maxCallDepth
     }
 
     /// Initializes the OPA engine with raw IR policies and a data store, useful for testing.
@@ -81,16 +104,23 @@ extension OPA.Engine {
     ///   - customBuiltins: Additional builtins to register alongside the default Rego builtins.
     ///                     See https://www.openpolicyagent.org/docs/policy-reference/builtins
     ///                     Conflicts are validated during ``prepareForEvaluation(query:)``.
+    ///   - customSyncBuiltins: Additional synchronous builtins (usable on the ``PreparedQuery/evaluateSync(input:tracer:strictBuiltins:)``
+    ///                     path). A name may not appear in both `customBuiltins` and `customSyncBuiltins`,
+    ///                     nor collide with a default builtin; such conflicts throw during ``prepareForEvaluation(query:)``.
     public init(
         policies: [IR.Policy],
         store: any OPA.Store,
         capabilities: CapabilitiesInput? = nil,
-        customBuiltins: [String: Builtin] = [:]
+        customBuiltins: [String: Builtin] = [:],
+        customSyncBuiltins: [String: SyncBuiltin] = [:],
+        maxCallDepth: Int = OPA.Engine.defaultMaxCallDepth
     ) {
         self.policies = policies
         self.store = store
         self.capabilities = capabilities
         self.customBuiltins = customBuiltins
+        self.customSyncBuiltins = customSyncBuiltins
+        self.maxCallDepth = maxCallDepth
     }
 
     /// A PreparedQuery represents a query that has been prepared for evaluation.
@@ -103,7 +133,10 @@ extension OPA.Engine {
         let store: any OPA.Store
         let builtinRegistry: BuiltinRegistry
         /// Builtin functions pre-resolved by string table index for each policy.
-        let builtins: [[Builtin?]]
+        let builtins: [[AnyBuiltin?]]
+        /// True if the prepared policies reference any async builtin. When false, ``evaluateSync(input:tracer:strictBuiltins:)`` is available.
+        let hasAsyncBuiltins: Bool
+        let maxCallDepth: Int
 
         /// Returns the result of evaluating the prepared query against the given input.
         ///
@@ -123,9 +156,50 @@ extension OPA.Engine {
                 store: self.store,
                 builtins: self.builtinRegistry,
                 tracer: tracer,
-                strictBuiltins: strictBuiltins
+                strictBuiltins: strictBuiltins,
+                hasAsyncBuiltins: self.hasAsyncBuiltins,
+                maxCallDepth: self.maxCallDepth
             )
             return try await self.evaluator.evaluate(withContext: ctx, builtins: self.builtins)
+        }
+
+        /// Synchronously evaluates the prepared query against the given input.
+        ///
+        /// This avoids all async overhead and is callable from synchronous code. It requires
+        /// that the prepared policies use no async builtins and that the store conforms to
+        /// ``OPA/SyncStore`` (the default ``OPA/InMemoryStore`` does). Otherwise it throws
+        /// ``RegoError/Code/syncEvaluationUnsupported``; use ``evaluate(input:tracer:strictBuiltins:)`` instead.
+        ///
+        /// - Parameters:
+        ///   - input: The input data to evaluate the query against.
+        ///   - tracer: (optional) The tracer to use for this evaluation.
+        ///   - strictBuiltins: (optional) Whether to run in strict builtin evaluation mode.
+        public func evaluateSync(
+            input: AST.RegoValue = .undefined,
+            tracer: OPA.Trace.QueryTracer? = nil,
+            strictBuiltins: Bool = false
+        ) throws -> ResultSet {
+            guard !self.hasAsyncBuiltins else {
+                throw RegoError(
+                    code: .syncEvaluationUnsupported,
+                    message: "query references async builtins; use evaluate(...) instead")
+            }
+            guard let syncStore = self.store as? any OPA.SyncStore else {
+                throw RegoError(
+                    code: .syncEvaluationUnsupported,
+                    message: "store does not support synchronous reads; use evaluate(...) instead")
+            }
+            let data = try syncStore.readSync(from: StoreKeyPath(["data"]))
+            let ctx = EvaluationContext(
+                query: self.query,
+                input: input,
+                store: self.store,
+                builtins: self.builtinRegistry,
+                tracer: tracer,
+                strictBuiltins: strictBuiltins,
+                maxCallDepth: self.maxCallDepth
+            )
+            return try self.evaluator.evaluateSync(withContext: ctx, data: data, builtins: self.builtins)
         }
     }
 
@@ -155,9 +229,13 @@ extension OPA.Engine {
     /// - Returns: A PreparedQuery that can be used to evaluate the given query.
     /// - Throws: `RegoError` if bundles fail to load, collide, or if capabilities/builtins validation fails.
     public mutating func prepareForEvaluation(query: String) async throws -> PreparedQuery {
-        // Merge default and custom builtins, throw appropriate error in case of name conflict
+        // Merge default and custom builtins, throw appropriate error in case of name conflict.
+        // Custom names must not collide with the defaults or with each other (sync vs async).
         let registryBuiltins = BuiltinRegistry.defaultRegistry.builtins
-        let conflictingBuiltins = Set(self.customBuiltins.keys).intersection(registryBuiltins.keys)
+        let customNames = Set(self.customBuiltins.keys).union(self.customSyncBuiltins.keys)
+        let conflictingBuiltins =
+            customNames.intersection(registryBuiltins.keys)
+            .union(Set(self.customBuiltins.keys).intersection(self.customSyncBuiltins.keys))
         guard conflictingBuiltins.isEmpty else {
             throw RegoError(
                 code: .ambiguousBuiltinError,
@@ -165,10 +243,9 @@ extension OPA.Engine {
                     "encountered conflicting builtin names between custom and default builtins: \(conflictingBuiltins)"
             )
         }
-        let builtins = self.customBuiltins.merging(
-            registryBuiltins,
-            uniquingKeysWith: { $1 }  // should never happen, see guard above
-        )
+        var builtins: [String: AnyBuiltin] = registryBuiltins
+        for (name, builtin) in self.customBuiltins { builtins[name] = .async(builtin) }
+        for (name, builtin) in self.customSyncBuiltins { builtins[name] = .sync(builtin) }
         let mergedBuiltinRegistry = BuiltinRegistry(builtins: builtins)
 
         // Bundles supplied via `init(bundles:)` live in `self.bundles` and are
@@ -313,12 +390,25 @@ extension OPA.Engine {
         try await Self.verifyCapabilitiesAndBuiltIns(
             capabilities: self.capabilities, builtins: builtins, evaluator: evaluator)
 
+        // Determine whether any referenced builtin is async; gates the synchronous eval path.
+        var hasAsyncBuiltins = false
+        asyncScan: for policy in evaluator.policies {
+            for fn in policy.builtinFuncs {
+                if case .async? = builtins[fn.name] {
+                    hasAsyncBuiltins = true
+                    break asyncScan
+                }
+            }
+        }
+
         return PreparedQuery(
             query: query,
             evaluator: evaluator,
             store: self.store,
             builtinRegistry: mergedBuiltinRegistry,
-            builtins: evaluator.policies.map { policy in policy.strings.map { mergedBuiltinRegistry[$0] } }
+            builtins: evaluator.policies.map { policy in policy.strings.map { mergedBuiltinRegistry[$0] } },
+            hasAsyncBuiltins: hasAsyncBuiltins,
+            maxCallDepth: self.maxCallDepth
         )
     }
 

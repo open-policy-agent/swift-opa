@@ -19,6 +19,13 @@ extension OPA {
         mutating func remove(at: StoreKeyPath) async throws
     }
 
+    /// An ``OPA/Store`` that additionally supports synchronous reads, enabling `evaluateSync`.
+    public protocol SyncStore: Store {
+        /// Synchronously returns the value at the specified key path.
+        /// - Throws: an error if the path is not found in the store.
+        func readSync(from: StoreKeyPath) throws -> AST.RegoValue
+    }
+
     /// InMemoryStore is an in-memory implementation of ``OPA/Store``
     public struct InMemoryStore {
         private var data: AST.RegoValue = AST.RegoValue.object([:])
@@ -57,6 +64,21 @@ extension OPA.InMemoryStore: OPA.Store {
     }
 
     public func read(from path: StoreKeyPath) async throws -> AST.RegoValue {
+        return try readSync(from: path)
+    }
+
+    public mutating func write(to path: StoreKeyPath, value: AST.RegoValue) async throws {
+        // TODO this is not achieving our goal of thread safety
+        data = data.patch(with: value, at: path.segments)
+    }
+
+    public mutating func remove(at path: StoreKeyPath) async throws {
+        data = try applyRemove(data, at: path.segments[...], fullPath: path)
+    }
+}
+
+extension OPA.InMemoryStore: OPA.SyncStore {
+    public func readSync(from path: StoreKeyPath) throws -> AST.RegoValue {
         var current: AST.RegoValue = data
         for segment in path.segments {
             switch current {
@@ -76,15 +98,6 @@ extension OPA.InMemoryStore: OPA.Store {
         }
 
         return current
-    }
-
-    public mutating func write(to path: StoreKeyPath, value: AST.RegoValue) async throws {
-        // TODO this is not achieving our goal of thread safety
-        data = data.patch(with: value, at: path.segments)
-    }
-
-    public mutating func remove(at path: StoreKeyPath) async throws {
-        data = try applyRemove(data, at: path.segments[...], fullPath: path)
     }
 }
 

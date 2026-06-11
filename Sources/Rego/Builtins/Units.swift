@@ -2,7 +2,7 @@ import AST
 import Foundation
 
 extension BuiltinFuncs {
-    static func parseUnits(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func parseUnits(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doParse(
             ctx: ctx, args: args, allowedUnits: ConversionUnit.regularUnits, unitNormalizer: metricUnitNormalizer,
             returnInts: false,
@@ -12,7 +12,7 @@ extension BuiltinFuncs {
             msgNoSpacesAllowed: "spaces not allowed in resource strings")
     }
 
-    static func parseByteUnits(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    static func parseByteUnits(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         return try doParse(
             ctx: ctx, args: args,
             allowedUnits: ConversionUnit.specialByteUnits.merging(

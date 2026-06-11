@@ -45,6 +45,11 @@ public struct Static: Codable, Hashable, Sendable {
 public struct BuiltinFunc: Codable, Hashable, Sendable {
     package var name: String
     package var decl: AST.FunctionTypeDecl
+
+    package init(name: String, decl: AST.FunctionTypeDecl) {
+        self.name = name
+        self.decl = decl
+    }
 }
 
 public struct ConstString: Codable, Hashable, Sendable {

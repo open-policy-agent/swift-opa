@@ -7,34 +7,97 @@ import typealias IR.Local
 let localIdxInput = Local(0)
 let localIdxData = Local(1)
 
+/// A value handed off to a worker thread/task while the originating context waits for that work
+/// to finish. The originator never touches the value until the worker completes, so there is no
+/// concurrent access — which is what makes `@unchecked Sendable` sound here. File-scoped `private`
+/// so the escape hatch can't be reused casually elsewhere.
+private struct Handoff<T>: @unchecked Sendable {
+    let value: T
+    init(_ value: T) { self.value = value }
+}
+
+private final class BlockingResultBox: @unchecked Sendable {
+    var result: Result<AST.RegoValue, Swift.Error>?
+}
+
+/// A thread-safe one-shot cancellation flag used to bridge Swift task cancellation onto the
+/// dedicated VM thread, where `Task.isCancelled` is unavailable (no task context).
+final class CancellationFlag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var cancelled = false
+    func cancel() {
+        lock.lock()
+        cancelled = true
+        lock.unlock()
+    }
+    var isCancelled: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return cancelled
+    }
+}
+
+/// Invokes an async builtin from synchronous VM code by blocking the current thread until it
+/// completes. The async work runs on the cooperative pool, so the caller must block a thread that
+/// is NOT part of that pool — guaranteed by only reaching this when `canBlockForAsyncBuiltins` is
+/// set, i.e. on the dedicated thread from `executeSyncOnDedicatedThread`.
+func blockingInvoke(
+    _ builtin: @escaping Builtin,
+    _ ctx: BuiltinContext,
+    _ args: [AST.RegoValue]
+) throws -> AST.RegoValue {
+    let semaphore = DispatchSemaphore(value: 0)
+    let box = BlockingResultBox()
+    let payload = Handoff((builtin, ctx, args))
+    Task.detached {
+        let (builtin, ctx, args) = payload.value
+        do {
+            box.result = .success(try await builtin(ctx, args))
+        } catch {
+            box.result = .failure(error)
+        }
+        semaphore.signal()
+    }
+    // The semaphore signal/wait pair establishes the happens-before edge for reading `box.result`.
+    semaphore.wait()
+    return try box.result!.get()
+}
+
 /// Bytecode Virtual Machine for executing compiled IR policies
 internal struct VM {
     let policy: Policy
 }
 
 extension VM {
-    /// Execute a bytecode plan
-    func executePlan(
+    /// Execute a bytecode plan synchronously. `data` is the `/data` document, read by the caller.
+    /// Synchronous builtins run inline. Asynchronous builtins block the current thread, which is
+    /// only safe off the cooperative pool — so they are rejected unless `canBlockForAsyncBuiltins`
+    /// is set (the async evaluator sets it when running this on a dedicated thread).
+    func executeSync(
         withContext ctx: EvaluationContext,
         planIndex: Int,
-        builtins: [Builtin?] = []
-    ) async throws -> ResultSet {
+        data: AST.RegoValue,
+        builtins: [AnyBuiltin?] = [],
+        canBlockForAsyncBuiltins: Bool = false,
+        isCancelled: @escaping @Sendable () -> Bool = { false }
+    ) throws -> ResultSet {
         guard planIndex < policy.plans.count else {
             throw Error.invalidPayloadLength
         }
 
         let plan = policy.plans[planIndex]
-        let data = try await ctx.store.read(from: StoreKeyPath(["data"]))
         let vmContext = VMContext(
             evaluationContext: ctx,
             policy: policy,
             planMaxLocal: plan.maxLocal,
             data: data,
-            builtins: builtins
+            builtins: builtins,
+            canBlockForAsyncBuiltins: canBlockForAsyncBuiltins,
+            isCancelled: isCancelled
         )
 
         for block in plan.blocks {
-            let blockResult = try await executeBlock(
+            let blockResult = try executeBlock(
                 context: vmContext,
                 offset: block.offset,
                 size: block.size
@@ -50,15 +113,56 @@ extension VM {
         return vmContext.results
     }
 
+    /// Runs `executeSync` on a dedicated thread with a large stack. Used for policies that call
+    /// async builtins: blocking on those builtins (`blockingInvoke`) is then safe because the
+    /// thread is not part of the cooperative pool, and the generous stack gives recursion room.
+    ///
+    /// Tradeoffs: one fresh thread is spawned per such evaluation (no pooling); and because
+    /// `blockingInvoke` cannot interrupt an in-flight async builtin, cancellation is observed only
+    /// once that builtin returns and the VM polls again. Both are acceptable for the rare
+    /// async-builtin path; sync-builtin policies never take this route.
+    func executeSyncOnDedicatedThread(
+        withContext ctx: EvaluationContext,
+        planIndex: Int,
+        data: AST.RegoValue,
+        builtins: [AnyBuiltin?] = []
+    ) async throws -> ResultSet {
+        // `Task.isCancelled` is meaningless on the dedicated thread, so bridge cancellation via a
+        // flag the task-cancellation handler trips and the VM polls.
+        let cancellation = CancellationFlag()
+        let payload = Handoff((self, ctx, planIndex, data, builtins))
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { (cont: CheckedContinuation<ResultSet, Swift.Error>) in
+                let thread = Thread {
+                    let (vm, ctx, planIndex, data, builtins) = payload.value
+                    do {
+                        cont.resume(
+                            returning: try vm.executeSync(
+                                withContext: ctx, planIndex: planIndex, data: data,
+                                builtins: builtins,
+                                canBlockForAsyncBuiltins: true,
+                                isCancelled: { cancellation.isCancelled }))
+                    } catch {
+                        cont.resume(throwing: error)
+                    }
+                }
+                thread.stackSize = 16 << 20
+                thread.start()
+            }
+        } onCancel: {
+            cancellation.cancel()
+        }
+    }
+
     /// Execute multiple blocks, collecting function return values
     internal func executeBlocks(
         context: VMContext,
         blocks: [(offset: Int, size: Int)]
-    ) async throws -> BlockResult {
+    ) throws -> BlockResult {
         var functionReturnValue: AST.RegoValue?
 
         for block in blocks {
-            let blockResult = try await executeBlock(
+            let blockResult = try executeBlock(
                 context: context,
                 offset: block.offset,
                 size: block.size
@@ -85,11 +189,11 @@ extension VM {
         context: VMContext,
         function: Function,
         args: [AST.RegoValue]
-    ) async throws -> AST.RegoValue {
+    ) throws -> AST.RegoValue {
         context.callDepth += 1
         guard context.callDepth <= context.maxCallDepth else {
             context.callDepth -= 1
-            throw RegoError(code: .internalError, message: "max call depth exceeded")
+            throw RegoError(code: .maxCallDepthExceeded, message: "max call depth exceeded")
         }
 
         // Save current locals and install new frame
@@ -115,7 +219,7 @@ extension VM {
         }
 
         // Execute function blocks
-        let result = try await executeBlocks(context: context, blocks: function.blocks)
+        let result = try executeBlocks(context: context, blocks: function.blocks)
 
         // Return explicit ReturnLocal value; undefined if none
         let returnValue = result.functionReturnValue ?? .undefined
@@ -128,13 +232,18 @@ extension VM {
         context: VMContext,
         offset: Int,
         size: Int
-    ) async throws -> BlockResult {
+    ) throws -> BlockResult {
         let bytecode = policy.bytecode
         var pc = offset
         let endOffset = offset + size
 
+        // Poll cooperative cancellation at every block boundary.
+        if context.isCancelled() {
+            throw RegoError(code: .evaluationCancelled, message: "parent task cancelled")
+        }
+
         while pc < endOffset {
-            if pc % 256 == 0 && Task.isCancelled {
+            if pc % 256 == 0 && context.isCancelled() {
                 throw RegoError(code: .evaluationCancelled, message: "parent task cancelled")
             }
 
@@ -200,14 +309,14 @@ extension VM {
                 result = try execAssignVar(context: context, payload: bytecode, start: payloadStart, length: length)
             // Control flow
             case Int(Opcode.block.rawValue):
-                result = try await execBlockStmt(
+                result = try execBlockStmt(
                     context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.break.rawValue):
                 result = try execBreak(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.call.rawValue):
-                result = try await execCall(context: context, payload: bytecode, start: payloadStart, length: length)
+                result = try execCall(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.callDynamic.rawValue):
-                result = try await execCallDynamic(
+                result = try execCallDynamic(
                     context: context, payload: bytecode, start: payloadStart, length: length)
             // Operations
             case Int(Opcode.dot.rawValue):
@@ -247,7 +356,7 @@ extension VM {
             case Int(Opcode.notEqual.rawValue):
                 result = try execNotEqual(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.not.rawValue):
-                result = try await execNot(context: context, payload: bytecode, start: payloadStart, length: length)
+                result = try execNot(context: context, payload: bytecode, start: payloadStart, length: length)
             // Object operations
             case Int(Opcode.objectInsertOnce.rawValue):
                 result = try execObjectInsertOnce(
@@ -265,14 +374,14 @@ extension VM {
                 result = try execReturnLocal(context: context, payload: bytecode, start: payloadStart, length: length)
             // Collection operations
             case Int(Opcode.scan.rawValue):
-                result = try await execScan(context: context, payload: bytecode, start: payloadStart, length: length)
+                result = try execScan(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.setAdd.rawValue):
                 result = try execSetAdd(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.with.rawValue):
-                result = try await execWith(context: context, payload: bytecode, start: payloadStart, length: length)
+                result = try execWith(context: context, payload: bytecode, start: payloadStart, length: length)
             case Int(Opcode.block1.rawValue):
                 // Inline block1 to avoid an extra async activation record for the single sub-block call.
-                let innerResult = try await executeBlock(context: context, offset: payloadStart, size: length)
+                let innerResult = try executeBlock(context: context, offset: payloadStart, size: length)
                 if innerResult.shouldBreak {
                     result = innerResult.breakByOne()
                 }
@@ -313,8 +422,14 @@ internal final class VMContext {
     let policy: Policy
     let tracingEnabled: Bool
 
-    var maxCallDepth: Int = 16_384
+    let maxCallDepth: Int
     var callDepth: Int = 0
+    /// Whether this run may block the current thread to invoke an async builtin (true only when
+    /// running off the cooperative pool, e.g. `executeSyncOnDedicatedThread`).
+    let canBlockForAsyncBuiltins: Bool
+    /// Polled periodically by `executeBlock` to honor cooperative cancellation. Defaults to
+    /// `Task.isCancelled`; the dedicated-thread path supplies a flag-backed check instead.
+    let isCancelled: @Sendable () -> Bool
     // Flat memo cache for the current scope; only pushed/popped by `with` opcodes.
     // Keeping it as a direct field avoids the isEmpty guard and array index arithmetic
     // on every 2-arg function call in execCall's fast path.
@@ -342,17 +457,22 @@ internal final class VMContext {
     private var argsPool: [[AST.RegoValue]] = []
 
     // Builtin functions pre-resolved by string table index at query prepare time.
-    let builtins: [Builtin?]
+    let builtins: [AnyBuiltin?]
 
     init(
-        evaluationContext: EvaluationContext, policy: Policy, planMaxLocal: Int,
-        data: AST.RegoValue, builtins: [Builtin?] = []
+        evaluationContext: EvaluationContext, policy: Policy, planMaxLocal: Int, data: AST.RegoValue,
+        builtins: [AnyBuiltin?] = [],
+        canBlockForAsyncBuiltins: Bool = false,
+        isCancelled: @escaping @Sendable () -> Bool = { false }
     ) {
         self.evaluationContext = evaluationContext
         self.policy = policy
         self.builtins = builtins
+        self.maxCallDepth = evaluationContext.maxCallDepth
         self.tracingEnabled = evaluationContext.tracer != nil
         self.results = ResultSet.empty
+        self.canBlockForAsyncBuiltins = canBlockForAsyncBuiltins
+        self.isCancelled = isCancelled
 
         // Pre-allocate locals based on static analysis
         self.locals = Locals(repeating: nil, count: max(planMaxLocal + 1, 2))

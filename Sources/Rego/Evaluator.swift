@@ -3,7 +3,11 @@ import AST
 import Foundation
 
 protocol Evaluator: Sendable {
-    func evaluate(withContext ctx: EvaluationContext, builtins: [[Builtin?]]) async throws -> ResultSet
+    func evaluate(withContext ctx: EvaluationContext, builtins: [[AnyBuiltin?]]) async throws -> ResultSet
+    /// Synchronous evaluation. `data` is the `/data` document, read synchronously by the caller.
+    /// Throws `syncEvaluationUnsupported` if the query needs to suspend on an async builtin.
+    func evaluateSync(withContext ctx: EvaluationContext, data: AST.RegoValue, builtins: [[AnyBuiltin?]]) throws
+        -> ResultSet
 }
 /// EvaluationContext is the common evaluation context that is passed to the common Engine.
 internal struct EvaluationContext {
@@ -13,6 +17,10 @@ internal struct EvaluationContext {
     public var builtins: BuiltinRegistry
     public var tracer: OPA.Trace.QueryTracer?
     public var strictBuiltins: Bool = false
+    /// True if the policy references any async builtin; the async evaluator then runs the
+    /// synchronous VM off the cooperative pool so blocking on those builtins is safe.
+    public var hasAsyncBuiltins: Bool = false
+    public var maxCallDepth: Int = OPA.Engine.defaultMaxCallDepth
     /// Date and Time of Context creation
     public let timestamp: Date
     /// Shared cache for builtin function calls
@@ -25,6 +33,8 @@ internal struct EvaluationContext {
         builtins: BuiltinRegistry = .defaultRegistry,
         tracer: OPA.Trace.QueryTracer? = nil,
         strictBuiltins: Bool = false,
+        hasAsyncBuiltins: Bool = false,
+        maxCallDepth: Int = OPA.Engine.defaultMaxCallDepth,
         timestamp: Date? = nil
     ) {
         self.query = query
@@ -33,6 +43,8 @@ internal struct EvaluationContext {
         self.builtins = builtins
         self.tracer = tracer
         self.strictBuiltins = strictBuiltins
+        self.hasAsyncBuiltins = hasAsyncBuiltins
+        self.maxCallDepth = maxCallDepth
         self.timestamp = timestamp ?? Date()
         self.builtinsCache = Ptr<BuiltinsCache>(toCopyOf: BuiltinsCache())
     }

@@ -29,7 +29,7 @@ extension OPA.Engine {
     ///     implementation for a required builtin.
     static func verifyCapabilitiesAndBuiltIns(
         capabilities: CapabilitiesInput?,
-        builtins: [String: Builtin],
+        builtins: [String: AnyBuiltin],
         evaluator: IREvaluator
     ) async throws {
         let capabilities: Capabilities? = try {

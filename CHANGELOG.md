@@ -5,7 +5,56 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-### Improved plan validation in Engine
+## 0.0.6
+
+This release includes extensive performance optimizations, stronger IR plan validation in the `Engine`, and a new builtin function!
+
+### Performance optimizations
+
+Thanks to some extensive work from @koponen across 12 smaller PRs, and 1 large PR (#136) over the last month and a half, Swift OPA now runs much more efficiently than before across all workloads.
+
+The cumulative effects are a general improvement across all benchmarks since the `0.0.5` release, with some benchmarks seeing extreme improvements.
+This results in wall clock time speedups of 7-33% (median: 11%), instruction count reductions of 6-35% (median: 12%), and malloc reductions of 19-85% (median: 38%) across the benchmark suite.
+Some benchmarks in the numeric and array iteration sets saw much greater improvements, with one array benchmark seeing a malloc reduction of 98%!
+
+The changes can broadly be split into two categories: micro-optimizations, and the larger sync optimization across the entire Engine and bytecode VM.
+
+#### Micro-optimizations
+
+Some changes, like #152, #153, and #154 each provide general 1-4% speedups and/or mallocs improvements across nearly all benchmarks.
+
+Other changes have more targeted effects:
+ - #153: 8%+ speedup on array iteration benchmarks
+ - #155 20%+ speedup for array-heavy benchmarks
+ - #156: 3% mallocs reduction for numeric literals
+ - #157: 98%+ mallocs reduction for array iteration workloads, improvements for builtin-heavy workloads
+ - #158: ~13% speedup for numeric literals
+ - #159: Small mallocs reduction for array iteration
+ - #160: 1-3% improvements for wall clock time and mallocs on dynamic call benchmarks
+ - #161: 5-20% speedup for builtin-heavy benchmarks
+ - #162: Small speedup for some object-related instructions
+
+#### Sync / Async optimizations (#136)
+
+Swift OPA now supports a synchronous evaluation path in the underlying VM, allowing policies that do not use async operations to skip Swift's async machinery during policy evaluation.
+This change reduced wall clock time by 9-23% and heap allocations by up to 38% across all benchmarks.
+
+The only externally visible change is that Swift OPA now supports a synchronous version of `PreparedQuery.evaluate`.
+This allows performance critical use cases to get the maximum possible speed boost, and throws if async operations are required in the policies.
+Most users can continue using the async version of `PreparedQuery.evaluate` and will still reap the main benefits of the optimization.
+
+The optimization works by first scanning through the entire policy with a static analysis pass.
+The static analysis pass annotates "sync-safety" bits into the bytecode at different scales, from the individual block scopes, up to the top-level policy structure.
+At runtime, the VM then uses those annotated bits to dispatch between sync/async paths efficiently, and only diverts into the slower async paths for the specific parts of a policy that require async operations.
+
+The new sync paths required duplicating most of the VM's internals to have synchronous equivalents.
+Rather than rewrite it all by hand and risk having drift occur between the sync and async functions over time, we now use a development-time macro to detect `// @sync` comments annotating async functions, and then emit synchronous equivalents into a generated source file.
+This codegen approach was chosen so that downstream users of the Swift OPA library do not need to have a dependency on [swift-syntax](https://github.com/swiftlang/swift-syntax), which changes with each language version.
+
+The new codegen step is run with `make generate`, and our CI workflows now ensure that the generated sources are up-to-date as part of normal PR checks.
+If you are working on Swift OPA, you should not need to invoke the macro specifically unless you are are working on the `Engine` or bytecode VM internals.
+
+### Improved plan validation in Engine (#151)
 
 The `Engine` now validates that plans are contained under the roots of their parent bundles.
 We also now support loading user-provided raw IR policies alongside bundles.
@@ -13,7 +62,7 @@ The improved validation ensures that plan names are unique across all sources, a
 
 The new validation is done at `prepareForEvaluation` time, and will throw descriptive errors if anything is amiss.
 
-### Improved store behavior
+### Improved store behavior (#151)
 
 In previous versions, the `Engine` would wipe out the store on each call to `prepareForEvaluation`, and would write only bundle contents back into the store.
 This was acceptable for bundle-centric workflows, but limited many other use cases OPA supports.
@@ -23,7 +72,7 @@ First, all old bundle roots are erased.
 Then, all new/retained bundle roots are written to, ensuring the live set of bundles will always have consistent state written to the store.
 Any user-modified locations in the store that are outside of those paths will be unmodified.
 
-### `OPA.Store` protocol gains `remove(at:)`
+### `OPA.Store` protocol gains `remove(at:)` (#151)
 
 The `OPA.Store` protocol now requires `mutating func remove(at: StoreKeyPath) async throws`.
 This method removes the value at the given path, including the leaf key from its parent object.
@@ -33,6 +82,21 @@ Removing the root path resets the store to an empty object.
 This new API moves us closer to supporting the range of store functionality that OPA provides.
 
 Authored by @philipaconrad
+
+### `json.marshal_with_options` builtin function (#150)
+
+Swift OPA now implements the [`json.marshal_with_options`](https://www.openpolicyagent.org/docs/policy-reference/builtins/encoding#builtin-encoding-jsonmarshal_with_options) builtin function, rounding out the `json` family of encoding builtins.
+
+Authored by @philipaconrad
+
+### Miscellaneous
+
+ - IR+StaticAnalysis: Add locals renumbering pass (#124) authored by @philipaconrad
+ - IR: Fix Encodable implementation for Block and Operand. (#147) authored by @philipaconrad
+ - IR: Repatriate the IR.Local type after move move to AST. (#149) authored by @philipaconrad
+ - Engine: Add MiniPlanner for basic data queries. (#145, reverted in #146) authored and reverted by @philipaconrad
+   - This change was moved over to the [Swift OPA SDK](https://github.com/open-policy-agent/swift-opa-sdk), in [swift-opa-sdk/pull/28](https://github.com/open-policy-agent/swift-opa-sdk/pull/28), as part of supporting OPA's [Discovery](https://www.openpolicyagent.org/docs/management-discovery) API.
+
 
 ## 0.0.5
 

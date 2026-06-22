@@ -69,6 +69,59 @@ extension BuiltinTests.RegexTests {
             args: [.null],
             expected: .success(false)
         ),
+        // RE2 compatibility: ICU-only constructs return false even though
+        // NSRegularExpression itself would accept them.
+        BuiltinTests.TestCase(
+            description: "RE2-incompatible: backreference",
+            name: "regex.is_valid",
+            args: ["(foo)\\1"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "RE2-incompatible: lookahead",
+            name: "regex.is_valid",
+            args: ["foo(?=bar)"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "RE2-incompatible: negative lookahead",
+            name: "regex.is_valid",
+            args: ["foo(?!bar)"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "RE2-incompatible: lookbehind",
+            name: "regex.is_valid",
+            args: ["(?<=foo)bar"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "RE2-incompatible: negative lookbehind",
+            name: "regex.is_valid",
+            args: ["(?<!foo)bar"],
+            expected: .success(false)
+        ),
+        BuiltinTests.TestCase(
+            description: "RE2-incompatible: atomic group",
+            name: "regex.is_valid",
+            args: ["(?>foo)"],
+            expected: .success(false)
+        ),
+        // The scanner must NOT flag escapes/parens that appear inside
+        // character classes — `\1` is literal there, `(?` is not a group
+        // opener.
+        BuiltinTests.TestCase(
+            description: "char class containing backslash-digit is valid",
+            name: "regex.is_valid",
+            args: ["[\\1]"],
+            expected: .success(true)
+        ),
+        BuiltinTests.TestCase(
+            description: "char class containing (?= is valid",
+            name: "regex.is_valid",
+            args: ["[(?=]"],
+            expected: .success(true)
+        ),
     ]
 
     // MARK: - regex.match
@@ -125,6 +178,24 @@ extension BuiltinTests.RegexTests {
             args: ["$^[[[", "something"],
             expected: .failure(
                 BuiltinError.evalError(msg: "invalid regex pattern: $^[[["))
+        ),
+        // RE2-only contract: ICU-only features throw with a descriptive
+        // error rather than evaluating successfully.
+        BuiltinTests.TestCase(
+            description: "RE2-incompatible lookahead throws",
+            name: "regex.match",
+            args: ["foo(?=bar)", "foobar"],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "RE2-incompatible regex pattern: lookahead (?=...) is not supported"))
+        ),
+        BuiltinTests.TestCase(
+            description: "RE2-incompatible backreference throws",
+            name: "regex.match",
+            args: ["(foo)\\1", "foofoo"],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "RE2-incompatible regex pattern: backreference \\1 is not supported"))
         ),
     ]
 
@@ -509,7 +580,7 @@ extension BuiltinTests.RegexTests {
         BuiltinTests.TestCase(
             description: "nested delimiters",
             name: "regex.template_match",
-            args: ["urn:{{.*}}", "urn:{foo}", "{", "}"],
+            args: ["urn:<<.*>>", "urn:<foo>", "<", ">"],
             expected: .success(true)
         ),
     ]

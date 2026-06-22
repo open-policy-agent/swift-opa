@@ -1,40 +1,32 @@
 import AST
 import Foundation
 
-/// Global cache for compiled regex patterns, surviving across evaluations.
-///
-/// Regex compilation is expensive relative to matching. This cache ensures each
-/// unique pattern string is compiled once for the lifetime of the process,
-/// matching the behavior of Go OPA's package-level `regexpCache`.
-///
-/// This is intentionally a regex-specific cache, not a general-purpose
-/// cross-query cache. When a general-purpose inter-query builtin value cache
-/// is introduced (analogous to Go's `InterQueryBuiltinValueCache`), this
-/// should be reconsidered and potentially subsumed by that mechanism.
-///
-/// ## Thread safety
-///
-/// `NSLock` provides exclusive access for both reads and writes. Since compiled
-/// `Regex` values are immutable after creation, concurrent reads would be safe
-/// if the underlying `Dictionary` structure weren't being mutated by inserts.
-/// The lock is held only for dictionary operations (~100ns), so contention is
-/// negligible in practice. Upgrade path if this changes:
-///
-/// - `DispatchQueue(.concurrent)` with barrier writes for true concurrent reads.
-/// - `Mutex` (Swift `Synchronization` module) when the deployment target
-///   reaches macOS 15+ / iOS 18+.
-/// - `pthread_rwlock_t` for shared-reader/exclusive-writer semantics, with
-///   `#if os(Windows)` conditional for `SRWLOCK`.
+// MARK: - Supported regex syntax: RE2 only
+//
+// Only Go RE2 syntax is supported. `validateRE2Compatible` rejects ICU-only
+// features (backreferences, lookaround, atomic groups) before patterns reach
+// `NSRegularExpression`. See README "Known differences from OPA" for details.
+
+/// Per-pattern cache of compiled `NSRegularExpression` instances, mirroring
+/// Go OPA's package-level `regexpCache`. `NSLock` guards both maps; the lock
+/// is only held for the dictionary read/write. Upgrade to `Mutex` once the
+/// deployment target reaches macOS 15+ / iOS 18+.
 final class RegexCache: @unchecked Sendable {
-    private var patterns: [String: Regex<AnyRegexOutput>] = [:]
-    private var templates: [String: Regex<AnyRegexOutput>] = [:]
+    private var patterns: [String: NSRegularExpression] = [:]
+    private var templates: [String: NSRegularExpression] = [:]
     private let lock = NSLock()
     private let maxSize = 100
 
-    func compile(_ pattern: String) throws -> Regex<AnyRegexOutput> {
+    func compile(_ pattern: String) throws -> NSRegularExpression {
         if let cached = lock.withLock({ patterns[pattern] }) { return cached }
         do {
-            let regex = try Regex(pattern)
+            try validateRE2Compatible(pattern)
+
+            // NSRegularExpression rejects ""; substitute `(?:)`, which has the
+            // same match semantics and is accepted by ICU. Cache under the
+            // original key so the substitution is invisible to callers.
+            let effectivePattern = pattern.isEmpty ? "(?:)" : pattern
+            let regex = try NSRegularExpression(pattern: effectivePattern)
             lock.withLock {
                 if patterns.count >= maxSize {
                     if let key = patterns.keys.randomElement() {
@@ -44,26 +36,27 @@ final class RegexCache: @unchecked Sendable {
                 patterns[pattern] = regex
             }
             return regex
+        } catch let error as RegoError {
+            throw error
         } catch {
             throw BuiltinError.evalError(msg: "invalid regex pattern: \(pattern)")
         }
     }
 
-    /// Compile a template pattern, caching by the original template string.
-    /// Matches Go's `getRegexpTemplate` which caches `pat` → compiled regex,
-    /// so `compileRegexTemplate` only runs on cache miss.
-    ///
-    /// Templates and raw patterns are stored in separate dictionaries to avoid
-    /// key collisions — the same string can produce different compiled regexes
-    /// depending on whether it's treated as a raw pattern or a template.
+    /// Compile a template, caching by template string. Templates use a
+    /// separate dictionary from raw patterns: the same string can produce
+    /// different compiled regexes depending on which one it is.
     func compileTemplate(
         _ template: String,
         build: (String) throws -> String
-    ) throws -> Regex<AnyRegexOutput> {
+    ) throws -> NSRegularExpression {
         if let cached = lock.withLock({ templates[template] }) { return cached }
         do {
             let regexPattern = try build(template)
-            let regex = try Regex(regexPattern)
+            // Validate the assembled pattern: inner-delimiter content lands in
+            // the regex verbatim, while literal segments are escaped.
+            try validateRE2Compatible(regexPattern)
+            let regex = try NSRegularExpression(pattern: regexPattern)
             lock.withLock {
                 if templates.count >= maxSize {
                     if let key = templates.keys.randomElement() {
@@ -81,13 +74,92 @@ final class RegexCache: @unchecked Sendable {
     }
 }
 
+/// Reject ICU constructs that RE2 doesn't accept. Currently flagged:
+///
+/// - Backreferences (`\1`–`\9`)
+/// - Lookahead and negative lookahead (`(?=...)`, `(?!...)`)
+/// - Lookbehind and negative lookbehind (`(?<=...)`, `(?<!...)`)
+/// - Atomic groups (`(?>...)`)
+///
+/// Inside character classes, `\1` is a literal byte and `(` is not a group
+/// opener, so `[\1]` and `[(?=]` are not flagged. Some ICU-only constructs,
+/// like named groups `(?<name>...)`, are not flagged today.
+private func validateRE2Compatible(_ pattern: String) throws {
+    let chars = Array(pattern)
+    var i = 0
+    var inCharClass = false
+
+    while i < chars.count {
+        let c = chars[i]
+
+        if c == "\\" {
+            // Skip the escaped char. `\1` is a backreference outside char
+            // classes (RE2 forbids it) but a literal byte inside.
+            guard i + 1 < chars.count else { return }
+            let next = chars[i + 1]
+            if !inCharClass, next.isASCII,
+                let digit = next.wholeNumberValue, digit >= 1, digit <= 9
+            {
+                throw BuiltinError.evalError(
+                    msg: "RE2-incompatible regex pattern: backreference \\\(next) is not supported")
+            }
+            i += 2
+            continue
+        }
+
+        if inCharClass {
+            if c == "]" { inCharClass = false }
+            i += 1
+            continue
+        }
+
+        if c == "[" {
+            inCharClass = true
+            i += 1
+            continue
+        }
+
+        if c == "(", i + 2 < chars.count, chars[i + 1] == "?" {
+            switch chars[i + 2] {
+            case "=":
+                throw BuiltinError.evalError(
+                    msg: "RE2-incompatible regex pattern: lookahead (?=...) is not supported")
+            case "!":
+                throw BuiltinError.evalError(
+                    msg: "RE2-incompatible regex pattern: negative lookahead (?!...) is not supported")
+            case ">":
+                throw BuiltinError.evalError(
+                    msg: "RE2-incompatible regex pattern: atomic group (?>...) is not supported")
+            case "<":
+                if i + 3 < chars.count {
+                    let c3 = chars[i + 3]
+                    if c3 == "=" {
+                        throw BuiltinError.evalError(
+                            msg: "RE2-incompatible regex pattern: lookbehind (?<=...) is not supported")
+                    }
+                    if c3 == "!" {
+                        throw BuiltinError.evalError(
+                            msg: "RE2-incompatible regex pattern: negative lookbehind (?<!...) is not supported")
+                    }
+                }
+            default:
+                break
+            }
+        }
+
+        i += 1
+    }
+}
+
 extension BuiltinFuncs {
 
     private static let regexCache = RegexCache()
 
     // MARK: - regex.is_valid
 
-    static func regexIsValid(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    /// `regex.is_valid(pattern)` — `true` iff `pattern` is valid RE2 syntax.
+    /// Patterns using ICU-only features return `false`.
+    static func regexIsValid(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 1 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
         }
@@ -100,7 +172,9 @@ extension BuiltinFuncs {
 
     // MARK: - regex.match
 
-    static func regexMatch(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    /// `regex.match(pattern, value)` — `true` iff `pattern` matches anywhere
+    /// in `value`. Throws if `pattern` is not valid RE2 syntax.
+    static func regexMatch(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -112,12 +186,17 @@ extension BuiltinFuncs {
         }
 
         let regex = try regexCache.compile(pattern)
-        return .boolean(value.firstMatch(of: regex) != nil)
+        let range = NSRange(value.startIndex..., in: value)
+        return .boolean(regex.firstMatch(in: value, range: range) != nil)
     }
 
     // MARK: - regex.replace
 
-    static func regexReplace(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    /// `regex.replace(s, pattern, value)` — replace every match of `pattern`
+    /// in `s` with `value`. `value` supports `$0` (whole match), `$N`
+    /// (capture group N), and `$$` (literal `$`), matching Go's
+    /// `regexp.ReplaceAllString`.
+    static func regexReplace(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 3 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
         }
@@ -132,38 +211,41 @@ extension BuiltinFuncs {
         }
 
         let regex = try regexCache.compile(pattern)
-        let matches = base.matches(of: regex)
+        let nsRange = NSRange(base.startIndex..., in: base)
+        let matches = regex.matches(in: base, range: nsRange)
 
         guard !matches.isEmpty else {
             return .string(base)
         }
 
-        // Pass 1: pre-compute expanded replacements and calculate exact result size.
-        // String is a value type in Swift — repeated += without reserveCapacity
-        // triggers O(n) reallocations. Two passes avoids all of them.
+        // Pass 1: compute expansions and total size, so pass 2 can reserve
+        // capacity once. `$N` is expanded manually to preserve Go's `$$` → `$`
+        // semantics; NSRegularExpression's built-in template uses `\$`.
         var expansions: [String] = []
         expansions.reserveCapacity(matches.count)
         var totalSize = 0
         var lastEnd = base.startIndex
 
         for match in matches {
-            totalSize += base.utf8.distance(from: lastEnd, to: match.range.lowerBound)
-            let expanded = expandTemplate(replacement, match: match)
+            guard let r = Range(match.range, in: base) else { continue }
+            totalSize += base.utf8.distance(from: lastEnd, to: r.lowerBound)
+            let expanded = expandTemplate(replacement, match: match, in: base)
             totalSize += expanded.utf8.count
             expansions.append(expanded)
-            lastEnd = match.range.upperBound
+            lastEnd = r.upperBound
         }
         totalSize += base.utf8.distance(from: lastEnd, to: base.endIndex)
 
-        // Pass 2: assemble with exact capacity — zero reallocations.
+        // Pass 2: assemble with reserved capacity.
         var result = ""
         result.reserveCapacity(totalSize)
         lastEnd = base.startIndex
 
         for (i, match) in matches.enumerated() {
-            result += base[lastEnd..<match.range.lowerBound]
+            guard let r = Range(match.range, in: base) else { continue }
+            result += base[lastEnd..<r.lowerBound]
             result += expansions[i]
-            lastEnd = match.range.upperBound
+            lastEnd = r.upperBound
         }
         result += base[lastEnd...]
 
@@ -172,7 +254,9 @@ extension BuiltinFuncs {
 
     // MARK: - regex.split
 
-    static func regexSplit(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    /// `regex.split(pattern, value)` — split `value` at each match. Returns
+    /// `[value]` if there are no matches.
+    static func regexSplit(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 2 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 2)
         }
@@ -184,7 +268,8 @@ extension BuiltinFuncs {
         }
 
         let regex = try regexCache.compile(pattern)
-        let matches = value.matches(of: regex)
+        let nsRange = NSRange(value.startIndex..., in: value)
+        let matches = regex.matches(in: value, range: nsRange)
 
         guard !matches.isEmpty else {
             return .array([.string(value)])
@@ -194,8 +279,9 @@ extension BuiltinFuncs {
         var lastEnd = value.startIndex
 
         for match in matches {
-            parts.append(.string(String(value[lastEnd..<match.range.lowerBound])))
-            lastEnd = match.range.upperBound
+            guard let r = Range(match.range, in: value) else { continue }
+            parts.append(.string(String(value[lastEnd..<r.lowerBound])))
+            lastEnd = r.upperBound
         }
         parts.append(.string(String(value[lastEnd...])))
 
@@ -204,7 +290,9 @@ extension BuiltinFuncs {
 
     // MARK: - regex.find_n
 
-    static func regexFindN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    /// `regex.find_n(pattern, value, n)` — return up to `n` non-overlapping
+    /// matches. `n < 0` returns all matches.
+    static func regexFindN(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 3 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
         }
@@ -224,18 +312,23 @@ extension BuiltinFuncs {
         }
 
         let regex = try regexCache.compile(pattern)
-        let allMatches = value.matches(of: regex)
+        let nsRange = NSRange(value.startIndex..., in: value)
+        let allMatches = regex.matches(in: value, range: nsRange)
         let limited = n < 0 ? allMatches : Array(allMatches.prefix(n))
 
         return .array(
-            limited.map { match in
-                .string(String(value[match.range]))
+            limited.compactMap { match in
+                guard let r = Range(match.range, in: value) else { return nil }
+                return .string(String(value[r]))
             })
     }
 
     // MARK: - regex.find_all_string_submatch_n
 
-    static func regexFindAllStringSubmatchN(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    /// `regex.find_all_string_submatch_n(pattern, value, n)` — return up to
+    /// `n` non-overlapping matches with their capture groups. Each match is
+    /// `[whole_match, group_1, group_2, ...]`. `n < 0` returns all matches.
+    static func regexFindAllStringSubmatchN(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 3 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 3)
         }
@@ -255,15 +348,17 @@ extension BuiltinFuncs {
         }
 
         let regex = try regexCache.compile(pattern)
-        let allMatches = value.matches(of: regex)
+        let nsRange = NSRange(value.startIndex..., in: value)
+        let allMatches = regex.matches(in: value, range: nsRange)
         let limited = n < 0 ? allMatches : Array(allMatches.prefix(n))
 
         return .array(
             limited.map { match in
                 var groups: [AST.RegoValue] = []
-                for i in 0..<match.output.count {
-                    if let sub = match.output[i].substring {
-                        groups.append(.string(String(sub)))
+                for i in 0..<match.numberOfRanges {
+                    let groupRange = match.range(at: i)
+                    if groupRange.location != NSNotFound, let r = Range(groupRange, in: value) {
+                        groups.append(.string(String(value[r])))
                     } else {
                         groups.append(.string(""))
                     }
@@ -274,7 +369,10 @@ extension BuiltinFuncs {
 
     // MARK: - regex.template_match
 
-    static func regexTemplateMatch(ctx: BuiltinContext, args: [AST.RegoValue]) async throws -> AST.RegoValue {
+    /// `regex.template_match(pattern, value, delim_start, delim_end)` —
+    /// match `value` against a templated `pattern`. Regex segments appear
+    /// between single-character delimiter pairs; other text is literal.
+    static func regexTemplateMatch(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         guard args.count == 4 else {
             throw BuiltinError.argumentCountMismatch(got: args.count, want: 4)
         }
@@ -306,28 +404,21 @@ extension BuiltinFuncs {
             try compileTemplatePattern(
                 template, delimStart: Character(delimStart), delimEnd: Character(delimEnd))
         }
-        return .boolean(value.wholeMatch(of: regex) != nil)
+        // Anchored with `^...$`, so a non-nil firstMatch means the whole
+        // string matched.
+        let range = NSRange(value.startIndex..., in: value)
+        return .boolean(regex.firstMatch(in: value, range: range) != nil)
     }
 
     // MARK: - Private helpers
 
-    /// Build an anchored regex from a template pattern with configurable delimiters.
-    ///
-    /// Text outside delimiters is escaped as literal. Text inside delimiters
-    /// becomes a capture group. The result is anchored with `^...$`.
-    ///
-    /// Ported from Go OPA's `compileRegexTemplate` (originally from Gorilla Mux).
+    /// Build an anchored regex from a template with configurable delimiters.
+    /// Text outside delimiters is escaped as a literal; text inside becomes
+    /// a capture group. Result is anchored with `^...$`. Ported from Go OPA's
+    /// `compileRegexTemplate` (originally from Gorilla Mux).
     ///
     ///     compileTemplatePattern("urn:foo:{.*}", delimStart: "{", delimEnd: "}")
     ///     // → "^urn\\:foo\\:(.*)$"
-    ///
-    /// ## Performance
-    ///
-    /// Uses `NSRegularExpression.escapedPattern(for:)` for escaping literal segments,
-    /// which bridges through NSString. Also uses `+=` to assemble the pattern string.
-    /// Both are acceptable here because this runs once per unique template — the
-    /// compiled regex is cached in `RegexCache`, so subsequent calls with the same
-    /// template skip this entirely.
     private static func compileTemplatePattern(
         _ template: String, delimStart: Character, delimEnd: Character
     ) throws -> String {
@@ -354,26 +445,16 @@ extension BuiltinFuncs {
         return pattern
     }
 
-    /// Find balanced delimiter pairs in a template string.
-    ///
-    /// Returns indices as alternating `[open, close, open, close, ...]` pairs,
-    /// where `open` is the index of the start delimiter and `close` is one past
-    /// the end delimiter. Only top-level pairs are returned; nested delimiters
-    /// are consumed but not emitted.
-    ///
-    /// Example with `{` and `}`:
+    /// Find balanced delimiter pairs. Returns alternating `[open, close, ...]`
+    /// indices: `open` at the start delimiter, `close` one past the end.
+    /// Nested delimiters are tracked by depth and consumed but not emitted.
+    /// Throws on unbalanced delimiters (e.g. `"urn:{foo"` or `"urn:}foo"`).
     ///
     ///     "urn:{.*}:end"
     ///      ^   ^   ^
-    ///      |   |   └── close (index of character after "}")
-    ///      |   └────── open  (index of "{")
-    ///      └────────── not a delimiter, skipped
-    ///
-    ///     Returns: [index of "{", index after "}"]
-    ///
-    /// Nested delimiters increment/decrement a depth counter. Only when depth
-    /// returns to zero is a pair recorded. Throws on unbalanced delimiters
-    /// (e.g. `"urn:{foo"` or `"urn:}foo"`).
+    ///      |   |   └── close (one past `}`)
+    ///      |   └────── open (`{`)
+    ///      └────────── literal, skipped
     private static func delimiterIndices(
         _ s: String, start: Character, end: Character
     ) throws -> [String.Index] {
@@ -403,22 +484,13 @@ extension BuiltinFuncs {
         return indices
     }
 
-    /// Expand `$N` capture group references in a replacement template.
+    /// Expand `$N` capture references and `$$` (literal `$`) in a replacement
+    /// template, matching Go's `regexp.ReplaceAllString`. NSRegularExpression's
+    /// built-in template uses `\$` for a literal `$`, so we expand manually.
     ///
-    /// Go's `regexp.ReplaceAllString` supports `$0` (whole match), `$1`, `$2`, etc.
-    /// in the replacement string. For example:
-    ///
-    /// Go: regexp.MustCompile(`(foo)`).ReplaceAllString("foo", "$1$1") → "foofoo"
-    ///
-    /// Swift's `Regex` only offers closure-based `replacing(_:with:)` with no
-    /// template string API, so we implement the expansion manually. Given a match
-    /// of `/(foo)/` against `"foo"`:
-    ///
-    ///     match.output[0].substring  // "foo" — whole match ($0)
-    ///     match.output[1].substring  // "foo" — first capture group ($1)
-    ///     expandTemplate("$1$1", match) → "foofoo"
+    ///     expandTemplate("$1$1", match-of-`(foo)`-on-"foo", in: "foo") → "foofoo"
     private static func expandTemplate(
-        _ template: String, match: Regex<AnyRegexOutput>.Match
+        _ template: String, match: NSTextCheckingResult, in source: String
     ) -> String {
         var result = ""
         var iter = template.makeIterator()
@@ -432,10 +504,13 @@ extension BuiltinFuncs {
                 if next == "$" {
                     result.append("$")
                 } else if next.isWholeNumber, let digit = next.wholeNumberValue {
-                    if digit < match.output.count,
-                        let substring = match.output[digit].substring
-                    {
-                        result.append(contentsOf: substring)
+                    if digit < match.numberOfRanges {
+                        let groupRange = match.range(at: digit)
+                        if groupRange.location != NSNotFound,
+                            let r = Range(groupRange, in: source)
+                        {
+                            result.append(contentsOf: source[r])
+                        }
                     }
                 } else {
                     result.append(ch)

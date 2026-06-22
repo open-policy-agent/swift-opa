@@ -5,6 +5,23 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### `regex` builtins
+
+Swift OPA now supports the `regex.*` family of builtins:
+
+- `regex.is_valid`
+- `regex.match`
+- `regex.replace`
+- `regex.split`
+- `regex.find_n`
+- `regex.find_all_string_submatch_n`
+- `regex.template_match`
+
+> [!WARNING]
+> Swift OPA's `regex.*` builtins are only planned to support [RE2](https://github.com/google/re2/wiki/Syntax) syntax in the long term. Any regex syntax outside of RE2 syntax is unsupported, and may be broken in a future release.
+
+To enforce this, every pattern is validated against an RE2 compatibility scanner up-front. Patterns using backreferences (`\1`–`\9`), lookahead (`(?=...)`, `(?!...)`), lookbehind (`(?<=...)`, `(?<!...)`), or atomic groups (`(?>...)`) are rejected at compile time: `regex.is_valid` returns `false`, and the other builtins throw. The scanner will be tightened over time. See the README's "Regex syntax support" section for more details.
+
 ## 0.0.6
 
 This release includes extensive performance optimizations, stronger IR plan validation in the `Engine`, and a new builtin function!

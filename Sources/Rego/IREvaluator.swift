@@ -122,7 +122,12 @@ internal struct IREvaluator {
             for plan in p.plans?.plans ?? [] {
                 recordOwner(planName: plan.name, owner: .user(i))
             }
-            compiled.append(try Converter.convert(p))
+            let rawPolicy = try Converter.convert(p)
+            compiled.append(
+                optimizeAsync
+                    ? SyncSafePatcher.patch(policy: rawPolicy, builtins: builtinRegistry)
+                    : rawPolicy
+            )
         }
 
         // Ensure all plan names (raw user policies + bundle policies) are unique.

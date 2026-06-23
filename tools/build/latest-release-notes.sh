@@ -2,8 +2,14 @@
 
 set -e
 
-PROJ_DIR=$(dirname "${BASH_SOURCE}")/..
+# This script lives in tools/build/, so the repo root is two levels up.
+PROJ_DIR=$(dirname "${BASH_SOURCE[0]}")/../..
 CHANGELOG="${PROJ_DIR}/CHANGELOG.md"
+
+if [ ! -f "${CHANGELOG}" ]; then
+    echo "error: CHANGELOG not found at ${CHANGELOG}" >&2
+    exit 1
+fi
 
 usage() {
     echo "latest-release-notes.sh --output=<path>"

@@ -104,8 +104,8 @@ jobs:
       - name: compliance tests (main)
         run: |
           (make test-compliance || true) > results
-          ../../../pr/swift-opa/ComplianceSuite/tools/passed.sh < results > ../../../main-passed
-          ../../../pr/swift-opa/ComplianceSuite/tools/failed.sh < results > ../../../main-failed
+          ../../../main/swift-opa/ComplianceSuite/tools/passed.sh < results > ../../../main-passed
+          ../../../main/swift-opa/ComplianceSuite/tools/failed.sh < results > ../../../main-failed
         working-directory: main/swift-opa/ComplianceSuite
       - name: compliance tests (pr)
         run: |
@@ -129,6 +129,13 @@ jobs:
           }
           diff_and_print main-passed pr-passed 'passed (main vs PR)' >> $GITHUB_STEP_SUMMARY
           diff_and_print main-failed pr-failed 'failed (main vs PR)' >> $GITHUB_STEP_SUMMARY
+
+          new_failures="$(comm -23 pr-failed main-failed)"
+          if [ -n "$new_failures" ]; then
+            echo "::error::PR introduces new compliance failures not present on main:"
+            echo "$new_failures" | while IFS= read -r line; do echo "  ❌ $line"; done
+            exit 1
+          fi
 
   capabilities-check:
     name: check generated files unchanged

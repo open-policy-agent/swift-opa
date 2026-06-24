@@ -187,6 +187,10 @@ public struct BuiltinRegistry: Sendable {
             "json.marshal": BuiltinFuncs.jsonMarshal,
             "json.marshal_with_options": BuiltinFuncs.jsonMarshalWithOptions,
             "json.unmarshal": BuiltinFuncs.jsonUnmarshal,
+            "urlquery.encode": BuiltinFuncs.urlQueryEncode,
+            "urlquery.decode": BuiltinFuncs.urlQueryDecode,
+            "urlquery.encode_object": BuiltinFuncs.urlQueryEncodeObject,
+            "urlquery.decode_object": BuiltinFuncs.urlQueryDecodeObject,
 
             // Numbers
             "numbers.range": BuiltinFuncs.numbersRange,

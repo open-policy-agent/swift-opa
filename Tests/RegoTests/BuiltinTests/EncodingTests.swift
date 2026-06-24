@@ -376,6 +376,267 @@ extension BuiltinTests.EncodingTests {
         ),
     ]
 
+    // MARK: - urlquery.encode Tests
+    static let urlQueryEncodeTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "empty string",
+            name: "urlquery.encode",
+            args: [""],
+            expected: .success(.string(""))
+        ),
+        BuiltinTests.TestCase(
+            description: "compliance: a=b+1",
+            name: "urlquery.encode",
+            args: ["a=b+1"],
+            expected: .success(.string("a%3Db%2B1"))
+        ),
+        BuiltinTests.TestCase(
+            description: "space becomes plus",
+            name: "urlquery.encode",
+            args: ["hello world"],
+            expected: .success(.string("hello+world"))
+        ),
+        BuiltinTests.TestCase(
+            description: "unreserved characters pass through",
+            name: "urlquery.encode",
+            args: ["abcXYZ-._~"],
+            expected: .success(.string("abcXYZ-._~"))
+        ),
+        BuiltinTests.TestCase(
+            description: "unicode is utf-8 percent-encoded",
+            name: "urlquery.encode",
+            args: ["é"],
+            expected: .success(.string("%C3%A9"))
+        ),
+    ]
+
+    // MARK: - urlquery.decode Tests
+    static let urlQueryDecodeTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "empty string",
+            name: "urlquery.decode",
+            args: [""],
+            expected: .success(.string(""))
+        ),
+        BuiltinTests.TestCase(
+            description: "compliance: a%3Db%2B1",
+            name: "urlquery.decode",
+            args: ["a%3Db%2B1"],
+            expected: .success(.string("a=b+1"))
+        ),
+        BuiltinTests.TestCase(
+            description: "plus decodes to space",
+            name: "urlquery.decode",
+            args: ["hello+world"],
+            expected: .success(.string("hello world"))
+        ),
+        BuiltinTests.TestCase(
+            description: "lowercase hex accepted",
+            name: "urlquery.decode",
+            args: ["%c3%a9"],
+            expected: .success(.string("é"))
+        ),
+        BuiltinTests.TestCase(
+            description: "trailing %",
+            name: "urlquery.decode",
+            args: ["abc%"],
+            expected: .failure(BuiltinError.evalError(msg: "invalid URL escape \"%\""))
+        ),
+        BuiltinTests.TestCase(
+            description: "non-hex after %",
+            name: "urlquery.decode",
+            args: ["%ZZ"],
+            expected: .failure(BuiltinError.evalError(msg: "invalid URL escape \"%ZZ\""))
+        ),
+        BuiltinTests.TestCase(
+            description: "malformed escape mid-string clipped to 3 bytes",
+            name: "urlquery.decode",
+            args: ["abc%Zhello"],
+            expected: .failure(BuiltinError.evalError(msg: "invalid URL escape \"%Zh\""))
+        ),
+    ]
+
+    // MARK: - urlquery.encode_object Tests
+    static let urlQueryEncodeObjectTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "empty object",
+            name: "urlquery.encode_object",
+            args: [[:]],
+            expected: .success(.string(""))
+        ),
+        BuiltinTests.TestCase(
+            description: "compliance: strings sorted by key",
+            name: "urlquery.encode_object",
+            args: [["a": "b", "c": "d"]],
+            expected: .success(.string("a=b&c=d"))
+        ),
+        BuiltinTests.TestCase(
+            description: "keys emitted in sorted order regardless of literal order",
+            name: "urlquery.encode_object",
+            args: [["z": "1", "banana": "2", "apple": "3", "a": "4"]],
+            expected: .success(.string("a=4&apple=3&banana=2&z=1"))
+        ),
+        BuiltinTests.TestCase(
+            description: "value is escaped",
+            name: "urlquery.encode_object",
+            args: [["a": "c=b+1"]],
+            expected: .success(.string("a=c%3Db%2B1"))
+        ),
+        BuiltinTests.TestCase(
+            description: "array values produce repeated key",
+            name: "urlquery.encode_object",
+            args: [["a": ["b+1", "c+2"]]],
+            expected: .success(.string("a=b%2B1&a=c%2B2"))
+        ),
+        BuiltinTests.TestCase(
+            description: "set values produce repeated key (sorted)",
+            name: "urlquery.encode_object",
+            args: [["a": .set([.string("y"), .string("x")])]],
+            expected: .success(.string("a=x&a=y"))
+        ),
+        BuiltinTests.TestCase(
+            description: "mixed string and array values",
+            name: "urlquery.encode_object",
+            args: [["a": "1", "b": ["2", "3"]]],
+            expected: .success(.string("a=1&b=2&b=3"))
+        ),
+        BuiltinTests.TestCase(
+            description: "non-string value rejected",
+            name: "urlquery.encode_object",
+            args: [["a": 1]],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "operand 1 values must be string, array[string], or set[string]"))
+        ),
+        BuiltinTests.TestCase(
+            description: "non-string array element rejected",
+            name: "urlquery.encode_object",
+            args: [["a": [1, 2]]],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "operand 1 values must be string, array[string], or set[string]"))
+        ),
+        BuiltinTests.TestCase(
+            description: "non-string set element rejected",
+            name: "urlquery.encode_object",
+            args: [["a": .set([.number(1)])]],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "operand 1 values must be string, array[string], or set[string]"))
+        ),
+        BuiltinTests.TestCase(
+            description: "nested object value rejected",
+            name: "urlquery.encode_object",
+            args: [["a": ["nested": "value"]]],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "operand 1 values must be string, array[string], or set[string]"))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty array value emits no pairs",
+            name: "urlquery.encode_object",
+            args: [["a": []]],
+            expected: .success(.string(""))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty set value emits no pairs",
+            name: "urlquery.encode_object",
+            args: [["a": .set([])]],
+            expected: .success(.string(""))
+        ),
+    ]
+
+    // MARK: - urlquery.decode_object Tests
+    static let urlQueryDecodeObjectTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "empty string",
+            name: "urlquery.decode_object",
+            args: [""],
+            expected: .success(.object([:]))
+        ),
+        BuiltinTests.TestCase(
+            description: "compliance: multiple values per key",
+            name: "urlquery.decode_object",
+            args: ["a=value_a1&b=value_b&a=value_a2"],
+            expected: .success(["a": ["value_a1", "value_a2"], "b": ["value_b"]])
+        ),
+        BuiltinTests.TestCase(
+            description: "compliance: param without =",
+            name: "urlquery.decode_object",
+            args: ["a=value_a1&b"],
+            expected: .success(["a": ["value_a1"], "b": [""]])
+        ),
+        BuiltinTests.TestCase(
+            description: "percent-decodes both keys and values",
+            name: "urlquery.decode_object",
+            args: ["a%20b=c%20d"],
+            expected: .success(["a b": ["c d"]])
+        ),
+        BuiltinTests.TestCase(
+            description: "plus decodes to space",
+            name: "urlquery.decode_object",
+            args: ["a=hello+world"],
+            expected: .success(["a": ["hello world"]])
+        ),
+        BuiltinTests.TestCase(
+            description: "malformed escape throws",
+            name: "urlquery.decode_object",
+            args: ["a=%ZZ"],
+            expected: .failure(BuiltinError.evalError(msg: "invalid URL escape \"%ZZ\""))
+        ),
+        // Empty-pair handling — match Go's `url.ParseQuery`, which silently
+        // skips empty `&` pairs (leading, trailing, consecutive) and the
+        // lone `=` pair where both sides are empty.
+        BuiltinTests.TestCase(
+            description: "leading separator",
+            name: "urlquery.decode_object",
+            args: ["&a=1"],
+            expected: .success(["a": ["1"]])
+        ),
+        BuiltinTests.TestCase(
+            description: "trailing separator",
+            name: "urlquery.decode_object",
+            args: ["a=1&"],
+            expected: .success(["a": ["1"]])
+        ),
+        BuiltinTests.TestCase(
+            description: "consecutive separators",
+            name: "urlquery.decode_object",
+            args: ["a=1&&b=2"],
+            expected: .success(["a": ["1"], "b": ["2"]])
+        ),
+        BuiltinTests.TestCase(
+            description: "only separators",
+            name: "urlquery.decode_object",
+            args: ["&&"],
+            expected: .success(.object([:]))
+        ),
+        BuiltinTests.TestCase(
+            description: "lone equals is skipped",
+            name: "urlquery.decode_object",
+            args: ["="],
+            expected: .success(.object([:]))
+        ),
+        BuiltinTests.TestCase(
+            description: "empty key with non-empty value retained",
+            name: "urlquery.decode_object",
+            args: ["=value"],
+            expected: .success(["": ["value"]])
+        ),
+        BuiltinTests.TestCase(
+            description: "escaped = in key is decoded after splitting",
+            name: "urlquery.decode_object",
+            args: ["a%3Db=value"],
+            expected: .success(["a=b": ["value"]])
+        ),
+        BuiltinTests.TestCase(
+            description: "literal = in value preserved (maxSplits 1)",
+            name: "urlquery.decode_object",
+            args: ["a=b=c"],
+            expected: .success(["a": ["b=c"]])
+        ),
+    ]
+
     static var allTests: [BuiltinTests.TestCase] {
         [
             BuiltinTests.generateFailureTests(
@@ -462,11 +723,60 @@ extension BuiltinTests.EncodingTests {
                 allowedArgTypes: ["string"],
                 generateNumberOfArgsTest: true),
             jsonUnmarshalTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "urlquery.encode", sampleArgs: [""],
+                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
+            urlQueryEncodeTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "urlquery.decode", sampleArgs: [""],
+                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
+            urlQueryDecodeTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "urlquery.encode_object", sampleArgs: [[:]],
+                argIndex: 0, argName: "object", allowedArgTypes: ["object"],
+                generateNumberOfArgsTest: true),
+            urlQueryEncodeObjectTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "urlquery.decode_object", sampleArgs: [""],
+                argIndex: 0, argName: "x", allowedArgTypes: ["string"],
+                generateNumberOfArgsTest: true),
+            urlQueryDecodeObjectTests,
         ].flatMap { $0 }
     }
 
     @Test(arguments: allTests)
     func testBuiltins(tc: BuiltinTests.TestCase) async throws {
         try await BuiltinTests.testBuiltin(tc: tc)
+    }
+
+    /// `decode(encode(s)) == s` for representative inputs covering reserved
+    /// chars, spaces, multi-byte UTF-8, and the full unreserved set.
+    @Test(
+        arguments: [
+            "",
+            "a=b+1",
+            "hello world",
+            "é",
+            "🚀 emoji",
+            "/?:#[]@!$&'()*+,;=",
+            "abcXYZ-._~",
+            "tab\tnewline\n",
+        ])
+    func testUrlQueryRoundTrip(input: String) async throws {
+        let registry = BuiltinRegistry.defaultRegistry
+        let ctx = BuiltinContext()
+        let encoded = try await registry.invoke(
+            withContext: ctx, name: "urlquery.encode",
+            args: [.string(input)], strict: true)
+        let decoded = try await registry.invoke(
+            withContext: ctx, name: "urlquery.decode",
+            args: [encoded], strict: true)
+        #expect(decoded == .string(input))
     }
 }

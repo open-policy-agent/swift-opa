@@ -197,6 +197,37 @@ var engine = OPA.Engine(
 let preparedQuery = try await engine.prepareForEvaluation(query: "<some_query>")
 ```
 
+## Known differences from OPA
+
+<details>
+<summary><b>Regex syntax support (Click to expand)</b></summary>
+
+### Regex syntax (only RE2 regexes supported)
+
+> [!WARNING]
+> Swift OPA's `regex.*` builtins are only planned to support [RE2](https://github.com/google/re2/wiki/Syntax) syntax in the long term. Any regex syntax outside of RE2 syntax is unsupported, and may be broken in a future release.
+
+#### Background
+
+Today the implementation is built on top of `NSRegularExpression` (ICU), because it is built into Foundation and covers the common regexes we see in practice. ICU supports a *superset* of RE2 in some places (it supports backreferences, lookaround, atomic groups) and a *subset* of RE2 in others (it lacks `\A`, `\z`, etc.).
+
+To prevent policies from quietly depending on ICU-only features that will break when this implementation is replaced by a full RE2 engine, every pattern is validated against an RE2 compatibility scanner up front, before reaching `NSRegularExpression`. RE2-incompatible features are rejected at compile time, with `regex.is_valid` returning `false`, and every other `regex.*` builtin throwing an evaluation error.
+
+#### Compatibility checks
+
+The scanner currently flags:
+
+- Backreferences (`\1`–`\9`)
+- Lookahead and negative lookahead (`(?=...)`, `(?!...)`)
+- Lookbehind and negative lookbehind (`(?<=...)`, `(?<!...)`)
+- Atomic groups (`(?>...)`)
+
+Inside character classes, `\1` is treated as a literal byte and `(` is not a group opener, so `[\1]` and `[(?=]` are not flagged. Some constructs, like ICU-style named groups `(?<name>...)`, slip through the scanner for now but may be flagged in the future.
+
+We recommend sticking to the supported RE2 regex syntax, in order to avoid future breakage.
+
+</details>
+
 ## Community Support
 
 Feel free to open and issue if you encounter any problems using swift-opa, or have ideas on how to make it even better.

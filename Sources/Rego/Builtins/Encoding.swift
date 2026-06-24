@@ -1,6 +1,11 @@
 import AST
 import Foundation
 
+/// Used by ``BuiltinFuncs/urlQueryEncodeObject(ctx:args:)`` for any
+/// non-conforming input shape.
+private let urlEncodeObjectErrMessage =
+    "operand 1 values must be string, array[string], or set[string]"
+
 extension BuiltinFuncs {
     // MARK: - base64.encode
     static func base64Encode(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
@@ -256,6 +261,128 @@ extension BuiltinFuncs {
         // Returns the parsed RegoValue, or throws an error.
         return try JSONDecoder().decode(RegoValue.self, from: rawJSON.data(using: .utf8)!)
     }
+
+    // MARK: - urlquery.encode
+    /// URL-encodes a string. Mirrors Go's `net/url.QueryEscape`: spaces become
+    /// `+`; all bytes except `A-Z a-z 0-9 - _ . ~` become `%XX`.
+    public static func urlQueryEncode(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+        guard case .string(let s) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
+        }
+        return .string(queryEscape(s))
+    }
+
+    // MARK: - urlquery.decode
+    /// URL-decodes a string. Mirrors Go's `net/url.QueryUnescape`: `+` becomes
+    /// space, `%XX` becomes the byte, malformed `%` escapes throw.
+    public static func urlQueryDecode(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+        guard case .string(let s) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
+        }
+        return .string(try queryUnescape(s))
+    }
+
+    // MARK: - urlquery.encode_object
+    /// Encodes an object as a URL query string. String values produce one
+    /// `k=v` pair; arrays/sets produce one pair per element. Object keys are
+    /// emitted in sorted order; arrays preserve element order; sets are sorted
+    /// for determinism.
+    public static func urlQueryEncodeObject(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+        guard case .object(let obj) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "object", got: args[0].typeName, want: "object")
+        }
+
+        // Collect (key, value) pairs with string keys; sort by key for stable output.
+        var entries: [(String, AST.RegoValue)] = []
+        entries.reserveCapacity(obj.count)
+        for (key, val) in obj {
+            guard case .string(let k) = key else {
+                throw BuiltinError.evalError(msg: urlEncodeObjectErrMessage)
+            }
+            entries.append((k, val))
+        }
+        entries.sort { $0.0 < $1.0 }
+
+        var pairs: [String] = []
+        for (k, val) in entries {
+            let escapedKey = queryEscape(k)
+            switch val {
+            case .string(let s):
+                pairs.append("\(escapedKey)=\(queryEscape(s))")
+            case .array(let arr):
+                for elem in arr {
+                    guard case .string(let s) = elem else {
+                        throw BuiltinError.evalError(msg: urlEncodeObjectErrMessage)
+                    }
+                    pairs.append("\(escapedKey)=\(queryEscape(s))")
+                }
+            case .set(let set):
+                var members: [String] = []
+                members.reserveCapacity(set.count)
+                for elem in set {
+                    guard case .string(let s) = elem else {
+                        throw BuiltinError.evalError(msg: urlEncodeObjectErrMessage)
+                    }
+                    members.append(s)
+                }
+                members.sort()
+                for s in members {
+                    pairs.append("\(escapedKey)=\(queryEscape(s))")
+                }
+            default:
+                throw BuiltinError.evalError(msg: urlEncodeObjectErrMessage)
+            }
+        }
+
+        return .string(pairs.joined(separator: "&"))
+    }
+
+    // MARK: - urlquery.decode_object
+    /// Parses a URL query string into an object. Each key maps to an array of
+    /// values, since the same key may appear multiple times. Parameters with
+    /// no `=` decode to an empty-string value (e.g. `b` → `"b": [""]`).
+    public static func urlQueryDecodeObject(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+        guard case .string(let s) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
+        }
+
+        guard !s.isEmpty else {
+            return .object([:])
+        }
+
+        var values: [String: [AST.RegoValue]] = [:]
+        // Match Go's `url.ParseQuery`: skip empty `&` pairs (so leading,
+        // trailing, and consecutive `&` are all dropped) and skip the lone
+        // `=` pair where both key and value are empty.
+        for pair in s.split(separator: "&", omittingEmptySubsequences: true) {
+            let parts = pair.split(separator: "=", maxSplits: 1, omittingEmptySubsequences: false)
+            let rawKey = String(parts[0])
+            let rawValue = parts.count > 1 ? String(parts[1]) : ""
+            if rawKey.isEmpty && rawValue.isEmpty { continue }
+            let key = try queryUnescape(rawKey)
+            let value = try queryUnescape(rawValue)
+            values[key, default: []].append(.string(value))
+        }
+
+        var result: [AST.RegoValue: AST.RegoValue] = [:]
+        result.reserveCapacity(values.count)
+        for (k, vs) in values {
+            result[.string(k)] = .array(vs)
+        }
+        return .object(result)
+    }
 }
 
 /// Helper extension to the Data to encode and decode hex strings
@@ -422,4 +549,81 @@ private func prettyPrintGolangStyle(json: String, indentWith: String, prefixWith
     }
 
     return String(decoding: out, as: UTF8.self)
+}
+
+// MARK: - URL query escape helpers
+
+/// Go `net/url.QueryEscape`: keep `A-Z a-z 0-9 - _ . ~` literal, encode space
+/// as `+`, percent-encode everything else as `%XX` (uppercase hex).
+private func queryEscape(_ s: String) -> String {
+    var out = [UInt8]()
+    out.reserveCapacity(s.utf8.count)
+    for byte in s.utf8 {
+        switch byte {
+        case 0x20:  // space
+            out.append(UInt8(ascii: "+"))
+        case 0x41...0x5A,  // A-Z
+            0x61...0x7A,  // a-z
+            0x30...0x39,  // 0-9
+            0x2D, 0x2E, 0x5F, 0x7E:  // - . _ ~
+            out.append(byte)
+        default:
+            out.append(UInt8(ascii: "%"))
+            out.append(hexNibble(byte >> 4))
+            out.append(hexNibble(byte & 0x0F))
+        }
+    }
+    return String(decoding: out, as: UTF8.self)
+}
+
+/// Go `net/url.QueryUnescape`: `+` → space, `%XX` → byte, malformed `%`
+/// throws `BuiltinError.evalError`. Error text matches Go's `url.EscapeError`
+/// format: `invalid URL escape "<bad>"`, where `<bad>` is the offending
+/// substring starting at `%` and capped at 3 bytes — same rule Go uses.
+private func queryUnescape(_ s: String) throws -> String {
+    let bytes = Array(s.utf8)
+    var out = [UInt8]()
+    out.reserveCapacity(bytes.count)
+    var i = 0
+    while i < bytes.count {
+        let b = bytes[i]
+        switch b {
+        case UInt8(ascii: "+"):
+            out.append(0x20)
+            i += 1
+        case UInt8(ascii: "%"):
+            guard i + 2 < bytes.count,
+                let h1 = hexValue(bytes[i + 1]),
+                let h2 = hexValue(bytes[i + 2])
+            else {
+                let end = Swift.min(i + 3, bytes.count)
+                let bad = String(decoding: bytes[i..<end], as: UTF8.self)
+                throw BuiltinError.evalError(msg: "invalid URL escape \"\(bad)\"")
+            }
+            out.append(UInt8((h1 << 4) | h2))
+            i += 3
+        default:
+            out.append(b)
+            i += 1
+        }
+    }
+    return String(decoding: out, as: UTF8.self)
+}
+
+/// Maps a 4-bit nibble (0-15) to its uppercase ASCII hex digit (`'0'`-`'9'`,
+/// `'A'`-`'F'`). Used by `queryEscape` to format `%XX` percent-escapes.
+private func hexNibble(_ n: UInt8) -> UInt8 {
+    return n < 10 ? n &+ UInt8(ascii: "0") : n &- 10 &+ UInt8(ascii: "A")
+}
+
+/// Inverse of `hexNibble` (case-insensitive). Returns the integer value of an
+/// ASCII hex digit, or `nil` if `b` is not a hex digit. Used by
+/// `queryUnescape` to parse `%XX` percent-escapes.
+private func hexValue(_ b: UInt8) -> Int? {
+    switch b {
+    case UInt8(ascii: "0")...UInt8(ascii: "9"): return Int(b) - Int(UInt8(ascii: "0"))
+    case UInt8(ascii: "A")...UInt8(ascii: "F"): return Int(b) - Int(UInt8(ascii: "A")) + 10
+    case UInt8(ascii: "a")...UInt8(ascii: "f"): return Int(b) - Int(UInt8(ascii: "a")) + 10
+    default: return nil
+    }
 }

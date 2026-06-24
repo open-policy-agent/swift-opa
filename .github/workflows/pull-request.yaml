@@ -23,10 +23,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
+          - os: macos-15
             xcode: "16.2"
             swift: "6.0.3"
-          - os: macos-latest
+          - os: macos-15
             xcode: "16.4"
             swift: "6.1" # We can't go more modern than 6.1.0 for the 6.1 runner, due to Xcode version support.
           - os: macos-latest
@@ -101,11 +101,14 @@ jobs:
           ref: main
           path: main/swift-opa
           persist-credentials: false
+      # The reason we fetch the passed/failed filter scripts from the PR
+      # checkout folder, is so that we can change how those scripts work
+      # in a PR, and immediately see the results in this job step.
       - name: compliance tests (main)
         run: |
           (make test-compliance || true) > results
-          ../../../main/swift-opa/ComplianceSuite/tools/passed.sh < results > ../../../main-passed
-          ../../../main/swift-opa/ComplianceSuite/tools/failed.sh < results > ../../../main-failed
+          ../../../pr/swift-opa/ComplianceSuite/tools/passed.sh < results > ../../../main-passed
+          ../../../pr/swift-opa/ComplianceSuite/tools/failed.sh < results > ../../../main-failed
         working-directory: main/swift-opa/ComplianceSuite
       - name: compliance tests (pr)
         run: |

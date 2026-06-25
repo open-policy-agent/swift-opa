@@ -5,22 +5,63 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-### `regex` builtins
+## 0.0.7
+
+This release includes bugfixes for non-bundle IR policies and a bunch of new builtin functions.
+
+### Bugfix for non-bundle IR policies (#168)
+
+In the [`0.0.6`](https://github.com/open-policy-agent/swift-opa/releases/tag/0.0.6) release, we added internal machinery to the IR evaluator that determines whether a policy requires async support or not for evaluation, allowing faster evaluation of sync-only policies.
+The sync-safety static analysis pass handled bundles correctly, but did not properly handle user-supplied raw IR policies.
+
+This caused the sync-only variant of the `PreparedQuery.evaluate()` function to throw while trying to run tests in our compliance test suite.
+The issue was not noticed at first, because of how our compliance test CI step accidentally hid failure cases.
+
+The bug was fixed in #168 by adding the needed static analysis pass for user-supplied raw IR policies, and the CI job that should have caught the issue was also updated to better surface new compliance test failures (See the Miscellaneous section for the CI updates).
+
+Authored by @DFrenkel
+
+### `regex` builtins (#138)
 
 Swift OPA now supports the `regex.*` family of builtins:
 
-- `regex.is_valid`
-- `regex.match`
-- `regex.replace`
-- `regex.split`
-- `regex.find_n`
-- `regex.find_all_string_submatch_n`
-- `regex.template_match`
+ - [`regex.is_valid`](https://www.openpolicyagent.org/docs/policy-reference/builtins/regex#builtin-regex-regexis_valid)
+ - [`regex.match`](https://www.openpolicyagent.org/docs/policy-reference/builtins/regex#builtin-regex-regexmatch)
+ - [`regex.replace`](https://www.openpolicyagent.org/docs/policy-reference/builtins/regex#builtin-regex-regexreplace)
+ - [`regex.split`](https://www.openpolicyagent.org/docs/policy-reference/builtins/regex#builtin-regex-regexsplit)
+ - [`regex.find_n`](https://www.openpolicyagent.org/docs/policy-reference/builtins/regex#builtin-regex-regexfind_n)
+ - [`regex.find_all_string_submatch_n`](https://www.openpolicyagent.org/docs/policy-reference/builtins/regex#builtin-regex-regexfind_all_string_submatch_n)
+ - [`regex.template_match`](https://www.openpolicyagent.org/docs/policy-reference/builtins/regex#builtin-regex-regextemplate_match)
 
 > [!WARNING]
 > Swift OPA's `regex.*` builtins are only planned to support [RE2](https://github.com/google/re2/wiki/Syntax) syntax in the long term. Any regex syntax outside of RE2 syntax is unsupported, and may be broken in a future release.
 
 To enforce this, every pattern is validated against an RE2 compatibility scanner up-front. Patterns using backreferences (`\1`–`\9`), lookahead (`(?=...)`, `(?!...)`), lookbehind (`(?<=...)`, `(?<!...)`), or atomic groups (`(?>...)`) are rejected at compile time: `regex.is_valid` returns `false`, and the other builtins throw. The scanner will be tightened over time. See the README's "Regex syntax support" section for more details.
+
+These builtins add powerful new string matching and transformation capabilties.
+
+Authored by @DFrenkel
+
+### `urlquery` builtins (#174)
+
+Swift OPA now supports the `urlquery.*` family of builtins:
+
+ - [`urlquery.encode`](https://www.openpolicyagent.org/docs/policy-reference/builtins/encoding#builtin-encoding-urlqueryencode)
+ - [`urlquery.decode`](https://www.openpolicyagent.org/docs/policy-reference/builtins/encoding#builtin-encoding-urlquerydecode)
+ - [`urlquery.encode_object`](https://www.openpolicyagent.org/docs/policy-reference/builtins/encoding#builtin-encoding-urlqueryencode_object)
+ - [`urlquery.decode_object`](https://www.openpolicyagent.org/docs/policy-reference/builtins/encoding#builtin-encoding-urlquerydecode_object)
+
+These builtins make working with URLs and URL query parameters much more pleasant in Rego policies.
+
+Authored by @DFrenkel
+
+### Miscellaneous
+
+ - ci: Allow diffs PR check to surface new errors. (#171) authored by @philipaconrad
+   - This change corrects our CI jobs so that future compliance test failures will show up as blocking failures in CI.
+ - ci: Pin runner versions on older targets. Fix paths in diff PR check. (#175) authored by @philipaconrad
+ - chore: Fix paths in release notes scripts. (#170) authored by @philipaconrad
+
 
 ## 0.0.6
 

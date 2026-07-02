@@ -22,8 +22,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
-        .package(url: "https://github.com/apple/swift-crypto.git", "1.0.0"..<"5.0.0"),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0")
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -83,3 +82,19 @@ let package = Package(
         ),
     ]
 )
+
+// If the `SWIFT_OPA_ALLOW_SWIFT_CRYPTO_BETA` environment variable is set
+// swift-opa will accept swift-crypto beta releases as a dependency.
+//
+// Note: A beta release can only be used if other packages in the dependency tree
+// that have a direct dependency on swift-crypto accept beta releases as well.
+if ProcessInfo.processInfo.environment["SWIFT_OPA_ALLOW_SWIFT_CRYPTO_BETA"] == nil {
+    package.dependencies += [
+        .package(url: "https://github.com/apple/swift-crypto.git", "1.0.0"..<"5.0.0")
+    ]
+} else {
+    print("Accepting beta versions of swift-crypto!")
+    package.dependencies += [
+        .package(url: "https://github.com/apple/swift-crypto.git", "1.0.0"..<"5.0.0-beta.max")
+    ]
+}

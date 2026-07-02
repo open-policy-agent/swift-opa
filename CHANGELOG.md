@@ -5,6 +5,17 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 0.0.8
+
+This release is a test for some recent release engineering changes.
+
+### Miscellaneous
+
+ - ci: Add API breaking changes workflow. (#177) authored by @philipaconrad
+ - ci: Add `capabilities.json` to release artifacts. (#179) authored by @philipaconrad
+ - Enable using the Crypto 5.0 beta releases (#178) authored by @Lukasa
+
+
 ## 0.0.7
 
 This release includes bugfixes for non-bundle IR policies and a bunch of new builtin functions.

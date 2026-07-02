@@ -46,11 +46,14 @@ if [ "$(grep -vc -e '^[[:space:]]*$' -e "^${TAG_NAME}\$" "${RELEASE_NOTES}")" -e
     exit 1
 fi
 
+# Release artifacts to attach to the GitHub release
+CAPABILITIES_FILE="${CAPABILITIES_FILE:-capabilities.json}"
+
 # Update or create a release on github
 if gh release view "${TAG_NAME}" --repo open-policy-agent/swift-opa > /dev/null; then
     # Occurs when the tag is created via GitHub UI w/ a release
-    gh release upload "${TAG_NAME}" --repo open-policy-agent/swift-opa
+    gh release upload "${TAG_NAME}" "${CAPABILITIES_FILE}" --clobber --repo open-policy-agent/swift-opa
 else
     # Create a draft release
-    gh release create "${TAG_NAME}" -F ${RELEASE_NOTES} --draft --title "${TAG_NAME}" --repo open-policy-agent/swift-opa
+    gh release create "${TAG_NAME}" "${CAPABILITIES_FILE}" -F ${RELEASE_NOTES} --draft --title "${TAG_NAME}" --repo open-policy-agent/swift-opa
 fi

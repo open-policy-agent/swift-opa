@@ -15,8 +15,9 @@ permissions:
 
 jobs:
   ci:
-    name: Build Swift ${{ matrix.swift }}${{ matrix.xcode && format(', Xcode {0}', matrix.xcode) || '' }} (${{ matrix.os }})
+    name: Build Swift ${{ matrix.swift }}${{ matrix.xcode && format(', Xcode {0}', matrix.xcode) || '' }} (${{ matrix.container || matrix.os }})
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     permissions:
       contents: read
     strategy:
@@ -24,18 +25,23 @@ jobs:
       matrix:
         include:
           - os: macos-15
-            xcode: "16.2"
-            swift: "6.0.3"
-          - os: macos-15
             xcode: "16.4"
             swift: "6.1" # We can't go more modern than 6.1.0 for the 6.1 runner, due to Xcode version support.
-          - os: macos-latest
+          - os: macos-26
             xcode: "26.2"
             swift: "6.2.3"
+          - os: macos-26
+            xcode: "26.4"
+            swift: "6.3"
           - os: ubuntu-latest
-            swift: "6.0.3"
+            swift: "6.1"
+            container: "swift:6.1"
           - os: ubuntu-latest
             swift: "6.2"
+            container: "swift:6.2"
+          - os: ubuntu-latest
+            swift: "6.3"
+            container: "swift:6.3"
     env:
       XCODE_VERSION: ${{ matrix.xcode }}
       DEVELOPER_DIR: "/Applications/Xcode_${{ matrix.xcode }}.app"
@@ -46,10 +52,6 @@ jobs:
         run: |
           sudo xcode-select --switch "${DEVELOPER_DIR}/Contents/Developer"
           xcodebuild -version
-      - uses: swift-actions/setup-swift@7ca6abe6b3b0e8b5421b88be48feee39cbf52c6a #v2.4.0
-        if: runner.os == 'Linux'
-        with:
-          swift-version: ${{ matrix.swift }}
       - name: Show Swift version
         run: swift --version
       - name: Fail if Swift version does not match expected version (${{ matrix.swift }})
@@ -66,9 +68,14 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
-      - name: Install jemalloc
+      - name: Install jemalloc (macOS)
         if: runner.os == 'macOS'
         run: brew install jemalloc
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          apt-get update
+          apt-get install -y libjemalloc-dev make
       - name: Lint
         run: make lint
       - name: Test

@@ -5,6 +5,12 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Swift Tools Version updated to 6.1
+
+We have recently updated the [minimum Swift toolchain version](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/settingswifttoolsversion/) required to build Swift OPA from 6.0 to 6.1.
+
+This change gives the project access to [package traits](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/packagetraits/), which will allow us to separate out optional dependencies better.
+
 ## 0.0.8
 
 This release is a test for some recent release engineering changes.

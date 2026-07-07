@@ -232,6 +232,8 @@ We recommend sticking to the supported RE2 regex syntax, in order to avoid futur
 
 We aim to support "latest Swift major version - 2" releases back. As an example, for Swift 6.4, that implies supporting Swift 6.3, and 6.2 as well.
 
+For `.macOS` and `.iOS` platform versions, we aim to support the platform versions associated with the current and previous major macOS releases. For example, if the current macOS release is macOS 26 "Tahoe", then the previous major release was macOS 15 "Sequoia", and we would support the `.macOS(.v15)` target, as well as the iOS version that released at the same time, `.iOS(.v18)`.
+
 ## Community Support
 
 Feel free to open and issue if you encounter any problems using swift-opa, or have ideas on how to make it even better.

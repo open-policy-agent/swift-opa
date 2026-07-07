@@ -10,7 +10,7 @@ let swiftOpaDependencyPath = ProcessInfo.processInfo.environment["SWIFT_OPA_DEPE
 let package = Package(
     name: "RegoCompliance",
     platforms: [
-        .macOS(.v13)
+        .macOS(.v15)
     ],
     products: [
         // Products define the executables and libraries a package produces, making them visible to other packages.

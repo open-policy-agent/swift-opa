@@ -7,9 +7,15 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Swift Tools Version updated to 6.1
 
-We have recently updated the [minimum Swift toolchain version](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/settingswifttoolsversion/) required to build Swift OPA from 6.0 to 6.1.
+We have updated the [minimum Swift toolchain version](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/settingswifttoolsversion/) required to build Swift OPA from 6.0 to 6.1.
 
 This change gives the project access to [package traits](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/packagetraits/), which will allow us to separate out optional dependencies better.
+
+### Minimum platform OS versions updated for macOS and iOS
+
+We have updated the minimum platform OS versions required to build Swift OPA from `.macOS(.v13)` -> `.macOS(.v15)` and `.iOS(.v16)` -> `.iOS(.v18)`.
+
+Bumping the OS versions allows us to use [`Mutex<T>`](https://developer.apple.com/documentation/synchronization/mutex) and other newer Swift APIs.
 
 ## 0.0.8
 

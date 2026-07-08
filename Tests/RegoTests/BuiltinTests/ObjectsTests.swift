@@ -588,12 +588,397 @@ extension BuiltinTests.ObjectTests {
         ),
     ]
 
+    static let objectFilterKeysWant = "any<array[any], object[any: any], set[any]>"
+
+    static let objectFilterTests: [BuiltinTests.TestCase] =
+        [
+            BuiltinTests.TestCase(
+                description: "filter with set of keys",
+                name: "object.filter",
+                args: [
+                    ["a": 1, "b": 2, "c": 3],
+                    .set(["a", "c"]),
+                ],
+                expected: .success(.object(["a": 1, "c": 3]))
+            ),
+            BuiltinTests.TestCase(
+                description: "filter with array of keys",
+                name: "object.filter",
+                args: [
+                    ["a": 1, "b": 2],
+                    .array(["b"]),
+                ],
+                expected: .success(.object(["b": 2]))
+            ),
+            BuiltinTests.TestCase(
+                description: "filter with object keys (values ignored)",
+                name: "object.filter",
+                args: [
+                    ["a": 1, "b": 2],
+                    ["a": "ignored"],
+                ],
+                expected: .success(.object(["a": 1]))
+            ),
+            BuiltinTests.TestCase(
+                description: "key requested but not present is skipped",
+                name: "object.filter",
+                args: [
+                    ["a": 1],
+                    .set(["a", "zz"]),
+                ],
+                expected: .success(.object(["a": 1]))
+            ),
+            BuiltinTests.TestCase(
+                description: "empty keys yields empty object",
+                name: "object.filter",
+                args: [
+                    ["a": 1, "b": 2],
+                    .set([]),
+                ],
+                expected: .success(.object([:]))
+            ),
+            BuiltinTests.TestCase(
+                description: "empty object yields empty object",
+                name: "object.filter",
+                args: [
+                    [:],
+                    .set(["a"]),
+                ],
+                expected: .success(.object([:]))
+            ),
+            BuiltinTests.TestCase(
+                description: "nested values preserved",
+                name: "object.filter",
+                args: [
+                    ["a": ["x": 1], "b": 2],
+                    .set(["a"]),
+                ],
+                expected: .success(.object(["a": ["x": 1]]))
+            ),
+            BuiltinTests.TestCase(
+                description: "non string keys",
+                name: "object.filter",
+                args: [
+                    .object([.array([7]): 2, "a": 1]),
+                    .set([.array([7])]),
+                ],
+                expected: .success(.object([.array([7]): 2]))
+            ),
+        ]
+        + BuiltinTests.generateFailureTests(
+            builtinName: "object.filter",
+            sampleArgs: [["a": 1], .set(["a"])],
+            argIndex: 0,
+            argName: "object",
+            allowedArgTypes: ["object"],
+            generateNumberOfArgsTest: true
+        )
+        + BuiltinTests.generateFailureTests(
+            builtinName: "object.filter",
+            sampleArgs: [["a": 1], .set(["a"])],
+            argIndex: 1,
+            argName: "keys",
+            allowedArgTypes: ["array", "object", "set"],
+            wantArgs: objectFilterKeysWant
+        )
+
+    static let objectRemoveTests: [BuiltinTests.TestCase] =
+        [
+            BuiltinTests.TestCase(
+                description: "remove with set of keys",
+                name: "object.remove",
+                args: [
+                    ["a": 1, "b": 2, "c": 3],
+                    .set(["b"]),
+                ],
+                expected: .success(.object(["a": 1, "c": 3]))
+            ),
+            BuiltinTests.TestCase(
+                description: "remove with array of keys",
+                name: "object.remove",
+                args: [
+                    ["a": 1, "b": 2],
+                    .array(["a"]),
+                ],
+                expected: .success(.object(["b": 2]))
+            ),
+            BuiltinTests.TestCase(
+                description: "remove with object keys (values ignored)",
+                name: "object.remove",
+                args: [
+                    ["a": 1, "b": 2],
+                    ["a": "ignored"],
+                ],
+                expected: .success(.object(["b": 2]))
+            ),
+            BuiltinTests.TestCase(
+                description: "removing a key that doesn't exist is a no-op",
+                name: "object.remove",
+                args: [
+                    ["a": 1],
+                    .set(["zz"]),
+                ],
+                expected: .success(.object(["a": 1]))
+            ),
+            BuiltinTests.TestCase(
+                description: "remove all keys yields empty object",
+                name: "object.remove",
+                args: [
+                    ["a": 1, "b": 2],
+                    .set(["a", "b"]),
+                ],
+                expected: .success(.object([:]))
+            ),
+            BuiltinTests.TestCase(
+                description: "empty keys leaves object unchanged",
+                name: "object.remove",
+                args: [
+                    ["a": 1],
+                    .set([]),
+                ],
+                expected: .success(.object(["a": 1]))
+            ),
+            BuiltinTests.TestCase(
+                description: "empty object yields empty object",
+                name: "object.remove",
+                args: [
+                    [:],
+                    .set(["a"]),
+                ],
+                expected: .success(.object([:]))
+            ),
+            BuiltinTests.TestCase(
+                description: "non string keys",
+                name: "object.remove",
+                args: [
+                    .object([.array([7]): 2, "a": 1]),
+                    .set([.array([7])]),
+                ],
+                expected: .success(.object(["a": 1]))
+            ),
+        ]
+        + BuiltinTests.generateFailureTests(
+            builtinName: "object.remove",
+            sampleArgs: [["a": 1], .set(["a"])],
+            argIndex: 0,
+            argName: "object",
+            allowedArgTypes: ["object"],
+            generateNumberOfArgsTest: true
+        )
+        + BuiltinTests.generateFailureTests(
+            builtinName: "object.remove",
+            sampleArgs: [["a": 1], .set(["a"])],
+            argIndex: 1,
+            argName: "keys",
+            allowedArgTypes: ["array", "object", "set"],
+            wantArgs: objectFilterKeysWant
+        )
+
+    static let objectSubsetTypeError = BuiltinError.evalError(
+        msg: "both arguments object.subset must be of the same type or array and set")
+
+    static let objectSubsetTests: [BuiltinTests.TestCase] =
+        [
+            // object / object
+            BuiltinTests.TestCase(
+                description: "object: simple subset",
+                name: "object.subset",
+                args: [["a": 1, "b": 2], ["a": 1]],
+                expected: .success(.boolean(true))
+            ),
+            BuiltinTests.TestCase(
+                description: "object: equal objects",
+                name: "object.subset",
+                args: [["a": 1], ["a": 1]],
+                expected: .success(.boolean(true))
+            ),
+            BuiltinTests.TestCase(
+                description: "object: missing key",
+                name: "object.subset",
+                args: [["a": 1], ["b": 1]],
+                expected: .success(.boolean(false))
+            ),
+            BuiltinTests.TestCase(
+                description: "object: value mismatch",
+                name: "object.subset",
+                args: [["a": 1], ["a": 2]],
+                expected: .success(.boolean(false))
+            ),
+            BuiltinTests.TestCase(
+                description: "object: nested object subset recurses (true)",
+                name: "object.subset",
+                args: [["a": ["b": 1, "c": 2]], ["a": ["b": 1]]],
+                expected: .success(.boolean(true))
+            ),
+            BuiltinTests.TestCase(
+                description: "object: nested object subset recurses (false)",
+                name: "object.subset",
+                args: [["a": ["b": 1]], ["a": ["b": 1, "c": 2]]],
+                expected: .success(.boolean(false))
+            ),
+            BuiltinTests.TestCase(
+                description: "object: nested set subset recurses (true)",
+                name: "object.subset",
+                args: [["a": .set([1, 2, 3])], ["a": .set([1, 2])]],
+                expected: .success(.boolean(true))
+            ),
+            BuiltinTests.TestCase(
+                description: "object: nested set subset recurses (false)",
+                name: "object.subset",
+                args: [["a": .set([1])], ["a": .set([1, 2])]],
+                expected: .success(.boolean(false))
+            ),
+            BuiltinTests.TestCase(
+                description: "object: nested array subset recurses (true)",
+                name: "object.subset",
+                args: [["a": [1, 2, 3, 4]], ["a": [2, 3]]],
+                expected: .success(.boolean(true))
+            ),
+            BuiltinTests.TestCase(
+                description: "object: nested array subset recurses (false, not contiguous)",
+                name: "object.subset",
+                args: [["a": [1, 2, 3]], ["a": [1, 3]]],
+                expected: .success(.boolean(false))
+            ),
+            BuiltinTests.TestCase(
+                description: "object: nested value type mismatch",
+                name: "object.subset",
+                args: [["a": 1], ["a": .set([1])]],
+                expected: .success(.boolean(false))
+            ),
+            // set / set
+            BuiltinTests.TestCase(
+                description: "set: subset",
+                name: "object.subset",
+                args: [.set([1, 2, 3]), .set([1, 2])],
+                expected: .success(.boolean(true))
+            ),
+            BuiltinTests.TestCase(
+                description: "set: not a subset",
+                name: "object.subset",
+                args: [.set([1, 2]), .set([1, 3])],
+                expected: .success(.boolean(false))
+            ),
+            BuiltinTests.TestCase(
+                description: "set: empty sub is a subset",
+                name: "object.subset",
+                args: [.set([1]), .set([])],
+                expected: .success(.boolean(true))
+            ),
+            // array / array
+            BuiltinTests.TestCase(
+                description: "array: contiguous subslice",
+                name: "object.subset",
+                args: [[1, 2, 3, 4], [2, 3]],
+                expected: .success(.boolean(true))
+            ),
+            BuiltinTests.TestCase(
+                description: "array: non-contiguous is not a subset",
+                name: "object.subset",
+                args: [[1, 2, 3, 4], [1, 3]],
+                expected: .success(.boolean(false))
+            ),
+            BuiltinTests.TestCase(
+                description: "array: equal arrays",
+                name: "object.subset",
+                args: [[1, 2, 3], [1, 2, 3]],
+                expected: .success(.boolean(true))
+            ),
+            BuiltinTests.TestCase(
+                description: "array: subslice at start",
+                name: "object.subset",
+                args: [[1, 2, 3], [1, 2]],
+                expected: .success(.boolean(true))
+            ),
+            BuiltinTests.TestCase(
+                description: "array: subslice at end",
+                name: "object.subset",
+                args: [[1, 2, 3], [2, 3]],
+                expected: .success(.boolean(true))
+            ),
+            BuiltinTests.TestCase(
+                description: "array: empty sub is a subset",
+                name: "object.subset",
+                args: [[1, 2], .array([])],
+                expected: .success(.boolean(true))
+            ),
+            BuiltinTests.TestCase(
+                description: "array: sub bigger than super",
+                name: "object.subset",
+                args: [[1], [1, 2]],
+                expected: .success(.boolean(false))
+            ),
+            // array (super) / set (sub) - the one supported mixed case
+            BuiltinTests.TestCase(
+                description: "array super, set sub: all members present (order irrelevant)",
+                name: "object.subset",
+                args: [[1, 2, 3], .set([3, 1])],
+                expected: .success(.boolean(true))
+            ),
+            BuiltinTests.TestCase(
+                description: "array super, set sub: member missing",
+                name: "object.subset",
+                args: [[1, 2, 3], .set([4])],
+                expected: .success(.boolean(false))
+            ),
+            BuiltinTests.TestCase(
+                description: "array super, set sub: empty set",
+                name: "object.subset",
+                args: [[1, 2], .set([])],
+                expected: .success(.boolean(true))
+            ),
+            // type mismatches - error
+            BuiltinTests.TestCase(
+                description: "object super, set sub is unsupported",
+                name: "object.subset",
+                args: [["a": 1], .set(["a"])],
+                expected: .failure(objectSubsetTypeError)
+            ),
+            BuiltinTests.TestCase(
+                description: "object super, array sub is unsupported",
+                name: "object.subset",
+                args: [["a": 1], .array(["a"])],
+                expected: .failure(objectSubsetTypeError)
+            ),
+            BuiltinTests.TestCase(
+                description: "set super, object sub is unsupported",
+                name: "object.subset",
+                args: [.set([1]), ["a": 1]],
+                expected: .failure(objectSubsetTypeError)
+            ),
+            BuiltinTests.TestCase(
+                description: "set super, array sub is unsupported",
+                name: "object.subset",
+                args: [.set([1]), [1]],
+                expected: .failure(objectSubsetTypeError)
+            ),
+            BuiltinTests.TestCase(
+                description: "array super, object sub is unsupported",
+                name: "object.subset",
+                args: [[1], ["a": 1]],
+                expected: .failure(objectSubsetTypeError)
+            ),
+            BuiltinTests.TestCase(
+                description: "scalar arguments are unsupported",
+                name: "object.subset",
+                args: [.number(1), .number(1)],
+                expected: .failure(objectSubsetTypeError)
+            ),
+        ]
+        + BuiltinTests.generateNumberOfArgumentsFailureTests(
+            builtinName: "object.subset",
+            sampleArgs: [["a": 1], ["a": 1]]
+        )
+
     static var allTests: [BuiltinTests.TestCase] {
         [
             objectGetTests,
             objectKeysTests,
             objectUnionTests,
             objectUnionNTests,
+            objectFilterTests,
+            objectRemoveTests,
+            objectSubsetTests,
         ].flatMap { $0 }
     }
 

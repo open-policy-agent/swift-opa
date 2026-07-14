@@ -64,6 +64,10 @@ let package = Package(
                 .product(name: "Yams", package: "Yams", condition: .when(traits: ["YAML"])),
             ]
         ),
+        .target(
+            name: "TestRunner",
+            dependencies: ["AST", "IR", "Rego"]
+        ),
         // Internal module tests
         .testTarget(
             name: "ASTTests",
@@ -83,6 +87,11 @@ let package = Package(
             dependencies: ["Rego"],
             resources: [.copy("TestData")]
         ),
+        .testTarget(
+            name: "TestRunnerTests",
+            dependencies: ["TestRunner", "AST", "IR", "Rego"],
+            resources: [.copy("Fixtures")]
+        ),
         // Public API surface tests
         .testTarget(
             name: "SwiftOPATests",
@@ -92,6 +101,7 @@ let package = Package(
             name: "CLI",
             dependencies: [
                 "Rego",
+                "TestRunner",
                 .product(
                     name: "ArgumentParser",
                     package: "swift-argument-parser",

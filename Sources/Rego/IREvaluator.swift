@@ -215,5 +215,7 @@ func queryToEntryPoint(_ query: String) throws -> String {
         // done!
         return query
     }
-    return query.dropFirst(prefix.count + 1).replacingOccurrences(of: ".", with: "/")
+    // Hot path: called once per evaluate(). Avoid Foundation's
+    // replacingOccurrences(of:with:), which bridges to NSString on Linux.
+    return String(query.dropFirst(prefix.count + 1).map { $0 == "." ? "/" : $0 })
 }

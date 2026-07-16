@@ -133,6 +133,27 @@ public struct RegoNumber: Sendable, Hashable {
         }
     }
 
+    /// Whether this number is a whole number (no fractional part), regardless of magnitude.
+    /// Unlike ``int64Value`` this returns true even when the value is too large for `Int64`.
+    public var isInteger: Bool {
+        switch storage {
+        case .int(_):
+            return true
+        case .decimal(let v):
+            return v.isWholeNumber
+        }
+    }
+
+    /// Whether this number is strictly greater than zero.
+    public var isPositive: Bool {
+        switch storage {
+        case .int(let v):
+            return v > 0
+        case .decimal(let v):
+            return v > 0
+        }
+    }
+
 }
 
 // MARK: - CustomStringConvertible & CustomDebugStringConvertible

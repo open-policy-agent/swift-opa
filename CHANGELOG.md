@@ -5,17 +5,32 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-### Swift Tools Version updated to 6.1
+## 0.0.9
+
+This release includes small performance improvements, new `object.*` builtins, and upgrades our minimum Swift toolchain and OS versions.
+
+### object.filter, object.remove, object.subset (#187)
+
+Swift OPA now supports some new `object.*` builtins:
+
+- [`object.filter`](https://www.openpolicyagent.org/docs/policy-reference/builtins/object#builtin-object-objectfilter)
+- [`object.remove`](https://www.openpolicyagent.org/docs/policy-reference/builtins/object#builtin-object-objectremove)
+- [`object.subset`](https://www.openpolicyagent.org/docs/policy-reference/builtins/object#builtin-object-objectsubset)
+
+Authored by @DFrenkel
+
+### Swift Tools Version updated to 6.1 (#183)
 
 We have updated the [minimum Swift toolchain version](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/settingswifttoolsversion/) required to build Swift OPA from 6.0 to 6.1.
 
 This change gives the project access to [package traits](https://docs.swift.org/swiftpm/documentation/packagemanagerdocs/packagetraits/), which will allow us to separate out optional dependencies better.
 
-### Minimum platform OS versions updated for macOS and iOS
+### Minimum platform OS versions updated for macOS and iOS (#185)
 
 We have updated the minimum platform OS versions required to build Swift OPA from `.macOS(.v13)` -> `.macOS(.v15)` and `.iOS(.v16)` -> `.iOS(.v18)`.
 
 Bumping the OS versions allows us to use [`Mutex<T>`](https://developer.apple.com/documentation/synchronization/mutex) and other newer Swift APIs.
+
 
 ## 0.0.8
 

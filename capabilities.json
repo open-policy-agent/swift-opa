@@ -893,6 +893,67 @@
       "decl" : {
         "args" : [
           {
+            "dynamic" : {
+              "key" : {
+                "type" : "any"
+              },
+              "value" : {
+                "type" : "any"
+              }
+            },
+            "type" : "object"
+          },
+          {
+            "of" : [
+              {
+                "dynamic" : {
+                  "of" : [
+                    {
+                      "type" : "string"
+                    },
+                    {
+                      "dynamic" : {
+                        "type" : "any"
+                      },
+                      "type" : "array"
+                    }
+                  ],
+                  "type" : "any"
+                },
+                "type" : "array"
+              },
+              {
+                "of" : {
+                  "of" : [
+                    {
+                      "type" : "string"
+                    },
+                    {
+                      "dynamic" : {
+                        "type" : "any"
+                      },
+                      "type" : "array"
+                    }
+                  ],
+                  "type" : "any"
+                },
+                "type" : "set"
+              }
+            ],
+            "type" : "any"
+          }
+        ],
+        "result" : {
+          "type" : "any"
+        },
+        "type" : "function"
+      },
+      "name" : "json.filter"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
             "type" : "string"
           }
         ],
@@ -961,6 +1022,109 @@
         "type" : "function"
       },
       "name" : "json.marshal_with_options"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "type" : "any"
+          },
+          {
+            "dynamic" : {
+              "dynamic" : {
+                "key" : {
+                  "type" : "any"
+                },
+                "value" : {
+                  "type" : "any"
+                }
+              },
+              "static" : [
+                {
+                  "key" : "op",
+                  "value" : {
+                    "type" : "string"
+                  }
+                },
+                {
+                  "key" : "path",
+                  "value" : {
+                    "type" : "any"
+                  }
+                }
+              ],
+              "type" : "object"
+            },
+            "type" : "array"
+          }
+        ],
+        "result" : {
+          "type" : "any"
+        },
+        "type" : "function"
+      },
+      "name" : "json.patch"
+    },
+    {
+      "decl" : {
+        "args" : [
+          {
+            "dynamic" : {
+              "key" : {
+                "type" : "any"
+              },
+              "value" : {
+                "type" : "any"
+              }
+            },
+            "type" : "object"
+          },
+          {
+            "of" : [
+              {
+                "dynamic" : {
+                  "of" : [
+                    {
+                      "type" : "string"
+                    },
+                    {
+                      "dynamic" : {
+                        "type" : "any"
+                      },
+                      "type" : "array"
+                    }
+                  ],
+                  "type" : "any"
+                },
+                "type" : "array"
+              },
+              {
+                "of" : {
+                  "of" : [
+                    {
+                      "type" : "string"
+                    },
+                    {
+                      "dynamic" : {
+                        "type" : "any"
+                      },
+                      "type" : "array"
+                    }
+                  ],
+                  "type" : "any"
+                },
+                "type" : "set"
+              }
+            ],
+            "type" : "any"
+          }
+        ],
+        "result" : {
+          "type" : "any"
+        },
+        "type" : "function"
+      },
+      "name" : "json.remove"
     },
     {
       "decl" : {

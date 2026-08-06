@@ -197,6 +197,9 @@ public struct BuiltinRegistry: Sendable {
             "numbers.range_step": BuiltinFuncs.numbersRangeStep,
 
             // Objects
+            "json.filter": BuiltinFuncs.jsonFilter,
+            "json.patch": BuiltinFuncs.jsonPatch,
+            "json.remove": BuiltinFuncs.jsonRemove,
             "object.filter": BuiltinFuncs.objectFilter,
             "object.get": BuiltinFuncs.objectGet,
             "object.keys": BuiltinFuncs.objectKeys,

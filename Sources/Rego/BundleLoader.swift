@@ -1,7 +1,7 @@
 import AST
 import Foundation
 
-struct BundleLoader {
+package struct BundleLoader {
     var bundleFiles: any Sequence<Result<BundleFile, any Swift.Error>>
 
     init(fromFileSequence files: any Sequence<Result<BundleFile, any Swift.Error>>) {
@@ -84,14 +84,14 @@ struct BundleLoader {
         return bundle
     }
 
-    public static func load(fromDirectory url: URL) throws -> OPA.Bundle {
+    package static func load(fromDirectory url: URL) throws -> OPA.Bundle {
         let files = DirectoryLoader(baseURL: url)
         return try BundleLoader(fromFileSequence: files).load()
     }
 
     // Accept either a directory to load a bundle from or a path to an individual file
     // which will be treated as a bundle tarball.
-    public static func load(fromFile url: URL) throws -> OPA.Bundle {
+    package static func load(fromFile url: URL) throws -> OPA.Bundle {
         let isDir = (try url.resourceValues(forKeys: [.isDirectoryKey])).isDirectory ?? false
         if isDir {
             return try load(fromDirectory: url)

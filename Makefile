@@ -28,7 +28,12 @@ perf:
 .PHONY: build
 build:
 	swift build
-	
+
+# Minimum viable build: all package traits disabled.
+.PHONY: build-minimal
+build-minimal:
+	swift build --disable-default-traits
+
 .PHONY: build-release
 build-release:
 	swift build -c release

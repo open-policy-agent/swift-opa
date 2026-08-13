@@ -21,6 +21,15 @@ let package = Package(
             targets: ["CLI"]
         ),
     ],
+    traits: [
+        // Enabled by default. Library-only consumers can opt out to drop the CLI and its
+        // dependencies from resolution.
+        .default(enabledTraits: ["CLI"]),
+        Trait(
+            name: "CLI",
+            description: "Builds the swift-opa-cli executable and its dependencies."
+        ),
+    ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0")
     ],
@@ -77,7 +86,11 @@ let package = Package(
             name: "CLI",
             dependencies: [
                 "Rego",
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(
+                    name: "ArgumentParser",
+                    package: "swift-argument-parser",
+                    condition: .when(traits: ["CLI"])
+                ),
             ]
         ),
     ]

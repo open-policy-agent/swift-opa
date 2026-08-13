@@ -78,6 +78,25 @@ let package = Package(
 )
 ```
 
+### Traits and Minimal Builds
+
+Swift-OPA ships a `swift-opa-cli` executable that depends on
+[swift-argument-parser](https://github.com/apple/swift-argument-parser). This is enabled
+by default via the `CLI` package trait.
+
+Library-only consumers who only want the VM can disable the trait to drop the CLI and
+its dependencies entirely on newer Swift toolchain versions:
+
+```swift
+dependencies: [
+    .package(
+        url: "https://github.com/open-policy-agent/swift-opa",
+        branch: "main",
+        traits: []   // disables the default "CLI" trait; swift-argument-parser is not fetched
+    ),
+],
+```
+
 ## Usage
 
 The main entry point for policy evaluation is the `OPA.Engine`. An engine can evaluate policies packaged in one or more

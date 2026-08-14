@@ -80,22 +80,31 @@ let package = Package(
 
 ### Traits and Minimal Builds
 
-Swift-OPA ships a `swift-opa-cli` executable that depends on
-[swift-argument-parser](https://github.com/apple/swift-argument-parser). This is enabled
-by default via the `CLI` package trait.
+Swift-OPA exposes two optional features behind default-enabled package traits:
 
-Library-only consumers who only want the VM can disable the trait to drop the CLI and
-its dependencies entirely on newer Swift toolchain versions:
+- **`CLI`** — builds the `swift-opa-cli` executable. Depends on
+  [swift-argument-parser](https://github.com/apple/swift-argument-parser).
+- **`YAML`** — builds the `yaml.is_valid`, `yaml.marshal`, and `yaml.unmarshal`
+  builtins. Depends on [Yams](https://github.com/jpsim/Yams).
+
+Both are enabled by default. Library-only consumers who only want the VM can disable
+either or both traits to drop those features and their dependencies entirely on newer
+Swift toolchain versions:
 
 ```swift
 dependencies: [
     .package(
         url: "https://github.com/open-policy-agent/swift-opa",
-        branch: "main",
-        traits: []   // disables the default "CLI" trait; swift-argument-parser is not fetched
+        from: "<latest version>",
+        traits: []   // Disables all traits. Optional dependencies not fetched.
     ),
 ],
 ```
+
+To keep only some features, list the traits you want to enable, e.g.
+`traits: ["YAML"]` builds the `yaml.*` builtins but drops the CLI. When the `YAML`
+trait is disabled, the `yaml.*` builtins are not registered.
+
 
 ## Usage
 

@@ -22,16 +22,21 @@ let package = Package(
         ),
     ],
     traits: [
-        // Enabled by default. Library-only consumers can opt out to drop the CLI and its
-        // dependencies from resolution.
-        .default(enabledTraits: ["CLI"]),
+        // Enabled by default. Library-only consumers can opt out to drop optional
+        // features and dependencies from the build.
+        .default(enabledTraits: ["CLI", "YAML"]),
         Trait(
             name: "CLI",
             description: "Builds the swift-opa-cli executable and its dependencies."
         ),
+        Trait(
+            name: "YAML",
+            description: "Builds the yaml.* builtins and their Yams dependency."
+        ),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0")
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
+        .package(url: "https://github.com/jpsim/Yams", from: "6.2.1"),
     ],
     targets: [
         // Targets are the basic building blocks of a package, defining a module or a test suite.
@@ -56,6 +61,7 @@ let package = Package(
                 "IR",
                 "Bytecode",
                 .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
+                .product(name: "Yams", package: "Yams", condition: .when(traits: ["YAML"])),
             ]
         ),
         // Internal module tests

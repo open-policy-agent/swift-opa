@@ -5,6 +5,19 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### `yaml.is_valid`, `yaml.marshal`, `yaml.unmarshal` builtins
+
+Swift OPA now supports the `yaml.*` builtins:
+
+- [`yaml.is_valid`](https://www.openpolicyagent.org/docs/policy-reference/builtins/yaml#builtin-yaml-yamlis_valid)
+- [`yaml.marshal`](https://www.openpolicyagent.org/docs/policy-reference/builtins/yaml#builtin-yaml-yamlmarshal)
+- [`yaml.unmarshal`](https://www.openpolicyagent.org/docs/policy-reference/builtins/yaml#builtin-yaml-yamlunmarshal)
+
+These are backed by [Yams](https://github.com/jpsim/Yams), which is gated behind a new,
+default-enabled `YAML` package trait. Library-only consumers can disable the trait to
+drop the Yams dependency from their build. When disabled, the `yaml.*` builtins are not
+registered.
+
 ## 0.0.9
 
 This release includes small performance improvements, new `object.*` builtins, and upgrades our minimum Swift toolchain and OS versions.

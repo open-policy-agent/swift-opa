@@ -116,7 +116,7 @@ public struct BuiltinRegistry: Sendable {
     }
 
     internal static var defaultBuiltins: [String: SyncBuiltin] {
-        return [
+        var builtins: [String: SyncBuiltin] = [
             // Aggregates
             "count": BuiltinFuncs.count,
             "max": BuiltinFuncs.max,
@@ -294,6 +294,16 @@ public struct BuiltinRegistry: Sendable {
             // Walk
             "walk": BuiltinFuncs.walk,
         ]
+
+        // Encoding (YAML): Gated behind the optional "YAML" package trait, which
+        // controls whether the Yams dependency is resolved and compiled in.
+        #if YAML
+            builtins["yaml.is_valid"] = BuiltinFuncs.yamlIsValid
+            builtins["yaml.marshal"] = BuiltinFuncs.yamlMarshal
+            builtins["yaml.unmarshal"] = BuiltinFuncs.yamlUnmarshal
+        #endif
+
+        return builtins
     }
 
     public subscript(name: String) -> AsyncBuiltin? {

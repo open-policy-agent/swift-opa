@@ -38,6 +38,18 @@ build-minimal:
 build-release:
 	swift build -c release
 
+# CI-specific targets. `build-ci` builds the code and tests in one pass, and
+# `test-ci` (which depends on it) runs with `--skip-build`. Test artifacts are
+# written outside `.build` so they don't pollute the cached build directory.
+.PHONY: build-ci
+build-ci:
+	swift build --build-tests
+
+.PHONY: test-ci
+test-ci: build-ci
+	mkdir -p test-results
+	swift test --skip-build --xunit-output test-results/junit.xml
+
 .PHONY: ensure-bindir
 ensure-bindir:
 ifeq ($(shell test -d "$(BINDIR)"; echo $$?),1)

@@ -68,20 +68,33 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
-      - name: Install jemalloc (macOS)
+      - name: Setup zstd for GH cache (macOS)
         if: runner.os == 'macOS'
-        run: brew install jemalloc
+        run: brew install zstd
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
           apt-get update
-          apt-get install -y libjemalloc-dev make
+          apt-get install -y make zstd
       - name: Lint
         run: make lint
-      - name: Test
-        run: make test
+      - name: Restore .build
+        id: "restore-build"
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .build
+          key: "swiftpm-tests-build-${{ runner.os }}-${{ matrix.swift }}-${{ github.event.pull_request.base.sha || github.event.after }}"
+          restore-keys: "swiftpm-tests-build-${{ runner.os }}-${{ matrix.swift }}-"
       - name: Build
-        run: make build
+        run: make build-ci
+      - name: Cache .build
+        if: steps.restore-build.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .build
+          key: "swiftpm-tests-build-${{ runner.os }}-${{ matrix.swift }}-${{ github.event.pull_request.base.sha || github.event.after }}"
+      - name: Test
+        run: make test-ci
       - name: make fmt lint test (ComplianceSuite)
         run: make fmt lint test
         working-directory: ComplianceSuite
@@ -102,9 +115,22 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y libjemalloc-dev make
+          apt-get install -y libjemalloc-dev make zstd
+      - name: Restore .build
+        id: "restore-build"
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .build
+          key: "swiftpm-minimal-build-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
+          restore-keys: "swiftpm-minimal-build-${{ runner.os }}-"
       - name: Build (minimal, all traits disabled)
         run: make build-minimal
+      - name: Cache .build
+        if: steps.restore-build.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .build
+          key: "swiftpm-minimal-build-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
 
   diff:
     name: diff compliance tests (vs main)
@@ -127,6 +153,22 @@ jobs:
           ref: main
           path: main/swift-opa
           persist-credentials: false
+      - name: Setup zstd for GH cache
+        run: brew install zstd
+      - name: Restore ComplianceSuite .build (main)
+        id: "restore-compliance-main"
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: main/swift-opa/ComplianceSuite/.build
+          key: "compliance-build-main-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
+          restore-keys: "compliance-build-main-${{ runner.os }}-"
+      - name: Restore ComplianceSuite .build (pr)
+        id: "restore-compliance-pr"
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: pr/swift-opa/ComplianceSuite/.build
+          key: "compliance-build-pr-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
+          restore-keys: "compliance-build-pr-${{ runner.os }}-"
       # The reason we fetch the passed/failed filter scripts from the PR
       # checkout folder, is so that we can change how those scripts work
       # in a PR, and immediately see the results in this job step.
@@ -136,12 +178,24 @@ jobs:
           ../../../pr/swift-opa/ComplianceSuite/tools/passed.sh < results > ../../../main-passed
           ../../../pr/swift-opa/ComplianceSuite/tools/failed.sh < results > ../../../main-failed
         working-directory: main/swift-opa/ComplianceSuite
+      - name: Cache ComplianceSuite .build (main)
+        if: steps.restore-compliance-main.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: main/swift-opa/ComplianceSuite/.build
+          key: "compliance-build-main-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
       - name: compliance tests (pr)
         run: |
           (make test-compliance || true) > results
           ./tools/passed.sh < results > ../../../pr-passed
           ./tools/failed.sh < results > ../../../pr-failed
         working-directory: pr/swift-opa/ComplianceSuite
+      - name: Cache ComplianceSuite .build (pr)
+        if: steps.restore-compliance-pr.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: pr/swift-opa/ComplianceSuite/.build
+          key: "compliance-build-pr-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
       - name: summary diff
         run: |
           diff_and_print() {
@@ -176,8 +230,27 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
+      - name: Setup zstd for GH cache
+        run: brew install zstd
+      - name: Restore .build
+        id: "restore-build"
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            .build
+            tools/SyncGen/.build
+          key: "swiftpm-generate-build-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
+          restore-keys: "swiftpm-generate-build-${{ runner.os }}-"
       - name: generate
         run: make generate
+      - name: Cache .build
+        if: steps.restore-build.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            .build
+            tools/SyncGen/.build
+          key: "swiftpm-generate-build-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
       - name: check capabilities.json
         run: |
           if git diff --exit-code capabilities.json; then

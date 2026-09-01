@@ -11,6 +11,9 @@ Rego is a declarative language for expressing policy over structured data. A
 common use of Rego is for defining authorization policy.
 Swift-OPA allows for in-process evaluation of compiled Rego within a Swift-based service or application.
 
+> [!NOTE]
+> If you are looking for features like metrics, logging, automatic reloading of bundles over the network, and so on, then you may want to look into the [Swift-OPA-SDK](https://github.com/open-policy-agent/swift-opa-sdk/) library that provides a powerful management wrapper around the Swift OPA evaluator.
+
 ## Prerequisites
 
 ### A Rego Policy

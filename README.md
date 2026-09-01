@@ -1,6 +1,6 @@
 # Swift-OPA
 
-[![Swift 6.0.3+](https://img.shields.io/badge/Swift-6.0.3+-blue.svg)](https://developer.apple.com/swift/)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fopen-policy-agent%2Fswift-opa%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/open-policy-agent/swift-opa) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fopen-policy-agent%2Fswift-opa%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/open-policy-agent/swift-opa)
 
 Swift-OPA is a Swift package for evaluating [OPA IR
 Plans](https://www.openpolicyagent.org/docs/latest/ir/) compiled from

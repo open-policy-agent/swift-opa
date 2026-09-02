@@ -5,7 +5,24 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-### `yaml.is_valid`, `yaml.marshal`, `yaml.unmarshal` builtins
+
+## 0.0.10
+
+This release includes a handful of new builtins for handling YAML and object editing operations.
+
+### `json.filter`, `json.patch`, `json.remove` builtins (#193)
+
+Swift OPA now supports some of the object-category JSON builtins:
+
+- [`json.filter`](https://www.openpolicyagent.org/docs/policy-reference/builtins/object#builtin-json-jsonfilter)
+- [`json.patch`](https://www.openpolicyagent.org/docs/policy-reference/builtins/object#builtin-json-jsonpatch)
+- [`json.remove`](https://www.openpolicyagent.org/docs/policy-reference/builtins/object#builtin-json-jsonremove)
+
+These builtins allow editing Rego Objects with filtering, JSON-Patch operations, and removing items by path.
+
+Authored by @DFrenkel
+
+### `yaml.is_valid`, `yaml.marshal`, `yaml.unmarshal` builtins (#195)
 
 Swift OPA now supports the `yaml.*` builtins:
 
@@ -17,6 +34,16 @@ These are backed by [Yams](https://github.com/jpsim/Yams), which is gated behind
 default-enabled `YAML` package trait. Library-only consumers can disable the trait to
 drop the Yams dependency from their build. When disabled, the `yaml.*` builtins are not
 registered.
+
+Authored by @philipaconrad
+
+### Miscellaneous
+
+ - deps+CLI: Begin using traits + make CLI optional. (#194)  authored by @philipaconrad
+ - ci: Add Github Actions caching + CI makefile targets (#196) authored by @philipaconrad
+ - README: Add cross-linking to the Swift OPA SDK library. (#197) authored by @philipaconrad
+ - README: Add SPI badges for Swift version and platform support. (#198) authored by @philipaconrad
+
 
 ## 0.0.9
 

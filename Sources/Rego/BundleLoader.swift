@@ -8,14 +8,9 @@ package struct BundleLoader {
         self.bundleFiles = files
     }
 
-    enum LoadError: Swift.Error {
-        case unexpectedManifest(URL)
-        case unexpectedData(URL)
-        case manifestParseError(URL, Swift.Error)
-        case dataParseError(URL, Swift.Error)
-        case dataEscapedRoot
-        case unsupported(String)
-    }
+    // LoadError is defined publicly on OPA.Bundle. This
+    // alias keeps the existing unqualified `LoadError.x` references working.
+    typealias LoadError = OPA.Bundle.LoadError
 
     func load() throws -> OPA.Bundle {
         // Unwrap files, throw first error if we encounter one
@@ -33,8 +28,25 @@ package struct BundleLoader {
         var planFiles: [BundleFile] = []
         var manifest: OPA.Manifest?
         var data: AST.RegoValue = AST.RegoValue.object([:])
+        var signatures: OPA.Bundle.BundleSignaturesConfig?
+        // Original bytes of the signable files (everything except .signatures.json),
+        // preserved for signature verification and round-tripping.
+        var rawFiles: [BundleFile] = []
 
         for f in files {
+            // .signatures.json is metadata about the other files, not itself signed.
+            if f.url.lastPathComponent == ".signatures.json" {
+                do {
+                    signatures = try JSONDecoder().decode(
+                        OPA.Bundle.BundleSignaturesConfig.self, from: f.data)
+                } catch {
+                    throw LoadError.signaturesParseError(f.url, error)
+                }
+                continue
+            }
+
+            rawFiles.append(f)
+
             switch f.url.lastPathComponent {
             case ".manifest":
                 guard manifest == nil else {
@@ -74,9 +86,12 @@ package struct BundleLoader {
 
         regoFiles.sort(by: { $0.url.path < $1.url.path })
         planFiles.sort(by: { $0.url.path < $1.url.path })
+        rawFiles.sort(by: { $0.url.relativePath < $1.url.relativePath })
 
         manifest = manifest ?? OPA.Manifest()  // Default manifest if none was provided
-        let bundle = try OPA.Bundle(manifest: manifest!, planFiles: planFiles, regoFiles: regoFiles, data: data)
+        let bundle = try OPA.Bundle(
+            manifest: manifest!, planFiles: planFiles, regoFiles: regoFiles, data: data,
+            signatures: signatures, raw: rawFiles.isEmpty ? nil : rawFiles)
 
         // Ensure the bundle's data is contained under the bundle roots.
         try bundle.validate()
@@ -86,7 +101,13 @@ package struct BundleLoader {
 
     package static func load(fromDirectory url: URL) throws -> OPA.Bundle {
         let files = DirectoryLoader(baseURL: url)
-        return try BundleLoader(fromFileSequence: files).load()
+        var bundle = try BundleLoader(fromFileSequence: files).load()
+        // `raw` must reflect the full signable set (every file except .signatures.json),
+        // not just the recognized bundle files, so round-tripping and signature
+        // verification cover files the DirectoryLoader filter drops (e.g. data.yaml,
+        // README.md). Signing/verification enumerate the same way (see enumerateFiles).
+        bundle.raw = try enumerateFiles(inDirectory: url)
+        return bundle
     }
 
     // Accept either a directory to load a bundle from or a path to an individual file
@@ -98,6 +119,54 @@ package struct BundleLoader {
         }
         throw LoadError.unsupported("only directories can be loaded as bundles")
     }
+
+    /// Enumerates every regular file under a bundle directory, returning bundle files
+    /// with bundle-relative URLs and their raw bytes. Unlike ``load(fromDirectory:)``,
+    /// this does not filter by kind: it returns the full set of files except
+    /// `.signatures.json`, just like OPA does during signing/verification.
+    ///
+    /// - Note: Every regular file is included, including dotfiles, which matches OPA
+    ///   (`opa sign` applies no filter and signs every file). One interop caveat: when
+    ///   invoked as `opa sign -b .`, OPA strips a single leading `.` from top-level
+    ///   dotfile names (`.hidden` -> `hidden`, `.git/config` -> `git/config`) as an
+    ///   artifact of its path handling, except `.manifest`/`.manifest.pb`, which it
+    ///   restores. We keep the real names, so signatures for bundles that contain stray
+    ///   top-level dotfiles (e.g. a `.git` directory) will not match OPA. Sign clean
+    ///   bundle directories.
+    ///
+    /// - Parameters:
+    ///   - baseURL: The bundle directory.
+    ///   - excluding: File names (relative path or last component) to skip. Defaults
+    ///     to `.signatures.json`.
+    static func enumerateFiles(
+        inDirectory baseURL: URL, excluding: Set<String> = [".signatures.json"]
+    ) throws -> [BundleFile] {
+        let base = baseURL.resolvingSymlinksInPath()
+        guard
+            let enumerator = FileManager.default.enumerator(
+                at: base, includingPropertiesForKeys: [.isRegularFileKey], options: [])
+        else {
+            throw LoadError.unsupported("cannot enumerate directory \(base.path)")
+        }
+
+        var out: [BundleFile] = []
+        for case let fileURL as URL in enumerator {
+            let isRegular = (try? fileURL.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) ?? false
+            guard isRegular else {
+                continue
+            }
+            guard let relativeURL = makeRelativeURL(from: base, to: fileURL) else {
+                continue
+            }
+            if excluding.contains(relativeURL.relativePath) || excluding.contains(fileURL.lastPathComponent) {
+                continue
+            }
+            let data = try Data(contentsOf: fileURL)
+            out.append(BundleFile(url: relativeURL, data: data))
+        }
+        out.sort { $0.url.relativePath < $1.url.relativePath }
+        return out
+    }
 }
 
 // DirectoryLoader returns a sequence of OPA bundle files from a directory,
@@ -105,7 +174,7 @@ package struct BundleLoader {
 // I/O errors are propogated as failure cases of the results.
 struct DirectoryLoader: Sequence {
     let baseURL: URL
-    let keepFiles = Set(["data.json", "plan.json", ".manifest"])
+    let keepFiles = Set(["data.json", "plan.json", ".manifest", ".signatures.json"])
     let keepExtensions = Set(["rego"])
 
     init(baseURL: URL) {
@@ -242,8 +311,12 @@ func makeRelativeURL(from base: URL, to child: URL) -> URL? {
     guard base.isFileURL, child.isFileURL else {
         return nil
     }
-    let baseComponents = base.pathComponents
-    let childComponents = child.pathComponents
+    // Compare on symlink-resolved paths so they share a canonical prefix. On macOS the
+    // directory enumerator yields /private/var/... while resolvingSymlinksInPath reports
+    // /var/..., so resolving both normalizes them. The returned URL is still built from the
+    // original `base` to preserve its exact path form for callers.
+    let baseComponents = base.resolvingSymlinksInPath().pathComponents
+    let childComponents = child.resolvingSymlinksInPath().pathComponents
 
     if !childComponents.starts(with: baseComponents) {
         // childURL is not an ancestor of baseURL

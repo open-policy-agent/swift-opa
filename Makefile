@@ -21,6 +21,17 @@ test:
 test-compliance:
 	$(MAKE) -C ComplianceSuite test-compliance
 
+# End-to-end interop tests against the golang `opa` binary. These are gated behind
+# the SWIFT_OPA_E2E_TESTS env var and only run when `opa` is on PATH.
+.PHONY: test-e2e
+test-e2e:
+	@if command -v opa >/dev/null 2>&1; then \
+		echo "opa detected on PATH; enabling E2E interop tests"; \
+		SWIFT_OPA_E2E_TESTS=1 swift test --filter OPAInteropTests; \
+	else \
+		echo "opa not found on PATH; skipping E2E interop tests"; \
+	fi
+
 .PHONY: perf
 perf:
 	cd Benchmarks && swift package benchmark

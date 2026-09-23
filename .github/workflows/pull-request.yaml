@@ -132,6 +132,38 @@ jobs:
           path: .build
           key: "swiftpm-minimal-build-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
 
+  test-all-traits:
+    name: Test (all traits enabled)
+    runs-on: ubuntu-latest
+    container: "swift:6.2"
+    permissions:
+      contents: read
+    steps:
+      - name: Show Swift version
+        run: swift --version
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y make zstd
+      - name: Restore .build
+        id: "restore-build"
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .build
+          key: "swiftpm-all-traits-build-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
+          restore-keys: "swiftpm-all-traits-build-${{ runner.os }}-"
+      - name: Test (all traits enabled, incl. RSASignatures)
+        run: make test-all-traits
+      - name: Cache .build
+        if: steps.restore-build.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .build
+          key: "swiftpm-all-traits-build-${{ runner.os }}-${{ github.event.pull_request.base.sha || github.event.after }}"
+
   diff:
     name: diff compliance tests (vs main)
     runs-on: macos-latest

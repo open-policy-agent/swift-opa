@@ -83,15 +83,19 @@ let package = Package(
 
 ### Traits and Minimal Builds
 
-Swift-OPA exposes two optional features behind default-enabled package traits:
+Swift-OPA exposes optional features behind default-enabled package traits:
 
 - **`CLI`** — builds the `swift-opa-cli` executable. Depends on
   [swift-argument-parser](https://github.com/apple/swift-argument-parser).
 - **`YAML`** — builds the `yaml.is_valid`, `yaml.marshal`, and `yaml.unmarshal`
   builtins. Depends on [Yams](https://github.com/jpsim/Yams).
+- **`RSASignatures`** — enables the RSA bundle-signing algorithms (`RS*`/`PS*`).
+  Depends on [swift-crypto](https://github.com/apple/swift-crypto)'s `_CryptoExtras`
+  (BoringSSL-backed). Disable it to drop that dependency; RSA sign/verify then fails at
+  runtime while HMAC (`HS*`) and ECDSA (`ES*`) keep working.
 
-Both are enabled by default. Library-only consumers who only want the VM can disable
-either or both traits to drop those features and their dependencies entirely on newer
+All are enabled by default. Library-only consumers who only want the VM can disable
+any of them to drop those features and their dependencies entirely on newer
 Swift toolchain versions:
 
 ```swift
@@ -107,6 +111,11 @@ dependencies: [
 To keep only some features, list the traits you want to enable, e.g.
 `traits: ["YAML"]` builds the `yaml.*` builtins but drops the CLI. When the `YAML`
 trait is disabled, the `yaml.*` builtins are not registered.
+
+> [!NOTE]
+> Base [swift-crypto](https://github.com/apple/swift-crypto) / CryptoKit (HMAC, SHA,
+> ECDSA) is always available for signature verification. Only the RSA families pull in
+> the BoringSSL-backed `_CryptoExtras`, gated behind the `RSASignatures` trait above.
 
 
 ## Usage
@@ -226,6 +235,65 @@ var engine = OPA.Engine(
 // Throws if a custom builtin name conflicts with a default or a builtin required by the compiled policy is not present.
 // If capabilities are specified, this throws if a capabilities validation error against the builtins occurs.
 let preparedQuery = try await engine.prepareForEvaluation(query: "<some_query>")
+```
+
+## Bundle Signing and Verification
+
+Swift-OPA can generate and verify OPA [bundle signatures](https://www.openpolicyagent.org/docs/management-bundles/#signing)
+(the `.signatures.json` file). This mirrors `opa sign` and OPA's bundle verification.
+All JWS algorithms OPA supports are available: `HS256/384/512`, `RS256/384/512`,
+`ES256/384/512`, and `PS256/384/512` (default `RS256`). The RSA families (`RS*`/`PS*`)
+require the default-on `RSASignatures` trait; with it disabled they fail at runtime
+(see [Traits and Minimal Builds](#traits-and-minimal-builds)) while HMAC and ECDSA still work.
+
+> [!NOTE]
+> Only **directory** bundles are supported at this time. `.tar.gz` inputs are not yet handled.
+
+### CLI
+
+The `swift-opa-cli sign` and `verify` subcommands mirror `opa sign` and
+`opa run`/`opa build`'s verification flags. Run them from inside the bundle directory
+(`-b .`) to produce OPA's portable, bundle-relative file names:
+
+```bash
+# Sign a bundle directory (writes .signatures.json).
+swift run swift-opa-cli sign -b --signing-key private.pem --signing-alg RS256 -o . .
+
+# Verify a signed bundle directory.
+swift run swift-opa-cli verify -b --verification-key public.pem --signing-alg RS256 .
+```
+
+For HMAC algorithms (`HS*`), `--signing-key`/`--verification-key` point at a file
+containing the shared secret. Flags for features not yet implemented (e.g.
+`--signing-plugin`) are accepted but print a `not implemented` warning to stderr.
+
+### Library
+
+The same functionality is available on `OPA.Bundle`:
+
+```swift
+let files = try OPA.Bundle.signableFiles(inDirectory: bundleDir)
+let signatures = try OPA.Bundle.sign(files: files, algorithm: .rs256, key: .pem(privatePEM))
+try OPA.Bundle.verify(files: files, signatures: signatures, key: .pem(publicPEM), algorithm: .rs256)
+```
+
+For bundle *activation*, `OPA.Bundle.verifyIfRequired(files:signatures:key:...)` encodes
+OPA's [verification behavior table](https://www.openpolicyagent.org/docs/management-bundles/#signature-verification):
+an unsigned bundle with no key configured is accepted (no verification), an unsigned
+bundle with a key throws, a signed bundle with no key configured throws, and a signed
+bundle with a key runs full verification.
+
+Loading a directory bundle (`OPA.Bundle.decodeFromDirectory(fromDir:)`) parses any
+`.signatures.json` into `bundle.signatures` and preserves original file bytes in
+`bundle.raw`; `OPA.Bundle.encodeToDirectory(bundle:targetURL:)` writes a bundle back out.
+
+### Testing
+
+Cross-tool interop against the golang `opa` binary lives in a gated test suite:
+
+```bash
+make test-e2e                        # runs the opa interop tests if `opa` is on PATH
+SWIFT_OPA_OPENSSL_TESTS=1 swift test # additionally runs tests using openssl-generated keys
 ```
 
 ## Known differences from OPA

@@ -24,7 +24,7 @@ let package = Package(
     traits: [
         // Enabled by default. Library-only consumers can opt out to drop optional
         // features and dependencies from the build.
-        .default(enabledTraits: ["CLI", "YAML"]),
+        .default(enabledTraits: ["CLI", "YAML", "RSASignatures"]),
         Trait(
             name: "CLI",
             description: "Builds the swift-opa-cli executable and its dependencies."
@@ -32,6 +32,11 @@ let package = Package(
         Trait(
             name: "YAML",
             description: "Builds the yaml.* builtins and their Yams dependency."
+        ),
+        Trait(
+            name: "RSASignatures",
+            description:
+                "Enables RSA bundle-signing algorithms (RS*/PS*) via _CryptoExtras. Disable to drop the BoringSSL-backed dependency; RSA sign/verify then fails at runtime, while HMAC and ECDSA still work."
         ),
     ],
     dependencies: [
@@ -54,12 +59,25 @@ let package = Package(
             name: "Bytecode",
             dependencies: ["AST", "IR"]
         ),
+        // Bundle signing implementation details, like OPA-style JSON hashing + JWS crypto.
+        // Isolated into a separate package to allow eventual replacement with better libraries
+        // down the road.
+        .target(
+            name: "BundleSigningInternals",
+            dependencies: [
+                .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
+                .product(
+                    name: "CryptoExtras", package: "swift-crypto",
+                    condition: .when(traits: ["RSASignatures"])),
+            ]
+        ),
         .target(
             name: "Rego",
             dependencies: [
                 "AST",
                 "IR",
                 "Bytecode",
+                "BundleSigningInternals",
                 .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
                 .product(name: "Yams", package: "Yams", condition: .when(traits: ["YAML"])),
             ]
@@ -84,8 +102,20 @@ let package = Package(
         ),
         .testTarget(
             name: "RegoTests",
-            dependencies: ["Rego"],
+            dependencies: [
+                "Rego",
+                // ES/HMAC key generation needs base Crypto on Linux (CryptoKit is used on Apple).
+                .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
+                // RSA key generation in the signature tests, gated with the RSASignatures trait.
+                .product(
+                    name: "CryptoExtras", package: "swift-crypto",
+                    condition: .when(traits: ["RSASignatures"])),
+            ],
             resources: [.copy("TestData")]
+        ),
+        .testTarget(
+            name: "BundleSigningInternalsTests",
+            dependencies: ["BundleSigningInternals"]
         ),
         .testTarget(
             name: "TestRunnerTests",
@@ -96,6 +126,18 @@ let package = Package(
         .testTarget(
             name: "SwiftOPATests",
             dependencies: ["SwiftOPA"]
+        ),
+        // End-to-end interop tests against the golang `opa` binary. Gated behind the
+        // SWIFT_OPA_E2E_TESTS env var. Skipped otherwise.
+        .testTarget(
+            name: "E2ETests",
+            dependencies: [
+                "Rego",
+                .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
+                .product(
+                    name: "CryptoExtras", package: "swift-crypto",
+                    condition: .when(traits: ["RSASignatures"])),
+            ]
         ),
         .executableTarget(
             name: "CLI",
@@ -119,11 +161,11 @@ let package = Package(
 // that have a direct dependency on swift-crypto accept beta releases as well.
 if ProcessInfo.processInfo.environment["SWIFT_OPA_ALLOW_SWIFT_CRYPTO_BETA"] == nil {
     package.dependencies += [
-        .package(url: "https://github.com/apple/swift-crypto.git", "1.0.0"..<"6.0.0")
+        .package(url: "https://github.com/apple/swift-crypto.git", "4.0.0"..<"6.0.0")
     ]
 } else {
     print("Accepting beta versions of swift-crypto!")
     package.dependencies += [
-        .package(url: "https://github.com/apple/swift-crypto.git", "1.0.0"..<"6.0.0-beta.max")
+        .package(url: "https://github.com/apple/swift-crypto.git", "4.0.0"..<"6.0.0-beta.max")
     ]
 }

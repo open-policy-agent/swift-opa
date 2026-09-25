@@ -104,6 +104,28 @@ struct BundleSignatureTests {
         try Bundle.verify(files: Self.files, signatures: config, key: keys.verification, algorithm: algorithm)
     }
 
+    /// Minimal base64url (no padding), local to these tests since the internals helper is not public.
+    static func b64url(_ s: String) -> String {
+        Data(s.utf8).base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+    }
+
+    /// A token whose header `alg` is not a recognized JWS algorithm is rejected as
+    /// unsupported (distinct from a recognized-but-wrong alg, which is a mismatch).
+    @Test
+    func unknownAlgorithmIsUnsupported() throws {
+        let keys = try Self.keyPair(for: .hs256)
+        let token =
+            Self.b64url(#"{"alg":"none","typ":"JWT"}"#) + "." + Self.b64url(#"{"files":[]}"#) + "."
+            + Self.b64url("x")
+        let config = Bundle.BundleSignaturesConfig(signatures: [token])
+        #expect(throws: Bundle.BundleSignatureError.unsupportedAlgorithm("none")) {
+            try Bundle.verify(files: Self.files, signatures: config, key: keys.verification, algorithm: .hs256)
+        }
+    }
+
     #if !RSASignatures
         @Test
         func rsaAlgorithmsFailGracefullyWhenDisabled() throws {
@@ -111,10 +133,10 @@ struct BundleSignatureTests {
             #expect(throws: Bundle.BundleSignatureError.self) {
                 _ = try Bundle.sign(files: Self.files, algorithm: .rs256, key: .pem("unused"))
             }
-            // Verifying an RS256 token also fails at the signature step.
+            // Verifying an RS256 token also fails (unsupported algorithm) rather than crashing.
             let token =
-                Data(#"{"alg":"RS256","typ":"JWT"}"#.utf8).base64URLNoPad + "."
-                + Data(#"{"files":[]}"#.utf8).base64URLNoPad + "." + Data("sig".utf8).base64URLNoPad
+                Self.b64url(#"{"alg":"RS256","typ":"JWT"}"#) + "." + Self.b64url(#"{"files":[]}"#)
+                + "." + Self.b64url("sig")
             let config = Bundle.BundleSignaturesConfig(signatures: [token])
             #expect(throws: Bundle.BundleSignatureError.self) {
                 try Bundle.verify(files: Self.files, signatures: config, key: .pem("unused"), algorithm: .rs256)
@@ -338,23 +360,6 @@ struct BundleSignatureTests {
     // MARK: File digest canonicalization
 
     @Test
-    func canonicalJSONPreservesNumberLiteralsAndSortsKeysByBytes() throws {
-        // Numbers verbatim (1.0 not 1, 1e3 not 1000, big int intact). Keys sorted by
-        // UTF-8 byte order (Z < a < b).
-        let out = try CanonicalJSON.canonicalize(
-            Data(#"{ "b": 1.0, "a": 1e3, "Z": 10000000000000000000 }"#.utf8))
-        #expect(
-            String(decoding: out, as: UTF8.self) == #"{"Z":10000000000000000000,"a":1e3,"b":1.0}"#)
-    }
-
-    @Test
-    func canonicalJSONStringEscaping() throws {
-        // `<>&/` and non-ASCII stay raw. A normalizes to A. `\n` stays short-escaped.
-        let out = try CanonicalJSON.canonicalize(Data(#"{"k":"a<b>c&d/eA\n"}"#.utf8))
-        #expect(String(decoding: out, as: UTF8.self) == #"{"k":"a<b>c&d/eA\n"}"#)
-    }
-
-    @Test
     func structuredJSONDigestIsWhitespaceAndOrderIndependent() throws {
         let a = Data(#"{"b":2,"a":1}"#.utf8)
         let b = Data("{\n  \"a\": 1,\n  \"b\": 2\n}".utf8)  // reordered + whitespace
@@ -370,16 +375,6 @@ struct BundleSignatureTests {
         let da = try Bundle.fileDigest(name: "policy.rego", data: a)
         let db = try Bundle.fileDigest(name: "policy.rego", data: b)
         #expect(da != db)
-    }
-
-    @Test
-    func base64URLRoundTrips() throws {
-        let raw = Data((0...255).map { UInt8($0) })
-        let encoded = raw.base64URLNoPad
-        #expect(!encoded.contains("="))
-        #expect(!encoded.contains("+"))
-        #expect(!encoded.contains("/"))
-        #expect(Data(base64URLNoPad: encoded) == raw)
     }
 
     // MARK: Directory round-trip (sign on disk, load, verify, re-encode, verify)

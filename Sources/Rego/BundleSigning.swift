@@ -1,24 +1,15 @@
 import AST
+import BundleSigningInternals
 import Foundation
-
-// Base crypto (HMAC/SHA/ECDSA) comes from CryptoKit on Apple, else swift-crypto's Crypto.
-// RSA (RS*/PS*) lives in swift-crypto's CryptoExtras, which is linked only when the
-// RSASignatures trait is enabled. When it is off, RS*/PS* fail at runtime rather than forcing
-// the BoringSSL-backed CryptoExtras dependency on every consumer. CryptoExtras re-exports
-// Crypto, so importing it alone (when enabled) also provides HMAC/SHA/ECDSA and avoids a
-// duplicate-symbol ambiguity. (The RSA type is still spelled `_RSA`.)
-#if RSASignatures
-    import CryptoExtras
-#elseif canImport(CryptoKit)
-    import CryptoKit
-#else
-    import Crypto
-#endif
 
 #if YAML
     import Yams
 #endif
 
+// The public bundle-signing API lives here in Rego. The JWS crypto and canonical-JSON
+// hashing are implementation details in the BundleSigningInternals target, reached only
+// through the adapters below. This keeps `import Rego` sufficient to sign/verify while letting
+// the internals (and the BoringSSL-backed RSA dependency) be swapped or removed independently.
 extension OPA.Bundle {
     /// JWS algorithm used to sign a bundle's `.signatures.json` token. Raw values
     /// are the JWS `alg` header names, matching OPA.
@@ -52,6 +43,24 @@ extension OPA.Bundle {
         /// True for the HMAC (`HS*`) families, whose key is a shared secret rather
         /// than a PEM-encoded asymmetric key.
         public var isHMAC: Bool { family == .hmac }
+
+        /// The crypto descriptor handed to the internals JWS layer.
+        var jws: JWSAlgorithm {
+            let family: JWSFamily
+            switch self.family {
+            case .hmac: family = .hmac
+            case .rsaPKCS1: family = .rsaPKCS1
+            case .rsaPSS: family = .rsaPSS
+            case .ecdsa: family = .ecdsa
+            }
+            let hash: JWSHash
+            switch self {
+            case .hs256, .rs256, .es256, .ps256: hash = .sha256
+            case .hs384, .rs384, .es384, .ps384: hash = .sha384
+            case .hs512, .rs512, .es512, .ps512: hash = .sha512
+            }
+            return JWSAlgorithm(name: rawValue, family: family, hash: hash)
+        }
     }
 
     /// Hashing algorithm recorded per-file in a signature payload. Raw values match
@@ -62,6 +71,14 @@ extension OPA.Bundle {
         case sha512 = "SHA-512"
 
         public static let `default`: FileHashAlgorithm = .sha256
+
+        var jws: JWSHash {
+            switch self {
+            case .sha256: return .sha256
+            case .sha384: return .sha384
+            case .sha512: return .sha512
+            }
+        }
     }
 
     /// One entry in a signature payload's `files` list.
@@ -103,6 +120,13 @@ extension OPA.Bundle {
     public enum SigningKey: Sendable {
         case hmac(Data)
         case pem(String)
+
+        var jws: JWSKey {
+            switch self {
+            case .hmac(let secret): return .hmac(secret)
+            case .pem(let pem): return .pem(pem)
+            }
+        }
     }
 
     /// Key material for verification. HMAC families take the shared secret.
@@ -110,6 +134,13 @@ extension OPA.Bundle {
     public enum VerificationKey: Sendable {
         case hmac(Data)
         case pem(String)
+
+        var jws: JWSKey {
+            switch self {
+            case .hmac(let secret): return .hmac(secret)
+            case .pem(let pem): return .pem(pem)
+            }
+        }
     }
 
     public enum BundleSignatureError: Swift.Error, Equatable, CustomStringConvertible {
@@ -124,8 +155,22 @@ extension OPA.Bundle {
         case hashMismatch(file: String)
         case scopeMismatch(expected: String?, got: String?)
         case keyParsingFailed(String)
+        case signingFailed(String)
         case invalidFile(name: String, message: String)
         case duplicateFile(String)
+
+        /// Maps an internals JWS error onto the public error surface.
+        init(_ jws: JWSError) {
+            switch jws {
+            case .unsupportedAlgorithm(let a): self = .unsupportedAlgorithm(a)
+            case .algorithmMismatch(let e, let g): self = .algorithmMismatch(expected: e, got: g)
+            case .keyMismatch(let m): self = .keyMismatch(m)
+            case .keyParsingFailed(let m): self = .keyParsingFailed(m)
+            case .signingFailed(let m): self = .signingFailed(m)
+            case .invalidSignature: self = .invalidSignature
+            case .malformedToken(let m): self = .malformedToken(m)
+            }
+        }
 
         public var description: String {
             switch self {
@@ -152,6 +197,8 @@ extension OPA.Bundle {
                 return "scope mismatch: expected \(e ?? "<none>"), token has \(g ?? "<none>")"
             case .keyParsingFailed(let m):
                 return "failed to parse key: \(m)"
+            case .signingFailed(let m):
+                return "signing operation failed: \(m)"
             case .invalidFile(let name, let message):
                 return "cannot hash file \(name): \(message)"
             case .duplicateFile(let name):
@@ -171,7 +218,7 @@ extension OPA.Bundle {
         name: String, data: Data, algorithm: FileHashAlgorithm = .default
     ) throws(BundleSignatureError) -> String {
         let bytes = try canonicalizedBytes(name: name, data: data)
-        return digestHex(bytes, algorithm)
+        return JWS.digest(bytes, hash: algorithm.jws)
     }
 
     /// Builds a `SignedFileInfo` list for a set of bundle files. Throws on duplicate
@@ -232,21 +279,13 @@ extension OPA.Bundle {
     }
 
     /// JSONEncoder-based canonical JSON (sorted keys, no slash escaping) used for the JWS
-    /// header/payload and as the YAML-to-JSON intermediate. Structured-file *hashing* uses
-    /// the byte-accurate `CanonicalJSON.canonicalize` instead (see `canonicalizedBytes`).
+    /// payload content and as the YAML-to-JSON intermediate. Byte-accurate structured-file
+    /// hashing uses `CanonicalJSON.canonicalize` (see `canonicalizedBytes`).
     static func canonicalJSON(_ v: AST.RegoValue) throws -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
         encoder.nonConformingFloatEncodingStrategy = .throw
         return try encoder.encode(v)
-    }
-
-    static func digestHex(_ data: Data, _ algorithm: FileHashAlgorithm) -> String {
-        switch algorithm {
-        case .sha256: return Data(SHA256.hash(data: data)).hexEncoded
-        case .sha384: return Data(SHA384.hash(data: data)).hexEncoded
-        case .sha512: return Data(SHA512.hash(data: data)).hexEncoded
-        }
     }
 }
 
@@ -280,25 +319,13 @@ extension OPA.Bundle {
         scope: String? = nil,
         additionalClaims: AST.RegoValue = .object([:])
     ) throws -> String {
-        let headerData = try encodeHeader(algorithm: algorithm, keyID: keyID)
         let payloadData = try encodePayload(
             files: files, scope: scope, keyID: keyID, additionalClaims: additionalClaims)
-
-        let signingInput = Data((headerData.base64URLNoPad + "." + payloadData.base64URLNoPad).utf8)
-        let signature = try computeSignature(signingInput, algorithm: algorithm, key: key)
-
-        return headerData.base64URLNoPad + "." + payloadData.base64URLNoPad + "." + signature.base64URLNoPad
-    }
-
-    private static func encodeHeader(algorithm: SignatureAlgorithm, keyID: String?) throws -> Data {
-        var obj: [AST.RegoValue: AST.RegoValue] = [
-            .string("alg"): .string(algorithm.rawValue),
-            .string("typ"): .string("JWT"),
-        ]
-        if let keyID {
-            obj[.string("kid")] = .string(keyID)
+        do {
+            return try JWS.sign(payload: payloadData, algorithm: algorithm.jws, keyID: keyID, key: key.jws)
+        } catch {
+            throw BundleSignatureError(error)
         }
-        return try canonicalJSON(.object(obj))
     }
 
     private static func encodePayload(
@@ -323,117 +350,5 @@ extension OPA.Bundle {
             obj[.string("keyid")] = .string(keyID)
         }
         return try canonicalJSON(.object(obj))
-    }
-
-    static func computeSignature(
-        _ signingInput: Data, algorithm: SignatureAlgorithm, key: SigningKey
-    ) throws -> Data {
-        switch algorithm.family {
-        case .hmac:
-            guard case .hmac(let secret) = key else {
-                throw BundleSignatureError.keyMismatch("\(algorithm.rawValue) requires an HMAC secret")
-            }
-            return hmacSignature(signingInput, algorithm: algorithm, secret: secret)
-        case .rsaPKCS1, .rsaPSS:
-            #if RSASignatures
-                guard case .pem(let pem) = key else {
-                    throw BundleSignatureError.keyMismatch("\(algorithm.rawValue) requires a PEM private key")
-                }
-                return try rsaSignature(signingInput, algorithm: algorithm, pem: pem)
-            #else
-                throw BundleSignatureError.unsupportedAlgorithm(
-                    "\(algorithm.rawValue): RSA algorithms require the RSASignatures package trait")
-            #endif
-        case .ecdsa:
-            guard case .pem(let pem) = key else {
-                throw BundleSignatureError.keyMismatch("\(algorithm.rawValue) requires a PEM private key")
-            }
-            return try ecdsaSignature(signingInput, algorithm: algorithm, pem: pem)
-        }
-    }
-
-    /// Non-throwing HMAC over the signing input. Internal so verification can reuse it
-    /// and compare in constant time without a throwing/optional path.
-    static func hmacSignature(
-        _ input: Data, algorithm: SignatureAlgorithm, secret: Data
-    ) -> Data {
-        let symmetricKey = SymmetricKey(data: secret)
-        switch algorithm {
-        case .hs256: return Data(HMAC<SHA256>.authenticationCode(for: input, using: symmetricKey))
-        case .hs384: return Data(HMAC<SHA384>.authenticationCode(for: input, using: symmetricKey))
-        case .hs512: return Data(HMAC<SHA512>.authenticationCode(for: input, using: symmetricKey))
-        default: return Data()  // unreachable: guarded by family
-        }
-    }
-
-    #if RSASignatures
-        private static func rsaSignature(
-            _ input: Data, algorithm: SignatureAlgorithm, pem: String
-        ) throws -> Data {
-            let key: _RSA.Signing.PrivateKey
-            do {
-                key = try _RSA.Signing.PrivateKey(pemRepresentation: pem)
-            } catch {
-                throw BundleSignatureError.keyParsingFailed("\(error)")
-            }
-            let padding: _RSA.Signing.Padding = algorithm.family == .rsaPSS ? .PSS : .insecurePKCS1v1_5
-            switch algorithm {
-            case .rs256, .ps256:
-                return try key.signature(for: SHA256.hash(data: input), padding: padding).rawRepresentation
-            case .rs384, .ps384:
-                return try key.signature(for: SHA384.hash(data: input), padding: padding).rawRepresentation
-            case .rs512, .ps512:
-                return try key.signature(for: SHA512.hash(data: input), padding: padding).rawRepresentation
-            default: return Data()  // unreachable: guarded by family
-            }
-        }
-    #endif
-
-    private static func ecdsaSignature(
-        _ input: Data, algorithm: SignatureAlgorithm, pem: String
-    ) throws -> Data {
-        do {
-            switch algorithm {
-            case .es256:
-                let key = try P256.Signing.PrivateKey(pemRepresentation: pem)
-                return try key.signature(for: SHA256.hash(data: input)).rawRepresentation
-            case .es384:
-                let key = try P384.Signing.PrivateKey(pemRepresentation: pem)
-                return try key.signature(for: SHA384.hash(data: input)).rawRepresentation
-            case .es512:
-                let key = try P521.Signing.PrivateKey(pemRepresentation: pem)
-                return try key.signature(for: SHA512.hash(data: input)).rawRepresentation
-            default: return Data()  // unreachable: guarded by family
-            }
-        } catch let error as BundleSignatureError {
-            throw error
-        } catch {
-            throw BundleSignatureError.keyParsingFailed("\(error)")
-        }
-    }
-}
-
-// MARK: - base64url (no padding), for JWS segments
-
-extension Data {
-    /// URL-safe base64 without padding, as required for JWS compact serialization.
-    var base64URLNoPad: String {
-        base64EncodedString()
-            .replacingOccurrences(of: "+", with: "-")
-            .replacingOccurrences(of: "/", with: "_")
-            .replacingOccurrences(of: "=", with: "")
-    }
-
-    /// Decodes URL-safe base64 (padded or unpadded).
-    init?(base64URLNoPad string: String) {
-        var s =
-            string
-            .replacingOccurrences(of: "-", with: "+")
-            .replacingOccurrences(of: "_", with: "/")
-        let remainder = s.count % 4
-        if remainder != 0 {
-            s += String(repeating: "=", count: 4 - remainder)
-        }
-        self.init(base64Encoded: s)
     }
 }

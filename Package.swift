@@ -59,22 +59,26 @@ let package = Package(
             name: "Bytecode",
             dependencies: ["AST", "IR"]
         ),
+        // Bundle signing implementation details, like OPA-style JSON hashing + JWS crypto.
+        // Isolated into a separate package to allow eventual replacement with better libraries
+        // down the road.
+        .target(
+            name: "BundleSigningInternals",
+            dependencies: [
+                .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
+                .product(
+                    name: "CryptoExtras", package: "swift-crypto",
+                    condition: .when(traits: ["RSASignatures"])),
+            ]
+        ),
         .target(
             name: "Rego",
             dependencies: [
                 "AST",
                 "IR",
                 "Bytecode",
+                "BundleSigningInternals",
                 .product(name: "Crypto", package: "swift-crypto", condition: .when(platforms: [.linux])),
-                // RSA (RS*/PS*) needs the CryptoExtras product (BoringSSL-backed), gated behind
-                // the RSASignatures trait so consumers can drop it. It re-exports swift-crypto's
-                // Crypto (HMAC/SHA/ECDSA); when the trait is off the code falls back to
-                // CryptoKit/Crypto and RSA algorithms fail at runtime. (The RSA type is still spelled
-                // `_RSA`; only the product/module is the stable `CryptoExtras`, added in swift-crypto
-                // 4.0.0 — hence the 4.0.0 floor below.)
-                .product(
-                    name: "CryptoExtras", package: "swift-crypto",
-                    condition: .when(traits: ["RSASignatures"])),
                 .product(name: "Yams", package: "Yams", condition: .when(traits: ["YAML"])),
             ]
         ),
@@ -108,6 +112,10 @@ let package = Package(
                     condition: .when(traits: ["RSASignatures"])),
             ],
             resources: [.copy("TestData")]
+        ),
+        .testTarget(
+            name: "BundleSigningInternalsTests",
+            dependencies: ["BundleSigningInternals"]
         ),
         .testTarget(
             name: "TestRunnerTests",

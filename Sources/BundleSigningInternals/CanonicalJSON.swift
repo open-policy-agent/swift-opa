@@ -17,7 +17,7 @@ import Foundation
 /// Most current edge-cases are exactly that: uncommon things that do not happen often
 /// in real policies, but happen often enough for people to have complained about on
 /// the OPA issue tracker.
-enum CanonicalJSON {
+public enum CanonicalJSON {
     enum Error: Swift.Error, Equatable {
         case unexpectedEnd
         case unexpected(offset: Int)
@@ -28,7 +28,7 @@ enum CanonicalJSON {
     }
 
     /// Parses `data` as JSON and returns its canonical byte serialization.
-    static func canonicalize(_ data: Data) throws -> Data {
+    public static func canonicalize(_ data: Data) throws -> Data {
         var parser = Parser(Array(data))
         let value = try parser.parseDocument()
         var out: [UInt8] = []

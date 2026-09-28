@@ -17,9 +17,27 @@ test:
 	mkdir -p .build/test-results
 	swift test --xunit-output .build/test-results/junit.xml
 
+# Runs the suite with every package trait enabled (adds RSASignatures, i.e. RS*/PS*
+# support). The RSA tests are `#if RSASignatures`-gated, so they only run here.
+.PHONY: test-all-traits
+test-all-traits:
+	mkdir -p .build/test-results
+	swift test --enable-all-traits --xunit-output .build/test-results/junit-all-traits.xml
+
 .PHONY: test-compliance
 test-compliance:
 	$(MAKE) -C ComplianceSuite test-compliance
+
+# End-to-end interop tests against the golang `opa` binary. These are gated behind
+# the SWIFT_OPA_E2E_TESTS env var and only run when `opa` is on PATH.
+.PHONY: test-e2e
+test-e2e:
+	@if command -v opa >/dev/null 2>&1; then \
+		echo "opa detected on PATH; enabling E2E interop tests"; \
+		SWIFT_OPA_E2E_TESTS=1 swift test --filter OPAInteropTests; \
+	else \
+		echo "opa not found on PATH; skipping E2E interop tests"; \
+	fi
 
 .PHONY: perf
 perf:

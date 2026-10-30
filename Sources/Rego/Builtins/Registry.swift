@@ -138,6 +138,7 @@ public struct BuiltinRegistry: Sendable {
 
             // Array
             "array.concat": BuiltinFuncs.arrayConcat,
+            "array.flatten": BuiltinFuncs.arrayFlatten,
             "array.reverse": BuiltinFuncs.arrayReverse,
             "array.slice": BuiltinFuncs.arraySlice,
 

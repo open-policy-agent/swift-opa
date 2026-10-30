@@ -67,6 +67,57 @@ extension BuiltinTests.ArrayTests {
         ),
     ]
 
+    static let arrayFlattenTests: [BuiltinTests.TestCase] = [
+        BuiltinTests.TestCase(
+            description: "empty array",
+            name: "array.flatten",
+            args: [[]],
+            expected: .success([])
+        ),
+        BuiltinTests.TestCase(
+            description: "only arrays",
+            name: "array.flatten",
+            args: [[[1, 2], [3, 4], [5]]],
+            expected: .success([1, 2, 3, 4, 5])
+        ),
+        BuiltinTests.TestCase(
+            description: "single item array in array",
+            name: "array.flatten",
+            args: [[1, 2, [3]]],
+            expected: .success([1, 2, 3])
+        ),
+        BuiltinTests.TestCase(
+            description: "has nesting depth 1",
+            name: "array.flatten",
+            args: [[[[1], [2, 3, []]], [[4, 5]]]],
+            expected: .success([[1], [2, 3, []], [4, 5]])
+        ),
+        BuiltinTests.TestCase(
+            description: "mixed types",
+            name: "array.flatten",
+            args: [[[1, 2], "string", [3, ["a": "b"]], 4.5, [6, [7, 8]]]],
+            expected: .success([1, 2, "string", 3, ["a": "b"], 4.5, 6, [7, 8]])
+        ),
+        BuiltinTests.TestCase(
+            description: "no nested arrays",
+            name: "array.flatten",
+            args: [[1, "a", ["k": [1, 2]], .set([[1, 2]])]],
+            expected: .success([1, "a", ["k": [1, 2]], .set([[1, 2]])])
+        ),
+        BuiltinTests.TestCase(
+            description: "only empty nested arrays",
+            name: "array.flatten",
+            args: [[[], []]],
+            expected: .success([])
+        ),
+        BuiltinTests.TestCase(
+            description: "empty nested arrays mixed with values",
+            name: "array.flatten",
+            args: [[[], 1, [], [2], []]],
+            expected: .success([1, 2])
+        ),
+    ]
+
     static let arrayReverseTests: [BuiltinTests.TestCase] = [
         BuiltinTests.TestCase(
             description: "simple reverse",
@@ -144,6 +195,12 @@ extension BuiltinTests.ArrayTests {
                 argIndex: 1, argName: "y", allowedArgTypes: ["array"],
                 generateNumberOfArgsTest: false),
             arrayConcatTests,
+
+            BuiltinTests.generateFailureTests(
+                builtinName: "array.flatten", sampleArgs: [[[1], 2]],
+                argIndex: 0, argName: "arr", allowedArgTypes: ["array"],
+                generateNumberOfArgsTest: true),
+            arrayFlattenTests,
 
             BuiltinTests.generateFailureTests(
                 builtinName: "array.reverse", sampleArgs: [[1, 2]],

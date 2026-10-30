@@ -18,6 +18,42 @@ extension BuiltinFuncs {
         return .array(x + y)
     }
 
+    static func arrayFlatten(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
+        // arr: array (flattened by one level)
+        guard args.count == 1 else {
+            throw BuiltinError.argumentCountMismatch(got: args.count, want: 1)
+        }
+        guard case .array(let arr) = args[0] else {
+            throw BuiltinError.argumentTypeMismatch(arg: "arr", got: args[0].typeName, want: "array")
+        }
+
+        // Size the output up front, and skip the copy entirely if nothing is nested.
+        var containsArray = false
+        var capacity = 0
+        for elem in arr {
+            if case .array(let nested) = elem {
+                containsArray = true
+                capacity += nested.count
+            } else {
+                capacity += 1
+            }
+        }
+        guard containsArray else {
+            return args[0]
+        }
+
+        var flattened: [AST.RegoValue] = []
+        flattened.reserveCapacity(capacity)
+        for elem in arr {
+            if case .array(let nested) = elem {
+                flattened.append(contentsOf: nested)
+            } else {
+                flattened.append(elem)
+            }
+        }
+        return .array(flattened)
+    }
+
     static func arrayReverse(ctx: BuiltinContext, args: [AST.RegoValue]) throws -> AST.RegoValue {
         // x: array
         guard args.count == 1 else {

@@ -5,6 +5,12 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### `array.flatten` builtin (#205)
+
+Swift OPA now supports the [`array.flatten`](https://www.openpolicyagent.org/docs/policy-reference/builtins/array#builtin-array-arrayflatten) builtin, which flattens nested arrays by one level.
+
+Authored by @philipaconrad
+
 
 ## 0.0.10
 

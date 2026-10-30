@@ -5,11 +5,30 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 0.0.11
+
+This release includes a new builtin implementation, a Rego IR-adpated `test` command, and assorted bugfixes.
+
 ### `array.flatten` builtin (#205)
 
 Swift OPA now supports the [`array.flatten`](https://www.openpolicyagent.org/docs/policy-reference/builtins/array#builtin-array-arrayflatten) builtin, which flattens nested arrays by one level.
 
 Authored by @philipaconrad
+
+### CLI: `test` command (#189)
+
+Swift OPA's CLI now supports a subset of the `opa test` command's functionality for IR policies, which allows running tests when they are present in the IR bundle.
+
+The most reliable way to ensure the tests are included in the IR plan outputs is to mark the test package(s) as entrypoints, like: `opa build -b <dir> -t plan -e <test-package>`
+
+Users can then run their tests with `swift-opa-cli test <your_ir_bundle>`, and should receive output similar to what OPA would produce for testing a Rego bundle.
+
+Authored by @philipaconrad
+
+### Miscellaneous
+ - docs: Add RATIONALE.md (#200) authored by @philipaconrad
+ - deps: Update swift-crypto version ranges for the 5.0.0 release. (#202) authored by @philipaconrad
+ - builtins: Strengthen to_number checks around malformed and non-finite numbers. (#204) authored by @philipaconrad
 
 
 ## 0.0.10

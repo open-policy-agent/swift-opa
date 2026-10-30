@@ -36,6 +36,52 @@ extension BuiltinTests.CastsTests {
                     msg: "operand 0 must be valid number string, got Inf"))
         ),
         BuiltinTests.TestCase(
+            description: "overflow to Inf is not allowed",
+            name: "to_number",
+            args: [.string("1e9999")],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "operand 0 must be valid number string, got 1e9999"))
+        ),
+        BuiltinTests.TestCase(
+            description: "NaN with payload is not allowed",
+            name: "to_number",
+            args: [.string("nan(1)")],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "operand 0 must be valid number string, got nan(1)"))
+        ),
+        BuiltinTests.TestCase(
+            description: "embedded NUL is not allowed",
+            name: "to_number",
+            args: [.string("80\u{0}abc")],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "operand 0 must be valid number string, got 80\u{0}abc"))
+        ),
+        BuiltinTests.TestCase(
+            description: "finite value too large for Decimal is not allowed",
+            name: "to_number",
+            args: [.string("1e200")],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "operand 0 must be valid number string, got 1e200"))
+        ),
+        BuiltinTests.TestCase(
+            description: "finite value too small for Decimal is not allowed",
+            name: "to_number",
+            args: [.string("1e-200")],
+            expected: .failure(
+                BuiltinError.evalError(
+                    msg: "operand 0 must be valid number string, got 1e-200"))
+        ),
+        BuiltinTests.TestCase(
+            description: "large value within Decimal range",
+            name: "to_number",
+            args: [.string("1e100")],
+            expected: .success(.number(1e100))
+        ),
+        BuiltinTests.TestCase(
             description: "leading whitespace not allowed",
             name: "to_number",
             args: [.string("  123")],

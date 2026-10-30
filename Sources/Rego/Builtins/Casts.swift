@@ -20,18 +20,13 @@ extension BuiltinFuncs {
                     msg: "operand 0 must be valid number string NOT starting with + sign, got \(s)")
             }
 
-            // Check for NaN and Inf and Infinity
-            let unsigned = s.trimmingCharacters(in: CharacterSet(charactersIn: "+-")).lowercased()
-            guard unsigned != "inf", unsigned != "nan", unsigned != "infinity" else {
+            // Reject embedded NULs (Double stops parsing at the first one), and values
+            // RegoNumber maps to Decimal.nan (non-finite, or unrepresentable as Decimal).
+            guard !s.utf8.contains(0), let n = Double(s).map(RegoNumber.init(value:)), !n.decimalValue.isNaN else {
                 throw BuiltinError.evalError(msg: "operand 0 must be valid number string, got \(s)")
             }
 
-            // Now try to parse the amount value into a Double
-            guard let x = Double(s) else {
-                throw BuiltinError.evalError(msg: "operand 0 must be valid number string, got \(s)")
-            }
-
-            return .number(RegoNumber(value: x))
+            return .number(n)
         default:
             throw BuiltinError.argumentTypeMismatch(
                 arg: "x", got: args[0].typeName, want: "any<boolean, null, number, string>")

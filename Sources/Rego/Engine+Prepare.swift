@@ -7,60 +7,65 @@ extension OPA.Engine {
     // The decoder used to decode the capabilities file
     static let capabilitiesDecoder = JSONDecoder()
 
+    /// Returns the capabilities described by `input`, reading and decoding a file if needed.
+    static func resolveCapabilities(_ input: CapabilitiesInput?) throws -> Capabilities? {
+        switch input {
+        case .path(let url):
+            return try loadCapabilities(from: url)
+        case .data(let capabilities):
+            return capabilities
+        case .none:
+            return nil
+        }
+    }
+
+    /// Reads and decodes a `capabilities.json` file.
+    static func loadCapabilities(from url: URL) throws -> Capabilities {
+        let data: Data
+        do {
+            data = try Data(contentsOf: url)
+        } catch {
+            throw RegoError(
+                code: .capabilitiesReadError,
+                message: "failed to read capabilities from \(url)",
+                cause: error
+            )
+        }
+        do {
+            return try Self.capabilitiesDecoder.decode(Capabilities.self, from: data)
+        } catch {
+            throw RegoError(
+                code: .capabilitiesDecodeError,
+                message: "failed to decode capabilities from \(url)",
+                cause: error
+            )
+        }
+    }
+
     /// Verifies that all builtins referenced by the compiled policies are available both in the
     /// provided OPA capabilities and in the builtin registry.
     ///
     /// The method performs two checks:
-    /// 1. If a `capabilities.json` is supplied, it ensures that all builtins required by the
-    ///    policies are declared in the capabilities file, including their full signatures.
+    /// 1. If capabilities are supplied, it ensures that all builtins required by the
+    ///    policies are declared in the capabilities, including their full signatures.
     /// 2. It validates that each required builtin name exists in the provided `builtins`
     ///    dictionary (default or custom). Signatures are not checked here—argument validation
     ///    occurs only at runtime inside the builtin implementation.
     ///
     /// - Parameters:
-    ///   - capabilities: Optional input specifying the OPA capabilities to validate against.
-    ///                   Can be a file path or an in-memory `Capabilities` object.
+    ///   - capabilities: Optional OPA capabilities to validate against.
     ///   - builtins: A mapping of builtin names to their implementations available in Swift.
     ///   - evaluator: The intermediate representation (IR) evaluator containing the compiled policies.
     /// - Throws:
-    ///   - `RegoError.capabilitiesMissingBuiltin` if the capabilities file does not list all
+    ///   - `RegoError.capabilitiesMissingBuiltin` if the capabilities do not list all
     ///     required builtins.
     ///   - `RegoError.builtinUndefinedError` if the builtin registry does not provide an
     ///     implementation for a required builtin.
     static func verifyCapabilitiesAndBuiltIns(
-        capabilities: CapabilitiesInput?,
+        capabilities: Capabilities?,
         builtins: BuiltinRegistry,
         evaluator: IREvaluator
-    ) async throws {
-        let capabilities: Capabilities? = try {
-            switch capabilities {
-            case .path(let url):
-                let data: Data
-                do {
-                    data = try Data(contentsOf: url)
-                } catch {
-                    throw RegoError(
-                        code: .capabilitiesReadError,
-                        message: "failed to read capabilities from \(url)",
-                        cause: error
-                    )
-                }
-                do {
-                    return try Self.capabilitiesDecoder.decode(Capabilities.self, from: data)
-                } catch {
-                    throw RegoError(
-                        code: .capabilitiesDecodeError,
-                        message: "failed to decode capabilities from \(url)",
-                        cause: error
-                    )
-                }
-            case .data(let capabilities):
-                return capabilities
-            case .none:
-                return nil
-            }
-        }()
-
+    ) throws {
         for policy in evaluator.policies {
             let requiredBuiltInsArray = policy.builtinFuncs
             guard !requiredBuiltInsArray.isEmpty else {

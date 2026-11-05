@@ -113,27 +113,41 @@ public enum TestRunner {
             )
         }
 
-        var engine = OPA.Engine(bundles: integratedBundles)
-        return try await execute(engine: &engine, tests: tests, runFilter: runFilter, count: count)
-    }
-
-    /// Evaluates each test against `engine`.
-    ///
-    /// Skipped tests are reported without evaluation. Any error thrown while
-    /// preparing/evaluating a test are thrown upward.
-    private static func execute(
-        engine: inout OPA.Engine,
-        tests: [TestCase],
-        runFilter: String?,
-        count: Int
-    ) async throws -> [TestResult] {
         let filtered = try filter(tests, runFilter: runFilter)
 
+        // No runnable tests? Don't prepare anything.
+        guard filtered.contains(where: { !$0.skipped }) else {
+            return (0..<max(count, 1)).flatMap { _ in
+                filtered.map { TestResult(testCase: $0, outcome: .skipped, duration: .zero) }
+            }
+        }
+
+        // Prepare the bundles once. A failure here causes every test to error,
+        // just as if each test had prepared the bundles itself.
+        let engine = OPA.Engine(bundles: integratedBundles)
+        let policySet: Result<OPA.PreparedPolicySet, any Error>
+        do {
+            policySet = .success(try await engine.preparePolicySet())
+        } catch {
+            policySet = .failure(error)
+        }
+        return await execute(policySet: policySet, tests: filtered, count: count)
+    }
+
+    /// Evaluates each test against `policySet`.
+    ///
+    /// Skipped tests are reported without evaluation. Errors thrown while
+    /// preparing or evaluating a test are reported as that test's outcome.
+    private static func execute(
+        policySet: Result<OPA.PreparedPolicySet, any Error>,
+        tests: [TestCase],
+        count: Int
+    ) async -> [TestResult] {
         let clock = ContinuousClock()
         var results: [TestResult] = []
 
         for _ in 0..<max(count, 1) {
-            for test in filtered {
+            for test in tests {
                 if test.skipped {
                     results.append(TestResult(testCase: test, outcome: .skipped, duration: .zero))
                     continue
@@ -142,7 +156,7 @@ public enum TestRunner {
                 let start = clock.now
                 let outcome: TestOutcome
                 do {
-                    let prepared = try await engine.prepareForEvaluation(query: test.name)
+                    let prepared = try policySet.get().query(test.name)
                     let resultSet = try await prepared.evaluate(input: .object([:]))
                     outcome = passed(resultSet) ? .passed : .failed
                 } catch {

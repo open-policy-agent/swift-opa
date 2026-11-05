@@ -11,6 +11,10 @@ internal struct IREvaluator {
     /// time and guaranteed to be unique by ``init(bundles:userPolicies:)``.
     let planIndex: [String: (policyIdx: Int, planIdx: Int)]
 
+    /// Maps each bundle-supplied plan name to the name of the bundle that
+    /// defines it. Plans from user-supplied IR policies are absent.
+    let bundleOwners: [String: String]
+
     /// Identifies which source claimed a given plan name during construction.
     /// Used only for plan-name uniqueness bookkeeping; instances are not
     /// compared and only stringified on the error path.
@@ -66,9 +70,8 @@ internal struct IREvaluator {
             for planFile in bundle.planFiles {
                 let parsed: IR.Policy
                 do {
-                    var p = try IR.Policy(jsonData: planFile.data)
-                    try p.prepareForExecution()
-                    parsed = p
+                    // The JSON initializer already runs `prepareForExecution()`.
+                    parsed = try IR.Policy(jsonData: planFile.data)
                 } catch {
                     throw RegoError(
                         code: .bundleInitializationError,
@@ -161,8 +164,16 @@ internal struct IREvaluator {
             }
         }
 
+        var owners: [String: String] = [:]
+        for (name, owner) in firstOwner {
+            if case .bundle(let bundleName) = owner {
+                owners[name] = bundleName
+            }
+        }
+
         self.policies = compiled
         self.planIndex = index
+        self.bundleOwners = owners
     }
 
     /// Initialize from bundles only. Provided for backwards compatibility.
@@ -206,7 +217,7 @@ extension IREvaluator: Evaluator {
     }
 }
 
-func queryToEntryPoint(_ query: String) throws -> String {
+func queryToEntryPoint(_ query: String) throws(RegoError) -> String {
     let prefix = "data"
     guard query.hasPrefix(prefix) else {
         throw RegoError(code: .unsupportedQuery, message: "unsupported query: \(query), must start with 'data'")
@@ -215,7 +226,13 @@ func queryToEntryPoint(_ query: String) throws -> String {
         // done!
         return query
     }
+    // The prefix must end at a path separator, so `dataX.y` and `database` are rejected.
+    let rest = query.dropFirst(prefix.count)
+    guard rest.first == "." || rest.first == "/" else {
+        throw RegoError(
+            code: .unsupportedQuery, message: "unsupported query: \(query), must be 'data' or a path under it")
+    }
     // Hot path: called once per evaluate(). Avoid Foundation's
     // replacingOccurrences(of:with:), which bridges to NSString on Linux.
-    return String(query.dropFirst(prefix.count + 1).map { $0 == "." ? "/" : $0 })
+    return String(rest.dropFirst().map { $0 == "." ? "/" : $0 })
 }

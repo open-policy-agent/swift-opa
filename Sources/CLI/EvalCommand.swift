@@ -15,14 +15,14 @@
 
         mutating func run() async throws {
             // Initialize a Rego.Engine initially configured with our bundles from the CLI options.
-            var regoEngine = Rego.OPA.Engine(bundlePaths: self.evalOptions.bundlePaths)
+            let regoEngine = Rego.OPA.Engine(bundlePaths: self.evalOptions.bundlePaths)
 
             let tracer = tracerForLevel(self.evalOptions.explain)
 
             // Prepare does as much pre-processing as possible to get ready to evaluate queries.
             // This only needs to be done once when loading the engine and after updating it. These
             // PreparedQuery's can be re-used.
-            let preparedQuery = try await regoEngine.prepareForEvaluation(query: self.evalOptions.query)
+            let preparedQuery = try await regoEngine.preparePolicySet().query(self.evalOptions.query)
 
             let resultSet = try await preparedQuery.evaluate(
                 input: self.evalOptions.inputValue,

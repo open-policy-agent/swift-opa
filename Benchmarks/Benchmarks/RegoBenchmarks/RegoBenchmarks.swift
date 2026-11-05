@@ -121,6 +121,25 @@ let allBenchmarkSpecs: [BenchmarkSpec] =
         )
     }
 
+/// Loads a bundle directory's `.manifest`, root `plan.json`, and optional root `data.json` into memory.
+/// This is specialized to flat bundle structures like the ones the prepare benchmarks use,
+/// and may not work on other bundle structures.
+func loadPlanBundle(at url: URL) -> OPA.Bundle {
+    do {
+        let manifest = try OPA.Manifest(from: Data(contentsOf: url.appending(path: ".manifest")))
+        let planURL = url.appending(path: "plan.json")
+        let planFile = BundleFile(url: planURL, data: try Data(contentsOf: planURL))
+        var data: AST.RegoValue = .object([:])
+        let dataURL = url.appending(path: "data.json")
+        if FileManager.default.fileExists(atPath: dataURL.path) {
+            data = try JSONDecoder().decode(AST.RegoValue.self, from: Data(contentsOf: dataURL))
+        }
+        return try OPA.Bundle(manifest: manifest, planFiles: [planFile], data: data)
+    } catch {
+        fatalError("bundle load failed: \(error)")
+    }
+}
+
 let benchmarks: @Sendable () -> Void = {
     Benchmark.defaultConfiguration.timeUnits = .nanoseconds
 
@@ -143,12 +162,12 @@ let benchmarks: @Sendable () -> Void = {
             spec.name,
             configuration: .init(metrics: [.wallClock, .mallocCountTotal, .objectAllocCount, .instructions])
         ) { benchmark in
-            var engine = OPA.Engine(
+            let engine = OPA.Engine(
                 bundlePaths: [OPA.Engine.BundlePath(name: spec.bundleName, url: bundleURL)])
             var preparedQuery: OPA.Engine.PreparedQuery?
             do {
-                preparedQuery = try await engine.prepareForEvaluation(query: spec.query)
-            } catch { fatalError("prepareForEvaluation failed: \(error)") }
+                preparedQuery = try await engine.preparePolicySet().query(spec.query)
+            } catch { fatalError("prepare failed: \(error)") }
 
             benchmark.startMeasurement()
             for _ in benchmark.scaledIterations {
@@ -164,12 +183,12 @@ let benchmarks: @Sendable () -> Void = {
             "\(spec.name) (sync)",
             configuration: .init(metrics: [.wallClock, .mallocCountTotal, .objectAllocCount, .instructions])
         ) { benchmark in
-            var engine = OPA.Engine(
+            let engine = OPA.Engine(
                 bundlePaths: [OPA.Engine.BundlePath(name: spec.bundleName, url: bundleURL)])
             let preparedQuery: OPA.Engine.PreparedQuery
             do {
-                preparedQuery = try await engine.prepareForEvaluation(query: spec.query)
-            } catch { fatalError("prepareForEvaluation failed: \(error)") }
+                preparedQuery = try await engine.preparePolicySet().query(spec.query)
+            } catch { fatalError("prepare failed: \(error)") }
 
             benchmark.startMeasurement()
             if preparedQuery.supportsSyncEvaluation {
@@ -192,8 +211,8 @@ let benchmarks: @Sendable () -> Void = {
             engine.optimizeAsync = false
             var preparedQuery: OPA.Engine.PreparedQuery?
             do {
-                preparedQuery = try await engine.prepareForEvaluation(query: spec.query)
-            } catch { fatalError("prepareForEvaluation failed: \(error)") }
+                preparedQuery = try await engine.preparePolicySet().query(spec.query)
+            } catch { fatalError("prepare failed: \(error)") }
 
             benchmark.startMeasurement()
             for _ in benchmark.scaledIterations {
@@ -201,6 +220,52 @@ let benchmarks: @Sendable () -> Void = {
                     let result = try await preparedQuery?.evaluate(input: spec.input)
                     blackHole(result)
                 } catch {}
+            }
+            benchmark.stopMeasurement()
+        }
+    }
+
+    // MARK: - Query Preparation
+    // Compares preparing N queries one at a time against preparing a policy
+    // set once and deriving N queries from it. Bundles are loaded up front, so
+    // only preparation is measured.
+    let prepareQueryCount = 10
+    for spec in allBenchmarkSpecs where ["simple", "memo"].contains(spec.bundleName) {
+        let bundleURL = URL(fileURLWithPath: "\(bundlesPath)/\(spec.bundlePath)")
+
+        Benchmark(
+            "Prepare \(prepareQueryCount) Queries - prepareForEvaluation (\(spec.bundleName))",
+            configuration: .init(metrics: [.wallClock, .mallocCountTotal, .instructions])
+        ) { benchmark in
+            let bundle = loadPlanBundle(at: bundleURL)
+            var engine = OPA.Engine(bundles: [spec.bundleName: bundle])
+
+            benchmark.startMeasurement()
+            for _ in benchmark.scaledIterations {
+                do {
+                    for _ in 0..<prepareQueryCount {
+                        blackHole(try await engine.prepareForEvaluation(query: spec.query))
+                    }
+                } catch { fatalError("prepare failed: \(error)") }
+            }
+            benchmark.stopMeasurement()
+        }
+
+        Benchmark(
+            "Prepare \(prepareQueryCount) Queries - preparePolicySet (\(spec.bundleName))",
+            configuration: .init(metrics: [.wallClock, .mallocCountTotal, .instructions])
+        ) { benchmark in
+            let bundle = loadPlanBundle(at: bundleURL)
+            let engine = OPA.Engine(bundles: [spec.bundleName: bundle])
+
+            benchmark.startMeasurement()
+            for _ in benchmark.scaledIterations {
+                do {
+                    let policySet = try await engine.preparePolicySet()
+                    for _ in 0..<prepareQueryCount {
+                        blackHole(try policySet.query(spec.query))
+                    }
+                } catch { fatalError("prepare failed: \(error)") }
             }
             benchmark.stopMeasurement()
         }

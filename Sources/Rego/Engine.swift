@@ -27,13 +27,6 @@ extension OPA {
         // available on both the async and sync VM paths.
         private var customSyncBuiltins: [String: SyncBuiltin] = [:]
 
-        // Bundle-owned `/data` subtrees written by the most recent
-        // `prepareForEvaluation(query:)` call. The next prepare call uses
-        // this set (along with the new prepare's roots) to decide which
-        // subtrees to erase before writing fresh bundle data into the store.
-        // User data outside this set survives across prepare calls.
-        private var lastWrittenBundleRoots: Set<StoreKeyPath> = []
-
         /// When `false`, skip `SyncSafePatcher` at load time so the async VM path is
         /// always taken during evaluation. Intended for testing only.
         public var optimizeAsync = true
@@ -45,13 +38,13 @@ extension OPA.Engine {
     ///
     /// - Parameters:
     ///   - bundlePaths: File system paths to the bundles.
-    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it during ``prepareForEvaluation(query:)``.
+    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it when preparing (see ``preparePolicySet()``).
     ///                   See https://www.openpolicyagent.org/docs/deployments#capabilities
     ///   - customBuiltins: Additional async-only builtins to register alongside the default Rego builtins.
     ///                     See https://www.openpolicyagent.org/docs/policy-reference/builtins
-    ///                     Conflicts are validated during ``prepareForEvaluation(query:)``.
+    ///                     Conflicts are validated when preparing (see ``preparePolicySet()``).
     ///   - customSyncBuiltins: Additional synchronous builtins, available on both the async and sync VM paths.
-    ///                         Conflicts are validated during ``prepareForEvaluation(query:)``.
+    ///                         Conflicts are validated when preparing (see ``preparePolicySet()``).
     public init(
         bundlePaths: [BundlePath],
         capabilities: CapabilitiesInput? = nil,
@@ -68,13 +61,13 @@ extension OPA.Engine {
     ///
     /// - Parameters:
     ///   - bundles: Bundles provided directly in memory, keyed by name.
-    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it during ``prepareForEvaluation(query:)``.
+    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it when preparing (see ``preparePolicySet()``).
     ///                   See https://www.openpolicyagent.org/docs/deployments#capabilities
     ///   - customBuiltins: Additional async-only builtins to register alongside the default Rego builtins.
     ///                     See https://www.openpolicyagent.org/docs/policy-reference/builtins
-    ///                     Conflicts are validated during ``prepareForEvaluation(query:)``.
+    ///                     Conflicts are validated when preparing (see ``preparePolicySet()``).
     ///   - customSyncBuiltins: Additional synchronous builtins, available on both the async and sync VM paths.
-    ///                         Conflicts are validated during ``prepareForEvaluation(query:)``.
+    ///                         Conflicts are validated when preparing (see ``preparePolicySet()``).
     public init(
         bundles: [String: OPA.Bundle],
         capabilities: CapabilitiesInput? = nil,
@@ -92,13 +85,13 @@ extension OPA.Engine {
     /// - Parameters:
     ///   - policies: IR policies to load into the engine.
     ///   - store: Data store backing policy evaluation.
-    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it during ``prepareForEvaluation(query:)``.
+    ///   - capabilities: Optional capabilities. If set, all bundles are validated against it when preparing (see ``preparePolicySet()``).
     ///                   See https://www.openpolicyagent.org/docs/deployments#capabilities
     ///   - customBuiltins: Additional async-only builtins to register alongside the default Rego builtins.
     ///                     See https://www.openpolicyagent.org/docs/policy-reference/builtins
-    ///                     Conflicts are validated during ``prepareForEvaluation(query:)``.
+    ///                     Conflicts are validated when preparing (see ``preparePolicySet()``).
     ///   - customSyncBuiltins: Additional synchronous builtins, available on both the async and sync VM paths.
-    ///                         Conflicts are validated during ``prepareForEvaluation(query:)``.
+    ///                         Conflicts are validated when preparing (see ``preparePolicySet()``).
     public init(
         policies: [IR.Policy],
         store: any OPA.Store,
@@ -155,32 +148,34 @@ extension OPA.Engine {
         }
     }
 
-    /// Prepares a query for evaluation.
+    /// Validates and compiles the engine's policies and data into an immutable ``OPA/PreparedPolicySet``.
     ///
     /// Loads all bundles, performs internal consistency checks and validations via the specified capabilities,
-    /// and prepares the provided query for evaluation.
+    /// and compiles every plan. Deriving queries from the returned policy set with
+    /// ``OPA/PreparedPolicySet/query(_:)`` is cheap.
     /// Uses default + custom builtins (specified at ``OPA/Engine`` initialization) to validate and evaluate builtin calls.
     ///
     /// ## Store Behavior
-    /// Bundle-owned `/data` subtrees are refreshed on every call: the union
-    /// of the previously written bundle roots + currently declared bundle roots
-    /// is erased before fresh bundle data is written. Anything outside that
-    /// union is preserved across calls. user-supplied data sitting at paths
-    /// outside by any bundle roots survives a prepare call.
+    /// The policy set takes a copy of the engine's store, erases every bundle-owned `/data`
+    /// subtree, and writes fresh bundle data into the copy. The engine's own store is
+    /// left untouched, so each policy set pins its own data snapshot. User-supplied data at
+    /// paths outside all bundle roots is visible to the policy set. (A store with reference
+    /// semantics is written in place, and does not get a separate snapshot.)
     ///
     /// ## Bundles + raw IR policies
     /// If the engine was constructed with a mix of bundles and raw user IR
-    /// policies (via ``init(policies:store:capabilities:customBuiltins:)``
-    /// alongside ``init(bundles:capabilities:customBuiltins:)``-style
+    /// policies (via ``init(policies:store:capabilities:customBuiltins:customSyncBuiltins:)``
+    /// alongside ``init(bundles:capabilities:customBuiltins:customSyncBuiltins:)``-style
     /// inputs), the union is composed at preparation time. Plan names must
     /// be unique across the entire union, and bundle plan names must lie
     /// under one of their bundle's declared roots.
     ///
-    /// - Parameters:
-    ///   - query: The query to prepare evaluation for.
-    /// - Returns: A PreparedQuery that can be used to evaluate the given query.
+    /// - Returns: A PreparedPolicySet that can be used to prepare queries for evaluation.
     /// - Throws: `RegoError` if bundles fail to load, collide, or if capabilities/builtins validation fails.
-    public mutating func prepareForEvaluation(query: String) async throws -> PreparedQuery {
+    public func preparePolicySet() async throws -> OPA.PreparedPolicySet {
+        // Resolve capabilities first, so a bad capabilities file fails before any compile work.
+        let capabilities = try Self.resolveCapabilities(self.capabilities)
+
         // Merge default and custom builtins, throw appropriate error in case of name conflict
         let overlapping = Set(customBuiltins.keys).intersection(customSyncBuiltins.keys)
         guard overlapping.isEmpty else {
@@ -237,26 +232,58 @@ extension OPA.Engine {
             loadedBundles = try workingCache.validated()
         }
 
+        // User-supplied IR policies share the plan-name namespace with
+        // bundles. The IREvaluator already enforces global plan-name
+        // uniqueness. Here we also reject user plans whose names fall
+        // under any bundle's declared roots, because that subtree is
+        // owned by the bundle even if the bundle itself does not currently
+        // define a plan at that exact name.
+        if !self.policies.isEmpty && !loadedBundles.isEmpty {
+            try Self.checkUserPoliciesAgainstBundleRoots(
+                userPolicies: self.policies,
+                bundles: loadedBundles
+            )
+        }
+
+        let evaluator = try IREvaluator(
+            bundles: loadedBundles, userPolicies: self.policies,
+            builtinRegistry: mergedBuiltinRegistry, optimizeAsync: optimizeAsync)
+
+        // TODO: Validate local allocation assumptions (see Locals.swift).
+        // Could add validation to check:
+        // - Local indices are not sparse
+        // - No register collision between function frames
+        // - Maximum local index is reasonable
+
+        // Verifies that builtins are available in the OPA capabilities and builtin registry
+        try Self.verifyCapabilitiesAndBuiltIns(
+            capabilities: capabilities,
+            builtins: mergedBuiltinRegistry,
+            evaluator: evaluator)
+
+        // Everything below writes to the store, so the policy set has passed
+        // all validation by now. Bundle data goes into a copy of the engine's
+        // store, which becomes the policy set's data snapshot.
+        var store = self.store
+
         // Compute the set of `/data/...` subtrees the current bundle set
-        // claims. We erase only the union of the previously written roots +
-        // newly declared roots, which leaves user data outside both sets
-        // untouched across prepare calls.
-        var newRoots: Set<StoreKeyPath> = []
+        // claims. We erase only these, which leaves user data outside
+        // them untouched.
+        var bundleRoots: Set<StoreKeyPath> = []
         for (_, bundle) in loadedBundles {
             for root in bundle.manifest.roots {
                 let segments = root.split(separator: "/").map(String.init)
-                newRoots.insert(StoreKeyPath(["data"] + segments))
+                bundleRoots.insert(StoreKeyPath(["data"] + segments))
             }
         }
 
-        // Erase old + new bundle-owned subtrees in lexicographic order so an
+        // Erase bundle-owned subtrees in lexicographic order so an
         // ancestor is removed before any of its descendants.
         // A missing path is not an error here — the subtree simply wasn't
         // present (e.g. first prepare on a fresh store), so we skip it.
         // The recovery block below re-establishes the `data` root as an
         // empty object whenever a removal leaves it absent.
-        let toErase = lastWrittenBundleRoots.union(newRoots)
-        for path in toErase.sorted(by: { $0.segments.lexicographicallyPrecedes($1.segments) }) {
+        for path in bundleRoots.sorted(by: { $0.segments.lexicographicallyPrecedes($1.segments) }) {
             do {
                 try await store.remove(at: path)
             } catch let err as RegoError where err.code == .storePathNotFound {
@@ -309,52 +336,22 @@ extension OPA.Engine {
             }
         }
 
-        // Remember what we wrote so the next prepare knows what to erase.
-        self.lastWrittenBundleRoots = newRoots
+        return OPA.PreparedPolicySet(evaluator: evaluator, store: store, builtinRegistry: mergedBuiltinRegistry)
+    }
 
-        // User-supplied IR policies share the plan-name namespace with
-        // bundles. The IREvaluator already enforces global plan-name
-        // uniqueness. Here we also reject user plans whose names fall
-        // under any bundle's declared roots, because that subtree is
-        // owned by the bundle even if the bundle itself does not currently
-        // define a plan at that exact name.
-        if !self.policies.isEmpty && !loadedBundles.isEmpty {
-            try Self.checkUserPoliciesAgainstBundleRoots(
-                userPolicies: self.policies,
-                bundles: loadedBundles
-            )
-        }
-
-        let evaluator = try IREvaluator(
-            bundles: loadedBundles, userPolicies: self.policies,
-            builtinRegistry: mergedBuiltinRegistry, optimizeAsync: optimizeAsync)
-
-        // TODO: Future improvement - validate local allocation assumptions (see Locals.swift)
-        // Could add validation to check:
-        // - Local indices are not sparse
-        // - No register collision between function frames
-        // - Maximum local index is reasonable
-
-        // Verifies that builtins are available in the OPA capabilities and builtin registry
-        try await Self.verifyCapabilitiesAndBuiltIns(
-            capabilities: self.capabilities, builtins: mergedBuiltinRegistry, evaluator: evaluator)
-
-        let entrypoint = (try? queryToEntryPoint(query)) ?? ""
-        let supportsSyncEvaluation: Bool
-        if let hit = evaluator.planIndex[entrypoint] {
-            supportsSyncEvaluation = evaluator.policies[hit.policyIdx].plans[hit.planIdx].syncSafe
-        } else {
-            supportsSyncEvaluation = false
-        }
-
-        return PreparedQuery(
-            query: query,
-            evaluator: evaluator,
-            store: self.store,
-            builtinRegistry: mergedBuiltinRegistry,
-            builtins: evaluator.policies.map { policy in policy.strings.map { mergedBuiltinRegistry.lookup($0) } },
-            supportsSyncEvaluation: supportsSyncEvaluation
-        )
+    /// Prepares a query for evaluation.
+    ///
+    /// Equivalent to ``preparePolicySet()`` followed by ``OPA/PreparedPolicySet/query(_:)``,
+    /// except that an unknown or unsupported query prepares successfully, and only throws
+    /// (`RegoError.unknownQuery` or `RegoError.unsupportedQuery`) once evaluated.
+    /// Prefer ``preparePolicySet()`` when preparing several queries against the same bundles.
+    ///
+    /// - Parameters:
+    ///   - query: The query to prepare evaluation for.
+    /// - Returns: A PreparedQuery that can be used to evaluate the given query.
+    /// - Throws: `RegoError` if bundles fail to load, collide, or if capabilities/builtins validation fails.
+    public mutating func prepareForEvaluation(query: String) async throws -> PreparedQuery {
+        try await preparePolicySet().uncheckedQuery(query)
     }
 
     /// A named path to an ``OPA/Bundle``.

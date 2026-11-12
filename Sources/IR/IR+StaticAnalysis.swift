@@ -27,31 +27,72 @@ extension Block {
 }
 
 extension Statement {
+    // Placeholder swapped into `self` while a payload is mutated, so the payload's
+    // nested arrays are uniquely referenced and mutate in place instead of copying.
+    private static let walkPlaceholder = Statement.breakStmt(BreakStatement(index: 0))
+
     mutating func walk(_ visitStatement: (inout Statement) throws -> Void) rethrows {
         try visitStatement(&self)
 
         switch self {
         case .blockStmt(var stmt):
-            if var blocks = stmt.blocks {
-                for i in blocks.indices {
-                    try blocks[i].walk(visitStatement)
+            self = Self.walkPlaceholder
+            defer { self = .blockStmt(stmt) }
+            if stmt.blocks != nil {
+                for i in stmt.blocks!.indices {
+                    try stmt.blocks![i].walk(visitStatement)
                 }
-                stmt.blocks = blocks
             }
-            self = .blockStmt(stmt)
 
         case .notStmt(var stmt):
+            self = Self.walkPlaceholder
+            defer { self = .notStmt(stmt) }
             try stmt.block.walk(visitStatement)
-            self = .notStmt(stmt)
 
         case .scanStmt(var stmt):
+            self = Self.walkPlaceholder
+            defer { self = .scanStmt(stmt) }
             try stmt.block.walk(visitStatement)
-            self = .scanStmt(stmt)
 
         case .withStmt(var stmt):
+            self = Self.walkPlaceholder
+            defer { self = .withStmt(stmt) }
             try stmt.block.walk(visitStatement)
-            self = .withStmt(stmt)
 
+        default:
+            break
+        }
+    }
+}
+
+// MARK: - Read-only IR Visitor
+//
+// Read-only passes use this instead of `walk`, since mutating a copy of a block
+// forces copy-on-write of its statement arrays.
+
+extension Block {
+    func visit(_ visitStatement: (Statement) throws -> Void) rethrows {
+        for statement in statements {
+            try statement.visit(visitStatement)
+        }
+    }
+}
+
+extension Statement {
+    func visit(_ visitStatement: (Statement) throws -> Void) rethrows {
+        try visitStatement(self)
+
+        switch self {
+        case .blockStmt(let stmt):
+            for block in stmt.blocks ?? [] {
+                try block.visit(visitStatement)
+            }
+        case .notStmt(let stmt):
+            try stmt.block.visit(visitStatement)
+        case .scanStmt(let stmt):
+            try stmt.block.visit(visitStatement)
+        case .withStmt(let stmt):
+            try stmt.block.visit(visitStatement)
         default:
             break
         }
@@ -87,8 +128,8 @@ extension Plan {
 
     private func buildPlanRemapping() -> [Int: Int] {
         var allLocals = Set<Int>()
-        for var block in blocks {
-            block.walk { statement in
+        for block in blocks {
+            block.visit { statement in
                 statement.collectLocals(into: &allLocals)
             }
         }
@@ -109,8 +150,8 @@ extension Plan {
 
     public mutating func computeMaxLocal() {
         var maxLocal = -1
-        for i in blocks.indices {
-            blocks[i].walk { statement in
+        for block in blocks {
+            block.visit { statement in
                 maxLocal = max(maxLocal, statement.maxLocalUsed())
             }
         }
@@ -131,8 +172,8 @@ extension Func {
 
     private func buildFuncRemapping() -> [Int: Int] {
         var allLocals = Set<Int>()
-        for var block in blocks {
-            block.walk { statement in
+        for block in blocks {
+            block.visit { statement in
                 statement.collectLocals(into: &allLocals)
             }
         }
@@ -164,8 +205,8 @@ extension Func {
     public mutating func computeMaxLocal() {
         var maxLocal = -1
 
-        for i in blocks.indices {
-            blocks[i].walk { statement in
+        for block in blocks {
+            block.visit { statement in
                 maxLocal = max(maxLocal, statement.maxLocalUsed())
             }
         }
@@ -561,8 +602,8 @@ extension Policy {
 
 extension Plan {
     func verifyStaticStrings(staticData: Static?) throws {
-        for var block in blocks {
-            try block.walk { statement in
+        for block in blocks {
+            try block.visit { statement in
                 try statement.verifyStaticStrings(staticData: staticData)
             }
         }
@@ -571,8 +612,8 @@ extension Plan {
 
 extension Func {
     func verifyStaticStrings(staticData: Static?) throws {
-        for var block in blocks {
-            try block.walk { statement in
+        for block in blocks {
+            try block.visit { statement in
                 try statement.verifyStaticStrings(staticData: staticData)
             }
         }
@@ -663,8 +704,8 @@ extension Operand {
 
 extension Plan {
     func identifyStaticStringNumbers(into indices: inout Set<Int>) {
-        for var block in blocks {
-            block.walk { statement in
+        for block in blocks {
+            block.visit { statement in
                 statement.identifyStaticStringNumbers(into: &indices)
             }
         }
@@ -673,8 +714,8 @@ extension Plan {
 
 extension Func {
     func identifyStaticStringNumbers(into indices: inout Set<Int>) {
-        for var block in blocks {
-            block.walk { statement in
+        for block in blocks {
+            block.visit { statement in
                 statement.identifyStaticStringNumbers(into: &indices)
             }
         }

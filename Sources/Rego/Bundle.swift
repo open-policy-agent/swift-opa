@@ -207,6 +207,14 @@ extension OPA.Bundle {
         return false
     }
 
+    /// Returns true if either slash-separated path is equal to or is nested under the other path.
+    /// Paths are compared by segment, ignoring empty segments, the same way store paths are built.
+    static func pathsOverlap(_ a: String, _ b: String) -> Bool {
+        let a = a.split(separator: "/")
+        let b = b.split(separator: "/")
+        return a.starts(with: b) || b.starts(with: a)
+    }
+
     /// checkBundlesForOverlap verifies whether a set of bundles is valid
     /// together, in that there are no overlaps of their reserved roots
     /// space within the logical data tree.
@@ -228,15 +236,21 @@ extension OPA.Bundle {
     ///
     /// Throws a bundleConflictError if a conflict is detected.
     public static func checkBundlesForOverlap(bundleSet bundles: [String: OPA.Bundle]) throws {
-        // Trim slashes for display, then add leading/trailing "/" so byte-prefix comparison
+        try checkRootsForOverlap(bundles.mapValues(\.manifest.roots))
+    }
+
+    /// Same as ``checkBundlesForOverlap(bundleSet:)``, over each bundle's manifest roots keyed by bundle name.
+    static func checkRootsForOverlap(_ bundleRoots: [String: [String]]) throws {
+        // Drop empty segments, then add leading/trailing "/" so byte-prefix comparison
         // matches segment-prefix semantics. e.g. canonical "/a/b/" is a prefix
-        // of "/a/b/c/" but not of "/a/bc/".
+        // of "/a/b/c/" but not of "/a/bc/". Dropping empty segments matches how
+        // store paths are built, so "a//b" and "a/b" collide here as they do in the store.
         struct Entry {
             let bundle: String
             let canonical: String
 
             init(bundle: String, rawRoot: String) {
-                let trimmed = rawRoot.trimmingCharacters(in: ["/"])
+                let trimmed = rawRoot.split(separator: "/").joined(separator: "/")
                 self.bundle = bundle
                 self.canonical = (trimmed.isEmpty) ? "/" : "/" + trimmed + "/"
             }
@@ -248,8 +262,8 @@ extension OPA.Bundle {
         }
 
         let entries: [Entry] =
-            bundles.flatMap { name, bundle in
-                bundle.manifest.roots.map { Entry(bundle: name, rawRoot: $0) }
+            bundleRoots.flatMap { name, roots in
+                roots.map { Entry(bundle: name, rawRoot: $0) }
             }.sorted { $0.canonical < $1.canonical }
 
         var collidingBundles: Set<String> = []

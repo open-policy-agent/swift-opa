@@ -107,7 +107,9 @@ struct PreparedPolicySetTests {
         let set = OPA.PreparedPolicySet(
             evaluator: evaluator,
             store: OPA.InMemoryStore(initialData: .object(["data": .object([:])])),
-            builtinRegistry: .defaultRegistry
+            builtinRegistry: .defaultRegistry,
+            bundleRoots: ["app-bundle": ["app"]],
+            planBundles: ["app-bundle"]
         )
 
         #expect(set.entrypoints == ["app/allow", "user/allow"])
@@ -170,6 +172,23 @@ struct PreparedPolicySetTests {
         #expect(try await legacySecond.evaluate(input: .object([:])) == two)
     }
 
+    @Test("Preparing surfaces store read errors instead of resetting data")
+    func testStoreReadErrorsPropagate() async throws {
+        struct ReadError: Error {}
+        struct FailingReadStore: OPA.Store {
+            func read(from: StoreKeyPath) async throws -> AST.RegoValue { throw ReadError() }
+            mutating func write(to: StoreKeyPath, value: AST.RegoValue) async throws {}
+            mutating func remove(at: StoreKeyPath) async throws {}
+        }
+        let engine = OPA.Engine(
+            policies: [IREvaluatorValidationTests.makeIRPolicy(planNames: ["user/allow"])],
+            store: FailingReadStore()
+        )
+        await #expect(throws: ReadError.self) {
+            _ = try await engine.preparePolicySet()
+        }
+    }
+
     // MARK: - Capabilities
 
     @Test("A capabilities file is re-read on every prepare")
@@ -194,7 +213,232 @@ struct PreparedPolicySetTests {
         _ = try await engine.preparePolicySet()
     }
 
+    // MARK: - Replacing data
+
+    static let query = "data.example.allow"
+
+    static func result(_ value: AST.RegoValue) -> ResultSet {
+        ResultSet([.object(["result": value])])
+    }
+
+    @Test("replacingData(bundles:) swaps bundle data and leaves the original policy set untouched")
+    func testReplacingBundleData() async throws {
+        let set = try await Self.makeEngine().preparePolicySet()
+        let replaced = try await set.replacingData(bundles: ["data": ["config": ["example": ["value": 7]]]])
+
+        #expect(try await set.query(Self.query).evaluate() == Self.result(42))
+        #expect(try await replaced.query(Self.query).evaluate() == Self.result(7))
+        #expect(replaced.bundleRoots == set.bundleRoots)
+    }
+
+    @Test("replacingData(bundles:) rejects unknown bundles and data outside the bundle's roots")
+    func testReplacingBundleDataValidation() async throws {
+        let set = try await Self.makeEngine().preparePolicySet()
+        await Self.expectRegoError(.bundleNotFoundError) {
+            _ = try await set.replacingData(bundles: ["missing": [:]])
+        }
+        await Self.expectRegoError(.bundleNotFoundError) {
+            _ = try await set.replacingData(removingBundles: ["missing"])
+        }
+        await Self.expectRegoError(.bundleLoadError) {
+            _ = try await set.replacingData(bundles: ["data": ["other": 1]])
+        }
+        await Self.expectRegoError(.bundleLoadError) {
+            _ = try await set.replacingData(bundles: ["data": 7])
+        }
+        await Self.expectRegoError(.invalidArgumentError) {
+            _ = try await set.replacingData(bundles: ["data": [:]], removingBundles: ["data"])
+        }
+    }
+
+    @Test("Data-only bundles can be added and removed without recompiling")
+    func testAddingAndRemovingDataBundles() async throws {
+        let set = try await Self.makeEngine().preparePolicySet()
+        let removed = try await set.replacingData(removingBundles: ["data"])
+        #expect(try await removed.query(Self.query).evaluate() == ResultSet.empty)
+        #expect(removed.bundleRoots.keys.sorted() == ["policy"])
+
+        let dataBundle = try BundleCrossBundleDataTests.makeDataOnlyBundle(
+            dataPath: "config/example/value", value: 9)
+        let added = try await removed.replacingData(addingBundles: ["data2": dataBundle])
+        #expect(try await added.query(Self.query).evaluate() == Self.result(9))
+    }
+
+    @Test("Removing and adding one name replaces a data-only bundle, including its roots")
+    func testReplacingDataBundleRoots() async throws {
+        let set = try await Self.makeEngine().preparePolicySet()
+        let wider = try BundleCrossBundleDataTests.makeDataOnlyBundle(
+            dataPath: "config", value: ["example": ["value": 5]])
+        let replaced = try await set.replacingData(addingBundles: ["data": wider], removingBundles: ["data"])
+
+        #expect(try await replaced.query(Self.query).evaluate() == Self.result(5))
+        #expect(replaced.bundleRoots["data"] == ["config"])
+    }
+
+    @Test("Adding or removing bundles with plan files requires preparePolicySet()")
+    func testPlanBundlesRequireRecompile() async throws {
+        let set = try await Self.makeEngine().preparePolicySet()
+        let planBundle = try BundleCrossBundleDataTests.makePolicyOnlyBundle(
+            decisionPath: "other/allow", dataPath: "config/example/value")
+        await Self.expectRegoError(.bundleHasPlansError) {
+            _ = try await set.replacingData(removingBundles: ["policy"])
+        }
+        await Self.expectRegoError(.bundleHasPlansError) {
+            _ = try await set.replacingData(addingBundles: ["other": planBundle])
+        }
+    }
+
+    @Test("Added bundles must not conflict with existing names, roots, or raw IR plans")
+    func testAddedBundleConflicts() async throws {
+        let set = try await Self.makeEngine().preparePolicySet()
+        let overlapping = try BundleCrossBundleDataTests.makeDataOnlyBundle(dataPath: "config/example", value: [:])
+        await Self.expectRegoError(.bundleNameConflictError) {
+            _ = try await set.replacingData(addingBundles: ["data": overlapping])
+        }
+        await Self.expectRegoError(.bundleRootConflictError) {
+            _ = try await set.replacingData(addingBundles: ["overlap": overlapping])
+        }
+        // Empty segments are dropped from store paths, so "config//example" is "config/example".
+        let doubleSlash = try OPA.Bundle(manifest: OPA.Manifest(roots: ["config//example"]), planFiles: [], data: [:])
+        await Self.expectRegoError(.bundleRootConflictError) {
+            _ = try await set.replacingData(addingBundles: ["doubleSlash": doubleSlash])
+        }
+
+        let userPolicy = IREvaluatorValidationTests.makeIRPolicy(planNames: ["user/allow"])
+        let userSet = OPA.PreparedPolicySet(
+            evaluator: try IREvaluator(bundles: [:], userPolicies: [userPolicy]),
+            store: OPA.InMemoryStore(initialData: .object(["data": .object([:])])),
+            builtinRegistry: .defaultRegistry,
+            bundleRoots: [:],
+            planBundles: []
+        )
+        // Roots above and under a raw IR plan both conflict with it.
+        for dataPath in ["user", "user/allow/extra"] {
+            let claiming = try BundleCrossBundleDataTests.makeDataOnlyBundle(dataPath: dataPath, value: [:])
+            await Self.expectRegoError(.planNameConflictError) {
+                _ = try await userSet.replacingData(addingBundles: ["claiming": claiming])
+            }
+        }
+
+        let scalar = try OPA.Bundle(manifest: OPA.Manifest(roots: ["scalar"]), planFiles: [], data: .null)
+        await Self.expectRegoError(.bundleLoadError) {
+            _ = try await set.replacingData(addingBundles: ["scalar": scalar])
+        }
+    }
+
+    @Test("replacingData(at:with:) writes and removes user data outside bundle roots")
+    func testReplacingUserData() async throws {
+        let policyBundle = try BundleCrossBundleDataTests.makePolicyOnlyBundle(
+            decisionPath: "user/pref",
+            dataPath: "user/preference"
+        )
+        let irPolicy = try IR.Policy(jsonData: policyBundle.planFiles.first!.data)
+        let engine = OPA.Engine(
+            policies: [irPolicy],
+            store: OPA.InMemoryStore(initialData: .object(["data": .object(["user": .object(["preference": 7])])]))
+        )
+        let set = try await engine.preparePolicySet()
+
+        let written = try await set.replacingData(at: "user/preference", with: 8)
+        #expect(try await set.query("data.user.pref").evaluate() == Self.result(7))
+        #expect(try await written.query("data.user.pref").evaluate() == Self.result(8))
+
+        let removed = try await written.replacingData(at: "user/preference", with: nil)
+        #expect(try await removed.query("data.user.pref").evaluate() == ResultSet.empty)
+        await Self.expectRegoError(.storePathNotFound) {
+            _ = try await removed.replacingData(at: "user/preference", with: nil)
+        }
+
+        // Removing all of `data` leaves an empty `data` object behind.
+        let cleared = try await set.replacingData(at: "", with: nil)
+        #expect(try await cleared.store.read(from: StoreKeyPath(["data"])) == .object([:]))
+
+        // All of `data` must stay an object.
+        await Self.expectRegoError(.storeInvalidPatch) {
+            _ = try await set.replacingData(at: "", with: [1, 2])
+        }
+        let replacedRoot = try await set.replacingData(at: "", with: ["user": ["preference": 9]])
+        #expect(try await replacedRoot.query("data.user.pref").evaluate() == Self.result(9))
+    }
+
+    @Test(
+        "replacingData(at:with:) rejects paths under or above a bundle root",
+        arguments: ["config", "config/example/value/x", "config//example/value", "/config/example//value/x/"])
+    func testReplacingUserDataRejectsBundlePaths(path: String) async throws {
+        let set = try await Self.makeEngine().preparePolicySet()
+        await Self.expectRegoError(.pathOwnedByBundleError) {
+            _ = try await set.replacingData(at: path, with: 1)
+        }
+        // A sibling of a bundle root is fine.
+        _ = try await set.replacingData(at: "config/other", with: 1)
+    }
+
+    @Test("replacingData(at:with:) rejects writes that put data at or under a raw IR plan")
+    func testReplacingUserDataRejectsPlanPaths() async throws {
+        let userPolicy = IREvaluatorValidationTests.makeIRPolicy(planNames: ["user/allow"])
+        let set = OPA.PreparedPolicySet(
+            evaluator: try IREvaluator(bundles: [:], userPolicies: [userPolicy]),
+            store: OPA.InMemoryStore(initialData: .object(["data": .object(["user": .object(["allow": true])])])),
+            builtinRegistry: .defaultRegistry,
+            bundleRoots: [:],
+            planBundles: []
+        )
+
+        let conflicting: [(path: String, value: AST.RegoValue)] = [
+            ("user/allow", true),
+            ("user/allow/extra", 1),
+            ("user", ["allow": true]),
+            ("", ["user": ["allow": ["nested": 1]]]),
+        ]
+        for (path, value) in conflicting {
+            await Self.expectRegoError(.planNameConflictError) {
+                _ = try await set.replacingData(at: path, with: value)
+            }
+        }
+
+        // Writes above the plan are fine when they hold nothing at the plan's path.
+        _ = try await set.replacingData(at: "user", with: ["other": 1])
+        _ = try await set.replacingData(at: "", with: ["user": 5])
+        _ = try await set.replacingData(at: "elsewhere", with: 1)
+        // Removals can't put data under a plan.
+        _ = try await set.replacingData(at: "user/allow", with: nil)
+    }
+
+    @Test(
+        "replacingData(at:with:) reports why a path is bundle-owned, like OPA",
+        arguments: [
+            ("", ["data": ["config"]], "can't write to document root with bundle roots configured"),
+            ("config/x", ["all": [""]], #"all paths owned by bundle "all""#),
+            ("/config/", ["data": ["config/example"]], #"path config is owned by bundle "data""#),
+        ])
+    func testReplacingUserDataMessages(path: String, bundleRoots: [String: [String]], message: String) async throws {
+        let set = OPA.PreparedPolicySet(
+            evaluator: try IREvaluator(
+                bundles: [:], userPolicies: [IREvaluatorValidationTests.makeIRPolicy(planNames: ["user/allow"])]),
+            store: OPA.InMemoryStore(initialData: .object(["data": .object([:])])),
+            builtinRegistry: .defaultRegistry,
+            bundleRoots: bundleRoots,
+            planBundles: []
+        )
+        do {
+            _ = try await set.replacingData(at: path, with: 1)
+            Issue.record("expected pathOwnedByBundleError")
+        } catch let err as RegoError {
+            #expect(err.code == .pathOwnedByBundleError)
+            #expect(err.message == message)
+        }
+    }
+
     // MARK: - Helpers
+
+    static func expectRegoError(
+        _ code: RegoError.Code,
+        sourceLocation: SourceLocation = #_sourceLocation,
+        _ body: () async throws -> Void
+    ) async {
+        let err = await #expect(throws: RegoError.self, sourceLocation: sourceLocation) { try await body() }
+        #expect(err?.code == code, sourceLocation: sourceLocation)
+    }
 
     static func makeTempDir() throws -> URL {
         let dir = FileManager.default.temporaryDirectory.appending(path: UUID().uuidString)

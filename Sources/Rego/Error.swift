@@ -10,12 +10,15 @@ public struct RegoError: Sendable, Swift.Error {
             case internalError
 
             // Bundle errors
+            case bundleHasPlansError
             case bundleInitializationError
             case bundleLoadError
             case bundleNameConflictError
+            case bundleNotFoundError
             case bundleRootConflictError
             case bundleUnpreparedError
             case invalidArgumentError
+            case pathOwnedByBundleError
             case planEscapedBundleRoots
             case planNameConflictError
 
@@ -33,6 +36,7 @@ public struct RegoError: Sendable, Swift.Error {
             case unsupportedQuery
 
             // Store errors
+            case storeInvalidPatch
             case storePathNotFound
             case storeSyncNotSupported
 
@@ -54,13 +58,16 @@ public struct RegoError: Sendable, Swift.Error {
         }
 
         // Bundle-related codes
+        public static let bundleHasPlansError = Code(.bundleHasPlansError)
         public static let bundleInitializationError = Code(.bundleInitializationError)
         public static let bundleLoadError = Code(.bundleLoadError)
         public static let bundleNameConflictError = Code(.bundleNameConflictError)
+        public static let bundleNotFoundError = Code(.bundleNotFoundError)
         public static let bundleRootConflictError = Code(.bundleRootConflictError)
         public static let bundleUnpreparedError = Code(.bundleUnpreparedError)
         public static let internalError = Code(.internalError)
         public static let invalidArgumentError = Code(.invalidArgumentError)
+        public static let pathOwnedByBundleError = Code(.pathOwnedByBundleError)
         public static let planEscapedBundleRoots = Code(.planEscapedBundleRoots)
         public static let planNameConflictError = Code(.planNameConflictError)
 
@@ -78,6 +85,7 @@ public struct RegoError: Sendable, Swift.Error {
         public static let unsupportedQuery = Code(.unsupportedQuery)
 
         // Store errors
+        public static let storeInvalidPatch = Code(.storeInvalidPatch)
         public static let storePathNotFound = Code(.storePathNotFound)
         public static let storeSyncNotSupported = Code(.storeSyncNotSupported)
 

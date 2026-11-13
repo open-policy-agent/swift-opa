@@ -173,6 +173,25 @@ let isAdmin = try policySet.query("data.policy.main.is_admin")
 `entrypoints` lists the plans the policy set serves (e.g. `policy/main/is_valid`). Every query derived from one policy
 set shares its compiled policies and its snapshot of bundle data.
 
+### Replacing Data
+
+A policy set's data can change without recompiling its policies. Each `replacingData` call returns a new policy set.
+With a value-semantics store like `InMemoryStore`, the original policy set (and any queries derived from it) is left untouched:
+
+```swift
+// Replace a bundle's data. The bundle keeps its roots.
+let updated = try await policySet.replacingData(bundles: ["dataBundle": newData])
+
+// Add or remove data-only bundles (bundles without plan files).
+let swapped = try await policySet.replacingData(addingBundles: ["users": usersBundle], removingBundles: ["oldUsers"])
+
+// Write (or remove, with `nil`) data outside every bundle's roots.
+let written = try await policySet.replacingData(at: "settings/theme", with: "dark")
+```
+
+Bundles with plan files cannot be added or removed this way (`replacingData` throws `bundleHasPlansError`).
+In these cases, users should prepare a new policy set with `preparePolicySet()` instead.
+
 ### Complete Example
 
 For the copy-paste inclined.

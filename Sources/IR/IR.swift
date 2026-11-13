@@ -129,6 +129,7 @@ extension Block: Codable {
         var peek = iter
 
         var out: [Statement] = []
+        out.reserveCapacity(iter.count ?? 0)
         while !peek.isAtEnd {
             let partial = try peek.decode(PartialStatement.self)
             let inner = try iter.nestedContainer(keyedBy: InnerCodingKeys.self)

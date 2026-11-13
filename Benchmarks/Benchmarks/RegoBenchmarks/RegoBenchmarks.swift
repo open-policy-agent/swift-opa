@@ -269,5 +269,41 @@ let benchmarks: @Sendable () -> Void = {
             }
             benchmark.stopMeasurement()
         }
+
+        // Compares re-preparing a policy set against swapping its bundle data.
+        Benchmark(
+            "Replace Bundle Data - preparePolicySet (\(spec.bundleName))",
+            configuration: .init(metrics: [.wallClock, .mallocCountTotal, .instructions])
+        ) { benchmark in
+            let bundle = loadPlanBundle(at: bundleURL)
+            let engine = OPA.Engine(bundles: [spec.bundleName: bundle])
+
+            benchmark.startMeasurement()
+            for _ in benchmark.scaledIterations {
+                do {
+                    blackHole(try await engine.preparePolicySet())
+                } catch { fatalError("prepare failed: \(error)") }
+            }
+            benchmark.stopMeasurement()
+        }
+
+        Benchmark(
+            "Replace Bundle Data - replacingData (\(spec.bundleName))",
+            configuration: .init(metrics: [.wallClock, .mallocCountTotal, .instructions])
+        ) { benchmark in
+            let bundle = loadPlanBundle(at: bundleURL)
+            let policySet: OPA.PreparedPolicySet
+            do {
+                policySet = try await OPA.Engine(bundles: [spec.bundleName: bundle]).preparePolicySet()
+            } catch { fatalError("prepare failed: \(error)") }
+
+            benchmark.startMeasurement()
+            for _ in benchmark.scaledIterations {
+                do {
+                    blackHole(try await policySet.replacingData(bundles: [spec.bundleName: bundle.data]))
+                } catch { fatalError("replacing data failed: \(error)") }
+            }
+            benchmark.stopMeasurement()
+        }
     }
 }

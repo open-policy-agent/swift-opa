@@ -161,6 +161,9 @@ extension OPA.Engine {
     /// left untouched, so each policy set pins its own data snapshot. User-supplied data at
     /// paths outside all bundle roots is visible to the policy set. (A store with reference
     /// semantics is written in place, and does not get a separate snapshot.)
+    /// To change data without recompiling, see
+    /// ``OPA/PreparedPolicySet/replacingData(bundles:addingBundles:removingBundles:)``
+    /// and ``OPA/PreparedPolicySet/replacingData(at:with:)``.
     ///
     /// ## Bundles + raw IR policies
     /// If the engine was constructed with a mix of bundles and raw user IR
@@ -265,78 +268,17 @@ extension OPA.Engine {
         // all validation by now. Bundle data goes into a copy of the engine's
         // store, which becomes the policy set's data snapshot.
         var store = self.store
+        let bundleData = loadedBundles.map { (name: $0.key, roots: $0.value.manifest.roots, data: $0.value.data) }
+        try await OPA.PreparedPolicySet.writeBundleData(
+            into: &store, erasing: bundleData.flatMap(\.roots), bundles: bundleData)
 
-        // Compute the set of `/data/...` subtrees the current bundle set
-        // claims. We erase only these, which leaves user data outside
-        // them untouched.
-        var bundleRoots: Set<StoreKeyPath> = []
-        for (_, bundle) in loadedBundles {
-            for root in bundle.manifest.roots {
-                let segments = root.split(separator: "/").map(String.init)
-                bundleRoots.insert(StoreKeyPath(["data"] + segments))
-            }
-        }
-
-        // Erase bundle-owned subtrees in lexicographic order so an
-        // ancestor is removed before any of its descendants.
-        // A missing path is not an error here — the subtree simply wasn't
-        // present (e.g. first prepare on a fresh store), so we skip it.
-        // The recovery block below re-establishes the `data` root as an
-        // empty object whenever a removal leaves it absent.
-        for path in bundleRoots.sorted(by: { $0.segments.lexicographicallyPrecedes($1.segments) }) {
-            do {
-                try await store.remove(at: path)
-            } catch let err as RegoError where err.code == .storePathNotFound {
-                // Already absent — nothing to erase.
-            }
-        }
-
-        // Ensure the root `data` node exists; removal of the whole `data`
-        // subtree (e.g. a bundle with root "") leaves it absent.
-        do {
-            _ = try await store.read(from: StoreKeyPath(["data"]))
-        } catch {
-            try await store.write(to: StoreKeyPath(["data"]), value: .object([:]))
-        }
-
-        // Write each bundle's data into the store at paths corresponding to
-        // the bundle's declared roots. `checkBundlesForOverlap` guarantees
-        // these root paths are disjoint across bundles, so the per-root
-        // writes below cannot collide — each bundle contributes only within
-        // the subtree it "owns".
-        //
-        // A bundle with no data under one of its roots simply writes nothing
-        // for that root (e.g. a policy-only bundle whose roots describe
-        // decision paths rather than data paths).
-        for (_, bundle) in loadedBundles.sorted(by: { $0.key < $1.key }) {
-            let roots = bundle.manifest.roots
-            for root in roots.sorted() {
-                let rootSegments = root.split(separator: "/").map(String.init)
-
-                // Walk bundle.data down to the subtree the bundle actually
-                // contributes for this root. If any segment is missing or
-                // isn't an object, this bundle has nothing to contribute
-                // for this root and we skip.
-                var subtree: AST.RegoValue = bundle.data
-                var found = true
-                for segment in rootSegments {
-                    guard case .object(let obj) = subtree,
-                        let next = obj[.string(segment)]
-                    else {
-                        found = false
-                        break
-                    }
-                    subtree = next
-                }
-                guard found else { continue }
-
-                // Write the subtree at ["data"] + rootSegments.
-                let storePath = StoreKeyPath(["data"] + rootSegments)
-                try await store.write(to: storePath, value: subtree)
-            }
-        }
-
-        return OPA.PreparedPolicySet(evaluator: evaluator, store: store, builtinRegistry: mergedBuiltinRegistry)
+        return OPA.PreparedPolicySet(
+            evaluator: evaluator,
+            store: store,
+            builtinRegistry: mergedBuiltinRegistry,
+            bundleRoots: loadedBundles.mapValues(\.manifest.roots),
+            planBundles: Set(loadedBundles.filter { !$0.value.planFiles.isEmpty }.keys)
+        )
     }
 
     /// Prepares a query for evaluation.

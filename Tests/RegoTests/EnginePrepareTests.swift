@@ -142,6 +142,28 @@ struct EnginePrepareTests {
         }
     }
 
+    @Test("User IR plan whose name is above a bundle root is rejected")
+    func testUserPolicyAboveBundleRootRejected() throws {
+        // Bundle owns `app/admin`. A user plan at `app` would produce a
+        // document that contains the bundle's subtree, so it conflicts too.
+        let bundle = try IREvaluatorValidationTests.makeTestBundle(
+            roots: ["app/admin"],
+            planNames: ["app/admin/allow"]
+        )
+        let userPolicy = IREvaluatorValidationTests.makeIRPolicy(planNames: ["app"])
+
+        do {
+            try OPA.Engine.checkUserPoliciesAgainstBundleRoots(
+                userPolicies: [userPolicy],
+                bundles: ["b": bundle]
+            )
+            Issue.record("expected planNameConflictError")
+        } catch let err as RegoError {
+            #expect(err.code == .planNameConflictError)
+            #expect(err.message.contains("user:#0 'app' overlaps roots of [bundle:b]"))
+        }
+    }
+
     @Test("User IR plan with a name disjoint from all bundle roots is accepted")
     func testUserPolicyOutsideBundleRootsAccepted() throws {
         let bundle = try IREvaluatorValidationTests.makeTestBundle(

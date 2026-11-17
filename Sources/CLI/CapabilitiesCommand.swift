@@ -1,4 +1,5 @@
 #if CLI
+    import AST
     import ArgumentParser
     import Foundation
     import Rego
@@ -20,8 +21,10 @@
                 throw CapabilitiesError.capabilitiesFileNotFound(path: capabilitiesPath)
             }
 
-            guard let capabilitiesDict = try JSONSerialization.jsonObject(with: capabilitiesData) as? [String: Any]
-            else {
+            let parsed = try JSONSerialization.jsonObject(with: capabilitiesData)
+            // Reject duplicate keys.
+            try AST.RegoValue.checkForDuplicateKeys(json: capabilitiesData, parsed: parsed)
+            guard let capabilitiesDict = parsed as? [String: Any] else {
                 throw CapabilitiesError.invalidCapabilitiesFormat
             }
 

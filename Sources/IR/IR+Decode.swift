@@ -3,11 +3,14 @@
 //  Decoding/deserializing extensions for IR
 //
 
+import AST
 import Foundation
 
 extension Policy {
     public init(jsonData rawJson: Data) throws {
         self = try JSONDecoder().decode(Self.self, from: rawJson)
+        // Reject duplicate keys. This runs after decoding, so malformed JSON reports a DecodingError.
+        try RegoValue.checkForDuplicateKeys(json: rawJson)
 
         try self.prepareForExecution()
     }

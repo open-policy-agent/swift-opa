@@ -246,6 +246,31 @@ extension BuiltinTests.EncodingTests {
             args: [["foo": 1]],
             expected: .success(.boolean(false))  // Does not throw a builtin error in OPA, surprisingly.
         ),
+        // Duplicate keys are rejected.
+        BuiltinTests.TestCase(
+            description: "invalid - duplicate key",
+            name: "json.is_valid",
+            args: [#"{"role": "guest", "role": "admin"}"#],
+            expected: .success(.boolean(false))
+        ),
+        BuiltinTests.TestCase(
+            description: "invalid - nested duplicate key",
+            name: "json.is_valid",
+            args: [#"[{"user": {"role": "guest", "role": "admin"}}]"#],
+            expected: .success(.boolean(false))
+        ),
+        BuiltinTests.TestCase(
+            description: "valid - same key in nested objects",
+            name: "json.is_valid",
+            args: [#"{"role": {"role": "guest"}}"#],
+            expected: .success(.boolean(true))
+        ),
+        BuiltinTests.TestCase(
+            description: "valid - top-level scalar",
+            name: "json.is_valid",
+            args: ["5"],
+            expected: .success(.boolean(true))
+        ),
     ]
 
     // MARK: - json.marshal Tests
@@ -373,6 +398,25 @@ extension BuiltinTests.EncodingTests {
             name: "json.unmarshal",
             args: ["true"],
             expected: .success(.boolean(true))
+        ),
+        // Duplicate keys are rejected.
+        BuiltinTests.TestCase(
+            description: "duplicate key",
+            name: "json.unmarshal",
+            args: [#"{"role": "guest", "role": "admin"}"#],
+            expected: .failure(AST.RegoValue.JSONInputError.duplicateObjectKeys)
+        ),
+        BuiltinTests.TestCase(
+            description: "nested duplicate key",
+            name: "json.unmarshal",
+            args: [#"[{"user": {"role": "guest", "role": "admin"}}]"#],
+            expected: .failure(AST.RegoValue.JSONInputError.duplicateObjectKeys)
+        ),
+        BuiltinTests.TestCase(
+            description: "same key in nested objects",
+            name: "json.unmarshal",
+            args: [#"{"role": {"role": "guest"}}"#],
+            expected: .success(["role": ["role": "guest"]])
         ),
     ]
 

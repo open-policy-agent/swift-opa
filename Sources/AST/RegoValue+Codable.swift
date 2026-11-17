@@ -33,9 +33,14 @@ extension RegoValue: Codable {
             }
         case let v as [String: Any]:
             do {
-                let values: [RegoValue: RegoValue] = try v.reduce(into: [:]) { m, elem in
-                    m[try RegoValue(from: elem.key)] = try RegoValue(from: elem.value, objectMembers: &objectMembers)
+                var values: [RegoValue: RegoValue] = [:]
+                values.reserveCapacity(v.count)
+                for (key, value) in v {
+                    // Normalize to contiguous UTF-8 for faster comparisons.
+                    values[.string(String(decoding: key.utf8, as: UTF8.self))] = try RegoValue(
+                        from: value, objectMembers: &objectMembers)
                 }
+                // Count after insertion, so keys that collapse in the dictionary are detected.
                 objectMembers += values.count
                 self = .object(values)
             } catch {

@@ -5,6 +5,65 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+## 0.0.12
+
+This release introduces a new API for amortizing `PreparedQuery` creation costs, as well as two bugfixes that improve performance during policy loading.
+
+### `PreparedPolicySet` (#207, #208)
+
+This release introduces a new type, `PreparedPolicySet`, that amortizes most of the validation and setup costs for creating `PreparedQuery` instances over a given snapshot of bundles and data.
+It also makes a CoW copy of the `Engine`'s store at the time of creation, so that all `PreparedQuery` instances derived from it will have a consistent view of the `InMemoryStore`, regardless of later bundle changes.
+
+```swift
+// Validate and compile the engine's bundles once.
+let policySet = try await engine.preparePolicySet()
+
+// Getting a query from the policy set is cheap, and doesn't recompile anything.
+let allow = try policySet.query("data/authz/allow")
+
+let resultSet = try await allow.evaluate(input: input)
+```
+
+Deriving new `PreparedQuery` instances from the policy set is cheap, so this new structure should offer a meaningful performance benefit for applications where the set of loaded bundles and policies is not constantly changing.
+
+The data store bound on the policy set can be updated after creation using the policy set's `replacingData` methods, as shown below:
+
+```swift
+// Swap in new data without recompiling policies. This returns a new policy set.
+let updated = try await policySet.replacingData(bundles: ["authzBundle": newBundleData])
+
+// Data outside every bundle's roots can be written (or removed with nil) by path.
+let updated2 = try await updated.replacingData(at: "users/alice", with: ["role": "admin"])
+
+// Queries from the new policy set see the new data.
+let newResultSet = try await updated2.query("data/authz/allow").evaluate(input: input)
+
+// `allow` still sees the original snapshot.
+let oldResultSet = try await allow.evaluate(input: input)
+```
+
+This helps avoid rebuild costs when the policies are unchanged but the data they work on has changed.
+
+Authored by @philipaconrad
+
+### Performance optimizations (#209, #210)
+
+IR policies are rarely altered after loading. Previously, Swift OPA used repeated `append` calls to build up blocks during IR policy decoding.
+This resulted in statement arrays that had allocated 2x more capacity than necessary.
+
+As of #209, Swift OPA now reserves exact storage for statements during IR policy decoding, and this has reduced memory usage by up to 37% on some larger IR plans.
+
+In #210, Swift OPA has removed unnecessary copy-on-write copies during static analysis passes.
+Most static analysis passes are read-only, and so they now use a non-mutating `visit` method to traverse parsed IR data structures.
+
+This change has yielded the following results in small-scale synthetic benchmarks:
+  - `prepareForExecution` no longer adds to peak memory usage. Before, it added a spike of ~85% of the decoded IR's memory size.
+  - `prepareForExecution` runs ~2x faster.
+  - Bytecode conversion runs ~13% faster.
+
+Authored by @philipaconrad
+
+
 ## 0.0.11
 
 This release includes a new builtin implementation, a Rego IR-adpated `test` command, and assorted bugfixes.

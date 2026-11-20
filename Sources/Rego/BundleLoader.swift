@@ -46,7 +46,11 @@ package struct BundleLoader {
                     throw LoadError.unexpectedManifest(f.url)
                 }
 
-                manifest = try OPA.Manifest(from: f.data)
+                do {
+                    manifest = try OPA.Manifest(from: f.data)
+                } catch {
+                    throw LoadError.manifestParseError(f.url, error)
+                }
 
             case "data.json":
                 // Parse JSON into AST values

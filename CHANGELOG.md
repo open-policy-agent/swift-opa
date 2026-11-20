@@ -5,6 +5,39 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Breaking Change: Reject duplicate object keys in JSON input (#212)
+
+Swift OPA now rejects JSON objects with duplicate keys everywhere it parses JSON text:
+
+- `input` documents (`RegoValue(jsonData:)`)
+- Bundle files: `.manifest`, `data.json`, and `plan.json`
+- Capabilities files
+- The `json.unmarshal` builtin (raises a builtin error) and `json.is_valid` (returns `false`)
+
+**This is a deliberate incompatibility with OPA**, which accepts duplicate keys and keeps the last copy.
+Some documents that OPA accepts are now rejected, including bundle `data.json` files with duplicate keys present.
+
+`JSONSerialization` resolved duplicates differently by platform (the last copy wins on Linux, the first copy wins on Darwin), so a document like `{"role": "guest", "role": "admin"}` could read differently in a policy than in another parser handling the same bytes, allowing parser differential attacks.
+
+Swift OPA now detects duplicates by counting the object members in the raw JSON (the `:` characters outside of strings) and comparing that with the number of members after parsing.
+Fewer members after parsing means keys collapsed together, and the document is rejected with `RegoValue.JSONInputError.duplicateObjectKeys`.
+
+Details:
+
+- Keys that are equal only after unescaping (`"\u0072ole"` and `"role"`) count as duplicates.
+- Keys that look identical but are encoded differently in Unicode count as duplicates too, since Swift treats them as the same string.
+  For example, `é` can be written as one character (`"\u00e9"`) or as `e` followed by a combining accent (`"e\u0301"`).
+  OPA treats those as two distinct keys, so an object containing both keys would load successfully in OPA but is rejected here.
+- `json.unmarshal` and `json.is_valid` still parse with `JSONDecoder`, so top-level scalars and exact decimal numbers behave as before.
+- Manifest, plan, and capabilities files are checked after decoding, so malformed files still report a `DecodingError`. Manifest errors during bundle loading now include the manifest's location.
+- Input containing a NUL byte is now rejected with `RegoValue.JSONInputError.nulByte`. Only UTF-8 JSON is supported, as in OPA.
+
+The check adds about 0.6-0.9 ms per MB of JSON for `RegoValue(jsonData:)`, which is around 1-3% additional cost for typical structured data.
+Documents comprised of mostly long ASCII strings will see the largest relative costs (up to ~50%), since parsing those strings is very cheap.
+Manifest, plan, and capabilities files are parsed a second time for the member count check, which roughly doubles the time required to load a large IR plan.
+
+Authored by @philipaconrad
+
 ## 0.0.12
 
 This release introduces a new API for amortizing `PreparedQuery` creation costs, as well as two bugfixes that improve performance during policy loading.

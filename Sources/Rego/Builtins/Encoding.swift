@@ -153,7 +153,8 @@ extension BuiltinFuncs {
             return AST.RegoValue(booleanLiteral: false)
         }
 
-        let parsedOK = (try? JSONDecoder().decode(RegoValue.self, from: rawJSON.data(using: .utf8)!)) != nil
+        // Duplicate object keys are rejected, matching RegoValue(jsonData:).
+        let parsedOK = (try? AST.RegoValue.decodeRejectingDuplicateKeys(json: Data(rawJSON.utf8))) != nil
 
         // The result of the JSON parsing should be nil if parsing fails, or we got an empty input.
         return AST.RegoValue(booleanLiteral: parsedOK)
@@ -258,8 +259,8 @@ extension BuiltinFuncs {
             throw BuiltinError.argumentTypeMismatch(arg: "x", got: args[0].typeName, want: "string")
         }
 
-        // Returns the parsed RegoValue, or throws an error.
-        return try JSONDecoder().decode(RegoValue.self, from: rawJSON.data(using: .utf8)!)
+        // Returns the parsed RegoValue, or throws an error. Duplicate object keys are rejected, matching RegoValue(jsonData:).
+        return try AST.RegoValue.decodeRejectingDuplicateKeys(json: Data(rawJSON.utf8))
     }
 
     // MARK: - urlquery.encode

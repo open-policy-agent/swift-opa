@@ -32,7 +32,10 @@ extension OPA.Engine {
             )
         }
         do {
-            return try Self.capabilitiesDecoder.decode(Capabilities.self, from: data)
+            let capabilities = try Self.capabilitiesDecoder.decode(Capabilities.self, from: data)
+            // Reject duplicate keys. This runs after decoding, so malformed JSON reports a DecodingError.
+            try AST.RegoValue.checkForDuplicateKeys(json: data)
+            return capabilities
         } catch {
             throw RegoError(
                 code: .capabilitiesDecodeError,

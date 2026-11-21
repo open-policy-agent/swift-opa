@@ -43,8 +43,16 @@ Authored by @philipaconrad
 On Darwin, `.manifest`, `plan.json`, and capabilities files are now decoded by custom decoders that read the `JSONSerialization` result directly, instead of by `JSONDecoder`.
 They must produce the same results as the existing `Decodable` protocol implementations, which remain available.
 Other platforms keep decoding these files with `JSONDecoder`, since `JSONSerialization` from swift-corelibs-foundation is about 4x slower than Darwin's and uses about 20x more memory.
-For a 14 MB plan, loading on macOS is about 1.65x faster than in 0.0.12 and peaks at about 40% of the memory.
+For a 14 MB plan, loading on macOS is about 1.65x faster than in 0.0.12 and uses about 60% less peak memory.
 On Linux, the same plan loads within about 7% of 0.0.12's time, with the same peak memory.
+
+### Breaking Change: Reject JSON numbers outside the supported range
+
+Non-integer numbers too large or too small to convert to `Decimal`, such as `1e300` or `5e-324`, used to load as `NaN` in `input` and `data.json` documents.
+The NaNs would then compare equally to each other, which is definitely not what most policy authors would expect!
+The conversion fails for magnitudes beyond roughly 1e146, or closer to zero than 1e-109.
+These large/small values are now rejected with `RegoValue.JSONInputError.numberOutOfRange`, as `json.unmarshal` and `json.is_valid` already did.
+Out-of-range numbers in manifest `metadata` are rejected too (with `numberOutOfRange` on Darwin, and with a `DecodingError` on other platforms, where manifests are decoded with `JSONDecoder`).
 
 ## 0.0.12
 

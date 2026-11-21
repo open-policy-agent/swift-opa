@@ -22,6 +22,7 @@ extension RegoValue {
         case unsupportedArrayElement
         case unsupportedObjectElement
         case unsupportedType(Any.Type)
+        case numberOutOfRange
     }
     package enum RegoEncodingError: Error {
         case invalidUTF8

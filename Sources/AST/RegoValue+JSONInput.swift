@@ -7,6 +7,8 @@ extension RegoValue {
         case duplicateObjectKeys
         /// The input contained a NUL byte. Only UTF-8 JSON is supported, as in OPA.
         case nulByte
+        /// A number is too large or too small to convert to `Decimal`.
+        case numberOutOfRange
 
         public var description: String {
             switch self {
@@ -14,6 +16,8 @@ extension RegoValue {
                 return "JSON object contains duplicate keys"
             case .nulByte:
                 return "JSON input contains a NUL byte (only UTF-8 JSON is supported)"
+            case .numberOutOfRange:
+                return "JSON number is outside the supported range"
             }
         }
 

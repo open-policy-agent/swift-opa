@@ -241,6 +241,8 @@ import Foundation
         package static func regoValue(_ value: JSONValue) throws -> RegoValue {
             do {
                 return try RegoValue(from: value)
+            } catch .numberOutOfRange {
+                throw RegoValue.JSONInputError.numberOutOfRange
             } catch {
                 throw DecodingError.dataCorrupted(
                     .init(codingPath: [], debugDescription: "Unsupported JSON value.", underlyingError: error))

@@ -68,16 +68,6 @@ struct JSONDuplicateKeyLoadingTests {
         #expect(error.cause is DecodingError)
     }
 
-    // The CLI checks the object it already parsed, so this overload must catch duplicates on its own.
-    @Test
-    func checkGivenParsedObjectRejectsDuplicateKeys() throws {
-        let data = Data(#"{"builtins":[],"builtins":[]}"#.utf8)
-        let parsed = try JSONSerialization.jsonObject(with: data)
-        #expect(throws: RegoValue.JSONInputError.duplicateObjectKeys) {
-            try RegoValue.checkForDuplicateKeys(json: data, parsed: parsed)
-        }
-    }
-
     @Test
     func capabilitiesRejectDuplicateKeys() throws {
         let url = FileManager.default.temporaryDirectory

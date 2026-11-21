@@ -21,9 +21,10 @@
                 throw CapabilitiesError.capabilitiesFileNotFound(path: capabilitiesPath)
             }
 
-            let parsed = try JSONSerialization.jsonObject(with: capabilitiesData)
-            // Reject duplicate keys.
-            try AST.RegoValue.checkForDuplicateKeys(json: capabilitiesData, parsed: parsed)
+            // Parse, rejecting duplicate keys.
+            let parsed = try AST.RegoValue.parseRejectingDuplicateKeys(capabilitiesData) {
+                try JSONSerialization.jsonObject(with: capabilitiesData)
+            }
             guard let capabilitiesDict = parsed as? [String: Any] else {
                 throw CapabilitiesError.invalidCapabilitiesFormat
             }

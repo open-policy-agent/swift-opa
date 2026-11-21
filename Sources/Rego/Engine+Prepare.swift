@@ -4,9 +4,6 @@ import Foundation
 import IR
 
 extension OPA.Engine {
-    // The decoder used to decode the capabilities file
-    static let capabilitiesDecoder = JSONDecoder()
-
     /// Returns the capabilities described by `input`, reading and decoding a file if needed.
     static func resolveCapabilities(_ input: CapabilitiesInput?) throws -> Capabilities? {
         switch input {
@@ -32,10 +29,8 @@ extension OPA.Engine {
             )
         }
         do {
-            let capabilities = try Self.capabilitiesDecoder.decode(Capabilities.self, from: data)
-            // Reject duplicate keys. This runs after decoding, so malformed JSON reports a DecodingError.
-            try AST.RegoValue.checkForDuplicateKeys(json: data)
-            return capabilities
+            // Decode from a single JSONSerialization parse, rejecting duplicate keys.
+            return try Capabilities(jsonData: data)
         } catch {
             throw RegoError(
                 code: .capabilitiesDecodeError,

@@ -5,7 +5,7 @@ import Foundation
 // We're trying to avoid confusing NSNumber(0) from false and NSNumber(1) from true.
 private let boolLiteral = NSNumber(booleanLiteral: true)
 extension NSNumber {
-    fileprivate var isBool: Bool {
+    var isBool: Bool {
         return type(of: self) == type(of: boolLiteral)
     }
 }

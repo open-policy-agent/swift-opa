@@ -40,3 +40,26 @@ extension OPA.Manifest: Codable {
         }
     }
 }
+
+#if canImport(Darwin)
+    extension OPA.Manifest {
+        // Custom decoding from Darwin JSONSerialization output (see JSONObject). Must match init(from:).
+        init(json: JSONValue) throws {
+            let o = try JSONObject(json)
+            let revision = try o.stringIfPresent("revision") ?? ""
+            var roots = try o.arrayIfPresent("roots", JSONConvert.string) ?? [""]
+            if roots.isEmpty {
+                roots = [""]
+            }
+            let regoVersionInt: Int = try o.integerIfPresent("rego_version") ?? 1
+            guard let version = Version(rawValue: regoVersionInt) else {
+                throw DecodingError.dataCorrupted(
+                    .init(
+                        codingPath: [JSONKey("rego_version")],
+                        debugDescription: "Unsupported Rego version: \(regoVersionInt)"))
+            }
+            let metadata = try o.decodeIfPresent("metadata", JSONConvert.regoValue) ?? .null
+            self.init(revision: revision, roots: roots, regoVersion: version, metadata: metadata)
+        }
+    }
+#endif

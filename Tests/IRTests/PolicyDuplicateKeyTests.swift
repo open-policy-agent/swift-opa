@@ -4,6 +4,19 @@ import Testing
 
 @testable import IR
 
+// Plans decode through custom decoders on Darwin and JSONDecoder elsewhere. Both paths need to reject duplicate
+// keys, so we run each check through the platform's default path and through the JSONDecoder path.
+enum PolicyDecodePath: String, CaseIterable, Sendable {
+    case platformDefault, jsonDecoder
+
+    func decode(_ data: Data) throws -> Policy {
+        switch self {
+        case .platformDefault: return try Policy(jsonData: data)
+        case .jsonDecoder: return try RegoValue.decodeRejectingDuplicateKeys(Policy.self, json: data)
+        }
+    }
+}
+
 @Suite
 struct PolicyDuplicateKeyTests {
     // Reads an existing IR test fixture from Tests/IRTests/Fixtures (bundled as a test resource).
@@ -21,34 +34,34 @@ struct PolicyDuplicateKeyTests {
     // The unmodified fixture has no duplicate keys, so failures below come from the injected ones.
     @Test
     func fixturePassesDuplicateCheck() throws {
-        try RegoValue.checkForDuplicateKeys(json: Self.fixture("policy-happy-path.json"))
+        _ = try RegoValue(jsonData: Self.fixture("policy-happy-path.json"))
     }
 
-    @Test(arguments: [#""funcs":{"funcs":[]}"#, #""plans":{"plans":[]}"#])
-    func rejectsDuplicateTopLevelKey(member: String) throws {
+    @Test(arguments: [#""funcs":{"funcs":[]}"#, #""plans":{"plans":[]}"#], PolicyDecodePath.allCases)
+    func rejectsDuplicateTopLevelKey(member: String, decodePath: PolicyDecodePath) throws {
         let data = try Self.injectingTopLevelMember(member, into: Self.fixture("policy-happy-path.json"))
         #expect(throws: RegoValue.JSONInputError.duplicateObjectKeys) {
-            try Policy(jsonData: data)
+            try decodePath.decode(data)
         }
     }
 
-    // Malformed JSON still reports JSONDecoder's error, since decoding runs before the duplicate check.
-    @Test
-    func malformedPlanKeepsDecodingError() throws {
+    // Malformed JSON still reports a DecodingError, since duplicates are reported only after parsing succeeds.
+    @Test(arguments: PolicyDecodePath.allCases)
+    func malformedPlanKeepsDecodingError(decodePath: PolicyDecodePath) throws {
         let text = String(decoding: try Self.fixture("policy-happy-path.json"), as: UTF8.self)
         #expect(throws: DecodingError.self) {
-            try Policy(jsonData: Data(text.dropLast(2).utf8))
+            try decodePath.decode(Data(text.dropLast(2).utf8))
         }
     }
 
-    @Test
-    func rejectsNestedDuplicateKey() throws {
+    @Test(arguments: PolicyDecodePath.allCases)
+    func rejectsNestedDuplicateKey(decodePath: PolicyDecodePath) throws {
         let text = String(decoding: try Self.fixture("policy-happy-path.json"), as: UTF8.self)
         // Duplicate the first statement's "row" field.
         let row = try #require(text.range(of: #""row": "#))
         let data = Data((String(text[..<row.lowerBound]) + #""row": 1, "# + String(text[row.lowerBound...])).utf8)
         #expect(throws: RegoValue.JSONInputError.duplicateObjectKeys) {
-            try Policy(jsonData: data)
+            try decodePath.decode(data)
         }
     }
 }

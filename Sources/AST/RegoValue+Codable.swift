@@ -13,19 +13,13 @@ extension NSNumber {
 extension RegoValue: Codable {
     // Constructor for use with JSONSerialization
     package init(from: Any) throws(ValueError) {
-        var objectMembers = 0
-        try self.init(from: from, objectMembers: &objectMembers)
-    }
-
-    // objectMembers accumulates the number of members in every object we build, for duplicate key detection.
-    private init(from: Any, objectMembers: inout Int) throws(ValueError) {
         switch from {
         case let v as String:
             // Normalize to contiguous UTF-8 for faster comparisons
             self = .string(String(decoding: v.utf8, as: UTF8.self))
         case let v as [Any]:
             do {
-                let values: [RegoValue] = try v.map { try RegoValue(from: $0, objectMembers: &objectMembers) }
+                let values: [RegoValue] = try v.map { try RegoValue(from: $0) }
                 self = .array(values)
             } catch {
                 // TODO wrap the inital error. Need to assert it backto RegoError
@@ -37,11 +31,8 @@ extension RegoValue: Codable {
                 values.reserveCapacity(v.count)
                 for (key, value) in v {
                     // Normalize to contiguous UTF-8 for faster comparisons.
-                    values[.string(String(decoding: key.utf8, as: UTF8.self))] = try RegoValue(
-                        from: value, objectMembers: &objectMembers)
+                    values[.string(String(decoding: key.utf8, as: UTF8.self))] = try RegoValue(from: value)
                 }
-                // Count after insertion, so keys that collapse in the dictionary are detected.
-                objectMembers += values.count
                 self = .object(values)
             } catch {
                 // TODO wrap the inital error. Need to assert it back to RegoError
@@ -61,15 +52,11 @@ extension RegoValue: Codable {
     }
 
     // Initialize a RegoValue from raw JSON-encoded data, rejecting objects with duplicate keys.
-    // JSONSerialization resolves duplicates differently by platform, so they are detected by comparing member counts.
+    // JSONSerialization resolves duplicates differently by platform, so they are found by scanning the raw bytes.
     public init(jsonData rawJson: Data) throws {
-        guard let expectedMembers = jsonObjectMemberCount(rawJson) else {
-            throw JSONInputError.nulByte
+        self = try Self.parseRejectingDuplicateKeys(rawJson) {
+            try RegoValue(from: JSONSerialization.jsonObject(with: rawJson, options: []))
         }
-        let d = try JSONSerialization.jsonObject(with: rawJson, options: [])
-        var objectMembers = 0
-        try self.init(from: d, objectMembers: &objectMembers)
-        try Self.checkObjectMembers(scanned: expectedMembers, parsed: objectMembers)
     }
 
     // Decodable initializer

@@ -167,30 +167,9 @@ struct RegoValueJSONDuplicateKeyTests {
             try parser.parse(nulCase.1)
         }
     }
-
-    @Test(arguments: [
-        ("{}", 0),
-        (#"{"a":1}"#, 1),
-        (#"{"a":{"b":1,"c":2}}"#, 3),
-        (#"[{"a":1},{"a":2}]"#, 2),
-        (#"{"a:b":"c:d"}"#, 1),
-        (#"{"x\":y":1}"#, 1),
-        (#"{"a\\":1,"b":2}"#, 2),
-        (#"["::",":"]"#, 0),
-    ])
-    func memberCount(json: String, expected: Int) {
-        #expect(jsonObjectMemberCount(Data(json.utf8)) == expected)
-    }
-
-    @Test
-    func memberCountOfDataSlice() {
-        // Data slices have a non-zero startIndex.
-        let data = Data(#"xx{"a":1}xx"#.utf8)
-        #expect(jsonObjectMemberCount(data[2..<9]) == 1)
-    }
 }
 
-// Canaries for the parser strictness the byte scanner relies on. A failure means the duplicate key check is unsound on that platform.
+// Canaries for the parser strictness the duplicate key scanner relies on. A failure means the check is unsound on that platform.
 @Suite
 struct JSONParserCanaryTests {
     static let rejected: [(String, [UInt8])] = [
@@ -349,5 +328,16 @@ struct RegoValueJSONDuplicateKeyGeneratedTests {
         }
         // Both outcomes must be well represented for the test to mean anything.
         #expect(rejected > 200 && rejected < 1_800, "rejected \(rejected) of 2000")
+    }
+
+    // The scanner alone must find every duplicate, since decoders skip members they don't know.
+    @Test(arguments: [1, 2, 3, 4])
+    func generatedDocumentsScanner(seed: UInt64) {
+        var rng = RNG(state: seed)
+        for i in 0..<2_000 {
+            let (json, _, hasDuplicates) = Self.generate(depth: 4, topLevel: true, &rng)
+            let expected: JSONKeyScan = hasDuplicates ? .duplicate : .unique
+            #expect(scanJSONObjectKeys(Data(json.utf8)) == expected, "seed \(seed) doc \(i): \(json)")
+        }
     }
 }

@@ -19,8 +19,8 @@ Some documents that OPA accepts are now rejected, including bundle `data.json` f
 
 `JSONSerialization` resolved duplicates differently by platform (the last copy wins on Linux, the first copy wins on Darwin), so a document like `{"role": "guest", "role": "admin"}` could read differently in a policy than in another parser handling the same bytes, allowing parser differential attacks.
 
-Swift OPA now detects duplicates by counting the object members in the raw JSON (the `:` characters outside of strings) and comparing that with the number of members after parsing.
-Fewer members after parsing means keys collapsed together, and the document is rejected with `RegoValue.JSONInputError.duplicateObjectKeys`.
+Swift OPA now detects duplicates by scanning the raw JSON: each object's keys are decoded and compared as Swift strings, without building a value tree.
+A document with a repeated key is rejected with `RegoValue.JSONInputError.duplicateObjectKeys`.
 
 Details:
 
@@ -32,9 +32,9 @@ Details:
 - Manifest, plan, and capabilities files are checked after decoding, so malformed files still report a `DecodingError`. Manifest errors during bundle loading now include the manifest's location.
 - Input containing a NUL byte is now rejected with `RegoValue.JSONInputError.nulByte`. Only UTF-8 JSON is supported, as in OPA.
 
-The check adds about 0.6-0.9 ms per MB of JSON for `RegoValue(jsonData:)`, which is around 1-3% additional cost for typical structured data.
-Documents comprised of mostly long ASCII strings will see the largest relative costs (up to ~50%), since parsing those strings is very cheap.
-Manifest, plan, and capabilities files are parsed a second time for the member count check, which roughly doubles the time required to load a large IR plan.
+The scan adds about 1.5-3% to `RegoValue(jsonData:)` for typical structured data.
+Documents comprised of mostly long ASCII strings will see the largest relative costs (about 25%), since parsing those strings is very cheap.
+Manifest, plan, and capabilities files are also scanned during construction, which adds about 7% to the time required to load a large IR plan.
 
 Authored by @philipaconrad
 

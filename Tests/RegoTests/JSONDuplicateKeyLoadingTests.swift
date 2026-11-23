@@ -4,17 +4,31 @@ import Testing
 
 @testable import Rego
 
+// Manifests decode through custom decoders on Darwin and JSONDecoder elsewhere. Both paths need to reject duplicate
+// keys, so we run each check through both.
+enum ManifestDecodePath: String, CaseIterable, Sendable {
+    case platformDefault, jsonDecoder
+
+    func decode(_ data: Data) throws -> OPA.Manifest {
+        switch self {
+        case .platformDefault: return try OPA.Manifest(from: data)
+        case .jsonDecoder: return try RegoValue.decodeRejectingDuplicateKeys(OPA.Manifest.self, json: data)
+        }
+    }
+}
+
 // Duplicate keys are rejected in every JSON file Swift OPA decodes into typed structs.
 @Suite
 struct JSONDuplicateKeyLoadingTests {
-    @Test(arguments: [
-        #"{"roots":["x"],"roots":[""]}"#,
-        #"{"revision":"a","revision":"b"}"#,
-        #"{"metadata":{"name":"a","name":"b"}}"#,
-    ])
-    func manifestRejectsDuplicateKeys(json: String) {
+    @Test(
+        arguments: [
+            #"{"roots":["x"],"roots":[""]}"#,
+            #"{"revision":"a","revision":"b"}"#,
+            #"{"metadata":{"name":"a","name":"b"}}"#,
+        ], ManifestDecodePath.allCases)
+    func manifestRejectsDuplicateKeys(json: String, decodePath: ManifestDecodePath) {
         #expect(throws: RegoValue.JSONInputError.duplicateObjectKeys) {
-            try OPA.Manifest(from: Data(json.utf8))
+            try decodePath.decode(Data(json.utf8))
         }
     }
 
@@ -46,11 +60,11 @@ struct JSONDuplicateKeyLoadingTests {
         #expect(cause as? RegoValue.JSONInputError == .duplicateObjectKeys)
     }
 
-    // Malformed JSON still reports JSONDecoder's error, since decoding runs before the duplicate check.
-    @Test
-    func malformedManifestKeepsDecodingError() {
+    // Malformed JSON still reports a DecodingError, since duplicates are reported only after parsing succeeds.
+    @Test(arguments: ManifestDecodePath.allCases)
+    func malformedManifestKeepsDecodingError(decodePath: ManifestDecodePath) {
         #expect(throws: DecodingError.self) {
-            try OPA.Manifest(from: Data(#"{"roots":["x"],"#.utf8))
+            try decodePath.decode(Data(#"{"roots":["x"],"#.utf8))
         }
     }
 

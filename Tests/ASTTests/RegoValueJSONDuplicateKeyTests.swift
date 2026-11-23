@@ -202,10 +202,13 @@ struct JSONParserCanaryTests {
     }
 }
 
-// The checked entry points: JSONSerialization-based, JSONDecoder-based (json.unmarshal, json.is_valid),
-// and the standalone check used before decoding manifests, plans, and capabilities.
+// The checked entry points: JSONSerialization-based (`input` and `data.json`), JSONDecoder-based (json.unmarshal,
+// json.is_valid, and typed files outside Darwin), and JSONObject (typed files on Darwin).
 enum CheckedParser: String, CaseIterable, Sendable {
-    case jsonSerialization, jsonDecoder, checkThenDecode
+    case jsonSerialization, jsonDecoder
+    #if canImport(Darwin)
+        case jsonObject
+    #endif
 
     func parse(_ data: Data) throws -> RegoValue {
         switch self {
@@ -213,9 +216,10 @@ enum CheckedParser: String, CaseIterable, Sendable {
             return try RegoValue(jsonData: data)
         case .jsonDecoder:
             return try RegoValue.decodeRejectingDuplicateKeys(json: data)
-        case .checkThenDecode:
-            try RegoValue.checkForDuplicateKeys(json: data)
-            return try JSONDecoder().decode(RegoValue.self, from: data)
+        #if canImport(Darwin)
+            case .jsonObject:
+                return try JSONConvert.regoValue(JSONObject.parse(data))
+        #endif
         }
     }
 }

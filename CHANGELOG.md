@@ -38,6 +38,14 @@ Manifest, plan, and capabilities files are also scanned during construction, whi
 
 Authored by @philipaconrad
 
+### Decode manifest, plan, and capabilities files directly from JSONSerialization on Darwin
+
+On Darwin, `.manifest`, `plan.json`, and capabilities files are now decoded by custom decoders that read the `JSONSerialization` result directly, instead of by `JSONDecoder`.
+They must produce the same results as the existing `Decodable` protocol implementations, which remain available.
+Other platforms keep decoding these files with `JSONDecoder`, since `JSONSerialization` from swift-corelibs-foundation is about 4x slower than Darwin's and uses about 20x more memory.
+For a 14 MB plan, loading on macOS is about 1.65x faster than in 0.0.12 and peaks at about 40% of the memory.
+On Linux, the same plan loads within about 7% of 0.0.12's time, with the same peak memory.
+
 ## 0.0.12
 
 This release introduces a new API for amortizing `PreparedQuery` creation costs, as well as two bugfixes that improve performance during policy loading.

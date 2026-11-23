@@ -8,9 +8,12 @@ import Foundation
 
 extension Policy {
     public init(jsonData rawJson: Data) throws {
-        self = try JSONDecoder().decode(Self.self, from: rawJson)
-        // Reject duplicate keys. This runs after decoding, so malformed JSON reports a DecodingError.
-        try RegoValue.checkForDuplicateKeys(json: rawJson)
+        // Split implementation by platform for performance reasons.
+        #if canImport(Darwin)
+            self = try Policy(json: JSONObject.parse(rawJson))
+        #else
+            self = try RegoValue.decodeRejectingDuplicateKeys(Policy.self, json: rawJson)
+        #endif
 
         try self.prepareForExecution()
     }
@@ -56,5 +59,17 @@ extension Policy {
         }
 
         self.staticStringNumbers = Array(indices).sorted()
+    }
+}
+
+extension Capabilities {
+    /// Decodes capabilities from a single parse, rejecting duplicate keys.
+    package init(jsonData: Data) throws {
+        // Split implementation by platform for performance reasons.
+        #if canImport(Darwin)
+            self = try Capabilities(json: JSONObject.parse(jsonData))
+        #else
+            self = try RegoValue.decodeRejectingDuplicateKeys(Capabilities.self, json: jsonData)
+        #endif
     }
 }

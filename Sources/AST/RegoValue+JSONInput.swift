@@ -37,15 +37,11 @@ extension RegoValue {
     /// Decodes JSON with JSONDecoder, rejecting duplicate object keys the same way as `init(jsonData:)`.
     /// Unlike `init(jsonData:)`, top-level scalars are accepted and numbers are parsed as exact decimals.
     package static func decodeRejectingDuplicateKeys(json data: Data) throws -> RegoValue {
-        try parseRejectingDuplicateKeys(data) { try JSONDecoder().decode(RegoValue.self, from: data) }
+        try decodeRejectingDuplicateKeys(RegoValue.self, json: data)
     }
 
-    /// Throws if raw JSON has a NUL byte or duplicate object keys, for callers that decode it some other way.
-    package static func checkForDuplicateKeys(json data: Data) throws {
-        switch scanJSONObjectKeys(data) {
-        case .unique: return
-        case .duplicate: throw JSONInputError.duplicateObjectKeys
-        case .nulByte: throw JSONInputError.nulByte
-        }
+    /// Decodes `type` with JSONDecoder, rejecting NUL bytes and duplicate object keys.
+    package static func decodeRejectingDuplicateKeys<T: Decodable>(_ type: T.Type, json data: Data) throws -> T {
+        try parseRejectingDuplicateKeys(data) { try JSONDecoder().decode(T.self, from: data) }
     }
 }

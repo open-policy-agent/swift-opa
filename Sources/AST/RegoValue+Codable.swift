@@ -21,6 +21,8 @@ extension RegoValue: Codable {
             do {
                 let values: [RegoValue] = try v.map { try RegoValue(from: $0) }
                 self = .array(values)
+            } catch ValueError.numberOutOfRange {
+                throw .numberOutOfRange
             } catch {
                 // TODO wrap the inital error. Need to assert it backto RegoError
                 throw .unsupportedArrayElement
@@ -34,6 +36,8 @@ extension RegoValue: Codable {
                     values[.string(String(decoding: key.utf8, as: UTF8.self))] = try RegoValue(from: value)
                 }
                 self = .object(values)
+            } catch ValueError.numberOutOfRange {
+                throw .numberOutOfRange
             } catch {
                 // TODO wrap the inital error. Need to assert it back to RegoError
                 throw .unsupportedObjectElement
@@ -42,7 +46,12 @@ extension RegoValue: Codable {
             if v.isBool {
                 self = .boolean(v.boolValue)
             } else {
-                self = .number(RegoNumber(nsNumber: v))
+                let n = RegoNumber(nsNumber: v)
+                // Doubles too large or too small to convert to Decimal become NaN, which would equal any other NaN.
+                if n.isFloatType, n.decimalValue.isNaN {
+                    throw .numberOutOfRange
+                }
+                self = .number(n)
             }
         case _ as NSNull:
             self = .null
@@ -55,7 +64,12 @@ extension RegoValue: Codable {
     // JSONSerialization resolves duplicates differently by platform, so they are found by scanning the raw bytes.
     public init(jsonData rawJson: Data) throws {
         self = try Self.parseRejectingDuplicateKeys(rawJson) {
-            try RegoValue(from: JSONSerialization.jsonObject(with: rawJson, options: []))
+            let d = try JSONSerialization.jsonObject(with: rawJson, options: [])
+            do {
+                return try RegoValue(from: d)
+            } catch ValueError.numberOutOfRange {
+                throw JSONInputError.numberOutOfRange
+            }
         }
     }
 

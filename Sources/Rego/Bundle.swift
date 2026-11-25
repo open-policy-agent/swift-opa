@@ -10,20 +10,39 @@ extension OPA {
         public var planFiles: [BundleFile]
         public var regoFiles: [BundleFile]
         public var data: AST.RegoValue
+        public var signatures: BundleSignaturesConfig?
+        public var raw: [BundleFile]?
 
         public init(
             manifest: OPA.Manifest = OPA.Manifest(), planFiles: [BundleFile] = [], regoFiles: [BundleFile] = [],
-            data: AST.RegoValue = .object([:])
+            data: AST.RegoValue = .object([:]), signatures: BundleSignaturesConfig? = nil, raw: [BundleFile]? = nil
         ) throws(BundleError) {
             self.manifest = manifest
             self.planFiles = planFiles
             self.regoFiles = regoFiles
             self.data = data
+            self.signatures = signatures
+            self.raw = raw
 
             guard !manifest.roots.isEmpty else {
                 // Expect [""], not [] when roots were undefined.
                 throw .internalError("no roots in manifest")
             }
+        }
+
+        /// We override the compiler-synthesized equality operator so
+        /// that we don't compare on fields we dont care about.
+        public static func == (l: Bundle, r: Bundle) -> Bool {
+            l.manifest == r.manifest && l.planFiles == r.planFiles && l.regoFiles == r.regoFiles && l.data == r.data
+        }
+
+        /// We override the compiler-synthesized hasher so that we don't
+        /// hash in files outside of the set we care about.
+        public func hash(into h: inout Hasher) {
+            h.combine(manifest)
+            h.combine(planFiles)
+            h.combine(regoFiles)
+            h.combine(data)
         }
 
         /// ``validate`` runs integrity checks on the bundle, such as
@@ -32,6 +51,14 @@ extension OPA {
         /// init time.
         public func validate() throws(BundleError) {
             try OPA.Bundle.checkDataCoveredByRoots(data: self.data, roots: self.manifest.roots)
+        }
+
+        /// Copy with `raw` cleared for memory-sensitive, eval-only use. Keeps
+        /// `signatures` (tiny, useful for introspection). Result is == to the receiver.
+        public func strippingRawFiles() -> OPA.Bundle {
+            var b = self
+            b.raw = nil
+            return b
         }
     }
 
@@ -65,6 +92,23 @@ extension OPA {
 }
 
 extension OPA.Bundle {
+    /// Parsed contents of a bundle's `.signatures.json` file. Will be `nil`
+    /// when the bundle has no signatures file.
+    public struct BundleSignaturesConfig: Sendable, Hashable, Codable {
+        public var signatures: [String]  // compact JWS strings (usually exactly one)
+        public var customPlugin: String?  // custom-signing plugin key, if any
+        public init(signatures: [String] = [], customPlugin: String? = nil) {
+            self.signatures = signatures
+            self.customPlugin = customPlugin
+        }
+
+        /// Match OPA's `.signatures.json` field names.
+        enum CodingKeys: String, CodingKey {
+            case signatures = "signatures"
+            case customPlugin = "plugin"
+        }
+    }
+
     public enum BundleError: Swift.Error {
         case overlappingRoots(String)
         case dataEscapedRoots(String)

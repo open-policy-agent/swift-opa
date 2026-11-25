@@ -74,4 +74,27 @@ extension Decimal {
         guard self >= Self.int64Min && self <= Self.int64Max else { return nil }
         return Int64(truncating: self as NSNumber)
     }
+
+    /// Whether this Decimal represents a whole number (no fractional part), regardless of
+    /// magnitude. Unlike ``safeInt64Value`` this does not require the value to fit in `Int64`,
+    /// so very large integers such as `99999999999999999999` still report `true`.
+    public var isWholeNumber: Bool {
+        guard !self.isNaN && self.isFinite else { return false }
+
+        // exponent >= 0 means the value is already a whole number (significand * 10^exp).
+        guard exponent < 0 else { return true }
+
+        #if canImport(ObjectiveC)
+            // Compaction strips trailing zeros from the significand. If the exponent is still
+            // negative afterwards, the value is fractional.
+            var copy = self
+            NSDecimalCompact(&copy)
+            return copy.exponent >= 0
+        #else
+            var rounded = Decimal()
+            var copy = self
+            NSDecimalRound(&rounded, &copy, 0, .plain)
+            return rounded == self
+        #endif
+    }
 }

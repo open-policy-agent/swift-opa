@@ -41,24 +41,39 @@ extension BuiltinFuncs {
 
         var step: Int64 = 1
         if withStep {
-            guard case .number(_) = args[2] else {
+            guard case .number(let stepNum) = args[2] else {
                 throw BuiltinError.argumentTypeMismatch(arg: "step", got: args[2].typeName, want: "number")
             }
-            // NOTE that we are okay with this argument being a float with integer value
+            // We are okay with this argument being a float with integer value, e.g.
             // numbers.range_step(1.0, 3.0, 1.0) works just fine
-            guard let stepValue = args[2].integerValue else {
+            //
+            // Validate number is a positive whole number directly (not via int64Value), so that
+            // a whole-number step too large for Int64 is still accepted rather than being
+            // mistaken for a fractional value.
+            guard stepNum.isInteger else {
                 throw BuiltinError.evalError(msg: "step must be integer number but got floating-point number")
             }
 
-            guard stepValue > 0 else {
+            guard stepNum.isPositive else {
                 throw BuiltinError.evalError(msg: "step must be a positive integer")
+            }
+
+            guard let stepValue = stepNum.int64Value else {
+                // The step is a positive integer too large for an Int64. The span between two
+                // Int64 endpoints is below 2*Int64.max, so at most only a few elements fall in
+                // the range. A step just above Int64.max can still be smaller than that span,
+                // so we use a Decimal for the step size.
+                return rangeWithDecimalStep(intA: intA, intB: intB, step: stepNum.decimalValue)
             }
 
             step = stepValue
         }
 
-        var result: [RegoValue] = []
+        return rangeWithInt64Step(intA: intA, intB: intB, step: step)
+    }
 
+    private static func rangeWithInt64Step(intA: Int64, intB: Int64, step: Int64) -> RegoValue {
+        var result: [RegoValue] = []
         if intB > intA {
             result.reserveCapacity(Int((intB - intA) / step) + 1)
 
@@ -76,7 +91,31 @@ extension BuiltinFuncs {
                 current -= step
             }
         }
+        return .array(result)
+    }
 
+    /// Handle `numbers.range_step` when the step is a positive whole number too large for Int64.
+    /// The endpoints still fit in Int64, so the span `|b - a|` is below 2·Int64.max and the
+    /// result holds at most a handful of elements. We iterate in Decimal space (arbitrary
+    /// precision) to avoid Int64 overflow while remaining correct for steps that are only
+    /// slightly larger than Int64.max.
+    private static func rangeWithDecimalStep(intA: Int64, intB: Int64, step: Decimal) -> RegoValue {
+        let a = Decimal(intA)
+        let b = Decimal(intB)
+
+        var result: [RegoValue] = []
+        var current = a
+        if b >= a {
+            while current <= b {
+                result.append(.number(RegoNumber(current)))
+                current += step
+            }
+        } else {
+            while current >= b {
+                result.append(.number(RegoNumber(current)))
+                current -= step
+            }
+        }
         return .array(result)
     }
 
